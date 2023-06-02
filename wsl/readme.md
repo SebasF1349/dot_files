@@ -17,3 +17,9 @@
 ## Neofetch
 
 [https://github.com/dylanaraps/neofetch](https://github.com/dylanaraps/neofetch)
+
+## GitHub CLI
+
+[https://github.com/cli/cli/blob/trunk/docs/install_linux.md](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
+
+auth: [https://docs.github.com/en/github-cli/github-cli/quickstart](https://docs.github.com/en/github-cli/github-cli/quickstart)
