@@ -124,4 +124,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 . "$HOME/.cargo/env"
 
+# ctrl + arrows to move in history with the same first letters
+bind '"\e[1;5A": history-search-backward'
+bind '"\e[1;5B": history-search-forward'
+
+# trick: use `cat > /dev/null` to see the input of your keys
+
 eval "$(starship init bash)"
