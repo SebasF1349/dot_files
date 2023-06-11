@@ -2,3 +2,13 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = false
+
+[git_metrics]
+disabled = false
+
+[git_status]
+disabled = false
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+windows_starship = 'C:/Program Files/starship/bin/starship.exe'
