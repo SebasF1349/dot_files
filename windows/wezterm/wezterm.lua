@@ -37,7 +37,7 @@ config.window_padding = {
 
 config.window_background_opacity = 0.9
 
-config.font = wezterm.font('JetBrains Mono', { weight = 'Bold' })
+config.font = wezterm.font('JetBrains Mono NL', { weight = 'Bold' })
 
 config.window_close_confirmation = 'NeverPrompt'
 
