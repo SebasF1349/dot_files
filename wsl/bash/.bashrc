@@ -132,6 +132,8 @@ bind '"\e[1;5B": history-search-forward'
 alias exa='exa -lah'
 alias exat="exa --tree --level=2"
 
+alias uu="sudo apt update && sudo apt upgrade"
+
 ##fzf
 # Use ~~ as the trigger sequence instead of the default **
 export FZF_COMPLETION_TRIGGER='ºº'
