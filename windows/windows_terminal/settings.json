@@ -1,15 +1,13 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
-    [
+    "actions": [
         {
             "command": "paste",
             "keys": "ctrl+v"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "copy",
                 "singleLine": false
             },
@@ -28,8 +26,7 @@
             "keys": "ctrl+shift+t"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "splitPane",
                 "split": "auto",
                 "splitMode": "duplicate"
@@ -45,8 +42,7 @@
             "keys": "f9"
         },
         {
-            "command": 
-            {
+            "command": {
                 "action": "newTab"
             },
             "keys": "ctrl+t"
@@ -56,26 +52,22 @@
     "confirmCloseAllTabs": false,
     "copyOnSelect": true,
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-    "newTabMenu": 
-    [
+    "newTabMenu": [
         {
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
-    {
-        "defaults": 
-        {
+    "profiles": {
+        "defaults": {
+            "bellStyle": "none",
             "colorScheme": "GitHub Dark",
             "elevate": false,
-            "font": 
-            {
+            "font": {
                 "face": "JetBrainsMono Nerd Font"
             },
             "opacity": 85
         },
-        "list": 
-        [
+        "list": [
             {
                 "colorScheme": "GitHub Dark",
                 "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
@@ -135,8 +127,7 @@
             }
         ]
     },
-    "schemes": 
-    [
+    "schemes": [
         {
             "background": "#0C0C0C",
             "black": "#0C0C0C",
@@ -369,46 +360,39 @@
         }
     ],
     "startupActions": "new-tab -p \"PowerShell\" -d \"D:\\Trabajos\\Proyectos - Dev\" --title \"Proyectos\"; new-tab -p \"Ubuntu\" -d \"\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos\"; focus-tab -t 0",
-    "themes": 
-    [
+    "themes": [
         {
             "name": "legacyDark",
-            "tab": 
-            {
+            "tab": {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": 
-            {
+            "window": {
                 "applicationTheme": "dark",
                 "useMica": false
             }
         },
         {
             "name": "legacyLight",
-            "tab": 
-            {
+            "tab": {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": 
-            {
+            "window": {
                 "applicationTheme": "light",
                 "useMica": false
             }
         },
         {
             "name": "legacySystem",
-            "tab": 
-            {
+            "tab": {
                 "background": null,
                 "showCloseButton": "always",
                 "unfocusedBackground": null
             },
-            "window": 
-            {
+            "window": {
                 "applicationTheme": "system",
                 "useMica": false
             }
