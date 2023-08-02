@@ -10,23 +10,24 @@
         "editor.formatOnSave": true
     },
     "breadcrumbs.enabled": false,
-    "debug.console.fontFamily": "'JetBrains Mono'",
+    "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
     "editor.acceptSuggestionOnEnter": "off",
     "editor.bracketPairColorization.enabled": true,
     "editor.codeActionsOnSave": {
         "source.fixAll": true,
-        "source.sortImports": false
+        "source.sortImports": true,
+        "source.organizeImports": true
     },
-    "editor.codeLensFontFamily": "'JetBrains Mono'",
+    "editor.codeLensFontFamily": "'JetBrainsMono Nerd Font'",
     "editor.cursorBlinking": "phase",
     "editor.cursorSmoothCaretAnimation": "on",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.fontFamily": "'JetBrains Mono'",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font'",
     "editor.fontLigatures": true,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.guides.bracketPairs": true,
-    "editor.inlayHints.fontFamily": "'JetBrains Mono'",
+    "editor.inlayHints.fontFamily": "'JetBrainsMono Nerd Font'",
     "editor.linkedEditing": true,
     "editor.minimap.enabled": false,
     "editor.overviewRulerBorder": false,
@@ -37,10 +38,11 @@
     "editor.stickyScroll.enabled": true,
     "editor.suggest.showStatusBar": true,
     "editor.tabCompletion": "on",
-    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrap": "bounded",
     "editor.wordWrapColumn": 100,
-    "errorLens.fontFamily": "'JetBrains Mono'",
+    "errorLens.fontFamily": "'JetBrainsMono Nerd Font'",
     "eslint.run": "onSave",
+    "eslint.validate": ["javascript", "svelte"],
     "explorer.confirmDelete": false,
     "files.associations": {
         "header.ejs": "ejs"
@@ -56,17 +58,18 @@
     "html.format.wrapLineLength": 0,
     "javascript.updateImportsOnFileMove.enabled": "always",
     "lldb.suppressUpdateNotifications": true,
-    "notebook.output.fontFamily": "'JetBrains Mono'",
+    "notebook.output.fontFamily": "'JetBrainsMono Nerd Font'",
+    "prettier.documentSelectors": ["**/*.svelte"],
     "prettier.printWidth": 100,
     "prettier.tabWidth": 4,
     "prettier.useTabs": false,
-    "scm.inputFontFamily": "'JetBrains Mono'",
+    "scm.inputFontFamily": "'JetBrainsMono Nerd Font'",
     "search.seedOnFocus": true,
     "search.seedWithNearestWord": true,
     "security.workspace.trust.untrustedFiles": "open",
     "svelte.enable-ts-plugin": true,
     "telemetry.telemetryLevel": "off",
-    "terminal.integrated.fontFamily": "'JetBrains Mono'",
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
     "todohighlight.exclude": [
         "**/node_modules/**",
         "**/bower_components/**",
@@ -128,5 +131,6 @@
     "workbench.sideBar.location": "right",
     "workbench.statusBar.visible": false,
     "workbench.tree.indent": 16,
-    "workbench.tree.renderIndentGuides": "none"
+    "workbench.tree.renderIndentGuides": "none",
+    "security.allowedUNCHosts": ["wsl.localhost"]
 }
