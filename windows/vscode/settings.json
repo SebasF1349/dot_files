@@ -22,6 +22,7 @@
     "editor.cursorBlinking": "phase",
     "editor.cursorSmoothCaretAnimation": "on",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.find.addExtraSpaceOnTop": false,
     "editor.fontFamily": "'JetBrainsMono Nerd Font'",
     "editor.fontLigatures": true,
     "editor.formatOnPaste": true,
@@ -30,6 +31,7 @@
     "editor.inlayHints.fontFamily": "'JetBrainsMono Nerd Font'",
     "editor.linkedEditing": true,
     "editor.minimap.enabled": false,
+    "editor.multiCursorModifier": "ctrlCmd",
     "editor.overviewRulerBorder": false,
     "editor.renderLineHighlight": "none",
     "editor.scrollbar.horizontal": "hidden",
@@ -41,8 +43,13 @@
     "editor.wordWrap": "bounded",
     "editor.wordWrapColumn": 100,
     "errorLens.fontFamily": "'JetBrainsMono Nerd Font'",
+    "eslint.codeAction.showDocumentation": {
+        "enable": true
+    },
     "eslint.run": "onSave",
-    "eslint.validate": ["javascript", "svelte"],
+    "eslint.validate": ["javascript", "typescript", "svelte", "html", "markdown", "json"],
+    "extensions.autoUpdate": "onlyEnabledExtensions",
+    "extensions.ignoreRecommendations": true,
     "explorer.confirmDelete": false,
     "files.associations": {
         "header.ejs": "ejs"
@@ -117,9 +124,11 @@
     "todohighlight.toggleURI": false,
     "typescript.updateImportsOnFileMove.enabled": "always",
     "window.menuBarVisibility": "toggle",
+    "window.restoreWindows": "none",
     "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
     "workbench.activityBar.visible": false,
     "workbench.colorTheme": "GitHub Dark Default",
+    "workbench.editor.closeOnFileDelete": true,
     "workbench.editor.enablePreview": false,
     "workbench.editor.labelFormat": "short",
     "workbench.editor.limit.enabled": true,
