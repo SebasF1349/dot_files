@@ -10,10 +10,10 @@ if wezterm.config_builder then
   config = wezterm.config_builder()
 end
 
-wezterm.on('gui-startup', function(cmd)
-  local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
-  window:gui_window():maximize()
-end)
+--wezterm.on('gui-startup', function(cmd)
+--  local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+--window:gui_window():maximize()
+--end)
 
 -- This is where you actually apply your config choices
 
@@ -37,11 +37,11 @@ config.window_padding = {
 
 config.window_background_opacity = 0.9
 
-config.font = wezterm.font('JetBrains Mono NL', { weight = 'Bold' })
+config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = 'Bold' })
 
 config.window_close_confirmation = 'NeverPrompt'
 
-config.window_decorations = "RESIZE"
+--config.window_decorations = "RESIZE"
 
 --[[ wezterm.on("update-right-status", function(window, pane)
   -- Each element holds the text for a cell in a "powerline" style << fade
