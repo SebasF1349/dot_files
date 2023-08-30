@@ -29,15 +29,17 @@ config.inactive_pane_hsb = {
   brightness = 0.7,
 }
 config.window_padding = {
-  left = '4cell',
-  right = '4cell',
-  top = '1cell',
-  bottom = '1cell',
+  left = 0,
+  right = 0,
+  top = 0,
+  bottom = 0,
 }
+
+config.enable_scroll_bar = false
 
 config.window_background_opacity = 0.9
 
-config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = 'Bold' })
+config.font = wezterm.font('JetBrainsMono Nerd Font')
 
 config.window_close_confirmation = 'NeverPrompt'
 
