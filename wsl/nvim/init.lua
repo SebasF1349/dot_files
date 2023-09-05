@@ -449,6 +449,9 @@ local servers = {
   -- clangd = {},
   -- gopls = {},
   -- pyright = {},
+  --python = {
+  --filetypes = "python, py"
+  --},
   rust_analyzer = {
     ["rust_analyzer"] = {
       imports = {
@@ -477,8 +480,25 @@ local servers = {
       --      },
     },
   },
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  tsserver = {},
+  html = {
+    filetypes = { 'html', 'twig', 'hbs' },
+    opts = {
+      settings = {
+        html = {
+          format = {
+            templating = true,
+            wrapLineLength = 120,
+            wrapAttributes = 'auto',
+          },
+          hover = {
+            documentation = true,
+            references = true,
+          },
+        },
+      },
+    }
+  },
 
   lua_ls = {
     Lua = {
@@ -515,6 +535,12 @@ mason_lspconfig.setup_handlers {
     require("rust-tools").setup({
       on_attach = on_attach,
       capabilities = capabilities,
+      filetypes = "rust",
+      settings = {
+        cargo = {
+          allFeatures = true,
+        }
+      },
       check = {
         command = "clippy",
         extraArgs = { "--all", "--", "-W", "clippy::all" },
