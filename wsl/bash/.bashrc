@@ -131,8 +131,8 @@ bind '"\e[1;5A": history-search-backward'
 bind '"\e[1;5B": history-search-forward'
 # trick: use `cat > /dev/null` to see the input of your keys
 
-alias exa='exa -lah'
-alias exat="exa --tree --level=2"
+alias eza='eza -lah'
+alias ezat="eza --tree --level=2"
 
 alias uu="sudo apt update && sudo apt upgrade"
 
