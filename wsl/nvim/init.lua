@@ -324,8 +324,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-    'html' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -450,9 +449,6 @@ local servers = {
   -- clangd = {},
   -- gopls = {},
   -- pyright = {},
-  --python = {
-  --filetypes = "python, py"
-  --},
   rust_analyzer = {
     ["rust_analyzer"] = {
       imports = {
@@ -481,25 +477,8 @@ local servers = {
       --      },
     },
   },
-  tsserver = {},
-  html = {
-    filetypes = { 'html', 'twig', 'hbs' },
-    opts = {
-      settings = {
-        html = {
-          format = {
-            templating = true,
-            wrapLineLength = 120,
-            wrapAttributes = 'auto',
-          },
-          hover = {
-            documentation = true,
-            references = true,
-          },
-        },
-      },
-    }
-  },
+  -- tsserver = {},
+  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
 
   lua_ls = {
     Lua = {
@@ -536,12 +515,6 @@ mason_lspconfig.setup_handlers {
     require("rust-tools").setup({
       on_attach = on_attach,
       capabilities = capabilities,
-      filetypes = "rust",
-      settings = {
-        cargo = {
-          allFeatures = true,
-        }
-      },
       check = {
         command = "clippy",
         extraArgs = { "--all", "--", "-W", "clippy::all" },
@@ -600,3 +573,6 @@ cmp.setup {
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
+require("custom.remap")
+require("custom.set")
