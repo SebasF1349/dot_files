@@ -2,8 +2,6 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-neofetch
-
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -18,8 +16,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=20
-HISTFILESIZE=20
+HISTSIZE=500
+HISTFILESIZE=500
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -129,6 +127,9 @@ export NVM_DIR="$HOME/.nvm"
 # ctrl + arrows to move in history with the same first letters
 bind '"\e[1;5A": history-search-backward'
 bind '"\e[1;5B": history-search-forward'
+# just use arrows
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
 # trick: use `cat > /dev/null` to see the input of your keys
 
 alias eza='eza -lah'
