@@ -10,7 +10,7 @@ esac
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
-HISTCONTROL=ignoreboth
+HISTCONTROL=erasedups:ignoredups:ignorespace
 
 # append to the history file, don't overwrite it
 shopt -s histappend
@@ -153,5 +153,7 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
+
+if [[ $iatest > 0 ]]; then bind "set completion-ignore-case on"; fi
 
 eval "$(starship init bash)"
