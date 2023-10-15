@@ -18,9 +18,15 @@ end
 -- This is where you actually apply your config choices
 
 config.color_scheme = 'GitHub Dark'
-default_domain = "WSL:Ubuntu-20.04"
-config.default_prog = { "wsl.exe" }
-config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos"
+
+if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
+  config.default_domain = "WSL:Ubuntu-20.04"
+  config.default_prog = { "wsl.exe" }
+  config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos"
+elseif wezterm.target_triple == 'x86_64-unknown-linux-gnu' then
+  config.default_prog = { '/bin/bash', '-l' }
+  config.default_cwd = './~'
+end
 
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true
