@@ -20,7 +20,7 @@ end
 config.color_scheme = 'GitHub Dark'
 
 if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
-  config.default_domain = "WSL:Ubuntu-20.04"
+  default_domain = "WSL:Ubuntu-20.04"
   config.default_prog = { "wsl.exe" }
   config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos"
 elseif wezterm.target_triple == 'x86_64-unknown-linux-gnu' then
