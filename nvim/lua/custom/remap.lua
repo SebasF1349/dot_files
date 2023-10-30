@@ -1,3 +1,7 @@
+--Remap Escape
+vim.keymap.set("i", "jk", "<Esc>")
+
+--Open explorer
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 --Move things around when in visual mode

@@ -11,6 +11,7 @@ vim.opt.expandtab = true
 vim.opt.smartindent = true
 
 vim.opt.wrap = true
+vim.opt.linebreak = true
 
 vim.opt.incsearch = true
 
@@ -20,3 +21,7 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 
 vim.opt.updatetime = 50
+
+vim.opt.title = true
+
+vim.opt.clipboard = "unnamedplus"
