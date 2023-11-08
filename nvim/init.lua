@@ -151,7 +151,7 @@ require('lazy').setup({
     end,
   },
 
-  {
+  --[[{
     -- Theme inspired by Atom
     'navarasu/onedark.nvim',
     priority = 1000,
@@ -167,6 +167,18 @@ require('lazy').setup({
         vim.api.nvim_set_hl(0, group, { bg = "none" })
       end
     end,
+  },]]
+
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000,
+    config = function()
+      require('catppuccin').setup({
+        transparent_background = true,
+      })
+      vim.cmd.colorscheme 'catppuccin-mocha'
+    end
   },
 
 
@@ -177,7 +189,8 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'onedark',
+        --theme = 'onedark',
+        theme = 'catppuccin',
         component_separators = '|',
         section_separators = '',
       },
