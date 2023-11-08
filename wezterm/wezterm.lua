@@ -17,7 +17,7 @@ end
 
 -- This is where you actually apply your config choices
 
-config.color_scheme = 'GitHub Dark'
+config.color_scheme = 'Catppuccin Mocha'
 
 if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
   default_domain = "WSL:Ubuntu-20.04"
