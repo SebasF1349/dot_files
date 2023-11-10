@@ -552,6 +552,10 @@ local servers = {
       telemetry = { enable = false },
     },
   },
+
+  svelte = {
+    ["sveltejs/language-tools"] = {}
+  }
 }
 
 -- Setup neovim lua configuration
