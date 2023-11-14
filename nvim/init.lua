@@ -555,6 +555,10 @@ local servers = {
 
   svelte = {
     ["sveltejs/language-tools"] = {}
+  },
+
+  cssls = {
+    ["css-lsp"] = {}
   }
 }
 
