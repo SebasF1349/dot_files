@@ -30,10 +30,9 @@ ShowInstallerIsoInfo() {
     fi
 }
 
-
-alias ls='ls --color=auto'
-alias ll='ls -lav --ignore=..'   # show long listing of all except ".."
-alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles except "."
+#alias ls='ls --color=auto'
+#alias ll='ls -lav --ignore=..'   # show long listing of all except ".."
+#alias l='ls -lav --ignore=.?*'   # show long listing but no hidden dotfiles except "."
 
 [[ "$(whoami)" = "root" ]] && return
 
@@ -87,7 +86,6 @@ _open_files_for_editing() {
 if [[ $iatest > 0 ]]; then bind "set completion-ignore-case on"; fi
 
 shopt -s checkwinsize
-
 HISTCONTROL=erasedups:ignoredups:ignorespace
 HISTSIZE=500
 HISTFILESIZE=500
