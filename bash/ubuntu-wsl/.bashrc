@@ -89,9 +89,9 @@ fi
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+#alias ll='ls -alF'
+#alias la='ls -A'
+#alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -122,7 +122,6 @@ export PATH="$FLYCTL_INSTALL/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-. "$HOME/.cargo/env"
 
 # ctrl + arrows to move in history with the same first letters
 bind '"\e[1;5A": history-search-backward'
@@ -157,3 +156,14 @@ _fzf_compgen_dir() {
 if [[ $iatest > 0 ]]; then bind "set completion-ignore-case on"; fi
 
 eval "$(starship init bash)"
+
+# pnpm
+export PNPM_HOME="/home/sebasf/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+. "$HOME/.cargo/env"
+
+export PATH="/home/sebasf/.local/share/bob/nvim-bin/:$PATH"
