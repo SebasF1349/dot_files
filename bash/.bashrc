@@ -3,10 +3,9 @@
 # for examples
 
 # If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
+[[ $- != *i* ]] && return
+
+[[ -f ~/.welcome_screen ]] && . ~/.welcome_screen
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -30,11 +29,6 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
@@ -56,30 +50,8 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-if [ "$color_prompt" = yes ]; then
-    #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]sebas\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
@@ -87,11 +59,6 @@ fi
 
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-#alias ll='ls -alF'
-#alias la='ls -A'
-#alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -117,24 +84,19 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export FLYCTL_INSTALL="/home/sebasf/.fly"
-export PATH="$FLYCTL_INSTALL/bin:$PATH"
+[[ -z "$FUNCNEST" ]] && export FUNCNEST=100          # limits recursive functions, see 'man bash'
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# ctrl + arrows to move in history with the same first letters
-bind '"\e[1;5A": history-search-backward'
-bind '"\e[1;5B": history-search-forward'
-# just use arrows
+# use arrows to move in history with the same first letters
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 # trick: use `cat > /dev/null` to see the input of your keys
 
 alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
-
-alias uu="sudo apt update && sudo apt upgrade"
 
 ##fzf
 # Use ~~ as the trigger sequence instead of the default **
@@ -188,3 +150,95 @@ mkcd() {
     mkdir -p -- "$1" &&
 	cd -P -- "$1"
 }
+
+if [ -f /etc/os-release ]; then
+    # freedesktop.org and systemd
+    . /etc/os-release
+    DISTRO=$ID_LIKE
+fi
+
+if [ "$DISTRO" = "debian" ]; then
+    # set variable identifying the chroot you work in (used in the prompt below)
+    if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+        debian_chroot=$(cat /etc/debian_chroot)
+    fi
+
+    if [ "$color_prompt" = yes ]; then
+        #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]sebas\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    else
+        PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    fi
+    unset color_prompt force_color_prompt
+
+    alias uu="sudo apt update && sudo apt upgrade"
+
+    export FLYCTL_INSTALL="/home/sebasf/.fly"
+    export PATH="$FLYCTL_INSTALL/bin:$PATH"
+
+    # If this is an xterm set the title to user@host:dir
+    case "$TERM" in
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
+    *)
+        ;;
+    esac
+elif [ "$DISTRO" = "arch" ]; then
+    _set_liveuser_PS1() {
+        PS1='[\u@\h \W]\$ '
+        if [ "$(whoami)" = "liveuser" ] ; then
+            local iso_version="$(grep ^VERSION= /usr/lib/endeavouros-release 2>/dev/null | cut -d '=' -f 2)"
+            if [ -n "$iso_version" ] ; then
+                local prefix="eos-"
+                local iso_info="$prefix$iso_version"
+                PS1="[\u@$iso_info \W]\$ "
+            fi
+        fi
+    }
+    _set_liveuser_PS1
+    unset -f _set_liveuser_PS1
+
+    ShowInstallerIsoInfo() {
+        local file=/usr/lib/endeavouros-release
+        if [ -r $file ] ; then
+            cat $file
+        else
+            echo "Sorry, installer ISO info is not available." >&2
+        fi
+    }
+
+    [[ "$(whoami)" = "root" ]] && return
+
+    _open_files_for_editing() {
+        # Open any given document file(s) for editing (or just viewing).
+        # Note1:
+        #    - Do not use for executable files!
+        # Note2:
+        #    - Uses 'mime' bindings, so you may need to use
+        #      e.g. a file manager to make proper file bindings.
+
+        if [ -x /usr/bin/exo-open ] ; then
+            echo "exo-open $@" >&2
+            setsid exo-open "$@" >& /dev/null
+            return
+        fi
+        if [ -x /usr/bin/xdg-open ] ; then
+            for file in "$@" ; do
+                echo "xdg-open $file" >&2
+                setsid xdg-open "$file" >& /dev/null
+            done
+            return
+        fi
+
+        echo "$FUNCNAME: package 'xdg-utils' or 'exo' is required." >&2
+    }
+
+    # pacman + fzf
+    # install
+    alias fuzi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
+    # remove
+    alias fuzr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"
+    # install with yay?
+    alias yayi="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
+fi
