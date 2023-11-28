@@ -96,7 +96,6 @@ alias ezat='eza --tree --level=2'
 
 eval "$(starship init bash)"
 
-
 . "$HOME/.cargo/env"
 
 # pnpm
@@ -114,3 +113,19 @@ alias fuzi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sud
 alias fuzr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns" 
 # install with yay?
 alias yayi="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
+
+alias cd..="cd .."
+alias ..="cd .."
+alias ...="cd ../.."
+
+_cl() {
+	local dir="$1"
+	local dir="${dir:=$HOME}"
+	if [[ -d "$dir" ]]; then
+		cd "$dir" >/dev/null; eza -lah
+	else
+		echo "bash: cl: $dir: Directory not found"
+	fi
+}
+
+shopt -s autocd

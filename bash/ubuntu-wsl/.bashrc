@@ -167,3 +167,19 @@ esac
 . "$HOME/.cargo/env"
 
 export PATH="/home/sebasf/.local/share/bob/nvim-bin/:$PATH"
+
+alias cd..="cd .."
+alias ..="cd .."
+alias ...="cd ../.."
+
+_cl() {
+	local dir="$1"
+	local dir="${dir:=$HOME}"
+	if [[ -d "$dir" ]]; then
+		cd "$dir" >/dev/null; eza -lah
+	else
+		echo "bash: cl: $dir: Directory not found"
+	fi
+}
+
+shopt -s autocd
