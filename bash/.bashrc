@@ -129,10 +129,28 @@ esac
 . "$HOME/.cargo/env"
 
 export PATH="/home/sebasf/.local/share/bob/nvim-bin/:$PATH"
+export EDITOR=nvim
 
 alias cd..="cd .."
 alias ..="cd .."
 alias ...="cd ../.."
+alias home="cd ~"
+
+alias g="git"
+alias gstatus="git status"
+alias gdiff="git diff"
+alias gcommit="git commit -m"
+alias gclone="git clone"
+alias gadd="git add ."
+alias gaddall="git add --all"
+alias gbranch="git branch"
+alias gcheckout="git checkout"
+alias gpush="git push"
+alias gpull="git pull"
+
+alias nv="${EDITOR}"
+alias nv.="${EDITOR} ."
+alias bashrc="${EDITOR} ~/.bashrc"
 
 cl() {
     local dir="$1"
@@ -149,6 +167,14 @@ shopt -s autocd
 mkcd() {
     mkdir -p -- "$1" &&
 	cd -P -- "$1"
+}
+
+s() { # do sudo, or sudo the last command if no argument given
+    if [[ $# == 0 ]]; then
+        sudo $(history -p '!!')
+    else
+        sudo "$@"
+    fi
 }
 
 if [ -f /etc/os-release ]; then
@@ -184,6 +210,10 @@ if [ "$DISTRO" = "debian" ]; then
     *)
         ;;
     esac
+
+    alias proyectos="cd ~/Proyectos"
+    alias dot="cd ~/Proyectos/dot_files"
+
 elif [ "$DISTRO" = "arch" ]; then
     _set_liveuser_PS1() {
         PS1='[\u@\h \W]\$ '
@@ -233,6 +263,10 @@ elif [ "$DISTRO" = "arch" ]; then
 
         echo "$FUNCNAME: package 'xdg-utils' or 'exo' is required." >&2
     }
+
+    alias tup="cd ~/tup"
+    alias dot="cd ~/dot_files"
+    alias repos="cd ~/repos"
 
     # pacman + fzf
     # install
