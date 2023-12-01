@@ -134,7 +134,6 @@ export EDITOR=nvim
 alias cd..="cd .."
 alias ..="cd .."
 alias ...="cd ../.."
-alias home="cd ~"
 
 alias g="git"
 alias gstatus="git status"
@@ -151,6 +150,7 @@ alias gpull="git pull"
 alias nv="${EDITOR}"
 alias nv.="${EDITOR} ."
 alias bashrc="${EDITOR} ~/.bashrc"
+alias snv="sudo ${EDITOR}"
 
 cl() {
     local dir="$1"
@@ -169,13 +169,54 @@ mkcd() {
 	cd -P -- "$1"
 }
 
-s() { # do sudo, or sudo the last command if no argument given
+# do sudo, or sudo the last command if no argument given
+s() { 
     if [[ $# == 0 ]]; then
         sudo $(history -p '!!')
     else
         sudo "$@"
     fi
 }
+
+extract () {
+     if [ -f $1 ] ; then
+         case $1 in
+             *.tar.bz2)   tar xjf $1        ;;
+             *.tar.gz)    tar xzf $1     ;;
+             *.bz2)       bunzip2 $1       ;;
+             *.rar)       rar x $1     ;;
+             *.gz)        gunzip $1     ;;
+             *.tar)       tar xf $1        ;;
+             *.tbz2)      tar xjf $1      ;;
+             *.tgz)       tar xzf $1       ;;
+             *.zip)       unzip $1     ;;
+             *.Z)         uncompress $1  ;;
+             *.7z)        7z x $1    ;;
+             *)           echo "'$1' cannot be extracted via extract()" ;;
+         esac
+     else
+         echo "'$1' is not a valid file"
+     fi
+}
+
+#Copy and go to dir
+cpg (){
+    if [ -d "$2" ];then
+        cp $1 $2 && cd $2
+    else
+        cp $1 $2
+    fi
+}
+
+#Move and go to dir
+mvg (){
+    if [ -d "$2" ];then
+        mv $1 $2 && cd $2
+    else
+        mv $1 $2
+    fi
+}
+
 
 if [ -f /etc/os-release ]; then
     # freedesktop.org and systemd
@@ -198,6 +239,7 @@ if [ "$DISTRO" = "debian" ]; then
     unset color_prompt force_color_prompt
 
     alias uu="sudo apt update && sudo apt upgrade"
+    alias clean="sudo apt autoclean && sudo apt autoremove"
 
     export FLYCTL_INSTALL="/home/sebasf/.fly"
     export PATH="$FLYCTL_INSTALL/bin:$PATH"
@@ -276,3 +318,10 @@ elif [ "$DISTRO" = "arch" ]; then
     # install with yay?
     alias yayi="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
 fi
+
+# WELCOME WINDOW
+clear
+echo -ne "${LIGHTGREEN}""Hello, $USER. Today is "; date
+curl wttr.in/Bahia+Blanca?format="Bahia%20Blanca:+%C%20-%20Temp:%t%20-%20Feels:%f\n"
+echo -e "${LIGHTGREEN}"; cal ;
+echo ""
