@@ -1,5 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require 'wezterm'
+local action = wezterm.action
 
 -- This table will hold the configuration.
 local config = {}
@@ -20,8 +21,8 @@ end
 config.color_scheme = 'Catppuccin Mocha'
 
 if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
-  default_domain = "WSL:Ubuntu-20.04"
-  config.default_prog = { "wsl.exe" }
+  --default_domain = "WSL:Ubuntu-20.04"
+  config.default_prog = { 'wsl.exe', '--cd', '~' }
   config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos"
 elseif wezterm.target_triple == 'x86_64-unknown-linux-gnu' then
   config.default_prog = { '/bin/bash', '-l' }
@@ -31,8 +32,8 @@ end
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true
 config.inactive_pane_hsb = {
-  saturation = 0.8,
-  brightness = 0.7,
+  saturation = 1,
+  brightness = 0.5,
 }
 config.window_padding = {
   left = 0,
@@ -48,6 +49,76 @@ config.window_background_opacity = 0.9
 config.font = wezterm.font('JetBrainsMono Nerd Font')
 
 config.window_close_confirmation = 'NeverPrompt'
+
+-- Shortcuts
+config.keys = {
+  {
+    key = 'Enter',
+    mods = 'CTRL',
+    action = action.ToggleFullScreen
+  },
+  {
+    key = 'i',
+    mods = 'CTRL|SHIFT',
+    action = action.SplitPane {
+      direction = 'Right',
+      size = { Percent = 30 },
+    },
+  },
+  {
+    key = '_',
+    mods = 'CTRL|SHIFT',
+    action = action.SplitPane {
+      direction = 'Down',
+      size = { Percent = 30 },
+    },
+  },
+  {
+    key = 'w',
+    mods = 'CTRL|SHIFT',
+    action = action.CloseCurrentPane({ confirm = false }),
+  },
+  {
+    key = 'h',
+    mods = 'CTRL',
+    action = action.ActivatePaneDirection('Left'),
+  },
+  {
+    key = 'j',
+    mods = 'CTRL',
+    action = action.ActivatePaneDirection('Down'),
+  },
+  {
+    key = 'k',
+    mods = 'CTRL',
+    action = action.ActivatePaneDirection('Up'),
+  },
+  {
+    key = 'l',
+    mods = 'CTRL',
+    action = action.ActivatePaneDirection('Right'),
+  },
+  {
+    key = 'H',
+    mods = 'CTRL|SHIFT',
+    action = action.AdjustPaneSize({ 'Left', 1 }),
+  },
+  {
+    key = 'J',
+    mods = 'CTRL|SHIFT',
+    action = action.AdjustPaneSize({ 'Down', 1 }),
+  },
+  {
+    key = 'K',
+    mods = 'CTRL|SHIFT',
+    action = action.AdjustPaneSize({ 'Up', 1 }),
+  },
+  {
+    key = 'L',
+    mods = 'CTRL|SHIFT',
+    action = action.AdjustPaneSize({ 'Right', 1 }),
+  },
+}
 
 --config.window_decorations = "RESIZE"
 
