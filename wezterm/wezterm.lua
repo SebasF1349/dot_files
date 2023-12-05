@@ -21,12 +21,14 @@ end
 config.color_scheme = 'Catppuccin Mocha'
 
 if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
-  --default_domain = "WSL:Ubuntu-20.04"
-  config.default_prog = { 'wsl.exe', '--cd', '~' }
+  --This next line should be the only thing that's needed, but it doesn't work for new panes
+  --config.default_domain = 'WSL:Ubuntu'
   config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos"
+  config.default_prog = { 'wsl.exe', '--cd', '~/Proyectos' }
 elseif wezterm.target_triple == 'x86_64-unknown-linux-gnu' then
-  config.default_prog = { '/bin/bash', '-l' }
-  config.default_cwd = './~'
+  --Let open in home or in current directory, it works on linux, not in wsl
+  --config.default_prog = { '/bin/bash', '-l' }
+  --config.default_cwd = './~'
 end
 
 config.adjust_window_size_when_changing_font_size = false
