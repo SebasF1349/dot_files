@@ -320,8 +320,8 @@ elif [ "$DISTRO" = "arch" ]; then
 fi
 
 # WELCOME WINDOW
-LIGHTGREEN="\e[1;32m"
 clear
-echo -ne "${LIGHTGREEN}"; date
-curl wttr.in/Bahia+Blanca?format="Temp:%t%20-%20Feels:%f\n"
-echo ""
+#LIGHTGREEN="\e[1;32m"
+#echo -ne "${LIGHTGREEN}"; date
+#curl wttr.in/Bahia+Blanca?format="Temp:%t%20-%20Feels:%f\n"
+#echo ""
