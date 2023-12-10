@@ -113,7 +113,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -136,15 +136,23 @@ require('lazy').setup({
 
         --navigation
         map({ 'n', 'v' }, ']c', function()
-          if vim.wo.diff then return ']c' end
-          vim.schedule(function() gs.next_hunk() end)
+          if vim.wo.diff then
+            return ']c'
+          end
+          vim.schedule(function()
+            gs.next_hunk()
+          end)
           return '<Ignore>'
-        end, { expr = true, desc = "Jump to next hunk" })
+        end, { expr = true, desc = 'Jump to next hunk' })
         map({ 'n', 'v' }, '[c', function()
-          if vim.wo.diff then return '[c' end
-          vim.schedule(function() gs.prev_hunk() end)
+          if vim.wo.diff then
+            return '[c'
+          end
+          vim.schedule(function()
+            gs.prev_hunk()
+          end)
           return '<Ignore>'
-        end, { expr = true, desc = "Jump to previous hunk" })
+        end, { expr = true, desc = 'Jump to previous hunk' })
 
         -- Actions
         -- visual mode
@@ -210,13 +218,12 @@ require('lazy').setup({
     name = 'catppuccin',
     priority = 1000,
     config = function()
-      require('catppuccin').setup({
+      require('catppuccin').setup {
         transparent_background = true,
-      })
+      }
       vim.cmd.colorscheme 'catppuccin-mocha'
-    end
+    end,
   },
-
 
   {
     -- Set lualine as statusline
@@ -240,7 +247,7 @@ require('lazy').setup({
     -- See `:help ibl`
     main = 'ibl',
     opts = {
-      indent = { char = '┆' }
+      indent = { char = '┆' },
     },
   },
 
@@ -384,16 +391,16 @@ local function find_git_root()
   local current_dir
   local cwd = vim.fn.getcwd()
   -- If the buffer is not associated with a file, return nil
-  if current_file == "" then
+  if current_file == '' then
     current_dir = cwd
   else
     -- Extract the directory from the current file's path
-    current_dir = vim.fn.fnamemodify(current_file, ":h")
+    current_dir = vim.fn.fnamemodify(current_file, ':h')
   end
   -- Find the Git root directory from the current file's path
-  local git_root = vim.fn.systemlist("git -C " .. vim.fn.escape(current_dir, " ") .. " rev-parse --show-toplevel")[1]
+  local git_root = vim.fn.systemlist('git -C ' .. vim.fn.escape(current_dir, ' ') .. ' rev-parse --show-toplevel')[1]
   if vim.v.shell_error ~= 0 then
-    print("Not a git repository. Searching on current working directory")
+    print 'Not a git repository. Searching on current working directory'
     return cwd
   end
   return git_root
@@ -403,9 +410,9 @@ end
 local function live_grep_git_root()
   local git_root = find_git_root()
   if git_root then
-    require('telescope.builtin').live_grep({
+    require('telescope.builtin').live_grep {
       search_dirs = { git_root },
-    })
+    }
   end
 end
 
@@ -444,8 +451,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
-      'bash', "css", 'html', 'svelte' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash', 'css', 'html', 'svelte' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -590,12 +596,12 @@ local servers = {
   --filetypes = "python, py"
   --},
   rust_analyzer = {
-    ["rust_analyzer"] = {
+    ['rust_analyzer'] = {
       imports = {
         granularity = {
-          group = "module",
+          group = 'module',
         },
-        prefix = "self",
+        prefix = 'self',
       },
       cargo = {
         buildScripts = {
@@ -606,10 +612,11 @@ local servers = {
         enable = true,
       },
       command = {
-        "cargo", "clippy"
+        'cargo',
+        'clippy',
       },
       check = {
-        command = "clippy",
+        command = 'clippy',
         --  extraArgs = { "--all", "--", "-W", "clippy::all" },
       },
       --checkOnSave = {
@@ -634,7 +641,7 @@ local servers = {
           },
         },
       },
-    }
+    },
   },
 
   lua_ls = {
@@ -645,12 +652,12 @@ local servers = {
   },
 
   svelte = {
-    ["sveltejs/language-tools"] = {}
+    ['sveltejs/language-tools'] = {},
   },
 
   cssls = {
-    ["css-lsp"] = {}
-  }
+    ['css-lsp'] = {},
+  },
 }
 
 -- Setup neovim lua configuration
@@ -676,22 +683,22 @@ mason_lspconfig.setup_handlers {
       filetypes = (servers[server_name] or {}).filetypes,
     }
   end,
-  ["rust_analyzer"] = function()
-    require("rust-tools").setup({
+  ['rust_analyzer'] = function()
+    require('rust-tools').setup {
       on_attach = on_attach,
       capabilities = capabilities,
-      filetypes = "rust",
+      filetypes = 'rust',
       settings = {
         cargo = {
           allFeatures = true,
-        }
+        },
       },
       check = {
-        command = "clippy",
-        extraArgs = { "--all", "--", "-W", "clippy::all" },
+        command = 'clippy',
+        extraArgs = { '--all', '--', '-W', 'clippy::all' },
       },
-    })
-  end
+    }
+  end,
 }
 
 -- [[ Configure nvim-cmp ]]
@@ -709,7 +716,7 @@ cmp.setup {
   },
   -- First item is selected by default
   completion = {
-    completeopt = 'menu,menuone,noinsert'
+    completeopt = 'menu,menuone,noinsert',
   },
   mapping = cmp.mapping.preset.insert {
     ['<C-n>'] = cmp.mapping.select_next_item(),
@@ -750,5 +757,5 @@ cmp.setup {
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 
-require("custom.remap")
-require("custom.set")
+require 'custom.remap'
+require 'custom.set'
