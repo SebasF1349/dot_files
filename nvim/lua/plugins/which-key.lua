@@ -1,6 +1,7 @@
 -- Useful plugin to show you pending keybinds.
 return {
   'folke/which-key.nvim',
+  event = 'VeryLazy',
   opts = {},
   config = function()
     require('which-key').register {
