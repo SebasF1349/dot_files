@@ -34,12 +34,22 @@ vim.keymap.set('n', 'Q', '<nop>')
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
 
 -- split screen and navigation
-vim.keymap.set('n', '<leader>v', ':vsplit<CR><C-w>l', { noremap = true })
+--[[ vim.keymap.set('n', '<leader>v', ':vsplit<CR><C-w>l', { noremap = true })
 vim.keymap.set('n', '<leader>h', ':wincmd h<CR>', { noremap = true })
-vim.keymap.set('n', '<leader>l', ':wincmd l<CR>', { noremap = true })
+vim.keymap.set('n', '<leader>l', ':wincmd l<CR>', { noremap = true }) ]]
 
 -- window management
-vim.keymap.set('n', '<leader>si', '<C-w>v', { desc = 'Split window vertically' }) -- split window vertically
-vim.keymap.set('n', '<leader>s-', '<C-w>s', { desc = 'Split window horizontally' }) -- split window horizontally
-vim.keymap.set('n', '<leader>se', '<C-w>=', { desc = 'Make splits equal size' }) -- make split windows equal width & height
-vim.keymap.set('n', '<leader>sx', '<cmd>close<CR>', { desc = 'Close current split' }) -- close current split window
+vim.keymap.set('n', '<leader>bi', '<C-w>v', { desc = '[B]reak/Split Window [i]Vertically' })   -- split window vertically
+vim.keymap.set('n', '<leader>b-', '<C-w>s', { desc = '[B]reak/Split Window [-]Horizontally' }) -- split window horizontally
+vim.keymap.set('n', '<leader>be', '<C-w>=', { desc = '[B]reak/Splits [E]qual Size' })          -- make split windows equal width & height
+vim.keymap.set('n', '<leader>bx', '<cmd>close<CR>', { desc = '[B]reak/Split [x]Close' })       -- close current split window
+-- Move window
+vim.keymap.set("n", "<leader>bh", "<C-w>h", { desc = 'Move [B]reak/Split [h]Left' })
+vim.keymap.set("n", "<leader>bk", "<C-w>k", { desc = 'Move [B]reak/Split [k]Up' })
+vim.keymap.set("n", "<leader>bj", "<C-w>j", { desc = 'Move [B]reak/Split [j]Down' })
+vim.keymap.set("n", "<leader>bl", "<C-w>l", { desc = 'Move [B]reak/Split [l]right' })
+-- Resize window
+vim.keymap.set("n", "<leader>b<", "5<C-w><", { desc = 'Resize [B]reak/Split [<]Smaller Vertically' })
+vim.keymap.set("n", "<leader>b>", "5<C-w>>", { desc = 'Resize [B]reak/Split [>]Bigger Vertically' })
+vim.keymap.set("n", "<leader>b.", "5<C-w>-", { desc = 'Resize [B]reak/Split [<]Smaller Horizontally' })
+vim.keymap.set("n", "<leader>b,", "5<C-w>+", { desc = 'Resize [B]reak/Split [<]Bigger Horizontally' })
