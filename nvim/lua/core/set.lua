@@ -57,3 +57,7 @@ vim.opt.title = true
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 vim.opt.clipboard = 'unnamedplus'
+
+-- split windows
+vim.opt.splitright = true -- split vertical window to the right
+vim.opt.splitbelow = true -- split horizontal window to the bottom

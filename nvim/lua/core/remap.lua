@@ -37,3 +37,9 @@ vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
 vim.keymap.set('n', '<leader>v', ':vsplit<CR><C-w>l', { noremap = true })
 vim.keymap.set('n', '<leader>h', ':wincmd h<CR>', { noremap = true })
 vim.keymap.set('n', '<leader>l', ':wincmd l<CR>', { noremap = true })
+
+-- window management
+vim.keymap.set('n', '<leader>si', '<C-w>v', { desc = 'Split window vertically' }) -- split window vertically
+vim.keymap.set('n', '<leader>s-', '<C-w>s', { desc = 'Split window horizontally' }) -- split window horizontally
+vim.keymap.set('n', '<leader>se', '<C-w>=', { desc = 'Make splits equal size' }) -- make split windows equal width & height
+vim.keymap.set('n', '<leader>sx', '<cmd>close<CR>', { desc = 'Close current split' }) -- close current split window
