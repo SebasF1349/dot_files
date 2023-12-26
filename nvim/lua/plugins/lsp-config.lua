@@ -98,7 +98,7 @@ return {
       local cmp_nvim_lsp = require 'cmp_nvim_lsp'
       capabilities = cmp_nvim_lsp.default_capabilities()
 
-      local on_attach = function(_, bufnr)
+      local on_attach = function(data, bufnr)
         local nmap = function(keys, func, desc)
           if desc then
             desc = 'LSP: ' .. desc
@@ -118,7 +118,11 @@ return {
         nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
         -- See `:help K` for why this keymap
-        nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+        if (data.name == 'rust_analyzer') then
+          nmap('K', require('rust-tools').hover_actions.hover_actions, 'Hover Documentation')
+        else
+          nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+        end
         --nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
         -- Lesser used LSP functionality
@@ -167,6 +171,11 @@ return {
               check = {
                 command = 'clippy',
                 extraArgs = { '--all', '--', '-W', 'clippy::all' },
+              },
+            },
+            tools = {
+              hover_actions = {
+                auto_focus = true,
               },
             },
           }

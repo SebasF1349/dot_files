@@ -4,7 +4,6 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 require 'core'
-require 'lazy-nvim'
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
