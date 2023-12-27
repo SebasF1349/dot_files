@@ -149,8 +149,23 @@ alias gpull="git pull"
 
 alias nv="${EDITOR}"
 alias nv.="${EDITOR} ."
-alias bashrc="${EDITOR} ~/.bashrc"
+alias nvbash="${EDITOR} ~/.bashrc"
+alias sourcebash="source ~/.bashrc"
 alias snv="sudo ${EDITOR}"
+
+nvf() {
+    local dir="$1"
+    if [[ "$dir" == "repos" ]]; then
+        dir="${HOME}/repos/"
+    elif [[ "$dir" == "dot" ]]; then
+        dir="${HOME}/dot_files/"
+    fi
+    eval "${EDITOR} $(fd . ${dir} --type d --max-depth 2 | fzf)"
+}
+
+alias tup="cd ~/tup"
+alias dot="cd ~/dot_files"
+alias repos="cd ~/repos"
 
 cl() {
     local dir="$1"
@@ -252,10 +267,6 @@ if [ "$DISTRO" = "debian" ]; then
     *)
         ;;
     esac
-
-    alias proyectos="cd ~/Proyectos"
-    alias dot="cd ~/Proyectos/dot_files"
-
 elif [ "$DISTRO" = "arch" ]; then
     _set_liveuser_PS1() {
         PS1='[\u@\h \W]\$ '
@@ -305,10 +316,6 @@ elif [ "$DISTRO" = "arch" ]; then
 
         echo "$FUNCNAME: package 'xdg-utils' or 'exo' is required." >&2
     }
-
-    alias tup="cd ~/tup"
-    alias dot="cd ~/dot_files"
-    alias repos="cd ~/repos"
 
     # pacman + fzf
     # install
