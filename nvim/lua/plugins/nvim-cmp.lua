@@ -35,7 +35,7 @@ return {
         --some of these are not working, why?
         ['<A-k>'] = cmp.mapping.select_prev_item(),
         ['<A-j>'] = cmp.mapping.select_next_item(),
-        ['<A-d>'] = cmp.mapping.scroll_docs(-4),
+        ['<A-b>'] = cmp.mapping.scroll_docs(-4),
         ['<A-f>'] = cmp.mapping.scroll_docs(4),
         ['<A-Space>'] = cmp.mapping.complete(),
         ['<A-e>'] = cmp.mapping.abort(),
