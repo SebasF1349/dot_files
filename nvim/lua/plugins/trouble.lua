@@ -9,21 +9,21 @@ return {
   config = function()
     vim.keymap.set('n', '<leader>xx', function()
       require('trouble').toggle()
-    end)
+    end, { desc = '[X]Trouble [X]Toogle' })
     vim.keymap.set('n', '<leader>xw', function()
       require('trouble').toggle 'workspace_diagnostics'
-    end)
+    end, { desc = '[X]Trouble [W]orkspace' })
     vim.keymap.set('n', '<leader>xd', function()
       require('trouble').toggle 'document_diagnostics'
-    end)
+    end, { desc = '[X]Trouble [D]ocument' })
     vim.keymap.set('n', '<leader>xq', function()
       require('trouble').toggle 'quickfix'
-    end)
+    end, { desc = '[X]Trouble [Q]uickfix' })
     vim.keymap.set('n', '<leader>xl', function()
       require('trouble').toggle 'loclist'
-    end)
+    end, { desc = '[X]Trouble [L]ocal list' })
     vim.keymap.set('n', 'gR', function()
       require('trouble').toggle 'lsp_references'
-    end)
+    end, { desc = '[g]Trouble [R]eferences' })
   end,
 }
