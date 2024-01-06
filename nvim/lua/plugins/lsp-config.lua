@@ -118,7 +118,7 @@ return {
         nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
         -- See `:help K` for why this keymap
-        if (data.name == 'rust_analyzer') then
+        if data.name == 'rust_analyzer' then
           nmap('K', require('rust-tools').hover_actions.hover_actions, 'Hover Documentation')
         else
           nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -139,7 +139,7 @@ return {
         end, { desc = 'Format current buffer with LSP' })
       end
 
-      local codelldb = require('mason-registry').get_package('codelldb')
+      local codelldb = require('mason-registry').get_package 'codelldb'
       local extension_path = codelldb:get_install_path() .. '/extension/'
       local codelldb_path = extension_path .. 'adapter/codelldb'
       local liblldb_path = extension_path .. 'lldb/lib/liblldb.so'
@@ -171,8 +171,7 @@ return {
                   allFeatures = true,
                 },
               },
-              filetypes = 'rust',
-              'rs',
+              filetypes = { 'rust', 'rs' },
               check = {
                 command = 'clippy',
                 extraArgs = { '--all', '--', '-W', 'clippy::all' },
@@ -185,7 +184,7 @@ return {
             },
             dap = {
               adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path),
-            }
+            },
           }
         end,
       }
