@@ -46,18 +46,18 @@ return {
         incremental_selection = {
           enable = true,
           keymaps = {
-            init_selection = '<c-space>',
-            node_incremental = '<c-space>',
-            scope_incremental = '<c-s>',
-            node_decremental = '<M-space>',
+            init_selection = 'gn',
+            node_incremental = 'gn',
+            scope_incremental = 'gc',
+            node_decremental = 'gr',
           },
         },
         textobjects = {
           select = {
             enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
             keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
+              -- you can use the capture groups defined in textobjects.scm
               ['aa'] = '@parameter.outer',
               ['ia'] = '@parameter.inner',
               ['af'] = '@function.outer',
