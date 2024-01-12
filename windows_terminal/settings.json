@@ -382,7 +382,7 @@
             "yellow": "#808000"
         }
     ],
-    "startupActions": "new-tab -p \"PowerShell\" -d \"D:\\Trabajos\\Proyectos - Dev\" --title \"Proyectos\"; new-tab -p \"Ubuntu\" -d \"\\\\wsl$\\Ubuntu\\home\\sebasf\\Proyectos\"; focus-tab -t 0",
+    "startupActions": "new-tab -p \"PowerShell\" -d \"D:\\Trabajos\\Proyectos - Dev\" --title \"Proyectos\"; new-tab -p \"Ubuntu\" -d \"\\\\wsl$\\Ubuntu\\home\\sebasf\\repos\"; focus-tab -t 0",
     "theme": "Catppuccin Mocha",
     "themes": [
         {
