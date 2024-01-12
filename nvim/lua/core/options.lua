@@ -8,7 +8,7 @@ vim.o.hlsearch = false
 vim.wo.number = true
 
 -- Enable mouse mode
-vim.o.mouse = 'a'
+vim.o.mouse = "a"
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -21,10 +21,10 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
+vim.wo.signcolumn = "yes"
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = "menuone,noselect"
 
 --vim.opt.guicursor = ""
 
@@ -47,7 +47,7 @@ vim.opt.incsearch = true
 vim.opt.termguicolors = true
 
 vim.opt.scrolloff = 8
-vim.opt.signcolumn = 'yes'
+vim.opt.signcolumn = "yes"
 
 vim.opt.timeoutlen = 300
 vim.opt.updatetime = 250
@@ -62,6 +62,6 @@ vim.opt.title = true
 vim.opt.splitright = true -- split vertical window to the right
 vim.opt.splitbelow = true -- split horizontal window to the bottom
 
-vim.opt.fileencoding = 'utf-8'
+vim.opt.fileencoding = "utf-8"
 
-vim.opt.iskeyword:append '-'
+vim.opt.iskeyword:append("-")

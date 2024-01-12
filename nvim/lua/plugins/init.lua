@@ -1,15 +1,15 @@
 return {
   -- Git related plugins
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
+  "tpope/vim-fugitive",
+  "tpope/vim-rhubarb",
 
   -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
+  "tpope/vim-sleuth",
 
   -- "gc" to comment visual regions/lines
   {
-    'numToStr/Comment.nvim',
-    event = { 'BufReadPre', 'BufNewFile' },
+    "numToStr/Comment.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     opts = {},
   },
 }

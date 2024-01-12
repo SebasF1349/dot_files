@@ -1,29 +1,29 @@
 return {
   -- Autocompletion
-  'hrsh7th/nvim-cmp',
-  event = 'InsertEnter',
+  "hrsh7th/nvim-cmp",
+  event = "InsertEnter",
   dependencies = {
     -- Snippet Engine & its associated nvim-cmp source
-    'L3MON4D3/LuaSnip',
-    'saadparwaiz1/cmp_luasnip',
+    "L3MON4D3/LuaSnip",
+    "saadparwaiz1/cmp_luasnip",
     -- Adds LSP completion capabilities
-    'hrsh7th/cmp-nvim-lsp',
+    "hrsh7th/cmp-nvim-lsp",
     -- Source for text in buffer
-    'hrsh7th/cmp-buffer',
+    "hrsh7th/cmp-buffer",
     -- Source for file system paths
-    'hrsh7th/cmp-path',
+    "hrsh7th/cmp-path",
     -- Adds a number of user-friendly snippets
-    'rafamadriz/friendly-snippets',
+    "rafamadriz/friendly-snippets",
     -- Completion for the command line
-    'hrsh7th/cmp-cmdline',
+    "hrsh7th/cmp-cmdline",
   },
   config = function()
     -- See `:help cmp`
-    local cmp = require 'cmp'
-    local luasnip = require 'luasnip'
-    require('luasnip.loaders.from_vscode').lazy_load()
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
+    require("luasnip.loaders.from_vscode").lazy_load()
 
-    cmp.setup {
+    cmp.setup({
       snippet = {
         expand = function(args)
           luasnip.lsp_expand(args.body)
@@ -31,21 +31,21 @@ return {
       },
       -- First item is selected by default
       completion = {
-        completeopt = 'menu,menuone,preview,noinsert',
+        completeopt = "menu,menuone,preview,noinsert",
       },
-      mapping = cmp.mapping.preset.insert {
+      mapping = cmp.mapping.preset.insert({
         --some of these are not working, why?
-        ['<A-k>'] = cmp.mapping.select_prev_item(),
-        ['<A-j>'] = cmp.mapping.select_next_item(),
-        ['<A-b>'] = cmp.mapping.scroll_docs(-4),
-        ['<A-f>'] = cmp.mapping.scroll_docs(4),
-        ['<A-Space>'] = cmp.mapping.complete(),
-        ['<A-e>'] = cmp.mapping.abort(),
-        ['<CR>'] = cmp.mapping.confirm {
+        ["<A-k>"] = cmp.mapping.select_prev_item(),
+        ["<A-j>"] = cmp.mapping.select_next_item(),
+        ["<A-b>"] = cmp.mapping.scroll_docs(-4),
+        ["<A-f>"] = cmp.mapping.scroll_docs(4),
+        ["<A-Space>"] = cmp.mapping.complete(),
+        ["<A-e>"] = cmp.mapping.abort(),
+        ["<CR>"] = cmp.mapping.confirm({
           behavior = cmp.ConfirmBehavior.Replace,
           select = true,
-        },
-        ['<Tab>'] = cmp.mapping(function(fallback)
+        }),
+        ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
           elseif luasnip.expand_or_locally_jumpable() then
@@ -53,8 +53,8 @@ return {
           else
             fallback()
           end
-        end, { 'i', 's' }),
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
+        end, { "i", "s" }),
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
           elseif luasnip.locally_jumpable(-1) then
@@ -62,32 +62,32 @@ return {
           else
             fallback()
           end
-        end, { 'i', 's' }),
-      },
+        end, { "i", "s" }),
+      }),
       sources = {
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' },
-        { name = 'buffer' },
-        { name = 'path' },
-      },
-    }
-
-    cmp.setup.cmdline('/', {
-      mapping = cmp.mapping.preset.cmdline(),
-      sources = {
-        { name = 'buffer' },
+        { name = "nvim_lsp" },
+        { name = "luasnip" },
+        { name = "buffer" },
+        { name = "path" },
       },
     })
 
-    cmp.setup.cmdline(':', {
+    cmp.setup.cmdline("/", {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = {
+        { name = "buffer" },
+      },
+    })
+
+    cmp.setup.cmdline(":", {
       mapping = cmp.mapping.preset.cmdline(),
       sources = cmp.config.sources({
-        { name = 'path' },
+        { name = "path" },
       }, {
         {
-          name = 'cmdline',
+          name = "cmdline",
           option = {
-            ignore_cmds = { 'Man', '!' },
+            ignore_cmds = { "Man", "!" },
           },
         },
       }),

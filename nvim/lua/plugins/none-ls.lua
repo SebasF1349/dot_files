@@ -1,15 +1,15 @@
 return {
-  'nvimtools/none-ls.nvim',
-  event = { 'LspAttach' },
+  "nvimtools/none-ls.nvim",
+  event = { "LspAttach" },
   config = function()
-    local null_ls = require 'null-ls'
+    local null_ls = require("null-ls")
 
-    null_ls.setup {
+    null_ls.setup({
       sources = {
         null_ls.builtins.formatting.stylua,
       },
-    }
+    })
 
-    vim.keymap.set('n', '<leader>fn', vim.lsp.buf.format, {})
+    vim.keymap.set("n", "<leader>fn", vim.lsp.buf.format, {})
   end,
 }

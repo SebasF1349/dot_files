@@ -1,35 +1,35 @@
 return {
   -- Highlight, edit, and navigate code
-  'nvim-treesitter/nvim-treesitter',
-  event = { 'BufReadPre', 'BufNewFile' },
+  "nvim-treesitter/nvim-treesitter",
+  event = { "BufReadPre", "BufNewFile" },
   dependencies = {
-    'nvim-treesitter/nvim-treesitter-textobjects',
+    "nvim-treesitter/nvim-treesitter-textobjects",
   },
-  build = ':TSUpdate',
+  build = ":TSUpdate",
   config = function()
     -- [[ Configure Treesitter ]]
     -- See `:help nvim-treesitter`
     vim.defer_fn(function()
-      require('nvim-treesitter.configs').setup {
+      require("nvim-treesitter.configs").setup({
         -- Add languages to be installed here that you want installed for treesitter
         ensure_installed = {
-          'c',
-          'cpp',
-          'go',
-          'lua',
-          'python',
-          'rust',
-          'tsx',
-          'javascript',
-          'typescript',
-          'vimdoc',
-          'vim',
-          'bash',
-          'css',
-          'html',
-          'svelte',
-          'json',
-          'toml',
+          "c",
+          "cpp",
+          "go",
+          "lua",
+          "python",
+          "rust",
+          "tsx",
+          "javascript",
+          "typescript",
+          "vimdoc",
+          "vim",
+          "bash",
+          "css",
+          "html",
+          "svelte",
+          "json",
+          "toml",
         },
 
         -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
@@ -46,10 +46,10 @@ return {
         incremental_selection = {
           enable = true,
           keymaps = {
-            init_selection = 'gn',
-            node_incremental = 'gn',
-            scope_incremental = 'gc',
-            node_decremental = 'gr',
+            init_selection = "gn",
+            node_incremental = "gn",
+            scope_incremental = "gc",
+            node_decremental = "gr",
           },
         },
         textobjects = {
@@ -58,45 +58,45 @@ return {
             lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
             keymaps = {
               -- you can use the capture groups defined in textobjects.scm
-              ['aa'] = '@parameter.outer',
-              ['ia'] = '@parameter.inner',
-              ['af'] = '@function.outer',
-              ['if'] = '@function.inner',
-              ['ac'] = '@class.outer',
-              ['ic'] = '@class.inner',
+              ["aa"] = "@parameter.outer",
+              ["ia"] = "@parameter.inner",
+              ["af"] = "@function.outer",
+              ["if"] = "@function.inner",
+              ["ac"] = "@class.outer",
+              ["ic"] = "@class.inner",
             },
           },
           move = {
             enable = true,
             set_jumps = true, -- whether to set jumps in the jumplist
             goto_next_start = {
-              [']m'] = '@function.outer',
-              [']]'] = '@class.outer',
+              ["]m"] = "@function.outer",
+              ["]]"] = "@class.outer",
             },
             goto_next_end = {
-              [']M'] = '@function.outer',
-              [']['] = '@class.outer',
+              ["]M"] = "@function.outer",
+              ["]["] = "@class.outer",
             },
             goto_previous_start = {
-              ['[m'] = '@function.outer',
-              ['[['] = '@class.outer',
+              ["[m"] = "@function.outer",
+              ["[["] = "@class.outer",
             },
             goto_previous_end = {
-              ['[M'] = '@function.outer',
-              ['[]'] = '@class.outer',
+              ["[M"] = "@function.outer",
+              ["[]"] = "@class.outer",
             },
           },
           swap = {
             enable = true,
             swap_next = {
-              ['<leader>a'] = '@parameter.inner',
+              ["<leader>a"] = "@parameter.inner",
             },
             swap_previous = {
-              ['<leader>A'] = '@parameter.inner',
+              ["<leader>A"] = "@parameter.inner",
             },
           },
         },
-      }
+      })
     end, 0)
   end,
 }
