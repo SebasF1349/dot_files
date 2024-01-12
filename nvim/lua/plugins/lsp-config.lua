@@ -70,6 +70,7 @@ local servers = {
 return {
   {
     'williamboman/mason.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       require('mason').setup {
         ui = {
@@ -84,6 +85,7 @@ return {
   },
   {
     'williamboman/mason-lspconfig.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     dependencies = {
       'neovim/nvim-lspconfig',
       'simrat39/rust-tools.nvim',

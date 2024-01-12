@@ -55,8 +55,8 @@ vim.opt.updatetime = 250
 vim.opt.title = true
 
 -- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
-vim.opt.clipboard = 'unnamedplus'
+-- removed as idk how to use and takes 300ms of startup time
+--vim.opt.clipboard = 'unnamedplus'
 
 -- split windows
 vim.opt.splitright = true -- split vertical window to the right
