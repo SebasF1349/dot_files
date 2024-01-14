@@ -17,7 +17,7 @@ return {
     -- Completion for the command line
     {
       "hrsh7th/cmp-cmdline",
-      event = { "BufReadPre", "BufNewFile" },
+      keys = { ":", "/" },
     },
   },
   config = function()
