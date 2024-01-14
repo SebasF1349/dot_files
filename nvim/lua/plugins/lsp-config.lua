@@ -90,7 +90,17 @@ return {
       "neovim/nvim-lspconfig",
       "simrat39/rust-tools.nvim",
       "hrsh7th/cmp-nvim-lsp",
-      { "j-hui/fidget.nvim", opts = {} },
+      {
+        "j-hui/fidget.nvim",
+        opts = {
+          notification = {
+            window = {
+              normal_hl = "CursorLineNr",
+              winblend = 0,
+            },
+          },
+        },
+      },
       "folke/neodev.nvim",
       "nvim-telescope/telescope.nvim",
     },
