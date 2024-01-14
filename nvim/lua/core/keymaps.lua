@@ -60,3 +60,6 @@ vim.keymap.set("v", ">", ">gv")
 
 -- Keep pasted text after pasting
 vim.keymap.set("v", "p", '"_dp')
+
+-- NetRW
+vim.keymap.set("n", "<leader>E", ":Ex<cr>")

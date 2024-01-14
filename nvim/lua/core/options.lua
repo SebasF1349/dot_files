@@ -65,3 +65,7 @@ vim.opt.splitbelow = true -- split horizontal window to the bottom
 vim.opt.fileencoding = "utf-8"
 
 vim.opt.iskeyword:append("-")
+
+-- netrw options
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3
