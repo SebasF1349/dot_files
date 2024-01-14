@@ -15,7 +15,10 @@ return {
     -- Adds a number of user-friendly snippets
     "rafamadriz/friendly-snippets",
     -- Completion for the command line
-    "hrsh7th/cmp-cmdline",
+    {
+      "hrsh7th/cmp-cmdline",
+      event = { "BufReadPre", "BufNewFile" },
+    },
   },
   config = function()
     -- See `:help cmp`
