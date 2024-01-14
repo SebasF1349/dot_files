@@ -30,7 +30,7 @@ return {
       lualine_z = { { "filename", path = 1 } },
     },
     inactive_sections = {
-      lualine_a = {},
+      lualine_a = { "[[------------------>]]" },
       lualine_b = {},
       lualine_c = {},
       lualine_x = {},
