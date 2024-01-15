@@ -1,8 +1,14 @@
--- [[ Basic Keymaps ]]
-
 -- Keymaps for better default experience
--- See `:help vim.keymap.set()`
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+
+--Remap Escape
+vim.keymap.set("i", "jk", "<Esc>")
+
+-- Save
+vim.keymap.set({ "i", "n", "x", "s" }, "<C-s>", ":wa<cr>")
+
+-- Select all
+vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -14,11 +20,9 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnos
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
---Remap Escape
-vim.keymap.set("i", "jk", "<Esc>")
-
 --Open explorer
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>E", "vim.cmd.Ex")
+--vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 --Move things around when in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -58,11 +62,20 @@ vim.keymap.set("n", "s,", "5<C-w>+", { desc = "Resize [S]plit [<]Bigger Horizont
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
--- Keep pasted text after pasting
+-- Do things without affecting the registers
 vim.keymap.set("v", "p", '"_dp')
-
--- NetRW
-vim.keymap.set("n", "<leader>E", ":Ex<cr>")
+vim.keymap.set("n", "x", '"_x')
+vim.keymap.set("n", "<Leader>p", '"0p')
+vim.keymap.set("n", "<Leader>P", '"0P')
+vim.keymap.set("v", "<Leader>p", '"0p')
+vim.keymap.set("n", "<Leader>c", '"_c')
+vim.keymap.set("n", "<Leader>C", '"_C')
+vim.keymap.set("v", "<Leader>c", '"_c')
+vim.keymap.set("v", "<Leader>C", '"_C')
+vim.keymap.set("n", "<Leader>d", '"_d')
+vim.keymap.set("n", "<Leader>D", '"_D')
+vim.keymap.set("v", "<Leader>d", '"_d')
+vim.keymap.set("v", "<Leader>D", '"_D')
 
 -- Terminal
 vim.keymap.set("n", "tt", ":vsplit | vertical resize 50 | term<cr>")

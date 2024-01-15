@@ -135,7 +135,7 @@ return {
         else
           nmap("K", vim.lsp.buf.hover, "Hover Documentation")
         end
-        nmap("<C-s>", vim.lsp.buf.signature_help, "Signature Documentation")
+        nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
 
         -- Lesser used LSP functionality
         nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
