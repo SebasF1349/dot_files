@@ -105,6 +105,10 @@ return {
       "nvim-telescope/telescope.nvim",
     },
     config = function()
+      -- add border to the floating windows
+      require("lspconfig.ui.windows").default_options = {
+        border = "single",
+      }
       -- used to enable autocompletion (assign to every lsp server config)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local cmp_nvim_lsp = require("cmp_nvim_lsp")

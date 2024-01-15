@@ -55,8 +55,7 @@ vim.opt.updatetime = 250
 vim.opt.title = true
 
 -- Sync clipboard between OS and Neovim.
--- removed as idk how to use and takes 300ms of startup time
---vim.opt.clipboard = 'unnamedplus'
+vim.opt.clipboard = "unnamedplus"
 
 -- split windows
 vim.opt.splitright = true -- split vertical window to the right
@@ -69,3 +68,15 @@ vim.opt.iskeyword:append("-")
 -- netrw options
 vim.g.netrw_banner = 0
 vim.g.netrw_liststyle = 3
+
+-- add borders to floating windows
+local _border = "single"
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+  border = _border,
+})
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+  border = _border,
+})
+vim.diagnostic.config({
+  float = { border = _border },
+})
