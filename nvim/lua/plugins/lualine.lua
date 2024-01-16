@@ -29,8 +29,8 @@ return {
       lualine_z = { { "filename", path = 1 } },
     },
     inactive_sections = {
-      lualine_a = { "[[------------------>]]" },
-      lualine_b = {},
+      lualine_a = { { "filetype", icon_only = true } },
+      lualine_b = { "branch", "diff", "diagnostics" },
       lualine_c = {},
       lualine_x = {},
       lualine_y = {},
