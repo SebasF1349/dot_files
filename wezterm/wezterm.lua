@@ -37,12 +37,6 @@ config.inactive_pane_hsb = {
   saturation = 1,
   brightness = 0.5,
 }
-config.window_padding = {
-  left = 0,
-  right = 0,
-  top = "0.5cell",
-  bottom = 0,
-}
 
 config.enable_scroll_bar = false
 
