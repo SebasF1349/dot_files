@@ -1,5 +1,5 @@
 -- Pull in the wezterm API
-local wezterm = require 'wezterm'
+local wezterm = require("wezterm")
 local action = wezterm.action
 
 -- This table will hold the configuration.
@@ -18,14 +18,14 @@ end
 
 -- This is where you actually apply your config choices
 
-config.color_scheme = 'Catppuccin Mocha'
+config.color_scheme = "Catppuccin Mocha"
 
-if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
+if wezterm.target_triple == "x86_64-pc-windows-msvc" then
   --This next line should be the only thing that's needed, but it doesn't work for new panes
   --config.default_domain = 'WSL:Ubuntu'
   config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
-  config.default_prog = { 'wsl.exe', '--cd', '~/repos' }
-elseif wezterm.target_triple == 'x86_64-unknown-linux-gnu' then
+  config.default_prog = { "wsl.exe", "--cd", "~/repos" }
+elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
   --Let open in home or in current directory, it works on linux, not in wsl
   --config.default_prog = { '/bin/bash', '-l' }
   --config.default_cwd = './~'
@@ -40,7 +40,7 @@ config.inactive_pane_hsb = {
 config.window_padding = {
   left = 0,
   right = 0,
-  top = 0,
+  top = "0.5cell",
   bottom = 0,
 }
 
@@ -48,77 +48,77 @@ config.enable_scroll_bar = false
 
 config.window_background_opacity = 0.9
 
-config.font = wezterm.font('JetBrainsMono Nerd Font')
+config.font = wezterm.font("JetBrainsMono Nerd Font")
 
-config.window_close_confirmation = 'NeverPrompt'
+config.window_close_confirmation = "NeverPrompt"
 
 -- Shortcuts
 config.keys = {
   {
-    key = 'Enter',
-    mods = 'CTRL',
-    action = action.ToggleFullScreen
+    key = "Enter",
+    mods = "CTRL",
+    action = action.ToggleFullScreen,
   },
   {
-    key = 'i',
-    mods = 'CTRL|SHIFT',
-    action = action.SplitPane {
-      direction = 'Right',
+    key = "i",
+    mods = "CTRL|SHIFT",
+    action = action.SplitPane({
+      direction = "Right",
       size = { Percent = 30 },
-    },
+    }),
   },
   {
-    key = '_',
-    mods = 'CTRL|SHIFT',
-    action = action.SplitPane {
-      direction = 'Down',
+    key = "_",
+    mods = "CTRL|SHIFT",
+    action = action.SplitPane({
+      direction = "Down",
       size = { Percent = 30 },
-    },
+    }),
   },
   {
-    key = 'w',
-    mods = 'CTRL|SHIFT',
+    key = "w",
+    mods = "CTRL|SHIFT",
     action = action.CloseCurrentPane({ confirm = false }),
   },
   {
-    key = 'h',
-    mods = 'CTRL',
-    action = action.ActivatePaneDirection('Left'),
+    key = "h",
+    mods = "CTRL",
+    action = action.ActivatePaneDirection("Left"),
   },
   {
-    key = 'j',
-    mods = 'CTRL',
-    action = action.ActivatePaneDirection('Down'),
+    key = "j",
+    mods = "CTRL",
+    action = action.ActivatePaneDirection("Down"),
   },
   {
-    key = 'k',
-    mods = 'CTRL',
-    action = action.ActivatePaneDirection('Up'),
+    key = "k",
+    mods = "CTRL",
+    action = action.ActivatePaneDirection("Up"),
   },
   {
-    key = 'l',
-    mods = 'CTRL',
-    action = action.ActivatePaneDirection('Right'),
+    key = "l",
+    mods = "CTRL",
+    action = action.ActivatePaneDirection("Right"),
   },
   {
-    key = 'H',
-    mods = 'CTRL|SHIFT',
-    action = action.AdjustPaneSize({ 'Left', 1 }),
+    key = "H",
+    mods = "CTRL|SHIFT",
+    action = action.AdjustPaneSize({ "Left", 1 }),
   },
   {
-    key = 'J',
-    mods = 'CTRL|SHIFT',
-    action = action.AdjustPaneSize({ 'Down', 1 }),
+    key = "J",
+    mods = "CTRL|SHIFT",
+    action = action.AdjustPaneSize({ "Down", 1 }),
   },
   {
-    key = 'K',
-    mods = 'CTRL|SHIFT',
-    action = action.AdjustPaneSize({ 'Up', 1 }),
+    key = "K",
+    mods = "CTRL|SHIFT",
+    action = action.AdjustPaneSize({ "Up", 1 }),
   },
   {
-    key = 'L',
-    mods = 'CTRL|SHIFT',
-    action = action.AdjustPaneSize({ 'Right', 1 }),
+    key = "L",
+    mods = "CTRL|SHIFT",
+    action = action.AdjustPaneSize({ "Right", 1 }),
   },
 }
 
