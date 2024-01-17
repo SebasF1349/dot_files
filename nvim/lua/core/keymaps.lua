@@ -63,7 +63,7 @@ vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
 -- Do things without affecting the registers
-vim.keymap.set("v", "p", '"_dp')
+vim.keymap.set("v", "p", '"_dP')
 vim.keymap.set("n", "x", '"_x')
 vim.keymap.set("n", "<Leader>p", '"0p')
 vim.keymap.set("n", "<Leader>P", '"0P')
