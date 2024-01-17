@@ -135,6 +135,7 @@ alias cd..="cd .."
 alias ..="cd .."
 alias ...="cd ../.."
 
+# git
 alias g="git"
 alias gs="git status"
 alias gd="git diff"
@@ -145,8 +146,20 @@ alias ga="git add ."
 alias gaa="git add --all"
 alias gb="git branch"
 alias gch="git checkout"
+alias gcb="git checkout -b"
+function git_checkout_fzf() {
+    branch=$(git branch --all \
+      | fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" \
+      | sed "s/remotes\/origin\///" | xargs)
+    if [ -n "$branch" ]; then
+      git checkout $branch
+    fi
+}
+alias gcf="git_checkout_fzf"
 alias gpush="git push"
 alias gpull="git pull"
+alias gl="git log"
+alias gst="git stash"
 
 alias nv="${EDITOR}"
 alias nv.="${EDITOR} ."
