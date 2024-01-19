@@ -78,5 +78,6 @@ vim.keymap.set("v", "<Leader>d", '"_d')
 vim.keymap.set("v", "<Leader>D", '"_D')
 
 -- Terminal
-vim.keymap.set("n", "tt", ":vsplit | vertical resize 50 | term<cr>")
-vim.keymap.set("t", "jk", "<C-\\><C-n>")
+vim.keymap.set("n", "tt", ":vsplit | vertical resize 50 | term<cr>i")
+vim.keymap.set("t", "jk", "<C-\\><C-n><C-w>w")
+vim.keymap.set("t", "sx", "<cmd>close<CR>")

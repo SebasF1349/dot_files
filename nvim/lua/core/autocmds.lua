@@ -15,6 +15,20 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
   end,
 })
 
+-- Always enter terminal in insert move
+vim.api.nvim_create_autocmd({ "WinEnter" }, {
+  pattern = "term://*",
+  command = "startinsert",
+})
+
+-- Remove line numbers from terminal
+vim.api.nvim_create_autocmd({ "TermOpen" }, {
+  callback = function()
+    vim.cmd("setlocal nonumber")
+    vim.cmd("setlocal norelativenumber")
+  end,
+})
+
 -- Close with 'q' in some windows
 vim.api.nvim_create_autocmd({ "FileType" }, {
   pattern = {
