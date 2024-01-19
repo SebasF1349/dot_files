@@ -174,7 +174,10 @@ nvf() {
     elif [[ "$dir" == "dot" ]]; then
         dir="${HOME}/dot_files/"
     fi
-    eval "cd $(fd . ${dir} --type d --max-depth 2 | fzf) && ${EDITOR} ."
+    dir=$(fd . ${dir} --type d --max-depth 2 | fzf)
+    if [[ "$dir" != "" ]]; then
+        cd $dir && ${EDITOR} .
+    fi
 }
 
 alias tup="cd ~/tup"
