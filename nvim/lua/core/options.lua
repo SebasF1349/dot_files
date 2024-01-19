@@ -54,8 +54,8 @@ vim.opt.updatetime = 250
 
 vim.opt.title = true
 
--- Sync clipboard between OS and Neovim.
-vim.opt.clipboard = "unnamedplus"
+-- No sync clipboard between OS and Neovim.
+vim.opt.clipboard = ""
 
 -- split windows
 vim.opt.splitright = true -- split vertical window to the right

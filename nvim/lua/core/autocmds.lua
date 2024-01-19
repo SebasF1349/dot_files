@@ -43,3 +43,13 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
     vim.cmd("tabdo wincmd =")
   end,
 })
+
+-- sync with system clipboard on focus
+vim.api.nvim_create_autocmd({ "FocusGained" }, {
+  pattern = { "*" },
+  command = [[call setreg("@", getreg("+"))]],
+})
+vim.api.nvim_create_autocmd({ "FocusLost" }, {
+  pattern = { "*" },
+  command = [[call setreg("+", getreg("@"))]],
+})
