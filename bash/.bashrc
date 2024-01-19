@@ -99,8 +99,7 @@ alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
 
 ##fzf
-# Use ~~ as the trigger sequence instead of the default **
-export FZF_COMPLETION_TRIGGER='ºº'
+export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='--border --info=inline'
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
@@ -174,15 +173,34 @@ nvf() {
     elif [[ "$dir" == "dot" ]]; then
         dir="${HOME}/dot_files/"
     fi
-    dir=$(fd . ${dir} --type d --max-depth 2 | fzf)
-    if [[ "$dir" != "" ]]; then
+    dir=$(fd . ${dir} --type d --max-depth 2 | fzf )
+    if [[ -n "$dir" ]]; then
         cd $dir && ${EDITOR} .
     fi
+}
+
+#   - Open the selected file with the default editor
+#   - Bypass fuzzy finder if there's only one match (--select-1)
+#   - Exit if there's no match (--exit-0)
+nvff() {
+  IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
 }
 
 alias tup="cd ~/tup"
 alias dot="cd ~/dot_files"
 alias repos="cd ~/repos"
+
+# cd to selected directory
+cdf() {
+  # nice idea: use just cd and run cd if no arguments
+  # sadly that would break cd to go to home
+  local dir
+  dir=$(fd . ${1:-.} --hidden --type d | fzf +m)
+  if [[ -n "$dir" ]]; then
+    cd "$dir"
+  fi
+}
 
 cl() {
     local dir="$1"
@@ -248,7 +266,6 @@ mvg (){
         mv $1 $2
     fi
 }
-
 
 if [ -f /etc/os-release ]; then
     # freedesktop.org and systemd
@@ -339,8 +356,10 @@ elif [ "$DISTRO" = "arch" ]; then
     alias fuzi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
     # remove
     alias fuzr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"
-    # install with yay?
+    # install with yay
     alias yayi="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
+    # remove with yay
+    alias yayr="yay -Qq | fzf --multi --preview 'yay -Qi {1}' | xargs -ro yay -Rns"
 fi
 
 # WELCOME WINDOW
