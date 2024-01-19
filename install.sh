@@ -1,6 +1,1 @@
-cargo install starship --locked
-sudo apt install exa
-sudo apt install bat
-sudo apt install fd-find
-sudo apt install fzf
-sudo apt install neofetch
+install=(starship exa bat fd-find fzf ripgrep xlip ttf-jetbrains-mono wezterm keepassxc python docker git implay obs curl openssh libreoffice numlockx autotiling mpv firefox eza pipewire github-cli bob docker-compose nodejs npm xlip picom)
