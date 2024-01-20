@@ -99,7 +99,7 @@ alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
 
 ##fzf
-export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
+export FZF_DEFAULT_OPTS='--height=50% --layout=reverse --border'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='--border --info=inline'
 # Use fd (https://github.com/sharkdp/fd) instead of the default find

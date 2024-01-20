@@ -70,7 +70,7 @@ config.keys = {
     }),
   },
   {
-    key = "w",
+    key = "x",
     mods = "CTRL|SHIFT",
     action = action.CloseCurrentPane({ confirm = false }),
   },
