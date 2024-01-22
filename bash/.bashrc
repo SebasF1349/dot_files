@@ -162,7 +162,7 @@ alias gst="git stash"
 
 alias nv="${EDITOR}"
 alias nv.="${EDITOR} ."
-alias nvbash="${EDITOR} ~/.bashrc"
+alias nvbash="${EDITOR} ~/.bashrc && source ~/.bashrc"
 alias sourcebash="source ~/.bashrc"
 alias snv="sudo ${EDITOR}"
 
