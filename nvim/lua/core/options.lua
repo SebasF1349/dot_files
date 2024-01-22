@@ -52,8 +52,6 @@ vim.opt.signcolumn = "yes"
 vim.opt.timeoutlen = 300
 vim.opt.updatetime = 250
 
-vim.opt.title = true
-
 -- No sync clipboard between OS and Neovim.
 vim.opt.clipboard = ""
 
