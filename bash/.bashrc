@@ -50,6 +50,12 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
+if [ -f /etc/os-release ]; then
+    # freedesktop.org and systemd
+    . /etc/os-release
+    DISTRO=$ID_LIKE
+fi
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias grep='grep --color=auto'
@@ -99,7 +105,11 @@ alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
 
 ##fzf
-export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
+if [ "$DISTRO" = "debian" ]; then
+    export FZF_DEFAULT_OPTS='--height 50% --layout=reverse --border'
+elif [ "$DISTRO" = "arch" ]; then
+    export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
+fi
 # Options to fzf command
 export FZF_COMPLETION_OPTS='--border --info=inline'
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
@@ -267,11 +277,6 @@ mvg (){
     fi
 }
 
-if [ -f /etc/os-release ]; then
-    # freedesktop.org and systemd
-    . /etc/os-release
-    DISTRO=$ID_LIKE
-fi
 
 if [ "$DISTRO" = "debian" ]; then
     # set variable identifying the chroot you work in (used in the prompt below)
