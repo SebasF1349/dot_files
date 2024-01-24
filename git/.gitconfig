@@ -1,0 +1,29 @@
+[user]
+    name = SebasF1349
+    email = ratablanca711@gmail.com
+[init]
+    defaultBranch = main
+
+[core]
+    pager = delta
+[include]
+    path = ~/dot_files/git/mocha.gitconfig 
+[delta]
+    features = catppuccin-<flavour>
+    true-color = always
+[core]
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only --features=interactive
+[delta]
+    features = decorations catppuccin-mocha navigate
+    syntax-theme = Catppuccin-mocha # Use bat theme
+[delta "interactive"]
+    keep-plus-minus-markers = false
+[delta "decorations"]
+    line-numbers = true
+    hyperlinks = true
+[merge]
+    conflictstyle = diff3
+[diff]
+    colorMoved = default

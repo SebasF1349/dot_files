@@ -183,7 +183,7 @@ nvf() {
 #   - Bypass fuzzy finder if there's only one match (--select-1)
 #   - Exit if there's no match (--exit-0)
 nvff() {
-  IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview 'cat {}'))
+  IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}"))
   [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
 }
 
