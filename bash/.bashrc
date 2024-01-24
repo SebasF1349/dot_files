@@ -99,7 +99,7 @@ alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
 
 ##fzf
-export FZF_DEFAULT_OPTS='--height=50% --layout=reverse --border'
+export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='--border --info=inline'
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
@@ -183,7 +183,7 @@ nvf() {
 #   - Bypass fuzzy finder if there's only one match (--select-1)
 #   - Exit if there's no match (--exit-0)
 nvff() {
-  IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0))
+  IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview 'cat {}'))
   [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
 }
 
