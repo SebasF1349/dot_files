@@ -8,11 +8,6 @@
     pager = delta
 [include]
     path = ~/dot_files/git/mocha.gitconfig 
-[delta]
-    features = catppuccin-<flavour>
-    true-color = always
-[core]
-    pager = delta
 [interactive]
     diffFilter = delta --color-only --features=interactive
 [delta]
@@ -21,6 +16,7 @@
 [delta "interactive"]
     keep-plus-minus-markers = false
 [delta "decorations"]
+    true-color = always
     line-numbers = true
     hyperlinks = true
 [merge]
