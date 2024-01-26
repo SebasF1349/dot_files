@@ -65,6 +65,7 @@ vim.opt.iskeyword:append("-")
 
 -- netrw options
 vim.g.netrw_banner = 0
+vim.g.netrw_sort_options = "i"
 
 -- add borders to floating windows
 local _border = "single"
