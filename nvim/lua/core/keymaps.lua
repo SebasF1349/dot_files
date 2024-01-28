@@ -16,8 +16,30 @@ vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
+vim.keymap.set("n", "[d", function()
+  vim.diagnostic.goto_prev({})
+  vim.api.nvim_feedkeys("zz", "n", false)
+end, { desc = "Go to previous diagnostic message" })
+vim.keymap.set("n", "]d", function()
+  vim.diagnostic.goto_next({})
+  vim.api.nvim_feedkeys("zz", "n", false)
+end, { desc = "Go to next diagnostic message" })
+vim.keymap.set("n", "[e", function()
+  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+  vim.api.nvim_feedkeys("zz", "n", false)
+end, { desc = "Go to previous error message" })
+vim.keymap.set("n", "]e", function()
+  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+  vim.api.nvim_feedkeys("zz", "n", false)
+end, { desc = "Go to next error message" })
+vim.keymap.set("n", "[w", function()
+  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.WARN })
+  vim.api.nvim_feedkeys("zz", "n", false)
+end, { desc = "Go to previous warning message" })
+vim.keymap.set("n", "]w", function()
+  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.WARN })
+  vim.api.nvim_feedkeys("zz", "n", false)
+end, { desc = "Go to next warning message" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
@@ -29,9 +51,34 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
---Keep search terms in the middle of the screen
+-- Press 'H', 'L' to jump to start/end of a line (first/last char)
+vim.keymap.set("n", "L", "$")
+vim.keymap.set("n", "H", "^")
+
+-- Press 'U' for undo
+vim.keymap.set("n", "U", "<C-r>")
+
+--Quick search and replace on the current word
+vim.keymap.set("n", "S", function()
+  local cmd = ":%s/<C-r><C-w>//gI<Left><Left><Left>"
+  local keys = vim.api.nvim_replace_termcodes(cmd, true, false, true)
+  vim.api.nvim_feedkeys(keys, "n", false)
+end)
+
+-- Center buffer while navigating
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "{", "{zz")
+vim.keymap.set("n", "}", "}zz")
+vim.keymap.set("n", "G", "Gzz")
+vim.keymap.set("n", "gg", "ggzz")
+vim.keymap.set("n", "<C-i>", "<C-i>zz")
+vim.keymap.set("n", "<C-o>", "<C-o>zz")
+vim.keymap.set("n", "%", "%zz")
+vim.keymap.set("n", "*", "*zz")
+vim.keymap.set("n", "#", "#zz")
 
 vim.keymap.set("n", "Q", "<nop>")
 
@@ -42,6 +89,11 @@ vim.keymap.set("n", "<leader>+x", "<cmd>!chmod +x %<CR>", { silent = true })
 --[[ vim.keymap.set('n', '<leader>v', ':vsplit<CR><C-w>l', { noremap = true })
 vim.keymap.set('n', '<leader>h', ':wincmd h<CR>', { noremap = true })
 vim.keymap.set('n', '<leader>l', ':wincmd l<CR>', { noremap = true }) ]]
+
+-- buffer movement
+vim.keymap.set("n", "<C-n>", "<C-i>", { desc = "Change to [N]ext buffer" })
+vim.keymap.set("n", "<C-p>", "<C-o>", { desc = "Change to [P]revious buffer" })
+vim.keymap.set("n", "<leader>,", "<C-^>", { desc = "Switch to last buffer" })
 
 -- window management
 vim.keymap.set("n", "si", "<C-w>v", { desc = "[S]plit Window [i]Vertically" }) -- split window vertically
