@@ -91,9 +91,9 @@ vim.keymap.set('n', '<leader>h', ':wincmd h<CR>', { noremap = true })
 vim.keymap.set('n', '<leader>l', ':wincmd l<CR>', { noremap = true }) ]]
 
 -- buffer movement
-vim.keymap.set("n", "<C-n>", "<C-i>", { desc = "Change to [N]ext buffer" })
-vim.keymap.set("n", "<C-p>", "<C-o>", { desc = "Change to [P]revious buffer" })
-vim.keymap.set("n", "<leader>,", "<C-^>", { desc = "Switch to last buffer" })
+-- vim.keymap.set("n", "<C-n>", "<C-i>", { desc = "Change to [N]ext buffer" })
+-- vim.keymap.set("n", "<C-p>", "<C-o>", { desc = "Change to [P]revious buffer" })
+-- vim.keymap.set("n", "<leader>,", "<C-^>", { desc = "Switch to last buffer" })
 
 -- window management
 vim.keymap.set("n", "si", "<C-w>v", { desc = "[S]plit Window [i]Vertically" }) -- split window vertically

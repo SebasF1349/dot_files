@@ -1,7 +1,35 @@
+local function basename(str)
+  local path = vim.fn.split(str, "/")
+  return path[#path - 1] .. "/" .. path[#path]
+end
+
+local function Harpoon_files()
+  local harpoon = require("harpoon")
+  local currentfile = basename(vim.fn.expand("%:p"))
+
+  local s = ""
+
+  for i, v in ipairs(harpoon:list().items) do
+    local fn = basename(v.value)
+    local prefix = fn ~= currentfile and i or "󰛢"
+
+    s = s .. prefix .. " " .. fn
+    if i < #harpoon:list().items then
+      s = s .. "  "
+    end
+  end
+
+  if #harpoon:list().items == 0 then
+    s = s .. "󰛢"
+  end
+
+  return s
+end
+
 return {
   "nvim-lualine/lualine.nvim",
   event = { "BufReadPre", "BufNewFile" },
-  dependencies = { "nvim-tree/nvim-web-devicons" },
+  dependencies = { "nvim-tree/nvim-web-devicons", "theprimeagen/harpoon" },
   opts = {
     options = {
       icons_enabled = true,
@@ -27,7 +55,7 @@ return {
       lualine_c = {},
       lualine_x = {},
       lualine_y = {},
-      lualine_z = { { "windows", mode = 0 } },
+      lualine_z = { { Harpoon_files } },
     },
     inactive_sections = {},
     tabline = {},
