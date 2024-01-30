@@ -1,5 +1,8 @@
 local function basename(str)
   local path = vim.fn.split(str, "/")
+  if #path == 1 then
+    return "/" .. path[#path]
+  end
   return path[#path - 1] .. "/" .. path[#path]
 end
 
