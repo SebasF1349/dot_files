@@ -3,6 +3,8 @@
     email = ratablanca711@gmail.com
 [init]
     defaultBranch = main
+[help]
+    autocorrect = prompt
 
 [core]
     pager = delta
