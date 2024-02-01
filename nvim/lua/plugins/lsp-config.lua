@@ -94,6 +94,9 @@ return {
       {
         "j-hui/fidget.nvim",
         opts = {
+          progress = {
+            ignore_empty_message = true,
+          },
           notification = {
             window = {
               normal_hl = "CursorLineNr",
