@@ -42,6 +42,7 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     "spectre_panel",
     "lir",
     "tsplayground",
+    "fugitive",
     "",
   },
   callback = function()
