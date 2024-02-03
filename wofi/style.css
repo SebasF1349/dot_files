@@ -1,0 +1,35 @@
+window {
+  opacity: 0.99;
+  font-family: "jetbrains mono nerd font";
+  border-radius: 20px;
+  background-color: @theme_bg_color;
+  border: solid 2px @theme_selected_bg_color;
+}
+#input {
+  border-radius: 10px;
+  font-size: 22px;
+  padding: 5px 10px;
+  margin: 0 0 10px 0;
+  background-color: mix(@theme_bg_color, @theme_fg_color, 0.1);
+}
+#inner-box {
+  
+}
+#outer-box {
+  padding: 10px;
+}
+#entry {
+  border-radius: 10px;
+  padding: 10px;
+}
+#entry:selected {
+  padding: 10px;
+  border: /*@theme_selected_bg_color 2px solid;*/ none;
+  background-color: mix(@theme_bg_color, @theme_fg_color, 0.1);
+}
+#text {
+  padding-left: 10px;
+}
+#selected {
+  background-color: transparent;
+}

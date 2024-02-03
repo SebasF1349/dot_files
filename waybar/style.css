@@ -1,0 +1,45 @@
+* {
+  /* `otf-font-awesome` is required to be installed for icons */
+  font-family: JetBrainsMono Nerd Font;
+  font-size: 14px;
+  border-radius: 0px;
+}
+
+#workspaces,
+#clock,
+#custom-notification,
+#custom-launcher,
+#custom-power-menu,
+#custom-window,
+#custom-weather,
+#network,
+#custom-spotify,
+#pulseaudio,
+#battery,
+#backlight,
+#idle_inhibitor,
+#tray {
+  color: rgb(180, 190, 254);
+  margin: 0px;
+  margin-right: 20px;
+  transition: all 0.3s ease;
+}
+
+#workspaces button.active label {
+  color: rgba(30, 30, 46, 0.6);
+  font-weight: bolder;
+}
+
+#workspaces button.active {
+  background-color: rgb(245, 194, 231);
+  transition: all 0.3s ease;
+}
+
+#tray menu {
+  background-color: rgba(30, 30, 46, 0.9);
+  opacity: 1;
+}
+
+#pulseaudio.muted {
+  color: rgb(243, 139, 168);
+}
