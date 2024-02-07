@@ -45,7 +45,8 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 
 --Open explorer
 --vim.keymap.set("n", "<leader>E", "vim.cmd.Ex")
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+-- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>pv", ":Lexplore!<CR>")
 
 --Move things around when in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
