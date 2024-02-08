@@ -42,7 +42,14 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 --Open explorer
 --vim.keymap.set("n", "<leader>E", "vim.cmd.Ex")
 -- vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
-vim.keymap.set("n", "<leader>pv", ":Lexplore!<CR>")
+vim.keymap.set("n", "<leader>pv", function()
+  local function getPath(str)
+    return str:match("(.*[/\\])")
+  end
+  local currentfile = getPath(vim.fn.expand("%:p"))
+  vim.print(currentfile)
+  vim.cmd("Lexplore!" .. currentfile)
+end)
 
 --Move things around when in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")

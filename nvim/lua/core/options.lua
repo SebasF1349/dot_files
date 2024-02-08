@@ -64,6 +64,7 @@ vim.opt.fileencoding = "utf-8"
 vim.opt.iskeyword:append("-")
 
 -- netrw options
+vim.g.netrw_liststyle = 3
 vim.g.netrw_banner = 0
 vim.g.netrw_sort_options = "i"
 vim.g.netrw_winsize = 30
