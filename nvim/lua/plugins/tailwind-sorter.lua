@@ -5,7 +5,7 @@ return {
   config = true,
   opts = {
     on_save_enabled = true,
-    on_save_pattern = { "*.html", "*.js", "*.jsx", "*.tsx", "*.twig", "*.hbs", "*.php", "*.heex", "*.astro", "*.svelte" },
+    on_save_pattern = { "*.html", "*.js", "*.ts", "*.jsx", "*.tsx", "*.twig", "*.hbs", "*.php", "*.heex", "*.astro", "*.svelte" },
     node_path = "node",
   },
 }
