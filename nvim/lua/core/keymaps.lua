@@ -4,10 +4,6 @@ vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 --Remap Escape
 vim.keymap.set("i", "jk", "<Esc>")
 
--- Save
-vim.keymap.set("n", "<C-s>", ":wa<cr>")
-vim.keymap.set({ "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>")
-
 -- Select all
 vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 

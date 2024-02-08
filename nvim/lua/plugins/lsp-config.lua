@@ -145,6 +145,12 @@ return {
         end
         nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
 
+        if data.name == "tailwind" then
+          vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>:TailwindSort<cr>")
+        else
+          vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>")
+        end
+
         -- Lesser used LSP functionality
         nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
         nmap("<leader>wa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
