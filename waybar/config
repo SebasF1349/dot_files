@@ -4,17 +4,13 @@
     "hyprland/workspaces"
   ],
   "modules-center": [
-    "custom/weather",
-    "clock",
   ],
   "modules-right": [
-    "tray",
-    "pulseaudio",
     "network",
-    "battery",
     "backlight",
-    "idle_inhibitor",
-    "custom/power-menu"
+    "pulseaudio",
+    "battery",
+    "clock",
   ],
   "hyprland/workspaces": {
     "disable-scroll": false,
@@ -35,25 +31,38 @@
     "spacing": 5
   },
   "clock": {
+    "format": "{:%a %b %d %I:%M %p}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-    "format": "{:%H:%M %a %d/%m}",
+    //"format": "{:%H:%M %a %d/%m}",
     "on-scroll": {
       "calendar": 1
     }
   },
+  //"network": {
+    //"format": "{ifname}",
+    //"format-wifi": " {signalStrength}%",
+    //"format-ethernet": "󰊗 {ipaddr}/{cidr}",
+    //"format-disconnected": "󰖪", 
+    //"tooltip-format": "{ifname} via {gwaddr}",
+    //"tooltip-format-wifi": "{essid}",
+    //"tooltip-format-ethernet": "{ifname}",
+    //"tooltip-format-disconnected": "Disconnected",
+    //"max-length": 50
+  //},
   "network": {
-    "format": "{ifname}",
-    "format-wifi": " {signalStrength}%",
-    "format-ethernet": "󰊗 {ipaddr}/{cidr}",
-    "format-disconnected": "󰖪", 
+    "interface": "wlan0",
+    "format-icons": ["󰤟","󰤢","󰤥","󰖩"],
+    "format": "Disconnected 󰤭", 
+    "format-wifi":"On {icon}",
+    "format-disconnected": "Offline 󰤭",
+    "format-ethernet": "{ipaddr}/{cidr}󰊗",
     "tooltip-format": "{ifname} via {gwaddr}",
     "tooltip-format-wifi": "{essid}",
     "tooltip-format-ethernet": "{ifname}",
-    "tooltip-format-disconnected": "Disconnected",
     "max-length": 50
   },
   "pulseaudio": {
-    "format": "{icon} {volume}%",
+    "format": "{volume} {icon}",
     "format-bluetooth": "{volume}%  {format_source}",
     "format-bluetooth-muted": "󰝟  ",
     "format-muted": "󰝟 ",
@@ -88,15 +97,15 @@
       "warning": 20,
       "critical": 10
     },
-    "format": "{icon} {capacity}%",
+    "format": "{capacity} {icon}",
     "format-icons": [" ", " ", " ", " ", " "],
-    "format-full": "{icon} {capacity}%",
-    "format-charging": "󱐋 {capacity}%",
+    "format-full": "{capacity} {icon}",
+    "format-charging": "{capacity}  <span color='#a6e3a1'>{icon}</span>",
     "tooltip": true,
   },
   "backlight": {
     "device": "intel_backlight",
-    "format": "{icon} {percent}%",
+    "format": "{percent} {icon}",
     "format-icons": [
       "󰃞",
       "󰃟",
