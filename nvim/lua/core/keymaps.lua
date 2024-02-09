@@ -7,6 +7,9 @@ vim.keymap.set("i", "jk", "<Esc>")
 -- Select all
 vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 
+-- Save all
+vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>")
+
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })

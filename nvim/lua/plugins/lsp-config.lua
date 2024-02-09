@@ -147,8 +147,6 @@ return {
 
         if data.name == "tailwind" then
           vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>:TailwindSort<cr>")
-        else
-          vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>")
         end
 
         -- Lesser used LSP functionality
