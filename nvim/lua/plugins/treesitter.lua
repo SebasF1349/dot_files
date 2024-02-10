@@ -4,6 +4,7 @@ return {
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
+    "windwp/nvim-ts-autotag",
   },
   build = ":TSUpdate",
   config = function()
@@ -95,6 +96,13 @@ return {
               ["<leader>A"] = "@parameter.inner",
             },
           },
+        },
+
+        autotag = {
+          enable = true,
+          enable_rename = true,
+          enable_close = true,
+          enable_close_on_slash = true,
         },
       })
     end, 0)
