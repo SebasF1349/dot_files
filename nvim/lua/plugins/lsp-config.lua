@@ -59,7 +59,7 @@ local servers = {
   },
 
   tailwindcss = {
-    ["tailwind-language-server"] = {},
+    ["tailwindcss-language-server"] = {},
   },
 
   emmet_ls = {
@@ -209,6 +209,20 @@ return {
             dap = {
               adapter = require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path),
             },
+          })
+        end,
+
+        ["tailwindcss"] = function()
+          require("lspconfig").tailwindcss.setup({
+            hovers = true,
+            suggestions = true,
+            root_dir = function(fname)
+              vim.inspect(fname)
+              local root_pattern =
+                require("lspconfig").util.root_pattern("tailwind.config.cjs", "tailwind.config.js", "tailwind.config.ts", "postcss.config.js")
+              vim.inspect(root_pattern(fname), fname)
+              return root_pattern(fname)
+            end,
           })
         end,
       })

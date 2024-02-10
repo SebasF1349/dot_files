@@ -35,6 +35,8 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     "netrw",
     "Jaq",
     "qf",
+    "query",
+    "checkhealth",
     "git",
     "help",
     "man",
@@ -45,11 +47,9 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     "fugitive",
     "",
   },
-  callback = function()
-    vim.cmd([[
-      nnoremap <silent> <buffer> q :close<CR>
-      set nobuflisted
-    ]])
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
   end,
 })
 
