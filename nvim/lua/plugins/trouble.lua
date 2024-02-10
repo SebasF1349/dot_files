@@ -2,11 +2,6 @@ return {
   "folke/trouble.nvim",
   event = "LspAttach",
   dependencies = { "nvim-tree/nvim-web-devicons" },
-  opts = {
-    -- your configuration comes here
-    -- or leave it empty to use the default settings
-    -- refer to the configuration section below
-  },
   config = function()
     vim.keymap.set("n", "<leader>xx", function()
       require("trouble").toggle()
@@ -26,5 +21,11 @@ return {
     vim.keymap.set("n", "gR", function()
       require("trouble").toggle("lsp_references")
     end, { desc = "[g]Trouble [R]eferences" })
+    vim.keymap.set("n", "[t", function()
+      require("trouble").next({ skip_groups = true, jump = true })
+    end)
+    vim.keymap.set("n", "]t", function()
+      require("trouble").previous({ skip_groups = true, jump = true })
+    end)
   end,
 }
