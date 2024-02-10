@@ -113,6 +113,16 @@ return {
       require("lspconfig.ui.windows").default_options = {
         border = "single",
       }
+
+      -- Setup neovim lua configuration
+      require("neodev").setup({
+        override = function(root_dir, library)
+          if root_dir:match("dot_files") then
+            library.enabled = true
+            library.plugins = true
+          end
+        end,
+      })
       -- used to enable autocompletion (assign to every lsp server config)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local cmp_nvim_lsp = require("cmp_nvim_lsp")
@@ -226,8 +236,6 @@ return {
           })
         end,
       })
-      -- Setup neovim lua configuration
-      require("neodev").setup()
     end,
   },
 }
