@@ -11,11 +11,24 @@ vim.api.nvim_create_autocmd("VimEnter", {
       vim.cmd.cd(data.file)
       local builtin = require("telescope.builtin")
       builtin.find_files()
-      -- vim.cmd("Telescope find_files")
     end
   end,
   group = general,
   desc = "Open Telescope when it's a Directory",
+})
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+  once = true,
+  callback = function()
+    -- In wsl 2, just install xclip
+    -- Ubuntu
+    -- sudo apt install xclip
+    -- Arch linux
+    -- sudo pacman -S xclip
+    vim.opt.clipboard = "unnamedplus" -- allows neovim to access the system clipboard
+  end,
+  group = general,
+  desc = "Lazy load clipboard",
 })
 
 -- Highlight on yank

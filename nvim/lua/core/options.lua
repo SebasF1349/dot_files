@@ -53,7 +53,7 @@ vim.opt.timeoutlen = 300
 vim.opt.updatetime = 250
 
 -- No sync clipboard between OS and Neovim.
-vim.opt.clipboard = ""
+-- vim.opt.clipboard = ""
 
 -- split windows
 vim.opt.splitright = true -- split vertical window to the right
