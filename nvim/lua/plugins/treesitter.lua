@@ -1,16 +1,15 @@
 return {
-  -- Highlight, edit, and navigate code
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
     "windwp/nvim-ts-autotag",
+    "nvim-treesitter/nvim-treesitter-context",
   },
   build = ":TSUpdate",
   config = function()
-    -- [[ Configure Treesitter ]]
-    -- See `:help nvim-treesitter`
     vim.defer_fn(function()
+      require("treesitter-context").setup({ mode = "topline" })
       require("nvim-treesitter.configs").setup({
         -- Add languages to be installed here that you want installed for treesitter
         ensure_installed = {
