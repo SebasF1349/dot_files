@@ -34,12 +34,12 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
   callback = function()
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
-      vim.cmd("silent!w")
+      vim.cmd("silent! wa")
       vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), "info")
       if vim.fn.exists(":Format") > 0 then
         vim.cmd.Format()
       end
-      if vim.fn.exists(":TailwindSort") then
+      if vim.fn.exists(":TailwindSort") > 0 then
         vim.cmd("TailwindSort")
       end
     end
