@@ -1,3 +1,23 @@
+-- General Settings
+local general = vim.api.nvim_create_augroup("General Settings", { clear = true })
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function(data)
+    -- buffer is a directory
+    local directory = vim.fn.isdirectory(data.file) == 1
+
+    -- change to the directory
+    if directory then
+      vim.cmd.cd(data.file)
+      local builtin = require("telescope.builtin")
+      builtin.find_files()
+      -- vim.cmd("Telescope find_files")
+    end
+  end,
+  group = general,
+  desc = "Open Telescope when it's a Directory",
+})
+
 -- Highlight on yank
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
