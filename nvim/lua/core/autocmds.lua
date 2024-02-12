@@ -204,3 +204,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 --     })
 --   end,
 -- }
+
+-- {{{ Automagically close command-line window.
+vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
+  group = general,
+  callback = function()
+    vim.cmd("quit")
+  end,
+})
