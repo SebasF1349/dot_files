@@ -2,3 +2,6 @@ install=(starship exa bat fd-find fzf ripgrep xlip ttf-jetbrains-mono wezterm ke
 
 # set keyboard layout to international english>
 # localectl set-x11-keymap us default intl
+
+# update mirrors
+# sudo reflector --country [COUNTRY CODE - BR] --threads 10 --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
