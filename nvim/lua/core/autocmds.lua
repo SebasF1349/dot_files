@@ -205,10 +205,22 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 --   end,
 -- }
 
--- {{{ Automagically close command-line window.
+-- Automagically close command-line window.
 vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
   group = general,
   callback = function()
     vim.cmd("quit")
+  end,
+})
+
+--Create dir when saving a file when an intermediate directory is missing.
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+  group = general,
+  callback = function(event)
+    if event.match:match("^%w%w+://") then
+      return
+    end
+    local file = vim.loop.fs_realpath(event.match) or event.match
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
