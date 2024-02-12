@@ -5,12 +5,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
   callback = function(data)
     -- buffer is a directory
     local directory = vim.fn.isdirectory(data.file) == 1
-
     -- change to the directory
     if directory then
       vim.cmd.cd(data.file)
-      local builtin = require("telescope.builtin")
-      builtin.find_files()
+      require("telescope.builtin").find_files()
     end
   end,
   group = general,

@@ -15,10 +15,7 @@ return {
     -- Adds a number of user-friendly snippets
     "rafamadriz/friendly-snippets",
     -- Completion for the command line
-    {
-      "hrsh7th/cmp-cmdline",
-      keys = { ":", "/" },
-    },
+    "hrsh7th/cmp-cmdline",
   },
   config = function()
     -- See `:help cmp`

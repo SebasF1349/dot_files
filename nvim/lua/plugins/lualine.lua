@@ -31,8 +31,8 @@ end
 
 return {
   "nvim-lualine/lualine.nvim",
-  -- event = { "BufReadPre", "BufNewFile" },
-  event = "VeryLazy",
+  event = { "BufReadPre", "BufNewFile" },
+  -- event = "VeryLazy",
   dependencies = { "nvim-tree/nvim-web-devicons", "theprimeagen/harpoon" },
   opts = {
     options = {

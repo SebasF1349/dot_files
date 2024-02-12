@@ -2,7 +2,7 @@ return {
   -- Git related plugins
   {
     "tpope/vim-fugitive",
-    keys = ":",
+    cmd = "G",
   },
 
   "tpope/vim-rhubarb",

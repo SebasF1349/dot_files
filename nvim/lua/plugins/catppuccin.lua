@@ -2,6 +2,7 @@ return {
   "catppuccin/nvim",
   name = "catppuccin",
   priority = 1000,
+  lazy = false,
   config = function()
     require("catppuccin").setup({
       flavour = "mocha",
@@ -17,7 +18,7 @@ return {
         which_key = true,
         indent_blankline = {
           enabled = true,
-          scope_color = "",
+          scope_color = "text",
           colored_indent_levels = false,
         },
         mason = true,
