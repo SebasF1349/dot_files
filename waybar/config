@@ -93,13 +93,15 @@
   "battery": {
     "interval": 10,
     "states": {
-      "warning": 20,
-      "critical": 10
+      "warning": 50,
+      "critical": 20
     },
     "format": "{capacity} {icon}",
     "format-icons": [" ", " ", " ", " ", " "],
     "format-full": "{capacity} {icon}",
     "format-charging": "{capacity}  <span color='#a6e3a1'>{icon}</span>",
+    "format-charging-warning": "{capacity}  <span color='#f9e2af'>{icon}</span>",
+    "format-charging-critical": "{capacity}  <span color='#f38ba8'>{icon}</span>",
     "tooltip": true,
   },
   "backlight": {
