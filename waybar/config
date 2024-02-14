@@ -103,10 +103,10 @@
     },
     "format-warning": "{capacity} <span color='#f9e2af'>{icon}</span>",
     "format-critical": "{capacity} <span color='#f38ba8'>{icon}</span>",
-    "format-full": "{capacity} <span color='#a6e3a1'>{icon}</span>",
+    //"format-full": "{capacity} <span color='#a6e3a1'>{icon}</span>",
     "format-charging-warning": "{capacity} <span color='#f9e2af'>{icon}</span>",
     "format-charging-critical": "{capacity} <span color='#f38ba8'>{icon}</span>",
-    "format-charging": "{capacity} <span color='#a6e3a1'>{icon}</span>",
+    //"format-charging": "{capacity} <span color='#a6e3a1'>{icon}</span>",
     "tooltip": true,
   },
   "backlight": {
