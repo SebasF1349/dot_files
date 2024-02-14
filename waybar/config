@@ -30,7 +30,7 @@
     "spacing": 5
   },
   "clock": {
-    "format": "{:%a %b %d %I:%M %p}",
+    "format": "{:%a %b %d %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
     //"format": "{:%H:%M %a %d/%m}",
     "on-scroll": {
@@ -97,11 +97,16 @@
       "critical": 20
     },
     "format": "{capacity} {icon}",
-    "format-icons": [" ", " ", " ", " ", " "],
-    "format-full": "{capacity} {icon}",
-    "format-charging": "{capacity}  <span color='#a6e3a1'>{icon}</span>",
-    "format-charging-warning": "{capacity}  <span color='#f9e2af'>{icon}</span>",
-    "format-charging-critical": "{capacity}  <span color='#f38ba8'>{icon}</span>",
+    "format-icons": {
+        "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]
+    },
+    "format-warning": "{capacity} <span color='#f9e2af'>{icon}</span>",
+    "format-critical": "{capacity} <span color='#f38ba8'>{icon}</span>",
+    "format-full": "{capacity} <span color='#a6e3a1'>{icon}</span>",
+    "format-charging-warning": "{capacity} <span color='#f9e2af'>{icon}</span>",
+    "format-charging-critical": "{capacity} <span color='#f38ba8'>{icon}</span>",
+    "format-charging": "{capacity} <span color='#a6e3a1'>{icon}</span>",
     "tooltip": true,
   },
   "backlight": {
