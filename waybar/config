@@ -1,13 +1,14 @@
  {
   "layer": "top",
+  "spacing": 5,
   "modules-left": [
     "hyprland/workspaces"
   ],
   "modules-center": [],
   "modules-right": [
     "network",
-    "backlight",
-    "pulseaudio",
+    "group/group-backlight",
+    "group/group-audio",
     "battery",
     "clock",
   ],
@@ -30,54 +31,60 @@
     "spacing": 5
   },
   "clock": {
-    "format": "{:%a %b %d %H:%M}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-    //"format": "{:%H:%M %a %d/%m}",
-    "on-scroll": {
-      "calendar": 1
+    "format": "{:%a %d %H:%M}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "on-scroll": { "calendar": 1 },
+    "calendar" : {
+        "on-scroll": 1,
+        "format" : {
+            "today": "<span color='#a6e3af'><b><u>{}</u></b></span>"
+        }
     }
   },
-  //"network": {
-    //"format": "{ifname}",
-    //"format-wifi": " {signalStrength}%",
-    //"format-ethernet": "󰊗 {ipaddr}/{cidr}",
-    //"format-disconnected": "󰖪", 
-    //"tooltip-format": "{ifname} via {gwaddr}",
-    //"tooltip-format-wifi": "{essid}",
-    //"tooltip-format-ethernet": "{ifname}",
-    //"tooltip-format-disconnected": "Disconnected",
-    //"max-length": 50
-  //},
   "network": {
     "interface": "wlan0",
     "format-icons": ["󰤟","󰤢","󰤥","󰖩"],
-    "format": "Disconnected 󰤭", 
-    "format-wifi":"On {icon}",
-    "format-disconnected": "Offline 󰤭",
+    "format": "󰤭", 
+    "format-wifi":"{icon}",
+    "format-disconnected": "󰤭",
     "format-ethernet": "{ipaddr}/{cidr}󰊗",
     "tooltip-format": "{ifname} via {gwaddr}",
     "tooltip-format-wifi": "{essid}",
     "tooltip-format-ethernet": "{ifname}",
     "max-length": 50
   },
-  "pulseaudio": {
-    "format": "{volume} {icon}",
-    "format-bluetooth": "{volume}%  {format_source}",
-    "format-bluetooth-muted": "󰝟  ",
-    "format-muted": "󰝟 ",
-    // "format-source": "{volume}% ",
-    // "format-source-muted": "",
-    "format-icons": {
-      "headphone": "",
-      "hands-free": "",
-      "headset": "󰋎",
-      "phone": "",
-      "portable": "",
-      "car": "",
-      "default": ["", "", ""]
+    "group/group-audio": {
+        "orientation": "inherit",
+        "drawer": {
+            "transition-duration": 500,
+            "children-class": "",
+            "transition-left-to-right": false,
+        },
+        "modules": [
+            "pulseaudio",
+            "pulseaudio/slider",
+        ]
     },
-    "on-click": "pavucontrol"
-  },
+    "pulseaudio": {
+        "scroll-step": 5,
+        "format": "{icon}",
+        "format-muted": "󰝟",
+        "format-source": "",
+        "format-source-muted": "",
+        "format-icons": {
+            "speaker": "󰕾",
+            "hdmi": "󰓃",
+            "headphone": "󰋋",
+            "hands-free": "?",
+            "headset": "󰋎",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click-right": "pavucontrol",
+        "on-click": "amixer set Master toggle",
+    },
   "idle_inhibitor": {
     "format": "{icon}",
     "format-icons": {
@@ -96,32 +103,38 @@
       "warning": 50,
       "critical": 20
     },
-    "format": "{capacity} {icon}",
+    "format": "{icon}",
     "format-icons": {
         "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
         "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]
     },
-    "format-warning": "{capacity} <span color='#f9e2af'>{icon}</span>",
-    "format-critical": "{capacity} <span color='#f38ba8'>{icon}</span>",
-    //"format-full": "{capacity} <span color='#a6e3a1'>{icon}</span>",
-    "format-charging-warning": "{capacity} <span color='#f9e2af'>{icon}</span>",
-    "format-charging-critical": "{capacity} <span color='#f38ba8'>{icon}</span>",
-    //"format-charging": "{capacity} <span color='#a6e3a1'>{icon}</span>",
-    "tooltip": true,
+    "format-warning": "<span color='#f9e2af'>{icon}</span>",
+    "format-critical": "<span color='#f38ba8'>{icon}</span>",
+    "format-charging-warning": "<span color='#f9e2af'>{icon}</span>",
+    "format-charging-critical": "<span color='#f38ba8'>{icon}</span>",
+    "tooltip-format": "{capacity}%",
   },
-  "backlight": {
-    "device": "intel_backlight",
-    "format": "{percent} {icon}",
-    "format-icons": [
-      "󰃞",
-      "󰃟",
-      "󰃠"
-    ],
-    "on-click": "brightnessctl set 5%+",
-    "on-click-right": "brightnessctl set 5%-",
-    "on-scroll-up": "brightnessctl set 1%+",
-    "on-scroll-down": "brightnessctl set 1%-",
-    "min-length": 6,
-    "tooltip-format": "brightnessctl"
+    "group/group-backlight": {
+        "orientation": "inherit",
+        "drawer": {
+            "transition-duration": 500,
+            "children-class": "",
+            "transition-left-to-right": false,
+        },
+        "modules": [
+            "backlight",
+            "backlight/slider",
+        ]
+    },
+    "backlight": {
+        "device": "intel_backlight",
+        "tooltip": false,
+        "format": "{icon}",
+        "format-icons": [
+            "󰃞", "󰃟", "󰃠"
+        ],
+        "on-click": "brightnessctl set 5%+",
+        "on-click-right": "brightnessctl set 5%-",
+        "tooltip-format": "{percent}%"
   },
 }

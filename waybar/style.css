@@ -55,36 +55,77 @@ window>box {
     border-radius: 4px;
     margin-top: 1px;
     margin-bottom: 1px;
-    padding-left: 12px;
     padding-right: 12px;
-    /* font-size: 15px; */
+    color: @rosewater;
 }
 
 #network {
     margin-top: 1px;
     margin-bottom: 1px;
-    padding-left: 30px;
-    padding-right: 7px;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: @sapphire;
 }
 
 #backlight {
-    padding-left: 15px;
-    padding-right: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
     margin-top: 1px;
     margin-bottom: 1px;
+    color: @flamingo;
 }
 
 #pulseaudio {
-    padding-left: 12px;
-    padding-right: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
     margin-top: 1px;
     margin-bottom: 1px;
+    color: @mauve;
 }
 
 #battery {
-    margin-right: 4px;
     margin-top: 1px;
     margin-bottom: 1px;
-    padding-left: 12px;
-    padding-right: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
+
+#pulseaudio-slider,
+#pulseaudio-slider *,
+#group-audio,
+#backlight-slider,
+#backlight-slider *,
+#group-backlight {
+    margin: 0;
+    padding: 0;
+}
+
+#pulseaudio-slider,
+#backlight-slider {
+    padding-left: 10px;
+}
+
+slider {
+    min-height: 10px;
+    min-width: 10px;
+    opacity: 0;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+}
+
+trough {
+    min-height: 5px;
+    min-width: 80px;
+    padding-left: 10px;
+    border-radius: 5px;
+    background-color: @surface0;
+}
+
+highlight {
+    min-height: 5px;
+    border-radius: 5px;
+    background-color: green;
+}
+
+/* NO CAMBIA EL COLOR DEL SLIDER */
