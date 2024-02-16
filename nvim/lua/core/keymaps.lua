@@ -102,27 +102,27 @@ vim.keymap.set('n', '<leader>l', ':wincmd l<CR>', { noremap = true }) ]]
 -- vim.keymap.set("n", "<leader>,", "<C-^>", { desc = "Switch to last buffer" })
 
 -- window management
-vim.keymap.set("n", "si", "<C-w>v", { desc = "[S]plit Window [i]Vertically" }) -- split window vertically
-vim.keymap.set("n", "s-", "<C-w>s", { desc = "[S]plit Window [-]Horizontally" }) -- split window horizontally
-vim.keymap.set("n", "se", "<C-w>=", { desc = "[S]plits [E]qual Size" }) -- make split windows equal width & height
-vim.keymap.set("n", "sx", "<cmd>close<CR>", { desc = "[S]plit [x]Close" }) -- close current split window
--- Change active window
-vim.keymap.set("n", "sh", "<C-w>h", { desc = "Move cursor to [S]plit [h]Left" })
-vim.keymap.set("n", "sk", "<C-w>k", { desc = "Move cursor to [S]plit [k]Up" })
-vim.keymap.set("n", "sj", "<C-w>j", { desc = "Move cursor to [S]plit [j]Down" })
-vim.keymap.set("n", "sl", "<C-w>l", { desc = "Move cursor to [S]plit [l]right" })
--- Resize window
-vim.keymap.set("n", "s<", "5<C-w><", { desc = "Resize [S]plit [<]Smaller Vertically" })
-vim.keymap.set("n", "s>", "5<C-w>>", { desc = "Resize [S]plit [>]Bigger Vertically" })
-vim.keymap.set("n", "s.", "5<C-w>-", { desc = "Resize [S]plit [<]Smaller Horizontally" })
-vim.keymap.set("n", "s,", "5<C-w>+", { desc = "Resize [S]plit [<]Bigger Horizontally" })
--- Move (rotate) window on row
-vim.keymap.set("n", "sr", "<C-w><C-r>", { desc = "[S]plit [R]otate" })
--- Move split to main position
-vim.keymap.set("n", "sH", "<C-w>H", { desc = "Move [S]plit [h]Left" })
-vim.keymap.set("n", "sK", "<C-w>K", { desc = "Move [S]plit [k]Up" })
-vim.keymap.set("n", "sJ", "<C-w>J", { desc = "Move [S]plit [j]Down" })
-vim.keymap.set("n", "sL", "<C-w>L", { desc = "Move [S]plit [l]right" })
+vim.keymap.set("n", "<A-i>", "<C-w>v", { desc = "[S]plit Window [i]Vertically" }) -- split window vertically
+vim.keymap.set("n", "<A-->", "<C-w>s", { desc = "[S]plit Window [-]Horizontally" }) -- split window horizontally
+vim.keymap.set("n", "<A-e>", "<C-w>=", { desc = "[S]plits [E]qual Size" }) -- make split windows equal width & height
+vim.keymap.set("n", "<A-x>", "<cmd>close<CR>", { desc = "[S]plit [x]Close" }) -- close current split window
+-- -- Change active window
+-- vim.keymap.set("n", "sh", "<C-w>h", { desc = "Move cursor to [S]plit [h]Left" })
+-- vim.keymap.set("n", "sk", "<C-w>k", { desc = "Move cursor to [S]plit [k]Up" })
+-- vim.keymap.set("n", "sj", "<C-w>j", { desc = "Move cursor to [S]plit [j]Down" })
+-- vim.keymap.set("n", "sl", "<C-w>l", { desc = "Move cursor to [S]plit [l]right" })
+-- -- Resize window
+-- vim.keymap.set("n", "s<", "5<C-w><", { desc = "Resize [S]plit [<]Smaller Vertically" })
+-- vim.keymap.set("n", "s>", "5<C-w>>", { desc = "Resize [S]plit [>]Bigger Vertically" })
+-- vim.keymap.set("n", "s.", "5<C-w>-", { desc = "Resize [S]plit [<]Smaller Horizontally" })
+-- vim.keymap.set("n", "s,", "5<C-w>+", { desc = "Resize [S]plit [<]Bigger Horizontally" })
+-- -- Move (rotate) window on row
+-- vim.keymap.set("n", "sr", "<C-w><C-r>", { desc = "[S]plit [R]otate" })
+-- -- Move split to main position
+-- vim.keymap.set("n", "sH", "<C-w>H", { desc = "Move [S]plit [h]Left" })
+-- vim.keymap.set("n", "sK", "<C-w>K", { desc = "Move [S]plit [k]Up" })
+-- vim.keymap.set("n", "sJ", "<C-w>J", { desc = "Move [S]plit [j]Down" })
+-- vim.keymap.set("n", "sL", "<C-w>L", { desc = "Move [S]plit [l]right" })
 
 -- Stay in indent mode
 vim.keymap.set("v", "<", "<gv")
@@ -155,8 +155,8 @@ local function navigate(dir)
     local win = vim.api.nvim_get_current_win()
     vim.cmd.wincmd(dir)
     -- local pane = vim.env.WEZTERM_PANE
-    local pane = true
-    if pane and win == vim.api.nvim_get_current_win() then
+    local pane = vim.loop.os_uname().release:find("WSL")
+    if not pane and win == vim.api.nvim_get_current_win() then
       local pane_dir = nav[dir]
       vim.system({ "wezterm", "cli", "activate-pane-direction", pane_dir }, { text = true }, function(p)
         if p.code ~= 0 then
