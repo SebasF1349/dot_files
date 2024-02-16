@@ -50,3 +50,5 @@
     plus-style = "syntax #394545"
     # Should match the name of the bat theme
     #syntax-theme = "Catppuccin-mocha"
+[pull]
+	rebase = true
