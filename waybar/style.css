@@ -9,6 +9,7 @@
     min-height: 20px;
     font-weight: 900;
     color: @text;
+    transition: all 0.3s ease;
 }
 
 window#waybar {
@@ -20,8 +21,6 @@ window>box {
     margin-right: 6px;
     margin-top: 6px;
     background-color: rgba(26, 30, 46, 0.5);
-    transition-property: background-color;
-    transition-duration: 0.5s;
     border: 2px solid rgba(138, 173, 244, 0.5);
 }
 
