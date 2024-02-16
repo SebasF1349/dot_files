@@ -19,8 +19,8 @@ function M.setup(config)
   config.disable_default_key_bindings = true
   config.keys = {
     -- Scrollback
-    { mods = M.mod, key = "k", action = act.ScrollByPage(-0.5) },
-    { mods = M.mod, key = "j", action = act.ScrollByPage(0.5) },
+    { mods = M.mod, key = "K", action = act.ScrollByPage(-0.5) },
+    { mods = M.mod, key = "J", action = act.ScrollByPage(0.5) },
     -- New Tab
     { mods = M.mod, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
     -- Splits
