@@ -1,6 +1,5 @@
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
-local action = wezterm.action
 
 -- This table will hold the configuration.
 local config = {}
@@ -10,6 +9,9 @@ local config = {}
 if wezterm.config_builder then
   config = wezterm.config_builder()
 end
+
+require("keys").setup(config)
+require("tabs").setup(config)
 
 --wezterm.on('gui-startup', function(cmd)
 --  local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
@@ -46,157 +48,31 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 
 config.window_close_confirmation = "NeverPrompt"
 
--- Shortcuts
-config.keys = {
-  {
-    key = "Enter",
-    mods = "CTRL",
-    action = action.ToggleFullScreen,
-  },
-  {
-    key = "i",
-    mods = "CTRL|SHIFT",
-    action = action.SplitPane({
-      direction = "Right",
-      size = { Percent = 30 },
-    }),
-  },
-  {
-    key = "_",
-    mods = "CTRL|SHIFT",
-    action = action.SplitPane({
-      direction = "Down",
-      size = { Percent = 30 },
-    }),
-  },
-  {
-    key = "x",
-    mods = "CTRL|SHIFT",
-    action = action.CloseCurrentPane({ confirm = false }),
-  },
-  {
-    key = "h",
-    mods = "CTRL",
-    action = action.ActivatePaneDirection("Left"),
-  },
-  {
-    key = "j",
-    mods = "CTRL",
-    action = action.ActivatePaneDirection("Down"),
-  },
-  {
-    key = "k",
-    mods = "CTRL",
-    action = action.ActivatePaneDirection("Up"),
-  },
-  {
-    key = "l",
-    mods = "CTRL",
-    action = action.ActivatePaneDirection("Right"),
-  },
-  {
-    key = "H",
-    mods = "CTRL|SHIFT",
-    action = action.AdjustPaneSize({ "Left", 1 }),
-  },
-  {
-    key = "J",
-    mods = "CTRL|SHIFT",
-    action = action.AdjustPaneSize({ "Down", 1 }),
-  },
-  {
-    key = "K",
-    mods = "CTRL|SHIFT",
-    action = action.AdjustPaneSize({ "Up", 1 }),
-  },
-  {
-    key = "L",
-    mods = "CTRL|SHIFT",
-    action = action.AdjustPaneSize({ "Right", 1 }),
-  },
-}
+config.front_end = "WebGpu"
+-- config.webgpu_power_preference = "HighPerformance"
+-- config.animation_fps = 1
+config.cursor_blink_ease_in = "Constant"
+config.cursor_blink_ease_out = "Constant"
 
---config.window_decorations = "RESIZE"
+-- config.underline_thickness = 3
+-- config.cursor_thickness = 4
+-- config.underline_position = -6
 
---[[ wezterm.on("update-right-status", function(window, pane)
-  -- Each element holds the text for a cell in a "powerline" style << fade
-  local cells = {};
+-- if wezterm.target_triple:find("windows") then
+--   --config.default_prog = { "pwsh" }
+--   config.window_decorations = "RESIZE|TITLE"
+--   wezterm.on("gui-startup", function(cmd)
+--     local screen = wezterm.gui.screens().active
+--     local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+--     local gui = window:gui_window()
+--     local width = 0.7 * screen.width
+--     local height = 0.7 * screen.height
+--     gui:set_inner_size(width, height)
+--     gui:set_position((screen.width - width) / 2, (screen.height - height) / 2)
+--   end)
+-- else
+--   config.term = "wezterm"
+--   config.window_decorations = "RESIZE"
+-- end
 
-  -- Figure out the cwd and host of the current pane.
-  -- This will pick up the hostname for the remote host if your
-  -- shell is using OSC 7 on the remote host.
-  local cwd_uri = pane:get_current_working_dir()
-  if cwd_uri then
-    cwd_uri = cwd_uri:sub(8);
-    local slash = cwd_uri:find("/")
-    local cwd = ""
-    local hostname = ""
-    if slash then
-      hostname = cwd_uri:sub(1, slash-1)
-      -- Remove the domain name portion of the hostname
-      local dot = hostname:find("[.]")
-      if dot then
-        hostname = hostname:sub(1, dot-1)
-      end
-      -- and extract the cwd from the uri
-      cwd = cwd_uri:sub(slash)
-
-      table.insert(cells, cwd);
-      table.insert(cells, hostname);
-    end
-  end
-
-  -- I like my date/time in this style: "Wed Mar 3 08:14"
-  local date = wezterm.strftime("%a %b %-d %H:%M");
-  table.insert(cells, date);
-
-  -- An entry for each battery (typically 0 or 1 battery)
-  for _, b in ipairs(wezterm.battery_info()) do
-    table.insert(cells, string.format("%.0f%%", b.state_of_charge * 100))
-  end
-
-  -- The powerline < symbol
-  local LEFT_ARROW = utf8.char(0xe0b3);
-  -- The filled in variant of the < symbol
-  local SOLID_LEFT_ARROW = utf8.char(0xe0b2)
-
-  -- Color palette for the backgrounds of each cell
-  local colors = {
-    "#3c1361",
-    "#52307c",
-    "#663a82",
-    "#7c5295",
-    "#b491c8",
-  };
-
-  -- Foreground color for the text across the fade
-  local text_fg = "#c0c0c0";
-
-  -- The elements to be formatted
-  local elements = {};
-  -- How many cells have been formatted
-  local num_cells = 0;
-
-  -- Translate a cell into elements
-  function push(text, is_last)
-    local cell_no = num_cells + 1
-    table.insert(elements, {Foreground={Color=text_fg}})
-    table.insert(elements, {Background={Color=colors[cell_no]}})
-    table.insert(elements, {Text=" "..text.." "})
-    if not is_last then
-      table.insert(elements, {Foreground={Color=colors[cell_no+1]}})
-      table.insert(elements, {Text=SOLID_LEFT_ARROW})
-    end
-    num_cells = num_cells + 1
-  end
-
-  while #cells > 0 do
-    local cell = table.remove(cells, 1)
-    push(cell, #cells == 0)
-  end
-
-  window:set_right_status(wezterm.format(elements));
-end); ]]
-
--- and finally, return the configuration to wezterm
 return config

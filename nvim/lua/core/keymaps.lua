@@ -50,7 +50,6 @@ vim.keymap.set("n", "<leader>pv", function()
     return str:match("(.*[/\\])")
   end
   local currentfile = getPath(vim.fn.expand("%:p"))
-  vim.print(currentfile)
   vim.cmd("Lexplore!" .. currentfile)
 end)
 
@@ -143,3 +142,63 @@ vim.keymap.set("v", "<Leader>D", '"_D')
 vim.keymap.set("n", "tt", ":vsplit | vertical resize 50 | term<cr>i")
 vim.keymap.set("t", "jk", "<C-\\><C-n><C-w>w")
 vim.keymap.set("t", "sx", "<cmd>close<CR>")
+
+local nav = {
+  h = "Left",
+  j = "Down",
+  k = "Up",
+  l = "Right",
+}
+
+local function navigate(dir)
+  return function()
+    local win = vim.api.nvim_get_current_win()
+    vim.cmd.wincmd(dir)
+    -- local pane = vim.env.WEZTERM_PANE
+    local pane = true
+    if pane and win == vim.api.nvim_get_current_win() then
+      local pane_dir = nav[dir]
+      vim.system({ "wezterm", "cli", "activate-pane-direction", pane_dir }, { text = true }, function(p)
+        if p.code ~= 0 then
+          vim.notify("Failed to move to pane " .. pane_dir .. "\n" .. p.stderr, vim.log.levels.ERROR, { title = "Wezterm" })
+        end
+      end)
+    end
+  end
+end
+
+local function base64(data)
+  data = tostring(data)
+  local bit = require("bit")
+  local b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+  local b64, len = "", #data
+  local rshift, lshift, bor = bit.rshift, bit.lshift, bit.bor
+
+  for i = 1, len, 3 do
+    local a, b, c = data:byte(i, i + 2)
+    b = b or 0
+    c = c or 0
+
+    local buffer = bor(lshift(a, 16), lshift(b, 8), c)
+    for j = 0, 3 do
+      local index = rshift(buffer, (3 - j) * 6) % 64
+      b64 = b64 .. b64chars:sub(index + 1, index + 1)
+    end
+  end
+
+  local padding = (3 - len % 3) % 3
+  b64 = b64:sub(1, -1 - padding) .. ("="):rep(padding)
+
+  return b64
+end
+
+local function set_user_var(key, value)
+  io.write(string.format("\027]1337;SetUserVar=%s=%s\a", key, base64(value)))
+end
+set_user_var("IS_NVIM", true)
+
+-- Move to window using the movement keys
+for key, dir in pairs(nav) do
+  vim.keymap.set("n", "<" .. dir .. ">", navigate(key))
+  vim.keymap.set("n", "<C-" .. key .. ">", navigate(key))
+end
