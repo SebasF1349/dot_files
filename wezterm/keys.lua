@@ -19,8 +19,8 @@ function M.setup(config)
   config.disable_default_key_bindings = true
   config.keys = {
     -- Scrollback
-    { mods = M.mod, key = "K", action = act.ScrollByPage(-0.5) },
-    { mods = M.mod, key = "J", action = act.ScrollByPage(0.5) },
+    { mods = M.mod, key = "u", action = act.ScrollByPage(-0.5) },
+    { mods = M.mod, key = "d", action = act.ScrollByPage(0.5) },
     -- New Tab
     { mods = M.mod, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
     -- Splits
@@ -45,7 +45,7 @@ function M.setup(config)
     { mods = M.mod, key = "V", action = act.PasteFrom("Clipboard") },
     { mods = M.mod, key = "M", action = act.TogglePaneZoomState },
     { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
-    { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
+    -- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
     M.split_nav("resize", "CTRL", "LeftArrow", "Left"),
     M.split_nav("resize", "CTRL", "RightArrow", "Right"),
     M.split_nav("resize", "CTRL", "UpArrow", "Up"),
