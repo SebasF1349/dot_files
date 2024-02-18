@@ -4,10 +4,25 @@
 [init]
     defaultBranch = main
 [help]
-    autocorrect = prompt
+    autocorrect = 10
+[pull]
+    ff = true
+[push]
+    default = current
+[merge]
+    conflictstyle = zdiff3
+[diff]
+    colorMoved = default
+    algorithm = histogram
+[rebase]
+    autosquash = true
+    autostash = true
+[branch]
+    sort = committerdate
 
 [core]
     pager = delta
+    autocrlf = false
 [interactive]
     diffFilter = delta --color-only --features=interactive
 [delta]
@@ -19,10 +34,6 @@
     true-color = always
     line-numbers = true
     hyperlinks = true
-[merge]
-    conflictstyle = diff3
-[diff]
-    colorMoved = default
 [delta "catppuccin-mocha"]
     # source https://github.com/Anomalocaridid/delta
     blame-palette = "#1e1e2e #181825 #11111b #313244 #45475a"
@@ -50,5 +61,3 @@
     plus-style = "syntax #394545"
     # Should match the name of the bat theme
     #syntax-theme = "Catppuccin-mocha"
-[pull]
-	rebase = true
