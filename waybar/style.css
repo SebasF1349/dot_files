@@ -54,7 +54,7 @@ window>box {
     padding: 1px 10px;
     margin: 9px 9px 9px 0;
     border-radius: 8px;
-    color: @rosewater;
+    color: @peach;
 }
 
 #network,
@@ -132,3 +132,11 @@ highlight {
 }
 
 /* NO CAMBIA EL COLOR DEL SLIDER */
+
+#custom-playerctl {
+    background-color: @surface0;
+    padding: 1px 10px;
+    margin: 9px 0;
+    border-radius: 8px;
+    margin-right: 10px;
+}

@@ -5,6 +5,7 @@
   ],
   "modules-center": [],
   "modules-right": [
+    "custom/playerctl",
     "network",
     "group/group-backlight",
     "group/group-audio",
@@ -135,5 +136,22 @@
         "on-click": "brightnessctl set 5%+",
         "on-click-right": "brightnessctl set 5%-",
         "tooltip-format": "{percent}%"
+  },
+  "custom/playerctl": {
+    "interval": 1,
+    "format": "{icon} {}",
+    "max-length": 40,
+    "exec": "~/.config/waybar/scripts/playerctl.sh",
+    "on-click": "playerctl play-pause",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous",
+    "scroll-step": 10,
+    "return-type": "json",
+    "format-icons": {
+      "Firefox": "<span color='#f38ba8'><b> </b></span>",
+      "Playing": "<span color='#b4befe'><b>󰎈</b></span>",
+      "Paused": "<span color='#f9e2af'><b>󰏤</b></span>",
+    },
+    "escape": true
   },
 }
