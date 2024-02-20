@@ -15,6 +15,14 @@ vim.api.nvim_create_autocmd("VimEnter", {
   desc = "Open Telescope when it's a Directory",
 })
 
+vim.api.nvim_create_autocmd("VimLeave", {
+  callback = function()
+    set_user_var("IS_NVIM", false)
+  end,
+  group = general,
+  desc = "Set Global Variable to false for Wezterm to use",
+})
+
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
   once = true,
   callback = function()
