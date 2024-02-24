@@ -1,0 +1,15 @@
+configuration{
+    modi: "drun,window";
+    icon-theme: "Oranchelo";
+    show-icons: true;
+    scroll-method: 0;
+    terminal: "wezterm";
+    drun-display-format: "{icon} {name}";
+    location: 0;
+    disable-history: false;
+    hide-scrollbar: true;
+    sidebar-mode: true;
+}
+
+@theme "./catppuccin-mocha-custom"
+
