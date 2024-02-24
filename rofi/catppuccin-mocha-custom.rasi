@@ -14,10 +14,7 @@
 
 configuration {
     show-icons:                     true;
-    display-drun: 		            "";
-    drun-display-format:            "{icon} {name}";
-    display-window: 		        "";
-    window-display-format:          "{icon} {name}";
+    display-combi: 		            "";
     disable-history:                false;
     click-to-exit: 		            true;
     location:                       0;
@@ -84,7 +81,6 @@ case-indicator {
     spacing:                        0;
 }
 
-
 listview {
     background-color:               transparent;
     columns:                        1;
@@ -147,13 +143,4 @@ element selected {
     border:                  	    0px 0px 0px 0px;
     border-radius:                  10px;
     border-color:                   @BDR;
-}
-
-element selected.urgent {
-    text-color:                     @FG;
-}
-
-element selected.active {
-    background-color:               @backgroundActive;
-    color:                          @FG;
 }

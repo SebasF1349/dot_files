@@ -1,5 +1,7 @@
 configuration{
-    modi: "drun,window";
+    modi: "combi";
+    combi-modes: [drun, window];
+    combi-hide-mode-prefix: true;
     icon-theme: "Oranchelo";
     show-icons: true;
     scroll-method: 0;
