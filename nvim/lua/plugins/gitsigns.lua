@@ -19,6 +19,9 @@ return {
         vim.keymap.set(mode, l, r, opts)
       end
 
+      -- These are the defaul keybindings
+      -- only leaving them here for reference and for the desc
+
       --navigation
       map({ "n", "v" }, "]c", function()
         if vim.wo.diff then

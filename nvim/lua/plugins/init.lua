@@ -17,6 +17,14 @@ return {
     opts = {},
   },
 
+  -- Highlight todo, notes, etc in comments
+  {
+    "folke/todo-comments.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = { signs = false },
+  },
+
   {
     "m4xshen/hardtime.nvim",
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },

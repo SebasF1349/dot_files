@@ -29,38 +29,32 @@ return {
           luasnip.lsp_expand(args.body)
         end,
       },
-      -- First item is selected by default
-      completion = {
-        completeopt = "menu,menuone,preview,noinsert",
-      },
+      completion = { completeopt = "menu,menuone,noinsert" },
       mapping = cmp.mapping.preset.insert({
-        --some of these are not working, why?
-        ["<A-k>"] = cmp.mapping.select_prev_item(),
-        ["<A-j>"] = cmp.mapping.select_next_item(),
-        ["<A-b>"] = cmp.mapping.scroll_docs(-4),
-        ["<A-f>"] = cmp.mapping.scroll_docs(4),
-        ["<A-Space>"] = cmp.mapping.complete(),
-        ["<A-e>"] = cmp.mapping.abort(),
-        ["<CR>"] = cmp.mapping.confirm({
+        ["<C-n>"] = cmp.mapping.select_prev_item(),
+        ["<C-p>"] = cmp.mapping.select_next_item(),
+        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-f>"] = cmp.mapping.scroll_docs(4),
+        -- Manually trigger a completion from nvim-cmp.
+        --  Generally you don't need this, because nvim-cmp will display
+        --  completions whenever it has completion options available.
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"] = cmp.mapping.abort(),
+        -- Accept ([y]es) the completion.
+        --  This will auto-import if your LSP supports it.
+        --  This will expand snippets if the LSP sent a snippet.
+        ["<C-y>"] = cmp.mapping.confirm({
           behavior = cmp.ConfirmBehavior.Replace,
           select = true,
         }),
-        ["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_next_item()
-          elseif luasnip.expand_or_locally_jumpable() then
+        ["<Tab>"] = cmp.mapping(function()
+          if luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()
-          else
-            fallback()
           end
         end, { "i", "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.locally_jumpable(-1) then
+        ["<S-Tab>"] = cmp.mapping(function()
+          if luasnip.locally_jumpable(-1) then
             luasnip.jump(-1)
-          else
-            fallback()
           end
         end, { "i", "s" }),
       }),
