@@ -1,26 +1,42 @@
 local servers = {
   rust_analyzer = {
-    imports = {
-      granularity = {
-        group = "module",
-      },
-      prefix = "self",
-    },
-    cargo = {
-      allFeatures = true,
-      buildScripts = {
+    ["rust-analyzer"] = {
+      diagnostics = {
         enable = true,
       },
-    },
-    procMacro = {
-      enable = true,
-    },
-    command = {
-      "cargo",
-      "clippy",
-    },
-    checkOnSave = {
-      command = "clippy",
+      inlayHints = {
+        enable = true,
+        showParameterNames = true,
+        parameterHintsPrefix = "<- ",
+        otherHintsPrefix = "=> ",
+      },
+      imports = {
+        granularity = {
+          group = "module",
+        },
+        prefix = "self",
+      },
+      cargo = {
+        allFeatures = true,
+        buildScripts = {
+          enable = true,
+        },
+      },
+      procMacro = {
+        enable = true,
+        ignored = {
+          ["async-trait"] = { "async_trait" },
+          ["napi-derive"] = { "napi" },
+          ["async-recursion"] = { "async_recursion" },
+        },
+      },
+      command = {
+        "cargo",
+        "clippy",
+      },
+      checkOnSave = {
+        command = "clippy",
+      },
     },
   },
   tsserver = {},
@@ -89,7 +105,6 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "neovim/nvim-lspconfig",
-      "simrat39/rust-tools.nvim",
       "hrsh7th/cmp-nvim-lsp",
       {
         "j-hui/fidget.nvim",
@@ -129,6 +144,7 @@ return {
       capabilities = cmp_nvim_lsp.default_capabilities()
 
       local on_attach = function(data, bufnr)
+        vim.lsp.inlay_hint.enable(bufnr, true)
         local nmap = function(keys, func, desc)
           if desc then
             desc = "LSP: " .. desc
@@ -147,12 +163,7 @@ return {
         -- nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
         nmap("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
-        -- See `:help K` for why this keymap
-        if data.name == "rust_analyzer" then
-          nmap("K", require("rust-tools").hover_actions.hover_actions, "Hover Documentation")
-        else
-          nmap("K", vim.lsp.buf.hover, "Hover Documentation")
-        end
+        nmap("K", vim.lsp.buf.hover, "Hover Documentation")
         nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
 
         if data.name == "tailwind" then
@@ -173,11 +184,6 @@ return {
         end, { desc = "Format current buffer with LSP" })
       end
 
-      local codelldb = require("mason-registry").get_package("codelldb")
-      local extension_path = codelldb:get_install_path() .. "/extension/"
-      local codelldb_path = extension_path .. "adapter/codelldb"
-      local liblldb_path = extension_path .. "lldb/lib/liblldb.so"
-
       local mason_lspconfig = require("mason-lspconfig")
       mason_lspconfig.setup({
         -- list of servers for mason to install
@@ -192,33 +198,6 @@ return {
             on_attach = on_attach,
             settings = servers[server_name],
             filetypes = (servers[server_name] or {}).filetypes,
-          })
-        end,
-        ["rust_analyzer"] = function()
-          require("rust-tools").setup({
-            server = {
-              on_attach = on_attach,
-              capabilities = capabilities,
-              --settings = servers['rust_analyzer'],
-              settings = {
-                cargo = {
-                  allFeatures = true,
-                },
-              },
-              filetypes = { "rust", "rs" },
-              check = {
-                command = "clippy",
-                extraArgs = { "--all", "--", "-W", "clippy::all" },
-              },
-            },
-            tools = {
-              hover_actions = {
-                auto_focus = true,
-              },
-            },
-            dap = {
-              adapter = require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path),
-            },
           })
         end,
 
