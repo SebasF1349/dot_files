@@ -139,9 +139,22 @@ vim.keymap.set("v", "<Leader>d", '"_d')
 vim.keymap.set("v", "<Leader>D", '"_D')
 
 -- Terminal
-vim.keymap.set("n", "tt", ":vsplit | vertical resize 50 | term<cr>i")
-vim.keymap.set("t", "jk", "<C-\\><C-n><C-w>w")
-vim.keymap.set("t", "sx", "<cmd>close<CR>")
+local function is_term_open()
+  for _, buf_hndl in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_get_name(buf_hndl):find("^term") then
+      return buf_hndl
+    end
+  end
+  return -1
+end
+vim.keymap.set({ "n", "t" }, "tt", function()
+  if is_term_open() == -1 then
+    vim.cmd("vsplit | vertical resize 50 | term")
+    vim.cmd("startinsert")
+  else
+    vim.cmd(is_term_open() .. "bd!")
+  end
+end, { desc = "[T]oggle [T]erminal" })
 
 local nav = {
   h = "Left",
@@ -172,5 +185,5 @@ set_user_var("IS_NVIM", true)
 -- Move to window using the movement keys
 for key, dir in pairs(nav) do
   vim.keymap.set("n", "<" .. dir .. ">", navigate(key))
-  vim.keymap.set("n", "<C-" .. key .. ">", navigate(key))
+  vim.keymap.set({ "n", "t" }, "<C-" .. key .. ">", navigate(key))
 end
