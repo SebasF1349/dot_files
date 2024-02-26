@@ -54,38 +54,38 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
   desc = "Auto Save",
 })
 
--- Highlight on yank
-local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function()
     vim.highlight.on_yank()
   end,
-  group = highlight_group,
-  pattern = "*",
+  group = general,
+  desc = "Highlight on yank",
 })
 
--- Don't auto comment after pressing enter in comment
 vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
   callback = function()
     vim.cmd("set formatoptions-=cro")
   end,
+  group = general,
+  desc = "Don't auto comment after pressing enter in comment",
 })
 
--- Always enter terminal in insert move
 vim.api.nvim_create_autocmd({ "WinEnter" }, {
   pattern = "term://*",
   command = "startinsert",
+  group = general,
+  desc = "Always enter terminal in insert mode",
 })
 
--- Remove line numbers from terminal
 vim.api.nvim_create_autocmd({ "TermOpen" }, {
   callback = function()
     vim.cmd("setlocal nonumber")
     vim.cmd("setlocal norelativenumber")
   end,
+  group = general,
+  desc = "Remove line numbers from terminal",
 })
 
--- Close with 'q' in some windows
 vim.api.nvim_create_autocmd({ "FileType" }, {
   pattern = {
     "netrw",
@@ -107,121 +107,51 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     vim.bo[event.buf].buflisted = false
     vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
   end,
+  group = general,
+  desc = "Close with 'q' in some windows",
 })
 
 vim.api.nvim_create_autocmd({ "VimResized" }, {
   callback = function()
     vim.cmd("tabdo wincmd =")
   end,
+  group = general,
+  desc = "Don't auto comment after pressing enter in comment",
 })
 
--- sync with system clipboard on focus
 vim.api.nvim_create_autocmd({ "FocusGained" }, {
   pattern = { "*" },
   command = [[call setreg("@", getreg("+"))]],
+  group = general,
+  desc = "Sync with system clipboard on focus",
 })
 vim.api.nvim_create_autocmd({ "FocusLost" }, {
   pattern = { "*" },
   command = [[call setreg("+", getreg("@"))]],
+  group = general,
+  desc = "Sync with system clipboard on focus",
 })
 
--- autoformat on save
 vim.api.nvim_create_autocmd("BufWritePre", {
-  group = vim.api.nvim_create_augroup("format_on_save", { clear = true }),
   pattern = "*",
-  desc = "Run LSP formatting on a file on save",
   callback = function()
     if vim.fn.exists(":Format") > 0 then
       vim.cmd.Format()
     end
   end,
-})
--- Old autoformat.lua replaced by the autocmd above
---
--- Use your language server to automatically format your code on save.
--- Adds additional commands as well to manage the behavior
--- return {
---   "neovim/nvim-lspconfig",
---   event = { "BufReadPre", "BufNewFile" },
---   config = function()
---     -- Switch for controlling whether you want autoformatting.
---     --  Use :KickstartFormatToggle to toggle autoformatting on or off
---     local format_is_enabled = true
---     vim.api.nvim_create_user_command("KickstartFormatToggle", function()
---       format_is_enabled = not format_is_enabled
---       print("Setting autoformatting to: " .. tostring(format_is_enabled))
---     end, {})
---
---     -- Create an augroup that is used for managing our formatting autocmds.
---     --      We need one augroup per client to make sure that multiple clients
---     --      can attach to the same buffer without interfering with each other.
---     local _augroups = {}
---     local get_augroup = function(client)
---       if not _augroups[client.id] then
---         local group_name = "kickstart-lsp-format-" .. client.name
---         local id = vim.api.nvim_create_augroup(group_name, { clear = true })
---         _augroups[client.id] = id
---       end
---
---       return _augroups[client.id]
---     end
---
---     -- Whenever an LSP attaches to a buffer, we will run this function.
---     --
---     -- See `:help LspAttach` for more information about this autocmd event.
---     vim.api.nvim_create_autocmd("LspAttach", {
---       group = vim.api.nvim_create_augroup("kickstart-lsp-attach-format", { clear = true }),
---       -- This is where we attach the autoformatting for reasonable clients
---       callback = function(args)
---         local client_id = args.data.client_id
---         local client = vim.lsp.get_client_by_id(client_id)
---         local bufnr = args.buf
---
---         -- Only attach to clients that support document formatting
---         if not client.server_capabilities.documentFormattingProvider then
---           return
---         end
---
---         -- Tsserver usually works poorly. Sorry you work with bad languages
---         -- You can remove this line if you know what you're doing :)
---         if client.name == "tsserver" then
---           return
---         end
---
---         -- Create an autocmd that will run *before* we save the buffer.
---         --  Run the formatting command for the LSP that has just attached.
---         vim.api.nvim_create_autocmd("BufWritePre", {
---           group = get_augroup(client),
---           buffer = bufnr,
---           callback = function()
---             if not format_is_enabled then
---               return
---             end
---
---             vim.lsp.buf.format({
---               async = false,
---               filter = function(c)
---                 return c.id == client.id
---               end,
---             })
---           end,
---         })
---       end,
---     })
---   end,
--- }
-
--- Automagically close command-line window.
-vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
   group = general,
+  desc = "Run LSP formatting on a file on save",
+})
+
+vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
   callback = function()
     vim.cmd("quit")
   end,
+  group = general,
+  desc = "Automagically close command-line window.",
 })
 
---Create dir when saving a file when an intermediate directory is missing.
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-  group = general,
   callback = function(event)
     if event.match:match("^%w%w+://") then
       return
@@ -229,4 +159,6 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     local file = vim.loop.fs_realpath(event.match) or event.match
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
+  group = general,
+  desc = "Create dir when saving a file when an intermediate directory is missing.",
 })
