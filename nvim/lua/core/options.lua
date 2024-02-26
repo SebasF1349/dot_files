@@ -5,7 +5,11 @@
 vim.o.hlsearch = false
 
 -- Make line numbers default
-vim.wo.number = true
+vim.opt.number = true
+vim.opt.relativenumber = true
+
+-- Don't show the mode, since it's already in status line
+vim.opt.showmode = false
 
 -- Enable mouse mode
 vim.o.mouse = "a"
@@ -26,10 +30,11 @@ vim.wo.signcolumn = "yes"
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 
---vim.opt.guicursor = ""
+-- Decreate update time
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
 
-vim.opt.nu = true
-vim.opt.relativenumber = true
+--vim.opt.guicursor = ""
 
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
@@ -37,6 +42,10 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
 vim.opt.smartindent = true
+
+-- Sets how neovim will display certain whitespace in the editor.
+vim.opt.list = true
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 vim.opt.wrap = false
 vim.opt.linebreak = true
@@ -49,17 +58,17 @@ vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 
-vim.opt.timeoutlen = 300
-vim.opt.updatetime = 250
-
--- No sync clipboard between OS and Neovim.
--- vim.opt.clipboard = ""
+-- Sync clipboard between OS and Neovim.
+vim.opt.clipboard = "unnamedplus"
 
 -- split windows
 vim.opt.splitright = true -- split vertical window to the right
 vim.opt.splitbelow = true -- split horizontal window to the bottom
 
 vim.opt.fileencoding = "utf-8"
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = "split"
 
 vim.opt.iskeyword:append("-")
 
