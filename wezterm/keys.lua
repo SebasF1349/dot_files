@@ -4,7 +4,8 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local M = {}
 
-M.mod = wezterm.target_triple:find("windows") and "SHIFT|CTRL" or "SHIFT|SUPER"
+-- M.mod = wezterm.target_triple:find("windows") and "SHIFT|CTRL" or "SHIFT|SUPER"
+M.mod = "CTRL"
 
 M.smart_split = wezterm.action_callback(function(window, pane)
   local dim = pane:get_dimensions()
@@ -22,19 +23,19 @@ function M.setup(config)
     { mods = M.mod, key = "u", action = act.ScrollByPage(-0.5) },
     { mods = M.mod, key = "d", action = act.ScrollByPage(0.5) },
     -- New Tab
-    { mods = M.mod, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
+    -- { mods = M.mod, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
     -- Splits
     { mods = M.mod, key = "Enter", action = M.smart_split },
     { mods = M.mod, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
     { mods = M.mod, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
     { mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
     -- Move Tabs
-    { mods = M.mod, key = ">", action = act.MoveTabRelative(1) },
-    { mods = M.mod, key = "<", action = act.MoveTabRelative(-1) },
+    -- { mods = M.mod, key = ">", action = act.MoveTabRelative(1) },
+    -- { mods = M.mod, key = "<", action = act.MoveTabRelative(-1) },
     -- Acivate Tabs
-    { mods = M.mod, key = "l", action = act({ ActivateTabRelative = 1 }) },
-    { mods = M.mod, key = "h", action = act({ ActivateTabRelative = -1 }) },
-    { mods = M.mod, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
+    -- { mods = M.mod, key = "l", action = act({ ActivateTabRelative = 1 }) },
+    -- { mods = M.mod, key = "h", action = act({ ActivateTabRelative = -1 }) },
+    -- { mods = M.mod, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
     -- show the pane selection mode, but have it swap the active and selected panes
     { mods = M.mod, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
     -- Clipboard
