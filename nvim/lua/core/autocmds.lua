@@ -8,7 +8,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
     -- change to the directory
     if directory then
       vim.cmd.cd(data.file)
-      require("telescope.builtin").find_files()
+      require("telescope.builtin").git_files()
     end
   end,
   group = general,
