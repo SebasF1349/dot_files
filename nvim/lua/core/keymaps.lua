@@ -105,20 +105,21 @@ vim.keymap.set("v", "<Leader>d", '"_d')
 vim.keymap.set("v", "<Leader>D", '"_D')
 
 -- Terminal
-local function is_term_open()
-  for _, buf_hndl in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_get_name(buf_hndl):find("^term") then
-      return buf_hndl
+local function get_term_buf()
+  for _, buf_hndl in ipairs(vim.fn.getwininfo() or {}) do
+    if buf_hndl.terminal == 1 then
+      return buf_hndl.bufnr
     end
   end
   return -1
 end
 vim.keymap.set({ "n", "t" }, "tt", function()
-  if is_term_open() == -1 then
+  local term_buf = get_term_buf()
+  if term_buf == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     vim.cmd("startinsert")
   else
-    vim.cmd(is_term_open() .. "bd!")
+    vim.cmd(term_buf .. "bd!")
   end
 end, { desc = "[T]oggle [T]erminal" })
 
