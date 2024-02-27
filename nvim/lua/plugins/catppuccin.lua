@@ -16,11 +16,6 @@ return {
         harpoon = true,
         lsp_trouble = true,
         which_key = true,
-        indent_blankline = {
-          enabled = true,
-          scope_color = "text",
-          colored_indent_levels = false,
-        },
         mason = true,
         dap = true,
         dap_ui = true,

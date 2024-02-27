@@ -11,6 +11,9 @@ vim.opt.relativenumber = true
 -- Don't show the mode, since it's already in status line
 vim.opt.showmode = false
 
+-- Don't show number of lines of characters selected
+vim.opt.showcmd = false
+
 -- Enable mouse mode
 vim.o.mouse = "a"
 
@@ -45,7 +48,7 @@ vim.opt.smartindent = true
 
 -- Sets how neovim will display certain whitespace in the editor.
 vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+-- vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 vim.opt.wrap = false
 vim.opt.linebreak = true
@@ -71,6 +74,7 @@ vim.opt.fileencoding = "utf-8"
 vim.opt.inccommand = "split"
 
 vim.opt.iskeyword:append("-")
+vim.opt.wildignore:append({ "*/node_modules/*", "*/.git/*" })
 
 -- netrw options
 vim.g.netrw_liststyle = 3
