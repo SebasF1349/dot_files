@@ -156,54 +156,57 @@ return {
         end,
       })
 
-      local on_attach = function(data, bufnr)
-        vim.lsp.inlay_hint.enable(bufnr, true)
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
+        callback = function(event)
+          vim.lsp.inlay_hint.enable(event.buf, true)
 
-        local nmap = function(keys, func, desc)
-          vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP:" .. desc })
-        end
+          local nmap = function(keys, func, desc)
+            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP:" .. desc })
+          end
 
-        nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-        nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-        nmap("K", vim.lsp.buf.hover, "Hover Documentation")
+          nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+          nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+          nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 
-        -- Jump to the definition of the word under your cursor.
-        --  This is where a variable was first declared, or where a function is defined, etc.
-        --  To jump back, press <C-T>.
-        nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+          -- Jump to the definition of the word under your cursor.
+          --  This is where a variable was first declared, or where a function is defined, etc.
+          --  To jump back, press <C-T>.
+          nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 
-        -- Find references for the word under your cursor.
-        nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+          -- Find references for the word under your cursor.
+          nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 
-        nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
+          nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
 
-        if data.name == "tailwind" then
-          vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>:TailwindSort<cr>")
-        end
+          if event.data.name == "tailwind" then
+            vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>:TailwindSort<cr>", { desc = "Save and Sort Tailwind Clases" })
+          end
 
-        -- Create a command `:Format` local to the LSP buffer
-        vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
-          vim.lsp.buf.format()
-        end, { desc = "Format current buffer with LSP" })
+          -- Create a command `:Format` local to the LSP buffer
+          vim.api.nvim_buf_create_user_command(event.buf, "Format", function(_)
+            vim.lsp.buf.format()
+          end, { desc = "Format current buffer with LSP" })
 
-        -- The following two autocommands are used to highlight references of the
-        -- word under your cursor when your cursor rests there for a little while.
-        --    See `:help CursorHold` for information about when this is executed
-        --
-        -- When you move your cursor, the highlights will be cleared (the second autocommand).
-        local client = vim.lsp.get_client_by_id(data.client_id)
-        if client and client.server_capabilities.documentHighlightProvider then
-          vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-            buffer = bufnr,
-            callback = vim.lsp.buf.document_highlight,
-          })
+          -- The following two autocommands are used to highlight references of the
+          -- word under your cursor when your cursor rests there for a little while.
+          --    See `:help CursorHold` for information about when this is executed
+          --
+          -- When you move your cursor, the highlights will be cleared (the second autocommand).
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.server_capabilities.documentHighlightProvider then
+            vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.document_highlight,
+            })
 
-          vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-            buffer = bufnr,
-            callback = vim.lsp.buf.clear_references,
-          })
-        end
-      end
+            vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+              buffer = event.buf,
+              callback = vim.lsp.buf.clear_references,
+            })
+          end
+        end,
+      })
 
       -- used to enable autocompletion (assign to every lsp server config)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -225,7 +228,6 @@ return {
               settings = server.settings,
               filetypes = server.filetypes,
               capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {}),
-              on_attach = on_attach,
             })
           end,
 
