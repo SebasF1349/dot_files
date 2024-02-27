@@ -21,11 +21,11 @@ return {
     vim.keymap.set("n", "gR", function()
       require("trouble").toggle("lsp_references")
     end, { desc = "[g]Trouble [R]eferences" })
-    vim.keymap.set("n", "[t", function()
+    vim.keymap.set("n", "[x", function()
       require("trouble").next({ skip_groups = true, jump = true })
-    end)
-    vim.keymap.set("n", "]t", function()
+    end, { desc = "Next [T]rouble group" })
+    vim.keymap.set("n", "]x", function()
       require("trouble").previous({ skip_groups = true, jump = true })
-    end)
+    end, { desc = "Previous [T]rouble group" })
   end,
 }
