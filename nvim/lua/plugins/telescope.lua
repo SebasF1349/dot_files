@@ -17,21 +17,10 @@ return {
   },
   config = function()
     local telescope = require("telescope")
-    local actions = require("telescope.actions")
     local builtin = require("telescope.builtin")
 
     telescope.setup({
       defaults = {
-        mappings = {
-          i = {
-            ["<C-u>"] = false,
-            ["<C-d>"] = false,
-            ["<A-k>"] = actions.move_selection_previous,
-            ["<A-j>"] = actions.move_selection_next,
-            ["<A-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
-            ["jk"] = actions.close,
-          },
-        },
         layout_strategy = "flex",
         layout_config = {
           horizontal = {
@@ -59,7 +48,10 @@ return {
 
     -- See `:help telescope.builtin`
     vim.keymap.set("n", "<leader>?", builtin.oldfiles, { desc = "[?] Find recently opened files" })
-    vim.keymap.set("n", "<leader><space>", builtin.buffers, { desc = "[ ] Find existing buffers" })
+    -- vim.keymap.set("n", "<leader><space>", builtin.buffers, { desc = "[ ] Find existing buffers" })
+    vim.keymap.set("n", "<leader><leader>", function()
+      builtin.buffers({ sort_mru = true, ignore_current_buffer = true })
+    end, { desc = "[ ] Find another opened buffers" })
     vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "[/] Fuzzily search in current buffer" })
 
     local function telescope_live_grep_open_files()
