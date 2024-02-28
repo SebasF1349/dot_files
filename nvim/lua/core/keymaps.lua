@@ -7,6 +7,9 @@ vim.keymap.set("i", "jk", "<Esc>")
 -- Select all
 vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 
+-- Reselect latest changed, put, or yanked text
+vim.keymap.set("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
+
 -- Save all
 vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>")
 
@@ -62,6 +65,10 @@ vim.keymap.set("n", "H", "^")
 -- Press 'U' for undo
 vim.keymap.set("n", "U", "<C-r>")
 
+-- Add empty lines before and after cursor line
+vim.keymap.set("n", "gO", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>")
+vim.keymap.set("n", "go", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>")
+
 -- Like this keymap, but I don't use it often and clashes with flash.nvim - have to find better keymap
 --Quick search and replace on the current word
 -- vim.keymap.set("n", "s", function()
@@ -104,6 +111,11 @@ vim.keymap.set("n", "<Leader>D", '"_D')
 vim.keymap.set("v", "<Leader>d", '"_d')
 vim.keymap.set("v", "<Leader>D", '"_D')
 
+-- Copy/paste with system clipboard
+vim.keymap.set({ "n", "x" }, "gy", '"+y', { desc = "Copy to system clipboard" })
+vim.keymap.set("n", "gp", '"+p', { desc = "Paste from system clipboard" })
+vim.keymap.set("x", "gp", '"+P', { desc = "Paste from system clipboard" })
+
 -- Terminal
 local function get_term_buf()
   for _, buf_hndl in ipairs(vim.fn.getwininfo() or {}) do
@@ -122,6 +134,21 @@ vim.keymap.set({ "n", "t" }, "tt", function()
     vim.cmd(term_buf .. "bd!")
   end
 end, { desc = "[T]oggle [T]erminal" })
+
+-- Move only sideways in command mode. Using `silent = false` makes movements
+-- to be immediately shown.
+vim.keymap.set("c", "<A-h>", "<Left>", { silent = false, desc = "Left" })
+vim.keymap.set("c", "<A-l>", "<Right>", { silent = false, desc = "Right" })
+-- Don't `noremap` in insert mode to have these keybindings behave exactly
+-- like arrows (crucial inside TelescopePrompt)
+vim.keymap.set("i", "<A-h>", "<Left>", { noremap = false, desc = "Left" })
+vim.keymap.set("i", "<A-j>", "<Down>", { noremap = false, desc = "Down" })
+vim.keymap.set("i", "<A-k>", "<Up>", { noremap = false, desc = "Up" })
+vim.keymap.set("i", "<A-l>", "<Right>", { noremap = false, desc = "Right" })
+vim.keymap.set("t", "<A-h>", "<Left>", { desc = "Left" })
+vim.keymap.set("t", "<A-j>", "<Down>", { desc = "Down" })
+vim.keymap.set("t", "<A-k>", "<Up>", { desc = "Up" })
+vim.keymap.set("t", "<A-l>", "<Right>", { desc = "Right" })
 
 -- window management
 vim.keymap.set("n", "<A-|>", "<C-w>v", { desc = "Split Window [|]Vertically" })
@@ -169,6 +196,6 @@ set_user_var("IS_NVIM", true)
 
 -- Move to window using the movement keys
 for key, dir in pairs(nav) do
-  vim.keymap.set("n", "<" .. dir .. ">", navigate(key))
+  -- vim.keymap.set("n", "<" .. dir .. ">", navigate(key))
   vim.keymap.set({ "n", "t" }, "<C-" .. key .. ">", navigate(key))
 end
