@@ -32,11 +32,11 @@ function M.setup(config)
     -- show the pane selection mode, but have it swap the active and selected panes
     -- NOTE: worth making clipboard work with nvim keys too?
     -- Clipboard
-    -- { mods = M.mod, key = "C", action = act.CopyTo("Clipboard") },
+    { mods = M.mod, key = "C", action = act.CopyTo("Clipboard") },
+    { mods = M.mod, key = "V", action = act.PasteFrom("Clipboard") },
     -- { mods = M.mod, key = "Space", action = act.QuickSelect },
     -- { mods = M.mod, key = "X", action = act.ActivateCopyMode },
     -- { mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
-    -- { mods = M.mod, key = "V", action = act.PasteFrom("Clipboard") },
     -- { mods = M.mod, key = "M", action = act.TogglePaneZoomState },
     -- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
     -- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
