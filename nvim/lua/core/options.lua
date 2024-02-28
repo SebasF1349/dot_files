@@ -23,6 +23,10 @@ vim.o.breakindent = true
 -- Save undo history
 vim.o.undofile = true
 
+-- Don't store backup while overwriting the file
+vim.o.backup = false
+vim.o.writebackup = false
+
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -30,8 +34,22 @@ vim.o.smartcase = true
 -- Keep signcolumn on by default
 vim.wo.signcolumn = "yes"
 
+-- Don't show `~` outside of buffer
+vim.o.fillchars = "eob: "
+
+-- Reduce command line messages
+vim.opt.shortmess:append("Wc")
+
+-- Reduce scroll during window split
+vim.o.splitkeep = "screen"
+
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
+
+-- Slight transparency - I like this ones but don't play with catppuccin
+-- vim.o.pumblend = 10 -- builtin completion
+-- vim.o.winblend = 10 -- floating windows
+vim.o.pumheight = 10 -- popup
 
 -- Decreate update time
 vim.opt.updatetime = 250
