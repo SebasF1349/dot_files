@@ -5,7 +5,7 @@ local act = wezterm.action
 local M = {}
 
 -- M.mod = wezterm.target_triple:find("windows") and "SHIFT|CTRL" or "SHIFT|SUPER"
-M.mod = "CTRL"
+M.mod = "SHIFT|CTRL"
 
 M.smart_split = wezterm.action_callback(function(window, pane)
   local dim = pane:get_dimensions()
@@ -19,16 +19,9 @@ end)
 function M.setup(config)
   config.disable_default_key_bindings = true
   config.keys = {
-    -- Scrollback
-    { mods = M.mod, key = "u", action = act.ScrollByPage(-0.5) },
-    { mods = M.mod, key = "d", action = act.ScrollByPage(0.5) },
-    -- New Tab
+    -- NOTE: will I ever use tabs?
+    -- New Tab --
     -- { mods = M.mod, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
-    -- Splits
-    { mods = M.mod, key = "Enter", action = M.smart_split },
-    { mods = M.mod, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-    { mods = M.mod, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-    { mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
     -- Move Tabs
     -- { mods = M.mod, key = ">", action = act.MoveTabRelative(1) },
     -- { mods = M.mod, key = "<", action = act.MoveTabRelative(-1) },
@@ -37,16 +30,22 @@ function M.setup(config)
     -- { mods = M.mod, key = "h", action = act({ ActivateTabRelative = -1 }) },
     -- { mods = M.mod, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
     -- show the pane selection mode, but have it swap the active and selected panes
-    { mods = M.mod, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
+    -- NOTE: worth making clipboard work with nvim keys too?
     -- Clipboard
-    { mods = M.mod, key = "C", action = act.CopyTo("Clipboard") },
-    { mods = M.mod, key = "Space", action = act.QuickSelect },
-    { mods = M.mod, key = "X", action = act.ActivateCopyMode },
-    { mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
-    { mods = M.mod, key = "V", action = act.PasteFrom("Clipboard") },
-    { mods = M.mod, key = "M", action = act.TogglePaneZoomState },
+    -- { mods = M.mod, key = "C", action = act.CopyTo("Clipboard") },
+    -- { mods = M.mod, key = "Space", action = act.QuickSelect },
+    -- { mods = M.mod, key = "X", action = act.ActivateCopyMode },
+    -- { mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
+    -- { mods = M.mod, key = "V", action = act.PasteFrom("Clipboard") },
+    -- { mods = M.mod, key = "M", action = act.TogglePaneZoomState },
     -- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
     -- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
+    -- Splits
+    { mods = M.mod, key = "Enter", action = M.smart_split },
+    { mods = M.mod, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+    { mods = M.mod, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+    { mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
+    { mods = M.mod, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
     M.split_nav("resize", "CTRL", "LeftArrow", "Left"),
     M.split_nav("resize", "CTRL", "RightArrow", "Right"),
     M.split_nav("resize", "CTRL", "UpArrow", "Up"),
@@ -55,6 +54,28 @@ function M.setup(config)
     M.split_nav("move", "CTRL", "j", "Down"),
     M.split_nav("move", "CTRL", "k", "Up"),
     M.split_nav("move", "CTRL", "l", "Right"),
+    -- Scrollback
+    M.scroll("CTRL", "u", "Up"),
+    M.scroll("CTRL", "d", "Down"),
+  }
+end
+
+function M.scroll(mods, key, dir)
+  local event = "Scroll_" .. dir
+  wezterm.on(event, function(win, pane)
+    if M.is_nvim(pane) then
+      -- pass the keys through to vim/nvim
+      win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
+    elseif dir == "Up" then
+      win:perform_action({ ScrollByPage = -0.5 }, pane)
+    else
+      win:perform_action({ ScrollByPage = 0.5 }, pane)
+    end
+  end)
+  return {
+    key = key,
+    mods = mods,
+    action = wezterm.action.EmitEvent(event),
   }
 end
 
