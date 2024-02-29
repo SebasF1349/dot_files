@@ -5,8 +5,6 @@ return {
     cmd = "G",
   },
 
-  "tpope/vim-rhubarb",
-
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 

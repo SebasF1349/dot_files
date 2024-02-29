@@ -9,7 +9,11 @@ return {
   build = ":TSUpdate",
   config = function()
     vim.defer_fn(function()
-      require("treesitter-context").setup({ mode = "topline" })
+      require("treesitter-context").setup({
+        max_lines = 2,
+        mode = "topline",
+        separator = "-",
+      })
       require("nvim-treesitter.configs").setup({
         -- Add languages to be installed here that you want installed for treesitter
         ensure_installed = {
@@ -44,7 +48,7 @@ return {
         modules = {},
 
         highlight = { enable = true },
-        indent = { enable = true },
+        -- indent = { enable = true }, -- doesn't work properly
         incremental_selection = {
           enable = true,
           keymaps = {

@@ -28,18 +28,18 @@ return {
     -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
     -- - sd'   - [S]urround [D]elete [']quotes
     -- - sr)'  - [S]urround [R]eplace [)] [']
-    local surround = require("mini.surround")
-    surround.setup({
-      mappings = {
-        add = "gsa", -- Add surrounding in Normal and Visual modes
-        delete = "gsd", -- Delete surrounding
-        find = "gsf", -- Find surrounding (to the right)
-        find_left = "gsF", -- Find surrounding (to the left)
-        highlight = "gsh", -- Highlight surrounding
-        replace = "gsr", -- Replace surrounding
-        update_n_lines = "gsn", -- Update `n_lines`
-      },
-    })
+    -- local surround = require("mini.surround")
+    -- surround.setup({
+    --   mappings = {
+    --     add = "<leader>aa", -- Add surrounding in Normal and Visual modes
+    --     delete = "<leader>ad", -- Delete surrounding
+    --     find = "<leader>af", -- Find surrounding (to the right)
+    --     find_left = "<leader>aF", -- Find surrounding (to the left)
+    --     highlight = "<leader>ah", -- Highlight surrounding
+    --     replace = "<leader>ar", -- Replace surrounding
+    --     update_n_lines = "<leader>an", -- Update `n_lines`
+    --   },
+    -- })
 
     -- ... and there is more!
     --  Check out: https://github.com/echasnovski/mini.nvim
