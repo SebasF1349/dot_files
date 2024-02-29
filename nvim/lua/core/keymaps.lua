@@ -199,3 +199,16 @@ for key, dir in pairs(nav) do
   -- vim.keymap.set("n", "<" .. dir .. ">", navigate(key))
   vim.keymap.set({ "n", "t" }, "<C-" .. key .. ">", navigate(key))
 end
+
+local surround = {
+  { "(", ")" },
+  { "[", "]" },
+  { "{", "}" },
+  { "'", "'" },
+  { '"', '"' },
+  { "<", ">" },
+  { "*", "*" },
+}
+for _, pair in ipairs(surround) do
+  vim.keymap.set("v", "<leader>" .. pair[1], "di" .. pair[1] .. "<ESC>pa" .. pair[2])
+end
