@@ -167,3 +167,8 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   group = general,
   desc = "Create dir when saving a file when an intermediate directory is missing.",
 })
+
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = "markdown",
+  command = "set awa",
+})
