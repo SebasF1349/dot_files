@@ -20,6 +20,19 @@ vim.api.nvim_create_autocmd("VimEnter", {
   desc = "Open Telescope when it's a Directory",
 })
 
+vim.api.nvim_create_autocmd("BufReadPost", {
+  pattern = "*",
+  -- command = 'silent! normal! g`"zv',
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    if mark[1] > 1 and mark[1] <= vim.api.nvim_buf_line_count(0) then
+      vim.api.nvim_win_set_cursor(0, mark)
+    end
+  end,
+  group = general,
+  desc = "Open file at the last position it was edited earlier",
+})
+
 vim.api.nvim_create_autocmd("VimLeave", {
   callback = function()
     set_user_var("IS_NVIM", false)
