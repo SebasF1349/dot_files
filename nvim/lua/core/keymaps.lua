@@ -208,9 +208,12 @@ local surround = {
   { "{", "}" },
   { "'", "'" },
   { '"', '"' },
+  { "`", "`" },
   { "<", ">" },
   { "*", "*" },
+  { "_", "_" },
 }
 for _, pair in ipairs(surround) do
+  vim.keymap.set("n", "<leader>" .. pair[1], "diwi" .. pair[1] .. "<ESC>pa" .. pair[2])
   vim.keymap.set("v", "<leader>" .. pair[1], "di" .. pair[1] .. "<ESC>pa" .. pair[2])
 end
