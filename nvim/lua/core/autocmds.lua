@@ -202,5 +202,29 @@ vim.api.nvim_create_autocmd("RecordingEnter", {
   end,
   desc = "Use 0 to stop recording a macro",
 })
--- Use 9 to execute macro
-vim.keymap.set("n", "9", "@z")
+vim.keymap.set("n", "9", "@z", { desc = "Use 9 to execute macro" })
+
+-- copied from https://github.com/Aasim-A/scrollEOF.nvim
+vim.api.nvim_create_autocmd({ "CursorMoved", "WinScrolled" }, {
+  group = general,
+  pattern = "*",
+  callback = function(data)
+    if data.event == "WinScrolled" then
+      local win_id = vim.api.nvim_get_current_win()
+      local win_event = vim.v.event[tostring(win_id)]
+      if win_event ~= nil and win_event.topline <= 0 then
+        return
+      end
+    end
+
+    local win_height = vim.fn.winheight(0)
+    local win_cur_line = vim.fn.winline()
+    local scrolloff = math.min(vim.o.scrolloff, math.floor(win_height / 2))
+    local visual_distance_to_eof = win_height - win_cur_line
+
+    if visual_distance_to_eof < scrolloff then
+      local win_view = vim.fn.winsaveview()
+      vim.fn.winrestview({ topline = win_view.topline + scrolloff - visual_distance_to_eof })
+    end
+  end,
+})
