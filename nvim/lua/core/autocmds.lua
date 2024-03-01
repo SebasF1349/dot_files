@@ -185,3 +185,22 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   pattern = "markdown",
   command = "set awa",
 })
+
+-- Easier macros
+vim.api.nvim_create_augroup("recording", {})
+vim.api.nvim_create_autocmd({ "RecordingLeave", "VimEnter" }, {
+  group = "recording",
+  callback = function()
+    vim.keymap.set("n", "0", "qz")
+  end,
+  desc = "Use 0 to record a macro",
+})
+vim.api.nvim_create_autocmd("RecordingEnter", {
+  group = "recording",
+  callback = function()
+    vim.keymap.set("n", "0", "q")
+  end,
+  desc = "Use 0 to stop recording a macro",
+})
+-- Use 9 to execute macro
+vim.keymap.set("n", "9", "@z")
