@@ -64,10 +64,6 @@ vim.opt.expandtab = true
 
 vim.opt.smartindent = true
 
--- Sets how neovim will display certain whitespace in the editor.
-vim.opt.list = true
--- vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-
 vim.opt.wrap = false
 vim.opt.linebreak = true
 vim.opt.textwidth = 0
