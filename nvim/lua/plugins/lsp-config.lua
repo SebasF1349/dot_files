@@ -200,7 +200,7 @@ return {
 
           nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
           nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-          nmap("K", vim.lsp.buf.hover, "Hover Documentation")
+          nmap("S", vim.lsp.buf.hover, "Hover Documentation")
 
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
