@@ -55,14 +55,12 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
   desc = "Lazy load clipboard",
 })
 
-vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
-  callback = function()
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
+  callback = function(args)
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
       vim.cmd("silent! wa")
       vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), "info")
-      if vim.fn.exists(":Format") > 0 then
-        vim.cmd.Format()
-      end
+      require("conform").format({ bufnr = args.buf })
       if vim.fn.exists(":TailwindSort") > 0 then
         vim.cmd("TailwindSort")
       end
@@ -148,17 +146,6 @@ vim.api.nvim_create_autocmd({ "FocusLost" }, {
   command = [[call setreg("+", getreg("@"))]],
   group = general,
   desc = "Sync with system clipboard on focus",
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function()
-    if vim.fn.exists(":Format") > 0 then
-      vim.cmd.Format()
-    end
-  end,
-  group = general,
-  desc = "Run LSP formatting on a file on save",
 })
 
 vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
