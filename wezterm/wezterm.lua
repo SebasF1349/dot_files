@@ -7,7 +7,7 @@ local config = {}
 -- In newer versions of wezterm, use the config_builder which will
 -- help provide clearer error messages
 if wezterm.config_builder then
-  config = wezterm.config_builder()
+	config = wezterm.config_builder()
 end
 
 require("keys").setup(config)
@@ -23,28 +23,28 @@ require("tabs").setup(config)
 config.color_scheme = "Catppuccin Mocha"
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-  --This next line should be the only thing that's needed, but it doesn't work for new panes
-  --config.default_domain = 'WSL:Ubuntu'
-  config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
-  config.default_prog = { "wsl.exe", "--cd", "~/repos" }
+	--This next line should be the only thing that's needed, but it doesn't work for new panes
+	--config.default_domain = 'WSL:Ubuntu'
+	config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
+	config.default_prog = { "wsl.exe", "--cd", "~/repos" }
 elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
-  --Let open in home or in current directory, it works on linux, not in wsl
-  --config.default_prog = { '/bin/bash', '-l' }
-  --config.default_cwd = './~'
+	--Let open in home or in current directory, it works on linux, not in wsl
+	--config.default_prog = { '/bin/bash', '-l' }
+	--config.default_cwd = './~'
 end
 
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true
 config.inactive_pane_hsb = {
-  saturation = 1,
-  brightness = 0.5,
+	saturation = 1,
+	brightness = 0.5,
 }
 
 config.enable_scroll_bar = false
 
 config.window_background_opacity = 0.9
 
-config.font = wezterm.font("JetBrainsMono Nerd Font")
+config.font = wezterm.font("JetBrainsMono Nerd Font", { weight = "Medium" })
 
 config.window_close_confirmation = "NeverPrompt"
 
@@ -53,6 +53,10 @@ config.front_end = "WebGpu"
 -- config.animation_fps = 1
 config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
+
+config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
+
+config.check_for_updates = false
 
 -- config.underline_thickness = 3
 -- config.cursor_thickness = 4
