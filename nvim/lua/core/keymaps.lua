@@ -128,9 +128,7 @@ vim.keymap.set({ "n", "t" }, "tt", function()
   if term_buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     vim.cmd("startinsert")
-    return
-  end
-  if is_hidden == 1 then
+  elseif is_hidden == 1 then
     vim.cmd("vsplit | vertical resize 50 | b" .. term_buf_num)
     vim.cmd("startinsert")
   else
