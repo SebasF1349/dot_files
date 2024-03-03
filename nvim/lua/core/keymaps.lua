@@ -116,20 +116,25 @@ vim.keymap.set("x", "gp", '"+P', { desc = "Paste from system clipboard" })
 
 -- Terminal
 local function get_term_buf()
-  for _, buf_hndl in ipairs(vim.fn.getwininfo() or {}) do
-    if buf_hndl.terminal == 1 then
-      return buf_hndl.bufnr
+  for _, buf_hndl in ipairs(vim.fn.getbufinfo() or {}) do
+    if buf_hndl.name:find("^term://") ~= nil then
+      return buf_hndl.bufnr, buf_hndl.hidden, buf_hndl.windows[1]
     end
   end
-  return -1
+  return -1, -1, -1
 end
 vim.keymap.set({ "n", "t" }, "tt", function()
-  local term_buf = get_term_buf()
-  if term_buf == -1 then
+  local term_buf_num, is_hidden, term_win_id = get_term_buf()
+  if term_buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     vim.cmd("startinsert")
+    return
+  end
+  if is_hidden == 1 then
+    vim.cmd("vsplit | vertical resize 50 | b" .. term_buf_num)
+    vim.cmd("startinsert")
   else
-    vim.cmd(term_buf .. "bd!")
+    vim.api.nvim_win_close(term_win_id, true)
   end
 end, { desc = "[T]oggle [T]erminal" })
 
