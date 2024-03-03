@@ -37,6 +37,7 @@ window>box {
 
 #workspaces label {
     color: @pink;
+    padding-right: 5px;
 }
 
 #workspaces button.active label {
