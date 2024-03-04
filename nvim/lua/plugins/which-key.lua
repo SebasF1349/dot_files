@@ -9,7 +9,7 @@ return {
       ["]"] = { name = "+next" },
       ["["] = { name = "+prev" },
       ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-      ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
+      ["<leader>d"] = { name = "[D]ebugger", _ = "which_key_ignore" },
       ["<leader>h"] = { { name = "Git [H]unk", _ = "which_key_ignore" }, { name = "[H]arpoon", _ = "which_key_ignore" } },
       ["<leader>b"] = { name = "Git [B]uffer", _ = "which_key_ignore" },
       ["<leader>f"] = { name = "[F]ind", _ = "which_key_ignore" },
