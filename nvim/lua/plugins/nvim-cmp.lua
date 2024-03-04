@@ -30,6 +30,18 @@ return {
         end,
       },
       completion = { completeopt = "menu,menuone,noinsert" },
+      window = {
+        completion = {
+          border = "rounded",
+          scrollbar = false,
+        },
+        documentation = {
+          border = "rounded",
+          scrollbar = false,
+          max_height = math.floor(vim.o.lines * 0.5),
+          max_width = math.floor(vim.o.columns * 0.4),
+        },
+      },
       mapping = cmp.mapping.preset.insert({
         ["<C-n>"] = cmp.mapping.select_prev_item(),
         ["<C-p>"] = cmp.mapping.select_next_item(),
@@ -90,5 +102,8 @@ return {
         },
       }),
     })
+
+    -- Inside a snippet, use backspace to remove the placeholder.
+    vim.keymap.set("s", "<BS>", "<C-O>s")
   end,
 }

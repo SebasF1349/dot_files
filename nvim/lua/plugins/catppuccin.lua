@@ -19,6 +19,10 @@ return {
         mason = true,
         dap = true,
         dap_ui = true,
+        mini = {
+          enabled = true,
+          indentscope_color = "", -- catppuccin color (eg. `lavender`) Default: text
+        },
         native_lsp = {
           enabled = true,
           virtual_text = {
