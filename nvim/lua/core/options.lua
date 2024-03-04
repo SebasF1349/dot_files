@@ -13,6 +13,7 @@ vim.opt.showmode = false
 
 -- Don't show number of lines of characters selected
 vim.opt.showcmd = false
+vim.opt.cmdheight = 0
 
 -- Enable mouse mode
 vim.o.mouse = "a"
@@ -38,7 +39,7 @@ vim.wo.signcolumn = "yes"
 vim.o.fillchars = "eob: "
 
 -- Reduce command line messages
-vim.opt.shortmess:append("Wc")
+vim.opt.shortmess:append("WcISs")
 
 -- Reduce scroll during window split
 vim.o.splitkeep = "screen"
@@ -107,3 +108,9 @@ vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.s
 vim.diagnostic.config({
   float = { border = _border },
 })
+
+-- Disable health checks for these providers.
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0

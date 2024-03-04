@@ -1,7 +1,12 @@
 return {
   "folke/flash.nvim",
   event = "VeryLazy",
-  opts = {},
+  opts = {
+    prompt = {
+      -- Place the prompt above the statusline.
+      win_config = { row = -2 },
+    },
+  },
   keys = {
     {
       "s",
