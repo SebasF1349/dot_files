@@ -2,15 +2,140 @@ return {
   "mfussenegger/nvim-dap",
   event = { "LspAttach" },
   dependencies = {
-    -- Creates a beautiful debugger UI
-    "rcarriga/nvim-dap-ui",
+    -- Fancy UI for the debugger
+    {
+      "rcarriga/nvim-dap-ui",
+      keys = {
+        {
+          "<leader>de",
+          function()
+            -- Calling this twice to open and jump into the window.
+            require("dapui").eval()
+            require("dapui").eval()
+          end,
+          desc = "Evaluate expression",
+        },
+      },
+      opts = {
+        icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+        controls = {
+          icons = {
+            pause = "⏸",
+            play = "▶",
+            step_into = "⏎",
+            step_over = "⏭",
+            step_out = "⏮",
+            step_back = "b",
+            run_last = "▶▶",
+            terminate = "⏹",
+            disconnect = "⏏",
+          },
+        },
+        floating = { border = "rounded" },
+        layouts = {
+          {
+            elements = {
+              { id = "stacks", size = 0.30 },
+              { id = "breakpoints", size = 0.20 },
+              { id = "scopes", size = 0.50 },
+            },
+            position = "left",
+            size = 40,
+          },
+        },
+      },
+    },
 
-    -- Installs the debug adapters for you
-    "williamboman/mason.nvim",
-    "jay-babu/mason-nvim-dap.nvim",
+    -- Virtual text.
+    {
+      "theHamsta/nvim-dap-virtual-text",
+      opts = { virt_text_pos = "eol" },
+    },
+
+    -- JS/TS debugging.
+    {
+      "mxsdev/nvim-dap-vscode-js",
+      opts = {
+        debugger_path = vim.fn.stdpath("data") .. "/lazy/vscode-js-debug",
+        adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" },
+      },
+    },
+    {
+      "microsoft/vscode-js-debug",
+      build = "npm i && npm run compile vsDebugServerBundle && rm -rf out && mv -f dist out",
+    },
+
+    -- Lua adapter.
+    {
+      "jbyuki/one-small-step-for-vimkind",
+      keys = {
+        {
+          "<leader>dl",
+          function()
+            require("osv").launch({ port = 8086 })
+          end,
+          desc = "Launch Lua adapter",
+        },
+      },
+    },
+  },
+
+  keys = {
+    {
+      "<leader>db",
+      function()
+        require("dap").toggle_breakpoint()
+      end,
+      desc = "Toggle breakpoint",
+    },
+
+    {
+      "<leader>dB",
+      "<cmd>FzfLua dap_breakpoints<cr>",
+      desc = "List breakpoints",
+    },
+
+    {
+      "<leader>dc",
+      function()
+        require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+      end,
+      desc = "Breakpoint condition",
+    },
+
+    {
+      "<F5>",
+      function()
+        require("dap").continue()
+      end,
+      desc = "Continue",
+    },
+
+    {
+      "<F10>",
+      function()
+        require("dap").step_over()
+      end,
+      desc = "Step over",
+    },
+
+    {
+      "<F11>",
+      function()
+        require("dap").step_into()
+      end,
+      desc = "Step into",
+    },
+
+    {
+      "<F12>",
+      function()
+        require("dap").step_out()
+      end,
+      desc = "Step Out",
+    },
   },
   config = function()
-    -- catppuccin
     local sign = vim.fn.sign_define
     sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
     sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
@@ -18,53 +143,40 @@ return {
     local dap = require("dap")
     local dapui = require("dapui")
 
-    require("mason-nvim-dap").setup({
-      -- Makes a best effort to setup the various debuggers with
-      -- reasonable debug configurations
-      automatic_setup = true,
-
-      -- You can provide additional configuration to the handlers,
-      -- see mason-nvim-dap README for more information
-      handlers = {},
-    })
-
-    -- Basic debugging keymaps, feel free to change to your liking!
-    vim.keymap.set("n", "<F5>", dap.continue, { desc = "Debug: Start/Continue" })
-    vim.keymap.set("n", "<F1>", dap.step_into, { desc = "Debug: Step Into" })
-    vim.keymap.set("n", "<F2>", dap.step_over, { desc = "Debug: Step Over" })
-    vim.keymap.set("n", "<F3>", dap.step_out, { desc = "Debug: Step Out" })
-    vim.keymap.set("n", "<leader>tB", dap.toggle_breakpoint, { desc = "Debug: Toggle Breakpoint" })
-    vim.keymap.set("n", "<leader>B", function()
-      dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
-    end, { desc = "Debug: Set Breakpoint" })
-
-    -- Dap UI setup
-    -- For more information, see |:help nvim-dap-ui|
-    dapui.setup({
-      -- Set icons to characters that are more likely to work in every terminal.
-      --    Feel free to remove or use ones that you like more! :)
-      --    Don't feel like these are good choices.
-      icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
-      controls = {
-        icons = {
-          pause = "⏸",
-          play = "▶",
-          step_into = "⏎",
-          step_over = "⏭",
-          step_out = "⏮",
-          step_back = "b",
-          run_last = "▶▶",
-          terminate = "⏹",
-          disconnect = "⏏",
-        },
-      },
-    })
-
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     vim.keymap.set("n", "<F7>", dapui.toggle, { desc = "Debug: See last session result." })
 
     dap.listeners.after.event_initialized["dapui_config"] = dapui.open
     dap.listeners.before.event_terminated["dapui_config"] = dapui.close
     dap.listeners.before.event_exited["dapui_config"] = dapui.close
+
+    -- Lua configurations.
+    dap.adapters.nlua = function(callback, config)
+      callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
+    end
+    dap.configurations["lua"] = {
+      {
+        type = "nlua",
+        request = "attach",
+        name = "Attach to running Neovim instance",
+      },
+    }
+
+    -- C configurations.
+    dap.adapters.codelldb = {
+      type = "server",
+      host = "localhost",
+      port = "${port}",
+      executable = {
+        command = "codelldb",
+        args = { "--port", "${port}" },
+      },
+    }
+
+    -- Add configurations from launch.json
+    require("dap.ext.vscode").load_launchjs(nil, {
+      ["codelldb"] = { "c" },
+      ["pwa-node"] = { "typescript", "javascript" },
+    })
   end,
 }
