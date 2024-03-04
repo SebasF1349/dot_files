@@ -8,13 +8,6 @@ return {
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
-  -- "gc" to comment visual regions/lines
-  {
-    "numToStr/Comment.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {},
-  },
-
   -- Highlight todo, notes, etc in comments
   {
     "folke/todo-comments.nvim",
@@ -57,5 +50,14 @@ return {
       crates.setup(opts)
       crates.show()
     end,
+  },
+
+  {
+    "Wansmer/treesj",
+    dependencies = "nvim-treesitter",
+    keys = {
+      { "<leader>j", "<cmd>TSJToggle<cr>", desc = "[J]oin/split code block" },
+    },
+    opts = { use_default_keymaps = false },
   },
 }
