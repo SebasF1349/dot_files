@@ -91,6 +91,7 @@ local servers = {
   lua_ls = {
     settings = {
       Lua = {
+        hint = { enable = true, arrayIndex = "Disable" },
         runtime = { version = "LuaJIT" },
         telemetry = { enable = false },
         completion = { callSnippet = "Replace" },
