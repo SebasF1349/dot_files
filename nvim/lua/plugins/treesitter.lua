@@ -4,16 +4,37 @@ return {
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
     "windwp/nvim-ts-autotag",
-    "nvim-treesitter/nvim-treesitter-context",
+    {
+      "nvim-treesitter/nvim-treesitter-context",
+      keys = {
+        {
+          "[c",
+          function()
+            -- Jump to previous change when in diffview.
+            if vim.wo.diff then
+              return "[c"
+            else
+              vim.schedule(function()
+                require("treesitter-context").go_to_context()
+              end)
+              return "<Ignore>"
+            end
+          end,
+          desc = "Jump to upper context",
+          expr = true,
+        },
+      },
+      opts = {
+        max_lines = 2,
+        multiline_threshold = 1,
+        min_window_height = 20,
+        separator = "—",
+      },
+    },
   },
   build = ":TSUpdate",
   config = function()
     vim.defer_fn(function()
-      require("treesitter-context").setup({
-        max_lines = 2,
-        mode = "topline",
-        separator = "-",
-      })
       require("nvim-treesitter.configs").setup({
         -- Add languages to be installed here that you want installed for treesitter
         ensure_installed = {
@@ -36,6 +57,7 @@ return {
           "toml",
           "markdown",
           "markdown_inline",
+          "regex",
         },
 
         -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
