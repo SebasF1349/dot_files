@@ -23,7 +23,7 @@ return {
       -- only leaving them here for reference and for the desc
 
       --navigation
-      map({ "n", "v" }, "]c", function()
+      map({ "n", "v" }, "]h", function()
         if vim.wo.diff then
           return "]c"
         end
@@ -32,7 +32,7 @@ return {
         end)
         return "<Ignore>"
       end, { expr = true, desc = "Jump to next Hunk" })
-      map({ "n", "v" }, "[c", function()
+      map({ "n", "v" }, "[h", function()
         if vim.wo.diff then
           return "[c"
         end
