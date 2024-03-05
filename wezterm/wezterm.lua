@@ -52,6 +52,8 @@ config.front_end = "WebGpu"
 config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
 
+config.check_for_updates = false
+
 config.window_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = "0.5cell" }
 
 local function recompute_padding(window, is_nvim)
@@ -75,8 +77,47 @@ wezterm.on("user-var-changed", function(window, _, name, value)
 	recompute_padding(window, value)
 end)
 
-config.check_for_updates = false
+local function recompute_font_size(window)
+	window:toast_notification("test", 12)
+	local window_dims = window:get_dimensions()
+	local overrides = window:get_config_overrides() or {}
+	local font_pixel_size = overrides.font_size * window_dims.dpi / 72
+	local number_rows = math.floor(window_dims / font_pixel_size)
+	local rest = window_dims % font_pixel_size
+	local new_pixel_font_size = font_pixel_size + rest / number_rows
+	local new_font_size = new_pixel_font_size * 72 / window_dims.dpi
+	overrides.font_size = new_font_size
+	window:set_config_overrides(overrides)
+	-- if not window_dims.is_full_screen then
+	-- 	if not overrides.window_padding then
+	-- 		-- not changing anything
+	-- 		return
+	-- 	end
+	-- 	overrides.window_padding = nil
+	-- else
+	-- 	-- Use only the middle 33%
+	-- 	local third = math.floor(window_dims.pixel_width / 3)
+	-- 	local new_padding = {
+	-- 		left = third,
+	-- 		right = third,
+	-- 		top = 0,
+	-- 		bottom = 0,
+	-- 	}
+	-- 	if overrides.window_padding and new_padding.left == overrides.window_padding.left then
+	-- 		-- padding is same, avoid triggering further changes
+	-- 		return
+	-- 	end
+	-- 	overrides.window_padding = new_padding
+	-- end
+end
 
+wezterm.on("window-resized", function(window)
+	recompute_font_size(window)
+end)
+
+wezterm.on("window-config-reloaded", function(window)
+	recompute_font_size(window)
+end)
 -- config.underline_thickness = 3
 -- config.cursor_thickness = 4
 -- config.underline_position = -6
