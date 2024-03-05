@@ -10,7 +10,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
       vim.fn.system("git rev-parse --is-inside-work-tree")
       -- vim.cmd.cd(data.file)
       if vim.v.shell_error == 0 then
-        require("telescope.builtin").git_files({ use_git_root = false })
+        require("telescope.builtin").git_files({ use_git_root = false, show_untracked = true })
       else
         require("telescope.builtin").find_files()
       end
