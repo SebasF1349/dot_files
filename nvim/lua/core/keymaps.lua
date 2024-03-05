@@ -55,14 +55,8 @@ vim.keymap.set("n", "<leader>pv", function()
 end, { desc = "Open Explorer Netrw" })
 
 --Move things around when in visual mode
-vim.keymap.set("n", "J", ":m .+1<CR>==")
-vim.keymap.set("n", "K", ":m .-2<CR>==")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-
--- Press 'H', 'L' to jump to start/end of a line (first/last char)
-vim.keymap.set("n", "L", "$")
-vim.keymap.set("n", "H", "^")
 
 -- Press 'U' for undo
 vim.keymap.set("n", "U", "<C-r>")
