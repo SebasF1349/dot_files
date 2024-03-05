@@ -196,8 +196,7 @@ end
 set_user_var("IS_NVIM", true)
 
 -- Move to window using the movement keys
-for key, dir in pairs(nav) do
-  -- vim.keymap.set("n", "<" .. dir .. ">", navigate(key))
+for key, _ in pairs(nav) do
   vim.keymap.set({ "n", "t" }, "<C-" .. key .. ">", navigate(key))
 end
 

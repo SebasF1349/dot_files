@@ -1,6 +1,5 @@
 return {
   "folke/flash.nvim",
-  event = "VeryLazy",
   opts = {
     prompt = {
       -- Place the prompt above the statusline.
