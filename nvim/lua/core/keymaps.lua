@@ -193,7 +193,7 @@ local function navigate(dir)
   end
 end
 
-set_user_var("IS_NVIM", true)
+Set_user_var("IS_NVIM", true)
 
 -- Move to window using the movement keys
 for key, _ in pairs(nav) do

@@ -35,7 +35,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 vim.api.nvim_create_autocmd("VimLeave", {
   callback = function()
-    set_user_var("IS_NVIM", false)
+    Set_user_var("IS_NVIM", false)
   end,
   group = general,
   desc = "Set Global Variable to false for Wezterm to use",
@@ -59,7 +59,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
   callback = function(args)
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
       vim.cmd("silent! wa")
-      vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), "info")
+      vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), vim.log.levels.INFO)
       require("conform").format({ bufnr = args.buf })
       if vim.fn.exists(":TailwindSort") > 0 then
         vim.cmd("TailwindSort")

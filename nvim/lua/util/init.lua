@@ -23,6 +23,6 @@ local function base64(data)
   return b64
 end
 
-function set_user_var(key, value)
+function Set_user_var(key, value)
   io.write(string.format("\027]1337;SetUserVar=%s=%s\a", key, base64(value)))
 end
