@@ -91,10 +91,23 @@ local servers = {
   lua_ls = {
     settings = {
       Lua = {
-        hint = { enable = true, arrayIndex = "Disable" },
         runtime = { version = "LuaJIT" },
+        workspace = {
+          checkThirdParty = false,
+          -- Tells lua_ls where to find all the Lua files that you have loaded
+          -- for your neovim configuration.
+          library = {
+            "${3rd}/luv/library",
+            unpack(vim.api.nvim_get_runtime_file("", true)),
+          },
+          -- If lua_ls is really slow on your computer, you can try this instead:
+          -- library = { vim.env.VIMRUNTIME },
+        },
+        completion = {
+          callSnippet = "Replace",
+        },
+        hint = { enable = true, arrayIndex = "Disable" },
         telemetry = { enable = false },
-        completion = { callSnippet = "Replace" },
       },
     },
   },
@@ -159,21 +172,10 @@ return {
         },
       },
     },
-    { "folke/neodev.nvim", opts = {} },
     "nvim-telescope/telescope.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
   },
   config = function()
-    -- Setup neovim lua configuration
-    require("neodev").setup({
-      override = function(root_dir, library)
-        if root_dir:match("dot_files") then
-          library.enabled = true
-          library.plugins = true
-        end
-      end,
-    })
-
     -- add border to the floating windows
     require("lspconfig.ui.windows").default_options = {
       border = "single",
