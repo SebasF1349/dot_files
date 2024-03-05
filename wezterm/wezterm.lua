@@ -44,8 +44,6 @@ config.enable_scroll_bar = false
 
 config.window_background_opacity = 0.9
 
-config.font = wezterm.font("JetBrainsMono Nerd Font", { weight = "Medium" })
-
 config.window_close_confirmation = "NeverPrompt"
 
 config.front_end = "WebGpu"
