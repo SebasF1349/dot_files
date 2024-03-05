@@ -54,7 +54,28 @@ config.front_end = "WebGpu"
 config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
 
-config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
+config.window_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = "0.5cell" }
+
+local function recompute_padding(window, is_nvim)
+	local overrides = window:get_config_overrides() or {}
+	local new_padding = {}
+	if is_nvim == "true" then
+		new_padding = { left = 0, right = 0, top = 0, bottom = 0 }
+	else
+		new_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = "0.5cell" }
+	end
+	if not overrides.window_padding or overrides.window_padding.left ~= new_padding.left then
+		overrides.window_padding = new_padding
+		window:set_config_overrides(overrides)
+	end
+end
+
+wezterm.on("user-var-changed", function(window, _, name, value)
+	if name ~= "IS_NVIM" then
+		return
+	end
+	recompute_padding(window, value)
+end)
 
 config.check_for_updates = false
 
