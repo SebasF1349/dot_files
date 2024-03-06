@@ -1,7 +1,10 @@
 -- "gc" to comment visual regions/lines
 return {
   "numToStr/Comment.nvim",
-  event = { "BufReadPre", "BufNewFile" },
+  keys = {
+    { "gc", mode = { "n", "v" }, desc = "Comment toggle linewise" },
+    { "gb", mode = { "n", "v" }, desc = "Comment toggle blockwise" },
+  },
   config = function()
     require("Comment").setup()
 
