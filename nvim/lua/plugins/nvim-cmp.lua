@@ -18,7 +18,6 @@ return {
     "hrsh7th/cmp-cmdline",
   },
   config = function()
-    -- See `:help cmp`
     local cmp = require("cmp")
     local luasnip = require("luasnip")
     require("luasnip.loaders.from_vscode").lazy_load()

@@ -89,26 +89,29 @@ local servers = {
   },
 
   lua_ls = {
-    settings = {
-      Lua = {
+    on_init = function(client)
+      local path = client.workspace_folders[1].name
+      if vim.loop.fs_stat(path .. "/.luarc.json") or vim.loop.fs_stat(path .. "/.luarc.jsonc") then
+        return
+      end
+
+      client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
         runtime = { version = "LuaJIT" },
+        -- Make the server aware of Neovim runtime files
         workspace = {
           checkThirdParty = false,
-          -- Tells lua_ls where to find all the Lua files that you have loaded
-          -- for your neovim configuration.
           library = {
             "${3rd}/luv/library",
             unpack(vim.api.nvim_get_runtime_file("", true)),
           },
-          -- If lua_ls is really slow on your computer, you can try this instead:
-          -- library = { vim.env.VIMRUNTIME },
         },
-        completion = {
-          callSnippet = "Replace",
-        },
+        completion = { callSnippet = "Replace" },
         hint = { enable = true, arrayIndex = "Disable" },
         telemetry = { enable = false },
-      },
+      })
+    end,
+    settings = {
+      Lua = {},
     },
   },
 
