@@ -92,26 +92,38 @@ return {
               ["if"] = "@function.inner",
               ["ac"] = "@class.outer",
               ["ic"] = "@class.inner",
+              ["a/"] = "@comment.outer",
+              ["i/"] = "@comment.outer", -- inner doesn't make sense
+              ["ab"] = "@block.outer",
+              ["ib"] = "@block.inner",
+              ["al"] = "@loop.outer",
+              ["il"] = "@loop.inner",
             },
           },
           move = {
             enable = true,
             set_jumps = true, -- whether to set jumps in the jumplist
             goto_next_start = {
-              ["]m"] = "@function.outer",
-              ["]]"] = "@class.outer",
-            },
-            goto_next_end = {
-              ["]M"] = "@function.outer",
-              ["]["] = "@class.outer",
+              ["]/"] = "@comment.outer",
             },
             goto_previous_start = {
-              ["[m"] = "@function.outer",
-              ["[["] = "@class.outer",
+              ["[/"] = "@comment.outer",
             },
-            goto_previous_end = {
-              ["[M"] = "@function.outer",
-              ["[]"] = "@class.outer",
+            goto_next = {
+              ["]d"] = "@conditional.outer",
+              ["]f"] = "@function.outer",
+              ["]["] = "@class.outer",
+              ["]b"] = "@block.outer",
+              ["]a"] = "@parameter.inner",
+              ["]l"] = "@loop.outer",
+            },
+            goto_previous = {
+              ["[d"] = "@conditional.outer",
+              ["[f"] = "@function.outer",
+              ["[["] = "@class.outer",
+              ["[b"] = "@block.outer",
+              ["[a"] = "@parameter.inner",
+              ["[l"] = "@loop.outer",
             },
           },
           swap = {
