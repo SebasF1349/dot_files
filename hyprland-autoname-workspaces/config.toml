@@ -7,8 +7,9 @@ delim = " "
 max_clients = 30 # you should not need this
 workspace = "{id}:{delim}{clients}" # {id}, {delim} and {clients} are supported
 workspace_empty = "{id}" # {id}, {delim} and {clients} are supported
-client = "{icon}"
+client = "{icon}{delim}"
 client_active = "{icon}"
+# client_active = "<span color='red'>{icon}</span>"
 # deduplicate client formatter
 # client_fullscreen = "[{icon}]"
 # client_dup = "{client}{counter_sup}"

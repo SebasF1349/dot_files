@@ -26,18 +26,19 @@ window>box {
 
 #workspaces {
     background-color: @surface0;
-    margin: 9px 0 9px 9px;
+    margin: 9px;
     border-radius: 8px;
 }
 
 #workspaces button {
-    padding-left: 5px;
-    padding-right: 5px;
+    /* padding-left: 5px; */
+    /* padding-right: 5px; */
 }
 
 #workspaces label {
     color: @pink;
-    padding-right: 5px;
+    padding-right: 10px;
+    padding-left: 5px;
 }
 
 #workspaces button.active label {
@@ -48,7 +49,6 @@ window>box {
 #workspaces button.active {
     background-color: @pink;
 }
-
 
 #clock {
     background-color: @surface0;
