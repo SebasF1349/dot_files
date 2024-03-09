@@ -86,18 +86,20 @@ return {
             lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
             keymaps = {
               -- you can use the capture groups defined in textobjects.scm
-              ["aa"] = "@parameter.outer",
-              ["ia"] = "@parameter.inner",
               ["af"] = "@function.outer",
               ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-              ["a/"] = "@comment.outer",
-              ["i/"] = "@comment.outer", -- inner doesn't make sense
+              ["aa"] = "@parameter.outer",
+              ["ia"] = "@parameter.inner",
+              -- ["ac"] = "@class.outer",
+              -- ["ic"] = "@class.inner",
               ["ab"] = "@block.outer",
               ["ib"] = "@block.inner",
               ["al"] = "@loop.outer",
               ["il"] = "@loop.inner",
+              ["ac"] = "@conditional.outer",
+              ["ic"] = "@conditional.inner",
+              ["a/"] = "@comment.outer",
+              ["i/"] = "@comment.outer", -- inner doesn't make sense
             },
           },
           move = {
@@ -110,20 +112,20 @@ return {
               ["[/"] = "@comment.outer",
             },
             goto_next = {
-              ["]d"] = "@conditional.outer",
               ["]f"] = "@function.outer",
-              ["]["] = "@class.outer",
-              ["]b"] = "@block.outer",
               ["]a"] = "@parameter.inner",
+              ["]b"] = "@block.outer",
               ["]l"] = "@loop.outer",
+              ["]c"] = "@conditional.outer",
+              -- ["]["] = "@class.outer",
             },
             goto_previous = {
-              ["[d"] = "@conditional.outer",
               ["[f"] = "@function.outer",
-              ["[["] = "@class.outer",
-              ["[b"] = "@block.outer",
               ["[a"] = "@parameter.inner",
+              ["[b"] = "@block.outer",
               ["[l"] = "@loop.outer",
+              ["[c"] = "@conditional.outer",
+              -- ["[["] = "@class.outer",
             },
           },
           swap = {
