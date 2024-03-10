@@ -183,14 +183,19 @@ alias snv='sudo ${EDITOR}'
 
 nvf() {
 	local dir="$1"
-	if [[ "$dir" == "repos" ]]; then
-		dir="${HOME}/repos/"
-	elif [[ "$dir" == "dot" ]]; then
-		dir="${HOME}/dot_files/"
+	local selected_dir
+	if [ -z "$dir" ]; then
+		selected_dir=$(fd . --type d --max-depth 2 | fzf)
+	else
+		if [[ "$dir" == "repos" ]]; then
+			dir="${HOME}/repos/"
+		elif [[ "$dir" == "dot" ]]; then
+			dir="${HOME}/dot_files/"
+		fi
+		selected_dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
 	fi
-	dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
-	if [[ -n "$dir" ]]; then
-		cd "$dir" && ${EDITOR} .
+	if [[ -n "$selected_dir" ]]; then
+		cd "$selected_dir" && ${EDITOR} .
 	fi
 }
 
