@@ -5,8 +5,6 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-[[ -f ~/.welcome_screen ]] && . ~/.welcome_screen
-
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=erasedups:ignoredups:ignorespace
@@ -76,7 +74,8 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
 if [ -f ~/.bash_aliases ]; then
-	. ~/.bash_aliases
+	# shellcheck disable=SC1091
+	source "$HOME"/.bash_aliases
 fi
 
 # enable programmable completion features (you don't need to enable
@@ -93,7 +92,9 @@ fi
 [[ -z "$FUNCNEST" ]] && export FUNCNEST=100 # limits recursive functions, see 'man bash'
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+# shellcheck disable=SC1091
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# shellcheck disable=SC1091
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
 # use arrows to move in history with the same first letters
@@ -124,20 +125,21 @@ _fzf_compgen_dir() {
 	fd --type d --hidden --follow --exclude ".git" . "$1"
 }
 
-if [[ $iatest > 0 ]]; then bind "set completion-ignore-case on"; fi
+# if [[ $iatest > 0 ]]; then bind "set completion-ignore-case on"; fi
 
 eval "$(starship init bash)"
 
 # pnpm
-export PNPM_HOME="/home/sebasf/.local/share/pnpm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
 *":$PNPM_HOME:"*) ;;
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-. "$HOME/.cargo/env"
+# shellcheck disable=SC1091
+source "$HOME/.cargo/env"
 
-export PATH="/home/sebasf/.local/share/bob/nvim-bin/:$PATH"
+export PATH="$HOME/.local/share/bob/nvim-bin/:$PATH"
 export EDITOR=nvim
 
 alias cd..="cd .."
@@ -161,7 +163,7 @@ function git_checkout_fzf() {
 		fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" |
 		sed "s/remotes\/origin\///" | xargs)
 	if [ -n "$branch" ]; then
-		git checkout $branch
+		git checkout "$branch"
 	fi
 }
 alias gcf="git_checkout_fzf"
@@ -170,11 +172,11 @@ alias gpull="git pull"
 alias gl="git log"
 alias gst="git stash"
 
-alias nv="${EDITOR}"
-alias nv.="${EDITOR} ."
-alias nvbash="${EDITOR} ~/.bashrc && source ~/.bashrc"
-alias sourcebash="source ~/.bashrc"
-alias snv="sudo ${EDITOR}"
+alias nv='${EDITOR}'
+alias nv.='${EDITOR} .'
+alias nvbash='${EDITOR} ~/.bashrc && source ~/.bashrc'
+alias sourcebash='source ~/.bashrc'
+alias snv='sudo ${EDITOR}'
 
 nvf() {
 	local dir="$1"
@@ -183,9 +185,9 @@ nvf() {
 	elif [[ "$dir" == "dot" ]]; then
 		dir="${HOME}/dot_files/"
 	fi
-	dir=$(fd . ${dir} --type d --max-depth 2 | fzf)
+	dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
 	if [[ -n "$dir" ]]; then
-		cd $dir && ${EDITOR} .
+		cd "$dir" && ${EDITOR} .
 	fi
 }
 
@@ -193,8 +195,8 @@ nvf() {
 #   - Bypass fuzzy finder if there's only one match (--select-1)
 #   - Exit if there's no match (--exit-0)
 nvff() {
-	IFS=$'\n' files=($(fzf --query="$1" --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}"))
-	[[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+	IFS=$'\n' files=("$(fzf --query="$1" --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}")")
+	[[ -n "${files[*]}" ]] && ${EDITOR:-vim} "${files[@]}"
 }
 
 alias tup="cd ~/tup"
@@ -206,9 +208,9 @@ cdf() {
 	# nice idea: use just cd and run cd if no arguments
 	# sadly that would break cd to go to home
 	local dir
-	dir=$(fd . ${1:-.} --hidden --type d | fzf +m)
+	dir=$(fd . "${1:-.}" --hidden --type d | fzf +m)
 	if [[ -n "$dir" ]]; then
-		cd "$dir"
+		cd "$dir" || exit
 	fi
 }
 
@@ -216,7 +218,7 @@ cl() {
 	local dir="$1"
 	local dir="${dir:=$HOME}"
 	if [[ -d "$dir" ]]; then
-		cd "$dir" >/dev/null
+		cd "$dir" >/dev/null || exit
 		eza -lah
 	else
 		echo "bash: cl: $dir: Directory not found"
@@ -227,32 +229,32 @@ shopt -s autocd
 
 mkcd() {
 	mkdir -p -- "$1" &&
-		cd -P -- "$1"
+		cd -P -- "$1" || exit
 }
 
 # do sudo, or sudo the last command if no argument given
 s() {
 	if [[ $# == 0 ]]; then
-		sudo $(history -p '!!')
+		sudo "$(history -p '!!')"
 	else
 		sudo "$@"
 	fi
 }
 
 extract() {
-	if [ -f $1 ]; then
+	if [ -f "$1" ]; then
 		case $1 in
-		*.tar.bz2) tar xjf $1 ;;
-		*.tar.gz) tar xzf $1 ;;
-		*.bz2) bunzip2 $1 ;;
-		*.rar) rar x $1 ;;
-		*.gz) gunzip $1 ;;
-		*.tar) tar xf $1 ;;
-		*.tbz2) tar xjf $1 ;;
-		*.tgz) tar xzf $1 ;;
-		*.zip) unzip $1 ;;
-		*.Z) uncompress $1 ;;
-		*.7z) 7z x $1 ;;
+		*.tar.bz2) tar xjf "$1" ;;
+		*.tar.gz) tar xzf "$1" ;;
+		*.bz2) bunzip2 "$1" ;;
+		*.rar) rar x "$1" ;;
+		*.gz) gunzip "$1" ;;
+		*.tar) tar xf "$1" ;;
+		*.tbz2) tar xjf "$1" ;;
+		*.tgz) tar xzf "$1" ;;
+		*.zip) unzip "$1" ;;
+		*.Z) uncompress "$1" ;;
+		*.7z) 7z x "$1" ;;
 		*) echo "'$1' cannot be extracted via extract()" ;;
 		esac
 	else
@@ -263,18 +265,18 @@ extract() {
 #Copy and go to dir
 cpg() {
 	if [ -d "$2" ]; then
-		cp $1 $2 && cd $2
+		cp "$1" "$2" && cd "$2" || exit
 	else
-		cp $1 $2
+		cp "$1" "$2"
 	fi
 }
 
 #Move and go to dir
 mvg() {
 	if [ -d "$2" ]; then
-		mv $1 $2 && cd $2
+		mv "$1" "$2" && cd "$2" || exit
 	else
-		mv $1 $2
+		mv "$1" "$2"
 	fi
 }
 
@@ -295,7 +297,7 @@ if [ "$DISTRO" = "debian" ]; then
 	alias uu="sudo apt update && sudo apt upgrade"
 	alias clean="sudo apt autoclean && sudo apt autoremove"
 
-	export FLYCTL_INSTALL="/home/sebasf/.fly"
+	export FLYCTL_INSTALL="$HOME/.fly"
 	export PATH="$FLYCTL_INSTALL/bin:$PATH"
 
 	# If this is an xterm set the title to user@host:dir
@@ -309,7 +311,8 @@ elif [ "$DISTRO" = "arch" ]; then
 	_set_liveuser_PS1() {
 		PS1='[\u@\h \W]\$ '
 		if [ "$(whoami)" = "liveuser" ]; then
-			local iso_version="$(grep ^VERSION= /usr/lib/endeavouros-release 2>/dev/null | cut -d '=' -f 2)"
+			local iso_version
+			iso_version="$(grep ^VERSION= /usr/lib/endeavouros-release 2>/dev/null | cut -d '=' -f 2)"
 			if [ -n "$iso_version" ]; then
 				local prefix="eos-"
 				local iso_info="$prefix$iso_version"
@@ -340,7 +343,7 @@ elif [ "$DISTRO" = "arch" ]; then
 		#      e.g. a file manager to make proper file bindings.
 
 		if [ -x /usr/bin/exo-open ]; then
-			echo "exo-open $@" >&2
+			echo "exo-open $*" >&2
 			setsid exo-open "$@" >&/dev/null
 			return
 		fi
@@ -352,7 +355,7 @@ elif [ "$DISTRO" = "arch" ]; then
 			return
 		fi
 
-		echo "$FUNCNAME: package 'xdg-utils' or 'exo' is required." >&2
+		echo "${FUNCNAME[*]}: package 'xdg-utils' or 'exo' is required." >&2
 	}
 
 	# pacman + fzf
