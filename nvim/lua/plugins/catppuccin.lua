@@ -41,6 +41,15 @@ return {
           },
         },
       },
+      custom_highlights = function(colors)
+        -- make the references to the word under the cursor darker
+        -- probably making other things light too, but I want them to be different to when I select a word
+        -- og color is surface1 in both
+        return {
+          LspReferenceRead = { bg = colors.surface0 },
+          LspReferenceWrite = { bg = colors.surface0 },
+        }
+      end,
     })
     vim.cmd.colorscheme("catppuccin")
   end,
