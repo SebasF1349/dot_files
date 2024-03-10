@@ -10,9 +10,33 @@ vim.api.nvim_create_autocmd("VimEnter", {
       vim.fn.system("git rev-parse --is-inside-work-tree")
       -- vim.cmd.cd(data.file)
       if vim.v.shell_error == 0 then
-        require("telescope.builtin").git_files({ use_git_root = false, show_untracked = true })
+        require("telescope.builtin").git_files({
+          use_git_root = false,
+          show_untracked = true,
+          on_complete = {
+            function(picker)
+              -- remove this on_complete callback
+              picker:clear_completion_callbacks()
+              -- if we have exactly one match, select it
+              if picker.manager.linked_states.size == 1 then
+                require("telescope.actions").select_default(picker.prompt_bufnr)
+              end
+            end,
+          },
+        })
       else
-        require("telescope.builtin").find_files()
+        require("telescope.builtin").find_files({
+          on_complete = {
+            function(picker)
+              -- remove this on_complete callback
+              picker:clear_completion_callbacks()
+              -- if we have exactly one match, select it
+              if picker.manager.linked_states.size == 1 then
+                require("telescope.actions").select_default(picker.prompt_bufnr)
+              end
+            end,
+          },
+        })
       end
     end
   end,
