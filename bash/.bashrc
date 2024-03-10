@@ -136,8 +136,11 @@ case ":$PATH:" in
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
-# shellcheck disable=SC1091
-source "$HOME/.cargo/env"
+
+if [ -d ~/.cargo ] && [ -f ~/.cargo/env ]; then
+	# shellcheck disable=SC1091
+	source "$HOME/.cargo/env"
+fi
 
 export PATH="$HOME/.local/share/bob/nvim-bin/:$PATH"
 export EDITOR=nvim
