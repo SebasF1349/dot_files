@@ -15,6 +15,8 @@ return {
       -- ['yaml.ansible'] = { 'ansible-lint', },
     }
 
+    lint.linters.shellcheck.args = { "-x" }
+
     local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 
     vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
