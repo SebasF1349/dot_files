@@ -8,7 +8,7 @@ return {
       "nvim-treesitter/nvim-treesitter-context",
       keys = {
         {
-          "[c",
+          "[s",
           function()
             -- Jump to previous change when in diffview.
             if vim.wo.diff then
@@ -20,7 +20,7 @@ return {
               return "<Ignore>"
             end
           end,
-          desc = "Jump to upper context",
+          desc = "Jump to upper context [s]tart",
           expr = true,
         },
       },
