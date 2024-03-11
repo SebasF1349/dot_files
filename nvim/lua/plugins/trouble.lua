@@ -1,6 +1,6 @@
 return {
   "folke/trouble.nvim",
-  event = "LspAttach",
+  keys = { "<leader>x" },
   dependencies = { "nvim-tree/nvim-web-devicons" },
   config = function()
     vim.keymap.set("n", "<leader>xx", function()
@@ -18,9 +18,9 @@ return {
     vim.keymap.set("n", "<leader>xl", function()
       require("trouble").toggle("loclist")
     end, { desc = "[X]Trouble [L]ocal list" })
-    vim.keymap.set("n", "gR", function()
+    vim.keymap.set("n", "<leader>xr", function()
       require("trouble").toggle("lsp_references")
-    end, { desc = "[g]Trouble [R]eferences" })
+    end, { desc = "[X]Trouble [R]eferences" })
     vim.keymap.set("n", "[x", function()
       require("trouble").next({ skip_groups = true, jump = true })
     end, { desc = "Next [T]rouble group" })
