@@ -177,6 +177,7 @@ return {
     },
     "nvim-telescope/telescope.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
+    "artemave/workspace-diagnostics.nvim",
   },
   config = function()
     -- add border to the floating windows
@@ -212,6 +213,9 @@ return {
         end
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+        require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
+
         if client and client.server_capabilities.documentHighlightProvider then
           -- Highlight references of the word under your cursor
           vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
