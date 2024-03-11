@@ -178,6 +178,7 @@ return {
     "nvim-telescope/telescope.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     "artemave/workspace-diagnostics.nvim",
+    { "dmmulroy/ts-error-translator.nvim", opts = {} },
   },
   config = function()
     -- add border to the floating windows
