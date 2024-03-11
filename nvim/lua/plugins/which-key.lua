@@ -5,7 +5,7 @@ return {
   opts = {},
   config = function()
     require("which-key").register({
-      ["g"] = { name = "Surround", _ = "which_key_ignore" },
+      ["g"] = { name = "Flash", _ = "which_key_ignore" },
       ["]"] = { name = "+next" },
       ["["] = { name = "+prev" },
       ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
