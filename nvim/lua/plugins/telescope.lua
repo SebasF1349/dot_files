@@ -46,6 +46,7 @@ return {
     telescope.load_extension("fzf")
     telescope.load_extension("ui-select")
 
+    vim.keymap.set("n", "<leader>fa", Telescope_git_or_files, { desc = "[F]ind [A]round" })
     vim.keymap.set("n", "<leader>?", builtin.oldfiles, { desc = "[?] Find recently opened files" })
     -- vim.keymap.set("n", "<leader><space>", builtin.buffers, { desc = "[ ] Find existing buffers" })
     vim.keymap.set("n", "<leader><leader>", function()

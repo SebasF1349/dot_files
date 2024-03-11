@@ -26,3 +26,27 @@ end
 function Set_user_var(key, value)
   io.write(string.format("\027]1337;SetUserVar=%s=%s\a", key, base64(value)))
 end
+
+local function on_complete(picker)
+  -- remove this on_complete callback
+  picker:clear_completion_callbacks()
+  -- if we have exactly one match, select it
+  if picker.manager.linked_states.size == 1 then
+    require("telescope.actions").select_default(picker.prompt_bufnr)
+  end
+end
+
+function Telescope_git_or_files()
+  vim.fn.system("git rev-parse --is-inside-work-tree")
+  if vim.v.shell_error == 0 then
+    require("telescope.builtin").git_files({
+      use_git_root = false,
+      show_untracked = true,
+      on_complete = { on_complete },
+    })
+  else
+    require("telescope.builtin").find_files({
+      on_complete = { on_complete },
+    })
+  end
+end
