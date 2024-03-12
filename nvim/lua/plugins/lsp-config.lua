@@ -17,6 +17,7 @@ local servers = {
         prefix = "self",
       },
       cargo = {
+        features = { "all" }, -- does it do something?
         allFeatures = true,
         buildScripts = {
           enable = true,

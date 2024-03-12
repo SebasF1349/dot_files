@@ -118,11 +118,11 @@ local function get_term_buf()
   return -1, -1, -1
 end
 vim.keymap.set({ "n", "t" }, "tt", function()
-  local term_buf_num, is_hidden, term_win_id = get_term_buf()
+  local term_buf_num, term_is_hidden, term_win_id = get_term_buf()
   if term_buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     vim.cmd("startinsert")
-  elseif is_hidden == 1 then
+  elseif term_is_hidden == 1 then
     vim.cmd("vsplit | vertical resize 50 | b" .. term_buf_num)
     vim.cmd("startinsert")
   else

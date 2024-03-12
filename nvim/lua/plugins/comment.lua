@@ -5,8 +5,8 @@ return {
     { "gc", mode = { "n", "v" }, desc = "Comment toggle linewise" },
     { "gb", mode = { "n", "v" }, desc = "Comment toggle blockwise" },
   },
-  config = function()
-    require("Comment").setup()
+  config = function(_, opts)
+    require("Comment").setup(opts)
 
     -- Add gcgc and gcu to uncomment blocks of comments
     local function commented_lines_textobject()
