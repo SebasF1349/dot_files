@@ -109,26 +109,53 @@ vim.keymap.set("n", "gp", '"+p', { desc = "Paste from system clipboard" })
 vim.keymap.set("x", "gp", '"+P', { desc = "Paste from system clipboard" })
 
 -- Terminal
+local terms = {}
 local function get_term_buf()
   for _, buf_hndl in ipairs(vim.fn.getbufinfo() or {}) do
     if buf_hndl.name:find("^term://") ~= nil then
-      return buf_hndl.bufnr, buf_hndl.hidden, buf_hndl.windows[1]
+      local found = false
+      for _, term in ipairs(terms) do
+        if term.buf_num == buf_hndl.bufnr then
+          found = true
+        end
+      end
+      if found == false then
+        return buf_hndl.bufnr, buf_hndl.hidden, buf_hndl.windows[1]
+      end
     end
   end
   return -1, -1, -1
 end
-vim.keymap.set({ "n", "t" }, "tt", function()
-  local term_buf_num, term_is_hidden, term_win_id = get_term_buf()
-  if term_buf_num == -1 then
+local function toggle_term(num)
+  local term = terms[num]
+  if term.buf_num == -1 then
+    term.buf_num, term.is_hidden, term.win_id = get_term_buf()
+  end
+  if term.buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     vim.cmd("startinsert")
-  elseif term_is_hidden == 1 then
-    vim.cmd("vsplit | vertical resize 50 | b" .. term_buf_num)
+    term.buf_num = vim.fn.bufnr()
+    term.win_id = vim.fn.win_getid()
+    term.is_hidden = 0
+  elseif term.is_hidden == 1 then
+    vim.cmd("vsplit | vertical resize 50 | b" .. term.buf_num)
     vim.cmd("startinsert")
+    term.win_id = vim.fn.win_getid()
+    term.is_hidden = 0
   else
-    vim.api.nvim_win_close(term_win_id, true)
+    vim.api.nvim_win_close(term.win_id, true)
+    term.is_hidden = 1
   end
-end, { desc = "[T]oggle [T]erminal" })
+end
+for pos = 1, 2 do
+  terms[pos] = { buf_num = -1 }
+  vim.keymap.set({ "n", "t" }, "t" .. pos, function()
+    toggle_term(pos)
+  end, { desc = "Toggle [T]erminal [" .. pos .. "]" })
+end
+vim.keymap.set({ "n", "t" }, "tt", function()
+  toggle_term(1)
+end, { desc = "[T]oggle [T]erminal 1" })
 
 -- Move only sideways in command mode. Using `silent = false` makes movements
 -- to be immediately shown.
