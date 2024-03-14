@@ -190,11 +190,14 @@ return {
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
       callback = function(event)
-        vim.lsp.inlay_hint.enable(event.buf, true)
-
         local nmap = function(keys, func, desc)
           vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP:" .. desc })
         end
+
+        vim.lsp.inlay_hint.enable(event.buf, true)
+        nmap("<leader>ti", function()
+          vim.lsp.inlay_hint.enable(event.buf, not vim.lsp.inlay_hint.is_enabled())
+        end, "[T]oggle [I]nlay Hints")
 
         nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
         nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
