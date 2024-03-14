@@ -110,27 +110,8 @@ vim.keymap.set("x", "gp", '"+P', { desc = "Paste from system clipboard" })
 
 -- Terminal
 local terms = {}
-local function get_term_buf()
-  for _, buf_hndl in ipairs(vim.fn.getbufinfo() or {}) do
-    if buf_hndl.name:find("^term://") ~= nil then
-      local found = false
-      for _, term in ipairs(terms) do
-        if term.buf_num == buf_hndl.bufnr then
-          found = true
-        end
-      end
-      if found == false then
-        return buf_hndl.bufnr, buf_hndl.hidden, buf_hndl.windows[1]
-      end
-    end
-  end
-  return -1, -1, -1
-end
 local function toggle_term(num)
   local term = terms[num]
-  if term.buf_num == -1 then
-    term.buf_num, term.is_hidden, term.win_id = get_term_buf()
-  end
   if term.buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     vim.cmd("startinsert")
