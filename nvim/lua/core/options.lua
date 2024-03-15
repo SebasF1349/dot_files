@@ -11,9 +11,6 @@ vim.opt.showmode = false
 -- Don't show number of lines of characters selected
 vim.opt.showcmd = false
 
--- Remove cmdline space
-vim.opt.cmdheight = 0
-
 -- Enable mouse mode
 vim.o.mouse = "a"
 
