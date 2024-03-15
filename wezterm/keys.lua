@@ -37,7 +37,6 @@ function M.setup(config)
 		-- { mods = M.mod, key = "Space", action = act.QuickSelect },
 		-- { mods = M.mod, key = "X", action = act.ActivateCopyMode },
 		-- { mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
-		-- { mods = M.mod, key = "M", action = act.TogglePaneZoomState },
 		-- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
 		-- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
 		-- Splits
@@ -47,6 +46,7 @@ function M.setup(config)
 		{ mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
 		{ mods = M.mod, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
 		{ mods = M.mod, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
+		{ mods = M.mod, key = "z", action = wezterm.action.TogglePaneZoomState },
 		M.split_nav("resize", "CTRL", "LeftArrow", "Left"),
 		M.split_nav("resize", "CTRL", "RightArrow", "Right"),
 		M.split_nav("resize", "CTRL", "UpArrow", "Up"),

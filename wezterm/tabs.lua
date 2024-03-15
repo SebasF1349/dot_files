@@ -59,8 +59,8 @@ function M.title(tab, max_width)
 			break
 		end
 	end
-	if is_zoomed then -- or (#tab.panes > 1 and not tab.is_active) then
-		title = " " .. process
+	if is_zoomed then
+		title = " " .. title
 	end
 
 	title = wezterm.truncate_right(title, max_width - 3)
