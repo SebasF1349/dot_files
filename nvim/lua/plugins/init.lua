@@ -1,9 +1,6 @@
 return {
   -- Git related plugins
-  {
-    "tpope/vim-fugitive",
-    cmd = "G",
-  },
+  { "tpope/vim-fugitive", cmd = "G" },
 
   -- Detect tabstop and shiftwidth automatically
   { "NMAC427/guess-indent.nvim", opts = {} },
@@ -33,15 +30,6 @@ return {
     opts = {},
   },
 
-  -- {
-  --   "lukas-reineke/indent-blankline.nvim",
-  --   event = { "BufReadPre", "BufNewFile" },
-  --   main = "ibl",
-  --   opts = {
-  --     indent = { char = "┆" },
-  --   },
-  -- },
-  --
   {
     "saecki/crates.nvim",
     ft = { "rust", "toml" },
@@ -50,14 +38,5 @@ return {
       crates.setup(opts)
       crates.show()
     end,
-  },
-
-  {
-    "Wansmer/treesj",
-    dependencies = "nvim-treesitter",
-    keys = {
-      { "<leader>j", "<cmd>TSJToggle<cr>", desc = "[J]oin/split code block" },
-    },
-    opts = { use_default_keymaps = false },
   },
 }
