@@ -2,7 +2,6 @@ return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
   dependencies = {
-    "nvim-treesitter/nvim-treesitter-textobjects",
     "windwp/nvim-ts-autotag",
     {
       "nvim-treesitter/nvim-treesitter-context",
@@ -78,64 +77,6 @@ return {
             node_incremental = "gn",
             scope_incremental = "gs",
             node_decremental = "gr",
-          },
-        },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true, -- automatically jump forward to textobj, similar to targets.vim
-            keymaps = {
-              -- you can use the capture groups defined in textobjects.scm
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["aa"] = "@parameter.outer",
-              ["ia"] = "@parameter.inner",
-              -- ["ac"] = "@class.outer",
-              -- ["ic"] = "@class.inner",
-              ["ab"] = "@block.outer",
-              ["ib"] = "@block.inner",
-              ["al"] = "@loop.outer",
-              ["il"] = "@loop.inner",
-              ["ac"] = "@conditional.outer",
-              ["ic"] = "@conditional.inner",
-              ["a/"] = "@comment.outer",
-              ["i/"] = "@comment.outer", -- inner doesn't make sense
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-              ["]/"] = "@comment.outer",
-            },
-            goto_previous_start = {
-              ["[/"] = "@comment.outer",
-            },
-            goto_next = {
-              ["]f"] = "@function.outer",
-              ["]a"] = "@parameter.inner",
-              ["]b"] = "@block.outer",
-              ["]l"] = "@loop.outer",
-              ["]c"] = "@conditional.outer",
-              -- ["]["] = "@class.outer",
-            },
-            goto_previous = {
-              ["[f"] = "@function.outer",
-              ["[a"] = "@parameter.inner",
-              ["[b"] = "@block.outer",
-              ["[l"] = "@loop.outer",
-              ["[c"] = "@conditional.outer",
-              -- ["[["] = "@class.outer",
-            },
-          },
-          swap = {
-            enable = true,
-            swap_next = {
-              ["<leader>a"] = "@parameter.inner",
-            },
-            swap_previous = {
-              ["<leader>A"] = "@parameter.inner",
-            },
           },
         },
 
