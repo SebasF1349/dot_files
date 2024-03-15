@@ -13,13 +13,6 @@ end
 require("keys").setup(config)
 require("tabs").setup(config)
 
---wezterm.on('gui-startup', function(cmd)
---  local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
---window:gui_window():maximize()
---end)
-
--- This is where you actually apply your config choices
-
 config.color_scheme = "Catppuccin Mocha"
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
@@ -27,6 +20,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	--config.default_domain = 'WSL:Ubuntu'
 	config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
 	config.default_prog = { "wsl.exe", "--cd", "~/repos" }
+	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland -- wait for wayland wez rewrite
 elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
 	--Let open in home or in current directory, it works on linux, not in wsl
 	--config.default_prog = { '/bin/bash', '-l' }
@@ -76,26 +70,5 @@ wezterm.on("user-var-changed", function(window, _, name, value)
 	end
 	recompute_padding(window, value)
 end)
-
--- config.underline_thickness = 3
--- config.cursor_thickness = 4
--- config.underline_position = -6
-
--- if wezterm.target_triple:find("windows") then
---   --config.default_prog = { "pwsh" }
---   config.window_decorations = "RESIZE|TITLE"
---   wezterm.on("gui-startup", function(cmd)
---     local screen = wezterm.gui.screens().active
---     local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
---     local gui = window:gui_window()
---     local width = 0.7 * screen.width
---     local height = 0.7 * screen.height
---     gui:set_inner_size(width, height)
---     gui:set_position((screen.width - width) / 2, (screen.height - height) / 2)
---   end)
--- else
---   config.term = "wezterm"
---   config.window_decorations = "RESIZE"
--- end
 
 return config
