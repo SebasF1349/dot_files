@@ -1,7 +1,17 @@
 return {
   -- Autocompletion
   "hrsh7th/nvim-cmp",
-  event = "InsertEnter",
+  init = function()
+    -- Make cmp not open in Telescope start
+    vim.api.nvim_create_autocmd("InsertEnter", {
+      callback = function()
+        if not vim.tbl_contains({ "Telescope" }, vim.bo.ft) then
+          return true
+        end
+        return false
+      end,
+    })
+  end,
   dependencies = {
     -- Snippet Engine & its associated nvim-cmp source
     {
