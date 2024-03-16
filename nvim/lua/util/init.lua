@@ -36,9 +36,14 @@ local function on_complete(picker)
   end
 end
 
+local is_inside_work_tree = {}
 function Telescope_git_or_files()
-  vim.fn.system("git rev-parse --is-inside-work-tree")
-  if vim.v.shell_error == 0 then
+  local cwd = vim.fn.getcwd()
+  if is_inside_work_tree[cwd] == nil then
+    vim.fn.system("git rev-parse --is-inside-work-tree")
+    is_inside_work_tree[cwd] = vim.v.shell_error == 0
+  end
+  if is_inside_work_tree[cwd] then
     require("telescope.builtin").git_files({
       use_git_root = false,
       show_untracked = true,
