@@ -1,13 +1,13 @@
 -- Useful plugin to show you pending keybinds.
 return {
   "folke/which-key.nvim",
-  keys = "<leader>",
+  keys = { "<leader>", "g", "[", "]" },
   opts = {},
   config = function()
     require("which-key").register({
       ["g"] = { name = "Flash", _ = "which_key_ignore" },
-      ["]"] = { name = "+next" },
-      ["["] = { name = "+prev" },
+      ["]"] = { name = "+next", _ = "which_key_ignore" },
+      ["["] = { name = "+prev", _ = "which_key_ignore" },
       ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
       ["<leader>d"] = { name = "[D]ebugger", _ = "which_key_ignore" },
       ["<leader>h"] = { { name = "Git [H]unk", _ = "which_key_ignore" }, { name = "[H]arpoon", _ = "which_key_ignore" } },

@@ -29,14 +29,14 @@ return { -- Collection of various small independent plugins/modules
       for _, mode in ipairs({ "n", "x", "o" }) do
         vim.keymap.set(mode, lhs, function()
           MiniAi.move_cursor(side, "a", textobj_id, { search_method = "prev" })
-        end)
+        end, { desc = "Move to Previous " .. side .. " " .. textobj_id .. " text object" })
       end
     end
     local map_next = function(lhs, side, textobj_id)
       for _, mode in ipairs({ "n", "x", "o" }) do
         vim.keymap.set(mode, lhs, function()
           MiniAi.move_cursor(side, "a", textobj_id, { search_method = "next" })
-        end)
+        end, { desc = "Move to Next " .. side .. " " .. textobj_id .. " text object" })
       end
     end
     for key, _ in pairs(custom_textobjects) do
