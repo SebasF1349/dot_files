@@ -171,7 +171,9 @@ function git_checkout_fzf() {
 	fi
 }
 alias gcf="git_checkout_fzf"
+alias gP="git push"
 alias gpush="git push"
+alias gp="git pull"
 alias gpull="git pull"
 alias gl="git log"
 alias gst="git stash"
