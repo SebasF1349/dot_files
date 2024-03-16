@@ -79,7 +79,8 @@ return {
     end, { desc = "[F]ind [T]odos or Notes" })
     vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
     vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
+    vim.keymap.set("n", "<leader>fb", builtin.git_branches, { desc = "[F]ind Git [B]ranch" })
+    vim.keymap.set("n", "<leader>fp", builtin.registers, { desc = "[F]ind Register to [P]aste" })
     vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
-    vim.keymap.set("n", "<leader>fq", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
   end,
 }
