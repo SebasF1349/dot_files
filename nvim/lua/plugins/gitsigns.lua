@@ -21,7 +21,7 @@ return {
       -- These are the defaul keybindings
       -- only leaving them here for reference and for the desc
 
-      --navigation
+      -- Navigation
       map({ "n", "v" }, "]h", function()
         if vim.wo.diff then
           return "]c"
@@ -41,28 +41,31 @@ return {
         return "<Ignore>"
       end, { expr = true, desc = "Jump to previous Hunk" })
 
-      -- Actions
-      -- visual mode
+      -- Visual mode
       map("v", "<leader>hs", function()
         gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
       end, { desc = "[H]unk [S]tage" })
       map("v", "<leader>hr", function()
         gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
       end, { desc = "[H]unk [R]eset" })
-      -- normal mode
+
+      -- Text object
+      map({ "o", "x" }, "<leader>hS", ":<C-U>Gitsigns select_hunk<CR>", { desc = "[H]unk [S]elect" })
+
+      -- Normal mode
       map("n", "<leader>hs", gs.stage_hunk, { desc = "[H]unk [S]tage" })
       map("n", "<leader>hr", gs.reset_hunk, { desc = "[H]unk [R]eset" })
-      map("n", "<leader>bs", gs.stage_buffer, { desc = "[B]uffer [S]tage" })
-      map("n", "<leader>br", gs.reset_buffer, { desc = "[B]uffer [R]eset" })
       map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "[H]unk [U]ndo" })
       map("n", "<leader>hp", gs.preview_hunk, { desc = "[H]unk [P]review" })
-      map("n", "<leader>hd", gs.diffthis, { desc = "git [D]iff against index" })
+
+      -- Buffer
+      map("n", "<leader>bs", gs.stage_buffer, { desc = "[B]uffer [S]tage" })
+      map("n", "<leader>br", gs.reset_buffer, { desc = "[B]uffer [R]eset" })
+      map("n", "<leader>bd", gs.diffthis, { desc = "[B]uffer [D]iff" })
+
       -- Toggles
       map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "[T]oggle git [B]lame line" })
       map("n", "<leader>td", gs.toggle_deleted, { desc = "[T]oggle git show [D]eleted" })
-
-      -- Text object
-      map({ "o", "x" }, "<leader>sh", ":<C-U>Gitsigns select_hunk<CR>", { desc = "[S]elect git [H]unk" })
     end,
   },
 }

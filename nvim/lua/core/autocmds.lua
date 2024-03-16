@@ -1,7 +1,7 @@
 -- General Settings
 local general = vim.api.nvim_create_augroup("General Settings", { clear = true })
 
-vim.api.nvim_create_autocmd("VimEnter", {
+vim.api.nvim_create_autocmd({ "VimEnter" }, {
   callback = function(data)
     -- buffer is a directory
     local directory = vim.fn.isdirectory(data.file) == 1
@@ -14,7 +14,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
   desc = "Open Telescope when it's a Directory",
 })
 
-vim.api.nvim_create_autocmd("BufReadPost", {
+vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   pattern = "*",
   -- command = 'silent! normal! g`"zv',
   callback = function()
@@ -27,7 +27,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   desc = "Open file at the last position it was edited earlier",
 })
 
-vim.api.nvim_create_autocmd("VimLeave", {
+vim.api.nvim_create_autocmd({ "VimLeave" }, {
   callback = function()
     Set_user_var("IS_NVIM", false)
   end,
@@ -52,16 +52,27 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
   callback = function(args)
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
-      vim.cmd("silent! wa")
-      vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), vim.log.levels.INFO)
       require("conform").format({ bufnr = args.buf })
+      -- idk why the auto-sort command doesn't work, even with `:w`
       if vim.fn.exists(":TailwindSort") > 0 then
         vim.cmd("TailwindSort")
       end
+      vim.cmd("silent! wa")
+      vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), vim.log.levels.INFO)
     end
   end,
   group = general,
   desc = "Auto Save",
+})
+
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+  callback = function()
+    if vim.fn.exists(":TailwindSort") > 0 then
+      vim.cmd("TailwindSort")
+    end
+  end,
+  group = general,
+  desc = "Sort Tailwind classes on save",
 })
 
 vim.api.nvim_create_autocmd("TextYankPost", {

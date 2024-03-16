@@ -10,8 +10,8 @@ vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 -- Reselect latest changed, put, or yanked text
 vim.keymap.set("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
 
--- Save all
-vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>")
+-- Save
+vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:w<cr>")
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -58,7 +58,7 @@ end, { desc = "Open Explorer Netrw" })
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
--- Press 'U' for undo
+-- Press 'U' for redo
 vim.keymap.set("n", "U", "<C-r>")
 
 -- Add empty lines before and after cursor line

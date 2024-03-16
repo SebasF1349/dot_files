@@ -46,46 +46,40 @@ return {
     telescope.load_extension("fzf")
     telescope.load_extension("ui-select")
 
-    vim.keymap.set("n", "<leader>fa", Telescope_git_or_files, { desc = "[F]ind [A]round" })
-    vim.keymap.set("n", "<leader>?", builtin.oldfiles, { desc = "[?] Find recently opened files" })
-    -- vim.keymap.set("n", "<leader><space>", builtin.buffers, { desc = "[ ] Find existing buffers" })
+    -- Browsing
+    vim.keymap.set("n", "<leader>ff", Telescope_git_or_files, { desc = "[F]ind [F]iles" })
     vim.keymap.set("n", "<leader><leader>", function()
       builtin.buffers({ sort_mru = true, ignore_current_buffer = true })
-    end, { desc = "[ ] Find another opened buffers" })
-    vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "[/] Fuzzily search in current buffer" })
+    end, { desc = "Find another [ ] opened buffers" })
 
-    local function telescope_live_grep_open_files()
+    -- Searching
+    vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind by [G]rep" })
+    vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Find [/] in current buffer" })
+    vim.keymap.set("n", "<leader>f/", function()
       builtin.live_grep({
         grep_open_files = true,
-        prompt_title = "Live Grep in Open Files",
+        prompt_title = "Live Grep in Open Buffers",
       })
-    end
-
-    vim.keymap.set("n", "<leader>f/", telescope_live_grep_open_files, { desc = "[F]ind [/] in Open Files" })
-    vim.keymap.set("n", "<leader>fq", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
-    vim.keymap.set("n", "<leader>gf", builtin.git_files, { desc = "Find [G]it [F]iles" })
-    vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "[F]ind [F]iles" })
-    vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
+    end, { desc = "[F]ind [/] in Open Buffers" })
     vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
     vim.keymap.set("n", "<leader>fW", function()
       local word = vim.fn.expand("<cWORD>")
       builtin.grep_string({ search = word })
     end, { desc = "[F]ind current [W]ORD until space" })
-    vim.keymap.set("n", "<leader>ft", function()
-      builtin.grep_string({ search = "(note|todo|fix):", use_regex = true })
-    end, { desc = "[F]ind [T]odos or Notes" })
-
-    local get_visual_selection = function()
-      return vim.fn.getregion(vim.fn.getpos("."), vim.fn.getpos("v"), { mode = vim.fn.mode() })
-    end
     vim.keymap.set("v", "<leader>fs", function()
+      local visual_selection = vim.fn.getregion(vim.fn.getpos("."), vim.fn.getpos("v"), { mode = vim.fn.mode() })
       require("telescope.builtin").live_grep({
-        default_text = vim.fn.escape(table.concat(get_visual_selection()), ".()"),
+        default_text = vim.fn.escape(table.concat(visual_selection), ".()"),
       })
     end, { desc = "[F]ind [S]elected Text" })
 
-    vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind by [G]rep" })
+    -- Miscelaneous
+    vim.keymap.set("n", "<leader>ft", function()
+      builtin.grep_string({ search = "(note|todo|fix):", use_regex = true })
+    end, { desc = "[F]ind [T]odos or Notes" })
     vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
     vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
+    vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
+    vim.keymap.set("n", "<leader>fq", builtin.builtin, { desc = "[F]ind [S]elect Telescope" })
   end,
 }

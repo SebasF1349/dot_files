@@ -124,9 +124,7 @@ local servers = {
     hovers = true,
     suggestions = true,
     root_dir = function(fname)
-      vim.inspect(fname)
       local root_pattern = require("lspconfig").util.root_pattern("tailwind.config.cjs", "tailwind.config.js", "tailwind.config.ts", "postcss.config.js")
-      vim.inspect(root_pattern(fname), fname)
       return root_pattern(fname)
     end,
   },
@@ -212,10 +210,6 @@ return {
         nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 
         nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
-
-        if event.data.name == "tailwind" then
-          vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:wa<cr>:TailwindSort<cr>", { desc = "Save and Sort Tailwind Clases" })
-        end
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
 
