@@ -16,6 +16,9 @@ return {
         grapple.untag()
       else
         local name = vim.fn.input("Enter tag name: ")
+        if name == nil or name == "" then
+          name = vim.fn.expand("%:t")
+        end
         grapple.tag({ name = name })
       end
     end, { desc = "[G]rapple" })
