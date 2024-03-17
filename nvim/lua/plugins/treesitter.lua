@@ -1,36 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
-  dependencies = {
-    "windwp/nvim-ts-autotag",
-    {
-      "nvim-treesitter/nvim-treesitter-context",
-      keys = {
-        {
-          "[s",
-          function()
-            -- Jump to previous change when in diffview.
-            if vim.wo.diff then
-              return "[c"
-            else
-              vim.schedule(function()
-                require("treesitter-context").go_to_context()
-              end)
-              return "<Ignore>"
-            end
-          end,
-          desc = "Jump to upper context [s]tart",
-          expr = true,
-        },
-      },
-      opts = {
-        max_lines = 2,
-        multiline_threshold = 1,
-        min_window_height = 20,
-        separator = "—",
-      },
-    },
-  },
   build = "<cmd>TSUpdate",
   config = function()
     vim.defer_fn(function()
@@ -78,13 +48,6 @@ return {
             scope_incremental = "gs",
             node_decremental = "gr",
           },
-        },
-
-        autotag = {
-          enable = true,
-          enable_rename = true,
-          enable_close = true,
-          enable_close_on_slash = true,
         },
       })
     end, 0)
