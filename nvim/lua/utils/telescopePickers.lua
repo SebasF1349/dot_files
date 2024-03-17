@@ -220,15 +220,16 @@ function telescopePickers.prettyGrepPicker(pickerAndOptions)
       -- Add coordinates if required by 'options'
       local coordinates = ""
 
-      if not options.disable_coordinates then
-        if entry.lnum then
-          if entry.col then
-            coordinates = string.format(" -> %s:%s", entry.lnum, entry.col)
-          else
-            coordinates = string.format(" -> %s", entry.lnum)
-          end
-        end
-      end
+      -- I don't like it
+      -- if not options.disable_coordinates then
+      --   if entry.lnum then
+      --     if entry.col then
+      --       coordinates = string.format(" -> %s:%s", entry.lnum, entry.col)
+      --     else
+      --       coordinates = string.format(" -> %s", entry.lnum)
+      --     end
+      --   end
+      -- end
 
       -- Append coordinates to tail
       tail = tail .. coordinates
