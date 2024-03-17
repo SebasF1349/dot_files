@@ -1,7 +1,7 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
-  build = "<cmd>TSUpdate",
+  build = ":TSUpdate",
   config = function()
     vim.defer_fn(function()
       require("nvim-treesitter.configs").setup({
