@@ -3,5 +3,4 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-require("util")
 require("core")

@@ -7,7 +7,8 @@ vim.api.nvim_create_autocmd({ "VimEnter" }, {
     local directory = vim.fn.isdirectory(data.file) == 1
     -- change to the directory
     if directory then
-      Telescope_git_or_files()
+      require("telescope") -- needed of error message for loop of something
+      require("utils.telescopeFiles").Telescope_git_or_files()
     end
   end,
   group = general,
@@ -29,7 +30,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost" }, {
 
 vim.api.nvim_create_autocmd({ "VimLeave" }, {
   callback = function()
-    Set_user_var("IS_NVIM", false)
+    require("utils.setVar").Set_user_var("IS_NVIM", false)
   end,
   group = general,
   desc = "Set Global Variable to false for Wezterm to use",

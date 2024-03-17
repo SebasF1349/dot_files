@@ -195,7 +195,7 @@ local function navigate(dir)
   end
 end
 
-Set_user_var("IS_NVIM", true)
+require("utils.setVar").Set_user_var("IS_NVIM", true)
 
 -- Move to window using the movement keys
 for key, _ in pairs(nav) do
