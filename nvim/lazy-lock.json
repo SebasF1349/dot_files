@@ -15,6 +15,7 @@
   "flash.nvim": { "branch": "main", "commit": "48817af25f51c0590653bbc290866e4890fe1cbe" },
   "friendly-snippets": { "branch": "main", "commit": "dcd4a586439a1c81357d5b9d26319ae218cc9479" },
   "gitsigns.nvim": { "branch": "main", "commit": "4e348641b8206c3b8d23080999e3ddbe4ca90efc" },
+  "grapple.nvim": { "branch": "main", "commit": "6d955cb2907fe36b499fc35b93eab68a929a2286" },
   "guess-indent.nvim": { "branch": "main", "commit": "b8ae749fce17aa4c267eec80a6984130b94f80b2" },
   "hardtime.nvim": { "branch": "main", "commit": "860e912895176112868c97b46277f547e149f5e6" },
   "harpoon": { "branch": "harpoon2", "commit": "a38be6e0dd4c6db66997deab71fc4453ace97f9c" },

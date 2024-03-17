@@ -12,7 +12,6 @@ return {
         treesitter = true,
         fidget = true,
         telescope = true,
-        harpoon = true,
         lsp_trouble = true,
         which_key = true,
         mason = true,
