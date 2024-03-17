@@ -187,29 +187,29 @@ return {
           },
         },
         set_mappings = function(buf)
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Left>", ":JumpLeft<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Left>", ":SwapWithLeftCell<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<Left>", "<cmd>JumpLeft<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Left>", "<cmd>SwapWithLeftCell<CR>", {})
 
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Right>", ":JumpRight<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Right>", ":SwapWithRightCell<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<Right>", "<cmd>JumpRight<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Right>", "<cmd>SwapWithRightCell<CR>", {})
 
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Up>", ":JumpUp<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Up>", ":SwapWithUpperCell<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<Up>", "<cmd>JumpUp<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Up>", "<cmd>SwapWithUpperCell<CR>", {})
 
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Down>", ":JumpDown<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Down>", ":SwapWithLowerCell<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<Down>", "<cmd>JumpDown<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Down>", "<cmd>SwapWithLowerCell<CR>", {})
 
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Tab>", ":JumpToNextCell<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Tab>", ":JumpToPreviousCell<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<Tab>", "<cmd>JumpToNextCell<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Tab>", "<cmd>JumpToPreviousCell<CR>", {})
 
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Left>", ":SwapWithLeftColumn<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Right>", ":SwapWithRightColumn<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Up>", ":SwapWithUpperRow<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Down>", ":SwapWithLowerRow<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Left>", "<cmd>SwapWithLeftColumn<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Right>", "<cmd>SwapWithRightColumn<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Up>", "<cmd>SwapWithUpperRow<CR>", {})
+          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Down>", "<cmd>SwapWithLowerRow<CR>", {})
         end,
       })
-      vim.keymap.set("n", "<leader>mi", ":EasyTablesImportThisTable<CR>", { desc = "[M]arkdown Table [I]mport" })
-      vim.keymap.set("n", "<leader>me", ":ExportTable<CR>", { desc = "[M]arkdown Table [E]xport" })
+      vim.keymap.set("n", "<leader>mi", "<cmd>EasyTablesImportThisTable<CR>", { desc = "[M]arkdown Table [I]mport" })
+      vim.keymap.set("n", "<leader>me", "<cmd>ExportTable<CR>", { desc = "[M]arkdown Table [E]xport" })
     end,
   },
   {

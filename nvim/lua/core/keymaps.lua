@@ -55,8 +55,8 @@ vim.keymap.set("n", "<leader>pv", function()
 end, { desc = "Open Explorer Netrw" })
 
 --Move things around when in visual mode
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("v", "J", "<cmd>m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", "<cmd>m '<-2<CR>gv=gv")
 
 -- Press 'U' for redo
 vim.keymap.set("n", "U", "<C-r>")
@@ -65,7 +65,12 @@ vim.keymap.set("n", "U", "<C-r>")
 vim.keymap.set("n", "gO", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>", { desc = "Create new line above" })
 vim.keymap.set("n", "go", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>", { desc = "Create new line below" })
 
-vim.keymap.set("n", "<leader>re", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>", { desc = "Quick search and [RE]place on the current word" })
+vim.keymap.set(
+  "n",
+  "<leader>re",
+  "<cmd>%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>",
+  { desc = "Quick search and [RE]place on the current word" }
+)
 
 -- Center buffer while navigating
 vim.keymap.set("n", "n", "nzzzv")

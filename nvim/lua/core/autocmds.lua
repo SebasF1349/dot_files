@@ -55,7 +55,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
       require("conform").format({ bufnr = args.buf })
       -- idk why the auto-sort command doesn't work, even with `:w`
-      if vim.fn.exists(":TailwindSort") > 0 then
+      if vim.fn.exists("<cmd>TailwindSort") > 0 then
         vim.cmd("TailwindSort")
       end
       vim.cmd("silent! wa")
@@ -68,7 +68,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
 
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   callback = function()
-    if vim.fn.exists(":TailwindSort") > 0 then
+    if vim.fn.exists("<cmd>TailwindSort") > 0 then
       vim.cmd("TailwindSort")
     end
   end,

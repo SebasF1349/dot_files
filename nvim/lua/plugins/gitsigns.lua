@@ -50,7 +50,7 @@ return {
       end, { desc = "[H]unk [R]eset" })
 
       -- Text object
-      map({ "o", "x" }, "<leader>hS", ":<C-U>Gitsigns select_hunk<CR>", { desc = "[H]unk [S]elect" })
+      map({ "o", "x" }, "<leader>hS", "<cmd>Gitsigns select_hunk<CR>", { desc = "[H]unk [S]elect" })
 
       -- Normal mode
       map("n", "<leader>hs", gs.stage_hunk, { desc = "[H]unk [S]tage" })

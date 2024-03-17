@@ -31,7 +31,7 @@ return {
       },
     },
   },
-  build = ":TSUpdate",
+  build = "<cmd>TSUpdate",
   config = function()
     vim.defer_fn(function()
       require("nvim-treesitter.configs").setup({
