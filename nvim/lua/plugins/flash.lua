@@ -2,22 +2,22 @@ return {
   "folke/flash.nvim",
   keys = {
     {
-      "gj",
+      "s",
       mode = { "n", "x", "o" },
       function()
         require("flash").jump({
           remote_op = { restore = true, motion = true },
         })
       end,
-      desc = "Flash Jump",
+      desc = "Fla[S]h Jump",
     },
     {
-      "gt",
+      "S",
       mode = { "n", "x", "o" },
       function()
         require("flash").treesitter()
       end,
-      desc = "Flash Treesitter Selection",
+      desc = "Flash Treesitter [S]election",
     },
     {
       "gs",
@@ -28,7 +28,7 @@ return {
           label = { before = true, after = false },
         })
       end,
-      desc = "Flash Treesitter Selection",
+      desc = "Flash Treesitter [G]o [S]tart",
     },
     {
       "ge",
@@ -39,7 +39,7 @@ return {
           label = { before = false, after = true },
         })
       end,
-      desc = "Flash Treesitter Selection",
+      desc = "Flash Treesitter [G]o [E]nd",
     },
   },
 }
