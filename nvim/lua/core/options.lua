@@ -96,7 +96,7 @@ vim.g.netrw_sort_options = "i"
 vim.g.netrw_winsize = 20
 
 -- add borders to floating windows
-local _border = "single"
+local _border = "rounded"
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
   border = _border,
 })
