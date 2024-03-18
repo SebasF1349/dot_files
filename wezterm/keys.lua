@@ -1,10 +1,12 @@
 -- based on https://github.com/folke/dot/blob/master/config/wezterm/keys.lua
-local wezterm = require("wezterm")
 
+local wezterm = require("wezterm")
 local act = wezterm.action
+
 local M = {}
 
-M.mod = "SHIFT|CTRL"
+M.modSplit = "SHIFT|ALT"
+M.modTab = "ALT"
 
 M.smart_split = wezterm.action_callback(function(window, pane)
 	local dim = pane:get_dimensions()
@@ -19,38 +21,38 @@ function M.setup(config)
 	config.disable_default_key_bindings = true
 	config.keys = {
 		-- New Tab --
-		{ mods = M.mod, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
+		{ mods = M.modTab, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
 		-- Move Tabs
-		{ mods = M.mod, key = ">", action = act.MoveTabRelative(1) },
-		{ mods = M.mod, key = "<", action = act.MoveTabRelative(-1) },
+		{ mods = M.modTab .. "|CTRL", key = "l", action = act.MoveTabRelative(1) },
+		{ mods = M.modTab .. "|CTRL", key = "h", action = act.MoveTabRelative(-1) },
 		-- Acivate Tabs
-		{ mods = M.mod, key = "l", action = act({ ActivateTabRelative = 1 }) },
-		{ mods = M.mod, key = "h", action = act({ ActivateTabRelative = -1 }) },
-		{ mods = M.mod, key = "!", action = act.ActivateTab(0) }, -- need to use the symbols because of shift
-		{ mods = M.mod, key = "@", action = act.ActivateTab(1) },
-		{ mods = M.mod, key = "#", action = act.ActivateTab(2) },
-		{ mods = M.mod, key = "$", action = act.ActivateTab(3) },
+		{ mods = M.modTab, key = "l", action = act({ ActivateTabRelative = 1 }) },
+		{ mods = M.modTab, key = "h", action = act({ ActivateTabRelative = -1 }) },
+		{ mods = M.modTab, key = "1", action = act.ActivateTab(0) },
+		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
+		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
+		{ mods = M.modTab, key = "4", action = act.ActivateTab(3) },
 		-- NOTE: worth making clipboard work with nvim keys too?
 		-- Clipboard
-		{ mods = M.mod, key = "C", action = act.CopyTo("Clipboard") },
-		{ mods = M.mod, key = "V", action = act.PasteFrom("Clipboard") },
+		{ mods = M.modSplit, key = "C", action = act.CopyTo("Clipboard") },
+		{ mods = M.modSplit, key = "V", action = act.PasteFrom("Clipboard") },
 		-- { mods = M.mod, key = "Space", action = act.QuickSelect },
 		-- { mods = M.mod, key = "X", action = act.ActivateCopyMode },
 		-- { mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
 		-- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
 		-- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
 		-- Splits
-		{ mods = M.mod, key = "Enter", action = M.smart_split },
-		{ mods = M.mod, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.mod, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
-		{ mods = M.mod, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
-		{ mods = M.mod, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
-		{ mods = M.mod, key = "z", action = wezterm.action.TogglePaneZoomState },
-		M.split_nav("resize", "CTRL", "LeftArrow", "Left"),
-		M.split_nav("resize", "CTRL", "RightArrow", "Right"),
-		M.split_nav("resize", "CTRL", "UpArrow", "Up"),
-		M.split_nav("resize", "CTRL", "DownArrow", "Down"),
+		{ mods = M.modSplit, key = "Enter", action = M.smart_split },
+		{ mods = M.modSplit, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+		{ mods = M.modSplit, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+		{ mods = M.modSplit, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
+		{ mods = M.modSplit, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
+		{ mods = M.modSplit, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
+		{ mods = M.modSplit, key = "z", action = wezterm.action.TogglePaneZoomState },
+		M.split_nav("resize", "CTRL|SHIFT", "<", "Left"),
+		M.split_nav("resize", "CTRL|SHIFT", ">", "Right"),
+		M.split_nav("resize", "CTRL", ",", "Up"),
+		M.split_nav("resize", "CTRL", ".", "Down"),
 		M.split_nav("move", "CTRL", "h", "Left"),
 		M.split_nav("move", "CTRL", "j", "Down"),
 		M.split_nav("move", "CTRL", "k", "Up"),

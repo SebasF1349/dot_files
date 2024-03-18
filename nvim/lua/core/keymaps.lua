@@ -154,22 +154,22 @@ vim.keymap.set("t", "<A-k>", "<Up>", { desc = "Up" })
 vim.keymap.set("t", "<A-l>", "<Right>", { desc = "Right" })
 
 -- window management
-vim.keymap.set("n", "<A-|>", "<C-w>v", { desc = "Split Window [|]Vertically" })
-vim.keymap.set("n", "<A-->", "<C-w>s", { desc = "Split Window [-]Horizontally" })
-vim.keymap.set("n", "<A-e>", "<C-w>=", { desc = "Window [E]qual Size" })
-vim.keymap.set("n", "<A-q>", "<cmd>close<CR>", { desc = "Window [Q]uit" })
+vim.keymap.set("n", "<C-\\>", "<C-w>v", { desc = "Split Window [|]Vertically" })
+vim.keymap.set("n", "<C-->", "<C-w>s", { desc = "Split Window [-]Horizontally" })
+vim.keymap.set("n", "<C-e>", "<C-w>=", { desc = "Window [E]qual Size" })
+vim.keymap.set("n", "<C-q>", "<cmd>close<CR>", { desc = "Window [Q]uit" })
 -- Resize window
-vim.keymap.set("n", "<A-<>", "5<C-w><", { desc = "Resize Window [<]Smaller Vertically" })
-vim.keymap.set("n", "<A->>", "5<C-w>>", { desc = "Resize Window [>]Bigger Vertically" })
-vim.keymap.set("n", "<A-,>", "5<C-w>-", { desc = "Resize Window [<]Smaller Horizontally" })
-vim.keymap.set("n", "<A-.>", "5<C-w>+", { desc = "Resize Window [<]Bigger Horizontally" })
+vim.keymap.set("n", "<C-<>", "5<C-w><", { desc = "Resize Window [<]Smaller Vertically" })
+vim.keymap.set("n", "<C->>", "5<C-w>>", { desc = "Resize Window [>]Bigger Vertically" })
+vim.keymap.set("n", "<C-,>", "5<C-w>-", { desc = "Resize Window [<]Smaller Horizontally" })
+vim.keymap.set("n", "<C-.>", "5<C-w>+", { desc = "Resize Window [<]Bigger Horizontally" })
 -- Move (rotate) window on row
-vim.keymap.set("n", "<A-r>", "<C-w><C-r>", { desc = "Window [R]otate" })
+vim.keymap.set("n", "<C-r>", "<C-w><C-r>", { desc = "Window [R]otate" })
 -- Move split to main position
-vim.keymap.set("n", "<A-h>", "<C-w>H", { desc = "Move Window [h]Left" })
-vim.keymap.set("n", "<A-k>", "<C-w>K", { desc = "Move Window [k]Up" })
-vim.keymap.set("n", "<A-j>", "<C-w>J", { desc = "Move Window [j]Down" })
-vim.keymap.set("n", "<A-l>", "<C-w>L", { desc = "Move Window [l]right" })
+vim.keymap.set("n", "<C-H>", "<C-w>H", { desc = "Move Window [h]Left" })
+vim.keymap.set("n", "<C-K>", "<C-w>K", { desc = "Move Window [k]Up" })
+vim.keymap.set("n", "<C-J>", "<C-w>J", { desc = "Move Window [j]Down" })
+vim.keymap.set("n", "<C-L>", "<C-w>L", { desc = "Move Window [l]right" })
 
 local nav = {
   h = "Left",
