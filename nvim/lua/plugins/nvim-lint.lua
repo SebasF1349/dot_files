@@ -12,6 +12,8 @@ return {
       svelte = { "eslint_d" },
       markdown = { "markdownlint" },
       sh = { "shellcheck" },
+      json = { "jsonlint" },
+      text = { "vale" },
       -- ['yaml.ansible'] = { 'ansible-lint', },
     }
 
