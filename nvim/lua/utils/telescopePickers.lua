@@ -59,7 +59,7 @@ function telescopePickers.prettyFilesPicker(pickerAndOptions)
   end
 
   -- Ensure 'options' integrity
-  options = pickerAndOptions.options or {}
+  local options = pickerAndOptions.options or {}
 
   -- Use Telescope's existing function to obtain a default 'entry_maker' function
   -- ----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ function telescopePickers.prettyGrepPicker(pickerAndOptions)
   end
 
   -- Ensure 'options' integrity
-  options = pickerAndOptions.options or {}
+  local options = pickerAndOptions.options or {}
 
   -- Use Telescope's existing function to obtain a default 'entry_maker' function
   -- ----------------------------------------------------------------------------
@@ -306,7 +306,7 @@ function telescopePickers.prettyDocumentSymbols(localOptions)
     return
   end
 
-  options = localOptions or {}
+  local options = localOptions or {}
 
   local originalEntryMaker = telescopeMakeEntryModule.gen_from_lsp_symbols(options)
 
@@ -342,7 +342,7 @@ function telescopePickers.prettyWorkspaceSymbols(localOptions)
     return
   end
 
-  options = localOptions or {}
+  local options = localOptions or {}
 
   local originalEntryMaker = telescopeMakeEntryModule.gen_from_lsp_symbols(options)
 
@@ -388,7 +388,7 @@ function telescopePickers.prettyBuffersPicker(localOptions)
     return
   end
 
-  options = localOptions or {}
+  local options = localOptions or {}
 
   local originalEntryMaker = telescopeMakeEntryModule.gen_from_buffer(options)
 
