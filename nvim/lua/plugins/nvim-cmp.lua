@@ -1,5 +1,4 @@
 return {
-  -- Autocompletion
   "hrsh7th/nvim-cmp",
   init = function()
     -- Make cmp not open in Telescope start
@@ -13,7 +12,6 @@ return {
     })
   end,
   dependencies = {
-    -- Snippet Engine & its associated nvim-cmp source
     {
       "L3MON4D3/LuaSnip",
       build = (function()
@@ -36,13 +34,10 @@ return {
       },
     },
     "saadparwaiz1/cmp_luasnip",
-    -- Adds LSP completion capabilities
     "hrsh7th/cmp-nvim-lsp",
-    -- Source for text in buffer
+    "hrsh7th/cmp-nvim-lsp-signature-help",
     "hrsh7th/cmp-buffer",
-    -- Source for file system paths
     "hrsh7th/cmp-path",
-    -- Completion for the command line
     "hrsh7th/cmp-cmdline",
   },
   config = function()
@@ -101,10 +96,11 @@ return {
         end, { "i", "s" }),
       }),
       sources = {
+        { name = "nvim_lsp_signature_help" },
         { name = "nvim_lsp" },
         { name = "luasnip" },
-        { name = "buffer" },
         { name = "path" },
+        { name = "buffer" },
       },
     })
 
