@@ -189,7 +189,7 @@ return {
       group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
       callback = function(event)
         local nmap = function(keys, func, desc)
-          vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP:" .. desc })
+          vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
         end
 
         vim.lsp.inlay_hint.enable(event.buf, true)
@@ -209,7 +209,7 @@ return {
         -- Find references for the word under your cursor.
         nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 
-        nmap("<leader>s", vim.lsp.buf.signature_help, "Signature Documentation")
+        nmap("<leader>s", vim.lsp.buf.signature_help, "[S]ignature Documentation")
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
 

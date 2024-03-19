@@ -54,11 +54,7 @@ return { -- Collection of various small independent plugins/modules
     -- require("mini.surround").setup()
     -- NOTE: mini-surround for better surroundings?
 
-    require("mini.splitjoin").setup({ mappings = {
-      toggle = "<leader>j",
-      split = "",
-      join = "",
-    } })
+    require("mini.splitjoin").setup({ mappings = { toggle = "<leader>j", split = "", join = "" } })
 
     -- NOTE: mini.bracketed just to move to comments? (TS-textobjects doesn't work on svelte, but mini.ai looks like it can)
     -- and maybe buffers?

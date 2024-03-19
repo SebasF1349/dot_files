@@ -43,16 +43,14 @@ vim.keymap.set("n", "]w", function()
   vim.api.nvim_feedkeys("zz", "n", false)
 end, { desc = "Go to next warning message" })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
---Open explorer
-vim.keymap.set("n", "<leader>pv", function()
+vim.keymap.set("n", "<leader>n", function()
   local function getPath(str)
     return str:match("(.*[/\\])")
   end
   local currentfile = getPath(vim.fn.expand("%:p"))
   vim.cmd("Lexplore!" .. currentfile)
-end, { desc = "Open Explorer Netrw" })
+end, { desc = "Open Explorer [N]etrw" })
 
 --Move things around when in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -65,7 +63,9 @@ vim.keymap.set("n", "U", "<C-r>")
 vim.keymap.set("n", "gO", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>", { desc = "Create new line above" })
 vim.keymap.set("n", "go", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>", { desc = "Create new line below" })
 
-vim.keymap.set("n", "<leader>re", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>", { desc = "Quick search and [RE]place on the current word" })
+vim.keymap.set("n", "<leader>re", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>", {
+  desc = "Search and [RE]place current word",
+})
 
 -- Center buffer while navigating
 vim.keymap.set("n", "n", "nzzzv")
