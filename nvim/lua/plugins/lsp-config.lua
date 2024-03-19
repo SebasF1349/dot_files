@@ -250,6 +250,12 @@ return {
       -- "yamllint", -- linter
       "yamlfmt", -- formatter
 
+      -- json
+      "jsonlint", -- linter
+
+      -- text
+      "vale", -- linter
+
       -- sql
       -- "sqlfluff", -- linter
     })
