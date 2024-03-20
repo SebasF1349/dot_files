@@ -149,6 +149,10 @@ return {
       event = { "BufReadPre", "BufNewFile" },
       config = function()
         require("mason").setup({
+          registries = {
+            "github:nvim-java/mason-registry",
+            "github:mason-org/mason-registry",
+          },
           ui = {
             icons = {
               package_installed = "✓",
@@ -189,15 +193,6 @@ return {
         "nvim-java/nvim-java-dap",
         "MunifTanjim/nui.nvim",
         "mfussenegger/nvim-dap",
-        {
-          "williamboman/mason.nvim",
-          opts = {
-            registries = {
-              "github:nvim-java/mason-registry",
-              "github:mason-org/mason-registry",
-            },
-          },
-        },
       },
     },
   },
