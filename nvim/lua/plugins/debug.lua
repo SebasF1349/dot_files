@@ -4,6 +4,7 @@ return {
     -- Fancy UI for the debugger
     {
       "rcarriga/nvim-dap-ui",
+      dependencies = "nvim-neotest/nvim-nio",
       keys = {
         {
           "<leader>de",
