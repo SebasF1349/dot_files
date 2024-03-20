@@ -210,6 +210,8 @@ return {
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
       callback = function(event)
+        local client = vim.lsp.get_client_by_id(event.data.client_id)
+
         local nmap = function(keys, func, desc)
           vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
         end
@@ -223,17 +225,14 @@ return {
         nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
         nmap("K", vim.lsp.buf.hover, "Hover Documentation")
 
-        -- Jump to the definition of the word under your cursor.
-        --  This is where a variable was first declared, or where a function is defined, etc.
-        --  To jump back, press <C-T>.
-        nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+        -- java doesn't support the same gd that telescope uses, this should be fixed soon
+        if client and client.supports_method("textDocument/definition") then
+          nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+        end
 
-        -- Find references for the word under your cursor.
         nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 
         nmap("<leader>s", vim.lsp.buf.signature_help, "[S]ignature Documentation")
-
-        local client = vim.lsp.get_client_by_id(event.data.client_id)
 
         require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
 
