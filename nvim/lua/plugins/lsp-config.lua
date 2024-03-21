@@ -149,10 +149,6 @@ return {
       event = { "BufReadPre", "BufNewFile" },
       config = function()
         require("mason").setup({
-          registries = {
-            "github:nvim-java/mason-registry",
-            "github:mason-org/mason-registry",
-          },
           ui = {
             icons = {
               package_installed = "✓",
@@ -184,17 +180,6 @@ return {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     "artemave/workspace-diagnostics.nvim",
     { "dmmulroy/ts-error-translator.nvim", opts = {} },
-    {
-      "nvim-java/nvim-java",
-      dependencies = {
-        "nvim-java/lua-async-await",
-        "nvim-java/nvim-java-core",
-        "nvim-java/nvim-java-test",
-        "nvim-java/nvim-java-dap",
-        "MunifTanjim/nui.nvim",
-        "mfussenegger/nvim-dap",
-      },
-    },
   },
   config = function()
     -- add border to the floating windows
@@ -284,13 +269,15 @@ return {
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities()) or {}
 
-    require("java").setup()
-
     require("mason-lspconfig").setup({
       automatic_installation = true, -- not the same as ensure_installed
 
       handlers = {
         function(server_name)
+          -- to avoid double lsp server, as java lsp is launched by the jdtls extension
+          if server_name == "jdtls" then
+            return
+          end
           local server = servers[server_name] or {}
           server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
           require("lspconfig")[server_name].setup(server)
