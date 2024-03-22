@@ -1,3 +1,7 @@
+local function breadcrumb()
+  return require("nvim-treesitter").statusline() or ""
+end
+
 return {
   "nvim-lualine/lualine.nvim",
   event = { "BufReadPre", "BufNewFile" },
@@ -34,7 +38,7 @@ return {
     tabline = {},
     winbar = {
       lualine_a = {},
-      lualine_b = {},
+      lualine_b = { breadcrumb },
       lualine_c = {},
       lualine_x = {},
       lualine_y = { { "filetype", icon_only = true } },
