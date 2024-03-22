@@ -1,14 +1,13 @@
 -- based on https://github.com/LazyVim/LazyVim/blob/6e57e86c9952986a0e90055e13aa86dcde5e478e/lua/lazyvim/plugins/extras/lang/java.lua
 return {
   "mfussenegger/nvim-jdtls",
-  dependencies = { "folke/which-key.nvim" },
   ft = "java",
   config = function()
     local bundles = {} ---@type string[]
     local mason_install_path = vim.env.HOME .. "/.local/share/nvim/mason/packages"
     local jar_patterns = {
-      mason_install_path .. "java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
-      mason_install_path .. "java-test/extension/server/*.jar",
+      mason_install_path .. "/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
+      mason_install_path .. "/java-test/extension/server/*.jar",
     }
     for _, jar_pattern in ipairs(jar_patterns) do
       for _, bundle in ipairs(vim.split(vim.fn.glob(jar_pattern), "\n")) do
