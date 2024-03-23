@@ -34,7 +34,7 @@ return {
       lualine_b = { "branch", "diff", "diagnostics" },
       lualine_c = {},
       lualine_x = {},
-      lualine_y = {},
+      lualine_y = { { "diagnostics", sources = { "nvim_workspace_diagnostic" } } },
       lualine_z = { "grapple" },
     },
     inactive_sections = {},
@@ -55,6 +55,6 @@ return {
       lualine_y = { { "filetype", icon_only = true } },
       lualine_z = { { "filename", path = 1 } },
     },
-    extensions = {},
+    extensions = { "fugitive", "trouble" },
   },
 }
