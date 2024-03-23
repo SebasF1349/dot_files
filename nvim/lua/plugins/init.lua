@@ -9,7 +9,26 @@ return {
     "m4xshen/hardtime.nvim",
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     event = { "BufReadPre", "BufNewFile" },
-    opts = {},
+    opts = {
+      disabled_filetypes = {
+        "TelescopePrompt",
+        "checkhealth",
+        "dapui-repl",
+        "dapui_breakpoints",
+        "dapui_console",
+        "dapui_scopes",
+        "dapui_stacks",
+        "dapui_watches",
+        "help",
+        "lazy",
+        "mason",
+        "netrw",
+        "prompt",
+        "qf",
+        "Trouble",
+        "fugitive",
+      },
+    },
   },
 
   {

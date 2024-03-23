@@ -1,7 +1,7 @@
 -- Keymaps for better default experience
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
---Remap Escape
+-- Remap Escape
 vim.keymap.set("i", "jk", "<Esc>")
 
 -- Select all
@@ -16,33 +16,6 @@ vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:w<cr>")
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- Diagnostic keymaps
-vim.keymap.set("n", "[d", function()
-  vim.diagnostic.goto_prev()
-  vim.api.nvim_feedkeys("zz", "n", false)
-end, { desc = "Go to previous diagnostic message" })
-vim.keymap.set("n", "]d", function()
-  vim.diagnostic.goto_next()
-  vim.api.nvim_feedkeys("zz", "n", false)
-end, { desc = "Go to next diagnostic message" })
-vim.keymap.set("n", "[e", function()
-  vim.diagnostic.goto_prev({ namespace = 0, severity = vim.diagnostic.severity.ERROR })
-  vim.api.nvim_feedkeys("zz", "n", false)
-end, { desc = "Go to previous error message" })
-vim.keymap.set("n", "]e", function()
-  vim.diagnostic.goto_next({ namespace = 0, severity = vim.diagnostic.severity.ERROR })
-  vim.api.nvim_feedkeys("zz", "n", false)
-end, { desc = "Go to next error message" })
-vim.keymap.set("n", "[w", function()
-  vim.diagnostic.goto_prev({ namespace = 0, severity = vim.diagnostic.severity.WARN })
-  vim.api.nvim_feedkeys("zz", "n", false)
-end, { desc = "Go to previous warning message" })
-vim.keymap.set("n", "]w", function()
-  vim.diagnostic.goto_next({ namespace = 0, severity = vim.diagnostic.severity.WARN })
-  vim.api.nvim_feedkeys("zz", "n", false)
-end, { desc = "Go to next warning message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 
 vim.keymap.set("n", "<leader>n", function()
   local function getPath(str)
@@ -63,8 +36,8 @@ vim.keymap.set("n", "U", "<C-r>")
 vim.keymap.set("n", "gO", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>", { desc = "Create new line above" })
 vim.keymap.set("n", "go", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>", { desc = "Create new line below" })
 
-vim.keymap.set("n", "<leader>re", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>", {
-  desc = "Search and [RE]place current word",
+vim.keymap.set("n", "<leader>rp", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>", {
+  desc = "Search and [R]e[P]lace current word",
 })
 
 -- Center buffer while navigating
@@ -137,21 +110,6 @@ end
 vim.keymap.set({ "n", "t" }, "tt", function()
   toggle_term(1)
 end, { desc = "[T]oggle [T]erminal 1" })
-
--- Move only sideways in command mode. Using `silent = false` makes movements
--- to be immediately shown.
-vim.keymap.set("c", "<A-h>", "<Left>", { silent = false, desc = "Left" })
-vim.keymap.set("c", "<A-l>", "<Right>", { silent = false, desc = "Right" })
--- Don't `noremap` in insert mode to have these keybindings behave exactly
--- like arrows (crucial inside TelescopePrompt)
-vim.keymap.set("i", "<A-h>", "<Left>", { noremap = false, desc = "Left" })
-vim.keymap.set("i", "<A-j>", "<Down>", { noremap = false, desc = "Down" })
-vim.keymap.set("i", "<A-k>", "<Up>", { noremap = false, desc = "Up" })
-vim.keymap.set("i", "<A-l>", "<Right>", { noremap = false, desc = "Right" })
-vim.keymap.set("t", "<A-h>", "<Left>", { desc = "Left" })
-vim.keymap.set("t", "<A-j>", "<Down>", { desc = "Down" })
-vim.keymap.set("t", "<A-k>", "<Up>", { desc = "Up" })
-vim.keymap.set("t", "<A-l>", "<Right>", { desc = "Right" })
 
 -- window management
 vim.keymap.set("n", "<C-\\>", "<C-w>v", { desc = "Split Window [|]Vertically" })

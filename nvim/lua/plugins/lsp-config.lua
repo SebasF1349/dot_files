@@ -169,8 +169,8 @@ return {
           ignore_empty_message = true,
         },
         notification = {
+          override_vim_notify = true,
           window = {
-            normal_hl = "CursorLineNr",
             winblend = 0,
           },
         },
@@ -192,27 +192,34 @@ return {
       callback = function(event)
         local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-        local nmap = function(keys, func, desc)
-          vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
-        end
-
         vim.lsp.inlay_hint.enable(event.buf, true)
-        nmap("<leader>ti", function()
+        vim.keymap.set("n", "<leader>ti", function()
           vim.lsp.inlay_hint.enable(event.buf, not vim.lsp.inlay_hint.is_enabled())
-        end, "[T]oggle [I]nlay Hints")
+        end, { desc = "LSP: [T]oggle [I]nlay Hints" })
 
-        nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-        nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-        nmap("K", vim.lsp.buf.hover, "Hover Documentation")
+        -- Diagnostic keymaps
+        vim.keymap.set("n", "]d", function()
+          vim.diagnostic.goto_prev()
+          vim.api.nvim_feedkeys("zz", "n", false)
+        end, { desc = "LSP: Go to previous [D]iagnostic message" })
+        vim.keymap.set("n", "[d", function()
+          vim.diagnostic.goto_next()
+          vim.api.nvim_feedkeys("zz", "n", false)
+        end, { desc = "LSP: Go to next [D]iagnostic message" })
+        vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "LSP: Open floating diagnostic message" })
+
+        vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP:[R]e[n]ame" })
+        vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP:[C]ode [A]ction" })
+        vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "LSP:Hover Documentation" })
 
         -- java doesn't support the same gd that telescope uses, this should be fixed soon
         if client and client.supports_method("textDocument/definition") then
-          nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+          vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
         end
 
-        nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+        vim.keymap.set("n", "gr", require("telescope.builtin").lsp_references, { desc = "LSP: [G]oto [R]eferences" })
 
-        nmap("<leader>s", vim.lsp.buf.signature_help, "[S]ignature Documentation")
+        vim.keymap.set("n", "<leader>s", vim.lsp.buf.signature_help, { desc = "LSP: [S]ignature Documentation" })
 
         require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
 
