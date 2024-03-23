@@ -2,6 +2,7 @@ return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
+  dependencies = { "andymass/vim-matchup", opts = {} },
   config = function()
     vim.defer_fn(function()
       require("nvim-treesitter.configs").setup({
@@ -38,7 +39,7 @@ return {
         -- You can specify additional Treesitter modules here: -- For example: -- playground = {--enable = true,-- },
         modules = {},
 
-        highlight = { enable = true },
+        -- highlight = { enable = true },
         -- indent = { enable = true }, -- doesn't work properly
         incremental_selection = {
           enable = true,
@@ -49,6 +50,7 @@ return {
             node_decremental = "gr",
           },
         },
+        matchup = { enable = true },
       })
     end, 0)
   end,
