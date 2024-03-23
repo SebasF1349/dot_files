@@ -1,5 +1,8 @@
 local function breadcrumb()
-  return require("nvim-treesitter").statusline() or ""
+  local indicator_size = vim.o.columns > 80 and vim.o.columns / 2 or vim.o.columns / 3
+  return require("nvim-treesitter").statusline({
+    indicator_size = indicator_size,
+  }) or ""
 end
 
 return {
