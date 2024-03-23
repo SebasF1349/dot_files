@@ -215,5 +215,11 @@ local surround = {
 }
 for _, pair in ipairs(surround) do
   vim.keymap.set("n", "<leader>" .. pair[1], "diwi" .. pair[1] .. "<ESC>pa" .. pair[2], { desc = "Surround with " .. pair[1] })
-  vim.keymap.set("v", "<leader>" .. pair[1], "di" .. pair[1] .. "<ESC>pa" .. pair[2], { desc = "Surround with " .. pair[1] })
+  vim.keymap.set("v", "<leader>" .. pair[1], function()
+    if vim.fn.mode() == "v" then
+      return "c" .. pair[1] .. pair[2] .. "<ESC>hp" .. "<ESC>"
+    elseif vim.fn.mode() == "V" then
+      return "<ESC>I" .. pair[1] .. "<ESC>A" .. pair[2] .. "<ESC>"
+    end
+  end, { desc = "Surround with " .. pair[1], expr = true })
 end
