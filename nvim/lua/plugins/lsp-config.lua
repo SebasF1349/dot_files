@@ -198,11 +198,11 @@ return {
         end, { desc = "LSP: [T]oggle [I]nlay Hints" })
 
         -- Diagnostic keymaps
-        vim.keymap.set("n", "]d", function()
+        vim.keymap.set("n", "[d", function()
           vim.diagnostic.goto_prev()
           vim.api.nvim_feedkeys("zz", "n", false)
         end, { desc = "LSP: Go to previous [D]iagnostic message" })
-        vim.keymap.set("n", "[d", function()
+        vim.keymap.set("n", "]d", function()
           vim.diagnostic.goto_next()
           vim.api.nvim_feedkeys("zz", "n", false)
         end, { desc = "LSP: Go to next [D]iagnostic message" })

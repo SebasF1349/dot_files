@@ -7,7 +7,7 @@ return {
         modules = {
           bib = false,
           buffers = true,
-          conceal = true,
+          conceal = false,
           cursor = true,
           folds = true,
           links = true,
@@ -39,7 +39,7 @@ return {
         links = {
           style = "markdown",
           name_is_source = false,
-          conceal = true,
+          conceal = false,
           context = 0,
           implicit_extension = nil,
           transform_implicit = false,

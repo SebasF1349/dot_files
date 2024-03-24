@@ -106,9 +106,6 @@ function telescopePickers.prettyFilesPicker(pickerAndOptions)
       -- Get the Tail and the Path to display
       local tail, pathToDisplay = telescopePickers.getPathAndTail(entry.value)
 
-      -- Add an extra space to the tail so that it looks nicely separated from the path
-      local tailForDisplay = tail .. " "
-
       -- Get the Icon with its corresponding Highlight information
       local icon, iconHighlight = telescopeUtilities.get_devicons(tail)
 
@@ -117,7 +114,7 @@ function telescopePickers.prettyFilesPicker(pickerAndOptions)
       --          internally and return in the correct format.
       return displayer({
         { icon, iconHighlight },
-        tailForDisplay,
+        tail,
         { pathToDisplay, "TelescopeResultsComment" },
       })
     end
@@ -217,25 +214,8 @@ function telescopePickers.prettyGrepPicker(pickerAndOptions)
       ---- Format Text for display ----
       ---------------------------------
 
-      -- Add coordinates if required by 'options'
-      local coordinates = ""
-
-      -- I don't like it
-      -- if not options.disable_coordinates then
-      --   if entry.lnum then
-      --     if entry.col then
-      --       coordinates = string.format(" -> %s:%s", entry.lnum, entry.col)
-      --     else
-      --       coordinates = string.format(" -> %s", entry.lnum)
-      --     end
-      --   end
-      -- end
-
-      -- Append coordinates to tail
-      tail = tail .. coordinates
-
-      -- Add an extra space to the tail so that it looks nicely separated from the path
-      local tailForDisplay = tail .. " "
+      -- Add an extra space to the path so that it looks nicely separated from the content
+      pathToDisplay = pathToDisplay .. " "
 
       -- Encode text if necessary
       local text = options.file_encoding and vim.iconv(entry.text, options.file_encoding, "utf8") or entry.text
@@ -245,7 +225,7 @@ function telescopePickers.prettyGrepPicker(pickerAndOptions)
       --          internally and return in the correct format.
       return displayer({
         { icon, iconHighlight },
-        tailForDisplay,
+        tail,
         { pathToDisplay, "TelescopeResultsComment" },
         text,
       })
