@@ -40,7 +40,7 @@ config.window_background_opacity = 0.9
 
 config.window_close_confirmation = "NeverPrompt"
 
-config.front_end = "WebGpu"
+-- config.front_end = "WebGpu"
 -- config.webgpu_power_preference = "HighPerformance"
 -- config.animation_fps = 1
 config.cursor_blink_ease_in = "Constant"
@@ -70,5 +70,7 @@ wezterm.on("user-var-changed", function(window, _, name, value)
 	end
 	recompute_padding(window, value)
 end)
+
+config.enable_wayland = false
 
 return config
