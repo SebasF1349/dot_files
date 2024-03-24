@@ -2,6 +2,7 @@ return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
+  dependencies = { "andymass/vim-matchup", opts = {} },
   config = function()
     vim.defer_fn(function()
       require("nvim-treesitter.configs").setup({
@@ -49,6 +50,7 @@ return {
             node_decremental = "gr",
           },
         },
+        matchup = { enable = true },
       })
     end, 0)
   end,

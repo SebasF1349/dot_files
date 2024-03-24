@@ -1,5 +1,8 @@
 local function breadcrumb()
-  return require("nvim-treesitter").statusline() or ""
+  local indicator_size = vim.o.columns > 80 and vim.o.columns / 2 or vim.o.columns / 3
+  return require("nvim-treesitter").statusline({
+    indicator_size = indicator_size,
+  }) or ""
 end
 
 return {
@@ -31,7 +34,7 @@ return {
       lualine_b = { "branch", "diff", "diagnostics" },
       lualine_c = {},
       lualine_x = {},
-      lualine_y = {},
+      lualine_y = { { "diagnostics", sources = { "nvim_workspace_diagnostic" } } },
       lualine_z = { "grapple" },
     },
     inactive_sections = {},
@@ -52,6 +55,6 @@ return {
       lualine_y = { { "filetype", icon_only = true } },
       lualine_z = { { "filename", path = 1 } },
     },
-    extensions = {},
+    extensions = { "fugitive", "trouble" },
   },
 }

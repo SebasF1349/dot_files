@@ -3,9 +3,7 @@ local general = vim.api.nvim_create_augroup("General Settings", { clear = true }
 
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
   callback = function(data)
-    -- buffer is a directory
     local directory = vim.fn.isdirectory(data.file) == 1
-    -- change to the directory
     if directory then
       require("telescope") -- needed of error message for loop of something
       require("utils.telescopeFiles").Telescope_git_or_files()
@@ -50,7 +48,20 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
   desc = "Lazy load clipboard",
 })
 
-vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "FocusGained" }, {
+  pattern = { "*" },
+  command = [[call setreg("@", getreg("+"))]],
+  group = general,
+  desc = "Sync with system clipboard on focus",
+})
+vim.api.nvim_create_autocmd({ "FocusLost" }, {
+  pattern = { "*" },
+  command = [[call setreg("+", getreg("@"))]],
+  group = general,
+  desc = "Sync with system clipboard on focus",
+})
+
+vim.api.nvim_create_autocmd({ "BufLeave", "InsertLeave" }, {
   callback = function(args)
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
       require("conform").format({ bufnr = args.buf })
@@ -128,20 +139,7 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
     vim.cmd("tabdo wincmd =")
   end,
   group = general,
-  desc = "Don't auto comment after pressing enter in comment",
-})
-
-vim.api.nvim_create_autocmd({ "FocusGained" }, {
-  pattern = { "*" },
-  command = [[call setreg("@", getreg("+"))]],
-  group = general,
-  desc = "Sync with system clipboard on focus",
-})
-vim.api.nvim_create_autocmd({ "FocusLost" }, {
-  pattern = { "*" },
-  command = [[call setreg("+", getreg("@"))]],
-  group = general,
-  desc = "Sync with system clipboard on focus",
+  desc = "Resize splits after resizing nvim",
 })
 
 vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
