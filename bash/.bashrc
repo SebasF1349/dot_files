@@ -143,6 +143,7 @@ if [ -d ~/.cargo ] && [ -f ~/.cargo/env ]; then
 fi
 
 export PATH="$HOME/.local/share/bob/nvim-bin/:$PATH"
+export ELECTRON_OZONE_PLATFORM_HINT=auto
 export EDITOR=nvim
 
 alias cd..="cd .."
