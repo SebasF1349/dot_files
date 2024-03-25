@@ -11,7 +11,7 @@ vim.keymap.set("n", "<C-a>", "gg<S-v>G")
 vim.keymap.set("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
 
 -- Save
-vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<Esc>:w<cr>")
+vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<cmd>w<CR>")
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
