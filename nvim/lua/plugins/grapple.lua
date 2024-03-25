@@ -1,9 +1,7 @@
 return {
   "cbochs/grapple.nvim",
-  dependencies = {
-    { "nvim-tree/nvim-web-devicons", lazy = true },
-  },
-  event = { "BufReadPost", "BufNewFile" },
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  keys = { "<leader>g", "<leader>tg", "<C-f>", "<C-b>", "<leader>1", "<leader>2", "<leader>3", "<leader>4" },
   cmd = "Grapple",
   config = function()
     local grapple = require("grapple")

@@ -17,11 +17,11 @@ return {
       if trouble.is_open() then
         trouble.next({ skip_groups = true, jump = true })
       end
-    end, { desc = "Next [T]rouble group" })
+    end, { desc = "Next [X]Trouble group" })
     vim.keymap.set("n", "[x", function()
       if trouble.is_open() then
         trouble.previous({ skip_groups = true, jump = true })
       end
-    end, { desc = "Previous [T]rouble group" })
+    end, { desc = "Previous [X]Trouble group" })
   end,
 }

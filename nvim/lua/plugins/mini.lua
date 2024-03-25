@@ -56,9 +56,6 @@ return { -- Collection of various small independent plugins/modules
 
     require("mini.splitjoin").setup({ mappings = { toggle = "<leader>j", split = "", join = "" } })
 
-    -- NOTE: mini.bracketed just to move to comments? (TS-textobjects doesn't work on svelte, but mini.ai looks like it can)
-    -- and maybe buffers?
-
     require("mini.comment").setup({ mappings = { comment_visual = "C" } })
     -- NOTE: only missing is block comments for inline comments, but I barely use them
   end,

@@ -10,19 +10,12 @@ return {
       topdelete = { text = "‾" },
       changedelete = { text = "~" },
     },
-    on_attach = function(bufnr)
+    preview_config = { border = "rounded" },
+    on_attach = function()
       local gs = package.loaded.gitsigns
-      local function map(mode, l, r, opts)
-        opts = opts or {}
-        opts.buffer = bufnr
-        vim.keymap.set(mode, l, r, opts)
-      end
-
-      -- These are the defaul keybindings
-      -- only leaving them here for reference and for the desc
 
       -- Navigation
-      map({ "n", "v" }, "]h", function()
+      vim.keymap.set({ "n", "v" }, "]h", function()
         if vim.wo.diff then
           return "]c"
         end
@@ -31,7 +24,7 @@ return {
         end)
         return "<Ignore>"
       end, { expr = true, desc = "Jump to next Hunk" })
-      map({ "n", "v" }, "[h", function()
+      vim.keymap.set({ "n", "v" }, "[h", function()
         if vim.wo.diff then
           return "[c"
         end
@@ -42,30 +35,30 @@ return {
       end, { expr = true, desc = "Jump to previous Hunk" })
 
       -- Visual mode
-      map("v", "<leader>hs", function()
+      vim.keymap.set("v", "<leader>hs", function()
         gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
       end, { desc = "[H]unk [S]tage" })
-      map("v", "<leader>hr", function()
+      vim.keymap.set("v", "<leader>hr", function()
         gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
       end, { desc = "[H]unk [R]eset" })
 
       -- Text object
-      map({ "o", "x" }, "<leader>hS", "<cmd>Gitsigns select_hunk<CR>", { desc = "[H]unk [S]elect" })
+      vim.keymap.set({ "o", "x" }, "<leader>hS", gs.select_hunk, { desc = "[H]unk [S]elect" })
 
       -- Normal mode
-      map("n", "<leader>hs", gs.stage_hunk, { desc = "[H]unk [S]tage" })
-      map("n", "<leader>hr", gs.reset_hunk, { desc = "[H]unk [R]eset" })
-      map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "[H]unk [U]ndo" })
-      map("n", "<leader>hp", gs.preview_hunk, { desc = "[H]unk [P]review" })
+      vim.keymap.set("n", "<leader>hs", gs.stage_hunk, { desc = "[H]unk [S]tage" })
+      vim.keymap.set("n", "<leader>hr", gs.reset_hunk, { desc = "[H]unk [R]eset" })
+      vim.keymap.set("n", "<leader>hu", gs.undo_stage_hunk, { desc = "[H]unk [U]ndo" })
+      vim.keymap.set("n", "<leader>hp", gs.preview_hunk, { desc = "[H]unk [P]review" })
 
       -- Buffer
-      map("n", "<leader>bs", gs.stage_buffer, { desc = "[B]uffer [S]tage" })
-      map("n", "<leader>br", gs.reset_buffer, { desc = "[B]uffer [R]eset" })
-      map("n", "<leader>bd", gs.diffthis, { desc = "[B]uffer [D]iff" })
+      vim.keymap.set("n", "<leader>bs", gs.stage_buffer, { desc = "[B]uffer [S]tage" })
+      vim.keymap.set("n", "<leader>br", gs.reset_buffer, { desc = "[B]uffer [R]eset" })
+      vim.keymap.set("n", "<leader>bd", gs.diffthis, { desc = "[B]uffer [D]iff" })
 
       -- Toggles
-      map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "[T]oggle git [B]lame line" })
-      map("n", "<leader>td", gs.toggle_deleted, { desc = "[T]oggle git show [D]eleted" })
+      vim.keymap.set("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "[T]oggle git [B]lame line" })
+      vim.keymap.set("n", "<leader>td", gs.toggle_deleted, { desc = "[T]oggle git show [D]eleted" })
     end,
   },
 }

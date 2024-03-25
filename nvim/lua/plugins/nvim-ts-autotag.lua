@@ -8,7 +8,7 @@ return {
       enable_rename = true,
       enable_close = true,
       enable_close_on_clash = true,
-      filetypes = { "svelte", "html" },
+      filetypes = { "svelte", "html", "markdown" },
     })
   end,
 }

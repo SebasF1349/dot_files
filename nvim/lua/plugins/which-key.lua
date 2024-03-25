@@ -5,9 +5,9 @@ return {
   opts = {},
   config = function()
     require("which-key").register({
-      ["g"] = { name = "Flash", _ = "which_key_ignore" },
-      ["]"] = { name = "+next", _ = "which_key_ignore" },
-      ["["] = { name = "+prev", _ = "which_key_ignore" },
+      ["g"] = { name = "[G]o to", _ = "which_key_ignore" },
+      ["]"] = { name = "Next", _ = "which_key_ignore" },
+      ["["] = { name = "Prev", _ = "which_key_ignore" },
       ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
       ["<leader>d"] = { name = "[D]ebugger", _ = "which_key_ignore" },
       ["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
