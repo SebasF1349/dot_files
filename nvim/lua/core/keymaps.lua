@@ -181,3 +181,40 @@ for _, pair in ipairs(surround) do
     end
   end, { desc = "Surround with " .. pair[1], expr = true })
 end
+
+-- notetaking
+local notes_cache = {}
+local function open_notes()
+  if not notes_cache.buf then
+    local notes_directory = vim.env.HOME .. "/notes"
+    if vim.fn.isdirectory(notes_directory) == 0 then
+      os.execute("mkdir " .. notes_directory)
+    end
+    local projects_notes_directory = vim.env.HOME .. "/notes/projects"
+    if vim.fn.isdirectory(projects_notes_directory) == 0 then
+      os.execute("mkdir " .. projects_notes_directory)
+    end
+    local project_dir = vim.fn.system("git rev-parse --show-toplevel")
+    if project_dir:match("fatal:") then
+      project_dir = vim.fn.getcwd()
+    end
+    local project_file_name = project_dir:gsub("%s+", ""):gsub(vim.env.HOME, ""):gsub("/", "__") .. ".md"
+    local note_file_path = vim.fs.normalize(projects_notes_directory .. "/" .. project_file_name)
+    if vim.tbl_isempty(vim.fs.find(project_file_name, { type = "file", path = projects_notes_directory })) then
+      os.execute("touch " .. note_file_path)
+    end
+    local note_buf = vim.api.nvim_create_buf(true, false)
+    local note_win = vim.api.nvim_open_win(note_buf, true, { split = "right" })
+    vim.cmd("edit " .. note_file_path)
+    notes_cache = { buf = note_buf, win = note_win, is_hidden = false }
+  elseif notes_cache.is_hidden then
+    local note_win = vim.api.nvim_open_win(notes_cache.buf, true, { split = "right" })
+    notes_cache.win = note_win
+    notes_cache.is_hidden = false
+  else
+    vim.cmd("w")
+    vim.api.nvim_win_close(notes_cache.win, true)
+    notes_cache.is_hidden = true
+  end
+end
+vim.keymap.set("n", "<leader>tn", open_notes, { desc = "[T]oggle [N]otes" })
