@@ -138,6 +138,8 @@ local servers = {
   bashls = {},
 
   jdtls = {},
+
+  marksman = {},
 }
 
 return {
@@ -244,26 +246,19 @@ return {
       -- web
       "eslint_d",
       "prettier",
-
       -- markdown
       "markdownlint",
-
       -- lua
       "stylua", -- formatter
-
       -- shell
       "shellcheck", -- linter
       "shfmt", -- formatter
-
       -- "yamllint", -- linter
       "yamlfmt", -- formatter
-
       -- json
       "jsonlint", -- linter
-
       -- text
       "vale", -- linter
-
       -- sql
       -- "sqlfluff", -- linter
     })
