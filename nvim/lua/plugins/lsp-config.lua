@@ -1,3 +1,11 @@
+local function organize_imports()
+  local params = {
+    command = "_typescript.organizeImports",
+    arguments = { vim.api.nvim_buf_get_name(0) },
+  }
+  vim.lsp.buf.execute_command(params)
+end
+
 local servers = {
   rust_analyzer = {
     settings = {
@@ -64,6 +72,12 @@ local servers = {
           includeInlayFunctionLikeReturnTypeHints = true,
           includeInlayEnumMemberValueHints = true,
         },
+      },
+    },
+    commands = {
+      OrganizeImports = {
+        organize_imports,
+        description = "Organize Imports",
       },
     },
   },
@@ -239,6 +253,12 @@ return {
         vim.keymap.set("n", "gr", require("telescope.builtin").lsp_references, { desc = "LSP: [G]oto [R]eferences" })
 
         vim.keymap.set("n", "<leader>s", vim.lsp.buf.signature_help, { desc = "LSP: [S]ignature Documentation" })
+
+        vim.keymap.set("n", "<leader>oi", function()
+          if vim.fn.exists(":OrganizeImports") > 0 then
+            vim.cmd("OrganizeImports")
+          end
+        end, { desc = "LSP: [O]rganize [I]mports" })
 
         require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
 
