@@ -121,6 +121,23 @@ local servers = {
   cssls = {},
 
   tailwindcss = {
+    filetypes = {
+      "astro",
+      "astro-markdown",
+      "ejs",
+      "html",
+      "css",
+      "less",
+      "postcss",
+      "sass",
+      "scss",
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",
+      "vue",
+      "svelte",
+    },
     hovers = true,
     suggestions = true,
     root_dir = function(fname)
