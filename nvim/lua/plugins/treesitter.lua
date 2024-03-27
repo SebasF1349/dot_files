@@ -14,42 +14,45 @@ return {
 
     require("nvim-treesitter.configs").setup({
       ensure_installed = {
+        -- langs
         "c",
         "cpp",
         "go",
         "lua",
         "python",
         "rust",
-        "tsx",
+        "java",
+        -- web
         "javascript",
         "typescript",
-        "java",
-        "vimdoc",
-        "vim",
-        "bash",
+        "tsx",
         "css",
         "html",
         "svelte",
+        -- config
         "json",
         "jsonc",
         "toml",
+        "yaml",
         "markdown",
         "markdown_inline",
-        "regex",
+        -- specific config
+        "vimdoc",
+        "vim",
+        "bash",
         "hyprlang",
         "git_config",
-        "dockerfile",
-        "sql",
         "rasi",
         "readline",
-        "yaml",
+        -- misc
+        "sql",
+        "regex",
+        "dockerfile",
       },
-
       auto_install = true,
       sync_install = false,
       ignore_install = {},
       modules = {},
-
       highlight = { enable = true },
       -- indent = { enable = true }, -- doesn't work properly
       incremental_selection = {
