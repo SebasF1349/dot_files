@@ -62,7 +62,7 @@ vim.api.nvim_create_autocmd({ "BufLeave", "InsertLeave" }, {
         vim.cmd("TailwindSort")
       end
       vim.cmd("silent! wa")
-      vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), vim.log.levels.INFO)
+      -- vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), vim.log.levels.INFO)
     end
   end,
   group = general,

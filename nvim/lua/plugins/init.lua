@@ -2,13 +2,15 @@ return {
   { "tpope/vim-fugitive", cmd = "G" },
 
   -- Detect tabstop and shiftwidth automatically
-  { "NMAC427/guess-indent.nvim", opts = {} },
+  { "NMAC427/guess-indent.nvim", event = "InsertEnter", opts = {} },
 
   {
     "m4xshen/hardtime.nvim",
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     opts = {
+      hint = true,
+      notification = false,
       disabled_filetypes = {
         "TelescopePrompt",
         "checkhealth",
