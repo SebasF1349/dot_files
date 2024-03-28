@@ -45,7 +45,9 @@ function M.title(tab, max_width)
 	-- local dir = tab.active_pane.current_working_dir
 	local dir = tab.active_pane.title
 	local colon_idx = dir:find(":")
-	dir = dir:sub(colon_idx + 1) -- remove user data
+	if colon_idx ~= nil then
+		dir = dir:sub(colon_idx + 1) -- remove user data
+	end
 
 	local title = dir
 	if M.icons[process] then
