@@ -1,5 +1,5 @@
 configuration{
-    modi: "combi";
+    modes: "combi";
     combi-modes: [drun, window, calc];
     combi-hide-mode-prefix: true;
     icon-theme: "Oranchelo";
