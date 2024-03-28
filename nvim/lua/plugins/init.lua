@@ -9,6 +9,8 @@ return {
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     opts = {
+      hint = true,
+      notification = false,
       disabled_filetypes = {
         "TelescopePrompt",
         "checkhealth",
