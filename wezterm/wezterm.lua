@@ -1,6 +1,7 @@
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
 
+local utils = require("utils")
 -- This table will hold the configuration.
 local config = {}
 
@@ -65,8 +66,7 @@ local function recompute_padding(window, is_nvim)
 end
 
 wezterm.on("update-status", function(window, pane)
-	local is_nvim = pane:get_foreground_process_name():find("vim") ~= nil
-	recompute_padding(window, is_nvim)
+	recompute_padding(window, utils.is_nvim(pane))
 end)
 
 config.enable_wayland = false

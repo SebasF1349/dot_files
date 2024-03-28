@@ -1,7 +1,8 @@
 -- based on https://github.com/folke/dot/blob/master/config/wezterm/keys.lua
-
 local wezterm = require("wezterm")
 local act = wezterm.action
+
+local utils = require("utils")
 
 local M = {}
 
@@ -66,7 +67,7 @@ end
 function M.scroll(mods, key, dir)
 	local event = "Scroll_" .. dir
 	wezterm.on(event, function(win, pane)
-		if M.is_nvim(pane) then
+		if utils.is_nvim(pane) then
 			-- pass the keys through to vim/nvim
 			win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
 		elseif dir == "Up" then
@@ -114,10 +115,6 @@ function M.split_nav(resize_or_move, mods, key, dir)
 		mods = mods,
 		action = wezterm.action.EmitEvent(event),
 	}
-end
-
-function M.is_nvim(pane)
-	return pane:get_foreground_process_name():find("n?vim") or pane:get_user_vars().WEZTERM_PROG:find("nv")
 end
 
 return M
