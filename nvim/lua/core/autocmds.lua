@@ -26,14 +26,6 @@ vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   desc = "Open file at the last position it was edited earlier",
 })
 
-vim.api.nvim_create_autocmd({ "VimLeave" }, {
-  callback = function()
-    require("utils.setVar").Set_user_var("IS_NVIM", false)
-  end,
-  group = general,
-  desc = "Set Global Variable to false for Wezterm to use",
-})
-
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
   once = true,
   callback = function()

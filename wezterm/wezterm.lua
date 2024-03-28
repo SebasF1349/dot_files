@@ -53,7 +53,7 @@ config.window_padding = { left = "1cell", right = "1cell", top = "0.5cell", bott
 local function recompute_padding(window, is_nvim)
 	local overrides = window:get_config_overrides() or {}
 	local new_padding = {}
-	if is_nvim == "true" then
+	if is_nvim then
 		new_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 	else
 		new_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = "0.5cell" }
@@ -64,11 +64,9 @@ local function recompute_padding(window, is_nvim)
 	end
 end
 
-wezterm.on("user-var-changed", function(window, _, name, value)
-	if name ~= "IS_NVIM" then
-		return
-	end
-	recompute_padding(window, value)
+wezterm.on("update-status", function(window, pane)
+	local is_nvim = pane:get_foreground_process_name():find("vim") ~= nil
+	recompute_padding(window, is_nvim)
 end)
 
 config.enable_wayland = false

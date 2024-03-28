@@ -140,9 +140,8 @@ local function navigate(dir)
   return function()
     local win = vim.api.nvim_get_current_win()
     vim.cmd.wincmd(dir)
-    -- local pane = vim.env.WEZTERM_PANE
-    local pane = vim.loop.os_uname().release:find("WSL")
-    if not pane and win == vim.api.nvim_get_current_win() then
+    local wsl_pane = vim.loop.os_uname().release:find("WSL")
+    if not wsl_pane and win == vim.api.nvim_get_current_win() then
       local pane_dir = nav[dir]
       vim.system({ "wezterm", "cli", "activate-pane-direction", pane_dir }, { text = true }, function(p)
         if p.code ~= 0 then
@@ -152,8 +151,6 @@ local function navigate(dir)
     end
   end
 end
-
-require("utils.setVar").Set_user_var("IS_NVIM", true)
 
 -- Move to window using the movement keys
 for key, _ in pairs(nav) do
