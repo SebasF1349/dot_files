@@ -195,20 +195,6 @@ return {
     },
     "neovim/nvim-lspconfig",
     "hrsh7th/cmp-nvim-lsp",
-    {
-      "j-hui/fidget.nvim",
-      opts = {
-        progress = {
-          ignore_empty_message = true,
-        },
-        notification = {
-          override_vim_notify = true,
-          window = {
-            winblend = 0,
-          },
-        },
-      },
-    },
     "nvim-telescope/telescope.nvim",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     "artemave/workspace-diagnostics.nvim",

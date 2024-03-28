@@ -10,7 +10,6 @@ return {
         cmp = true,
         gitsigns = true,
         treesitter = true,
-        fidget = true,
         telescope = true,
         lsp_trouble = true,
         which_key = true,

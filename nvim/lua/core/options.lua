@@ -112,3 +112,35 @@ vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_node_provider = 0
+
+---@diagnostic disable-next-line: duplicate-set-field
+vim.lsp.handlers["$/progress"] = function(_, progress, ctx)
+  local msg = progress.value
+  local title = msg.title or ""
+  local message = msg.message or ""
+  local percentage = msg.percentage or 0
+  local client = vim.lsp.get_client_by_id(ctx.client_id)
+
+  local out = ""
+  if client and client.name then
+    out = out .. "[" .. client.name .. "]"
+  end
+
+  if title ~= "" then
+    out = out .. " " .. title
+  end
+  if percentage > 0 then
+    out = out .. " " .. percentage .. "%"
+  end
+  if message ~= "" then
+    out = out .. " " .. message
+  end
+
+  if msg.kind == "end" then
+    out = out .. " done"
+  elseif msg.kind == "begin" then
+    out = out .. " starting..."
+  end
+
+  vim.api.nvim_command([[echo "]] .. out .. [["]])
+end
