@@ -133,7 +133,8 @@ vim.lsp.handlers["$/progress"] = function(_, progress, ctx)
     out = out .. " " .. percentage .. "%"
   end
   if message ~= "" then
-    out = out .. " " .. message
+    local message_size = vim.o.columns - (client and #client.name) - #title - 10
+    out = out .. " " .. message:sub(1, message_size)
   end
 
   if msg.kind == "end" then
