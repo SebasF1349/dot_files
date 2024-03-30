@@ -2,7 +2,6 @@ return {
   "nvim-treesitter/nvim-treesitter",
   event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
-  dependencies = { "andymass/vim-matchup", opts = {} },
   config = function()
     vim.filetype.add({
       extension = { rasi = "rasi" },
@@ -64,7 +63,6 @@ return {
           node_decremental = "gr",
         },
       },
-      matchup = { enable = true },
     })
   end,
 }
