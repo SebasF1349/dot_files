@@ -29,6 +29,7 @@ elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
 end
 
 --config.adjust_window_size_when_changing_font_size = false
+config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.hide_tab_bar_if_only_one_tab = true
 config.inactive_pane_hsb = {
 	saturation = 1,
