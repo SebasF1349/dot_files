@@ -64,6 +64,11 @@ return {
           winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
         },
       },
+      view = {
+        entries = {
+          follow_cursor = true,
+        },
+      },
       formatting = {
         expandable_indicator = false,
         fields = { "abbr", "kind", "menu" },
