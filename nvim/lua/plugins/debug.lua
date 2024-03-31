@@ -13,7 +13,7 @@ return {
             require("dapui").eval()
             require("dapui").eval()
           end,
-          desc = "Evaluate expression",
+          desc = "[D]ebug: [E]valuate Expression",
         },
       },
       opts = {
@@ -39,7 +39,7 @@ return {
               { id = "breakpoints", size = 0.20 },
               { id = "scopes", size = 0.50 },
             },
-            position = "left",
+            position = "right",
             size = 40,
           },
         },
@@ -74,7 +74,7 @@ return {
           function()
             require("osv").launch({ port = 8086 })
           end,
-          desc = "Launch Lua adapter",
+          desc = "[D]ebug: [L]ua",
         },
       },
     },
@@ -86,53 +86,61 @@ return {
       function()
         require("dap").toggle_breakpoint()
       end,
-      desc = "Toggle breakpoint",
+      desc = "[D]ebug: Toggle [B]reakpoint",
     },
 
     {
       "<leader>dB",
       "<cmd>FzfLua dap_breakpoints<cr>",
-      desc = "List breakpoints",
+      desc = "[D]ebug: List [B]reakpoints",
+    },
+
+    {
+      "<leader>dC",
+      function()
+        require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+      end,
+      desc = "[D]ebug: Breakpoint [C]ondition",
     },
 
     {
       "<leader>dc",
       function()
-        require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
-      end,
-      desc = "Breakpoint condition",
-    },
-
-    {
-      "<F5>",
-      function()
         require("dap").continue()
       end,
-      desc = "Continue",
+      desc = "[D]ebug: [C]ontinue",
     },
 
     {
-      "<F10>",
+      "<leader>dt",
+      function()
+        require("dap").terminate()
+      end,
+      desc = "[D]ebug: [T]erminate",
+    },
+
+    {
+      "<leader>dO",
       function()
         require("dap").step_over()
       end,
-      desc = "Step over",
+      desc = "[D]ebug: Step [O]ver",
     },
 
     {
-      "<F11>",
+      "<leader>di",
       function()
         require("dap").step_into()
       end,
-      desc = "Step into",
+      desc = "[D]ebug: Step [I]nto",
     },
 
     {
-      "<F12>",
+      "<leader>do",
       function()
         require("dap").step_out()
       end,
-      desc = "Step Out",
+      desc = "[D]ebug: Step [O]ut",
     },
   },
   config = function()
@@ -144,7 +152,7 @@ return {
     local dapui = require("dapui")
 
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
-    vim.keymap.set("n", "<F7>", dapui.toggle, { desc = "Debug: See last session result." })
+    vim.keymap.set("n", "<leader>ds", dapui.toggle, { desc = "[D]ebug: See Last [S]ession Result" })
 
     dap.listeners.after.event_initialized["dapui_config"] = dapui.open
     dap.listeners.before.event_terminated["dapui_config"] = dapui.close
