@@ -21,8 +21,12 @@ return {
       end
     end, { desc = "[G]rapple" })
     vim.keymap.set("n", "<leader>tg", grapple.toggle_tags, { desc = "[T]oggle [G]rapple Window" })
-    vim.keymap.set("n", "<C-f>", grapple.cycle_forward, { desc = "Grapple Cycle [F]orwards" })
-    vim.keymap.set("n", "<C-b>", grapple.cycle_backward, { desc = "Grapple Cycle [B]ackwards" })
+    vim.keymap.set("n", "<C-f>", function()
+      grapple.cycle_tags("next")
+    end, { desc = "Grapple Cycle [F]orwards" })
+    vim.keymap.set("n", "<C-b>", function()
+      grapple.cycle_tags("prev")
+    end, { desc = "Grapple Cycle [B]ackwards" })
     for pos = 1, 4 do
       vim.keymap.set("n", "<leader>" .. pos, function()
         grapple.select({ index = pos })
