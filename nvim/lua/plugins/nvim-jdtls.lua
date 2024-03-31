@@ -47,11 +47,10 @@ return {
       require("jdtls").start_or_attach(config)
     end
 
-    -- This is added in LazyVim, but doesn't seem necessary
-    -- vim.api.nvim_create_autocmd("FileType", {
-    --   pattern = "java",
-    --   callback = attach_jdtls,
-    -- })
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "java",
+      callback = attach_jdtls,
+    })
 
     vim.api.nvim_create_autocmd("LspAttach", {
       callback = function(args)
