@@ -86,7 +86,7 @@ end
 function M.split_nav(resize_or_move, mods, key, dir)
 	local event = "SplitNav_" .. resize_or_move .. "_" .. dir
 	wezterm.on(event, function(win, pane)
-		if M.is_nvim(pane) then
+		if utils.is_nvim(pane) then
 			-- pass the keys through to vim/nvim
 			win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
 		else
