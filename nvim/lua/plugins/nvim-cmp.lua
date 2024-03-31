@@ -54,13 +54,29 @@ return {
         completion = {
           border = "rounded",
           scrollbar = false,
+          winhighlight = "Normal:Pmenu,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
         },
         documentation = {
           border = "rounded",
           scrollbar = false,
           max_height = math.floor(vim.o.lines * 0.5),
           max_width = math.floor(vim.o.columns * 0.4),
+          winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
         },
+      },
+      formatting = {
+        expandable_indicator = false,
+        fields = { "abbr", "kind", "menu" },
+        format = function(entry, item)
+          item.menu = ({
+            luasnip = "[Snip]",
+            nvim_lsp = "[LSP]",
+            buffer = "[Buf]",
+            path = "[Path]",
+            cmdline = "[Cmd]",
+          })[entry.source.name] or entry.source.name
+          return item
+        end,
       },
       mapping = cmp.mapping.preset.insert({
         ["<C-p>"] = cmp.mapping.select_prev_item(),
@@ -93,7 +109,7 @@ return {
         { name = "nvim_lsp" },
         { name = "luasnip" },
         { name = "path" },
-        { name = "buffer" },
+        { name = "buffer", keyword_length = 2 },
       },
     })
 
