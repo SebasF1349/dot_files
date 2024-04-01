@@ -1,10 +1,3 @@
-local function breadcrumb()
-  local indicator_size = vim.o.columns > 80 and vim.o.columns / 2 or vim.o.columns / 3
-  return require("nvim-treesitter").statusline({
-    indicator_size = indicator_size,
-  }) or ""
-end
-
 return {
   "nvim-lualine/lualine.nvim",
   event = { "BufReadPre", "BufNewFile" },
@@ -41,7 +34,7 @@ return {
     tabline = {},
     winbar = {
       lualine_a = {},
-      lualine_b = { breadcrumb },
+      lualine_b = {},
       lualine_c = {},
       lualine_x = {},
       lualine_y = { { "filetype", icon_only = true } },
