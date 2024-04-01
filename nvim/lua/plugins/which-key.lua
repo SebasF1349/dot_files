@@ -1,28 +1,36 @@
--- Useful plugin to show you pending keybinds.
 return {
   "folke/which-key.nvim",
-  keys = { "<leader>", "g", "[", "]" },
-  opts = {},
+  keys = { "<leader>", "g", "[", "]", '"' },
+  ft = "markdown",
   config = function()
-    require("which-key").register({
-      ["g"] = { name = "[G]o to", _ = "which_key_ignore" },
-      ["]"] = { name = "Next", _ = "which_key_ignore" },
-      ["["] = { name = "Prev", _ = "which_key_ignore" },
-      ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-      ["<leader>d"] = { name = "[D]ebugger", _ = "which_key_ignore" },
-      ["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
-      ["<leader>b"] = { name = "Git [B]uffer", _ = "which_key_ignore" },
-      ["<leader>f"] = { name = "[F]ind", _ = "which_key_ignore" },
-      ["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-      ["<leader>x"] = { name = "[X]Trouble", _ = "which_key_ignore" },
-      ["<leader>m"] = { name = "[M]arkdown", _ = "which_key_ignore" },
-      ["<leader>r"] = { name = "[R]eplace current word", _ = "which_key_ignore" },
+    local which_key = require("which-key")
+
+    which_key.setup({
+      window = { border = "rounded" },
     })
-    -- register which-key VISUAL mode
-    -- required for visual <leader>hs (hunk stage) to work
-    require("which-key").register({
-      ["<leader>"] = { name = "VISUAL <leader>" },
-      ["<leader>h"] = { "Git [H]unk" },
+
+    which_key.register({
+      ["g"] = { name = "[G]o to" },
+      ["]"] = { name = "Next" },
+      ["["] = { name = "Prev" },
+      ["<leader>"] = {
+        ["c"] = { name = "[C]ode" },
+        ["d"] = { name = "[D]ebugger" },
+        ["h"] = { name = "Git [H]unk" },
+        ["b"] = { name = "Git [B]uffer" },
+        ["f"] = { name = "[F]ind" },
+        ["t"] = { name = "[T]oggle" },
+        ["x"] = { name = "[X]Trouble" },
+        ["m"] = { name = "[M]arkdown" },
+        ["r"] = { name = "[R]eplace current word" },
+      },
+    })
+    which_key.register({
+      ["<leader>"] = {
+        name = "VISUAL <leader>", -- this is needed (looks like a which-key bug)
+        ["h"] = { name = "Git [H]unk" },
+        ["f"] = { name = "[F]ind" },
+      },
     }, { mode = "v" })
   end,
 }
