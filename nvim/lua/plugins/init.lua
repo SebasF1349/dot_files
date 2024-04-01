@@ -1,7 +1,6 @@
 return {
   { "tpope/vim-fugitive", cmd = "G" },
 
-  -- Detect tabstop and shiftwidth automatically
   { "NMAC427/guess-indent.nvim", event = "InsertEnter", opts = {} },
 
   {

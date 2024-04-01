@@ -28,8 +28,26 @@ vim.o.writebackup = false
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
--- Keep signcolumn on by default
-vim.wo.signcolumn = "yes"
+-- Nicer and less noicy signcolumn
+vim.wo.signcolumn = "auto:2"
+vim.opt.statuscolumn = "%s%=%{%v:relnum ? '%r ' : '%l '%}"
+vim.diagnostic.config({
+  severity_sort = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN] = "",
+      [vim.diagnostic.severity.INFO] = "",
+      [vim.diagnostic.severity.HINT] = "",
+    },
+    numhl = {
+      [vim.diagnostic.severity.ERROR] = "ErrorMsg",
+      [vim.diagnostic.severity.WARN] = "WarningMsg",
+      [vim.diagnostic.severity.INFO] = "InfoMsg",
+      [vim.diagnostic.severity.HINT] = "HintMsg",
+    },
+  },
+})
 
 -- Don't show `~` outside of buffer
 vim.o.fillchars = "eob: "
