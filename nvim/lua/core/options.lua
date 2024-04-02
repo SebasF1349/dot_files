@@ -28,27 +28,6 @@ vim.o.writebackup = false
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
--- Nicer and less noicy signcolumn
-vim.wo.signcolumn = "auto:2"
-vim.opt.statuscolumn = "%s%=%{%v:relnum ? '%r ' : '%l '%}"
-vim.diagnostic.config({
-  severity_sort = true,
-  signs = {
-    text = {
-      [vim.diagnostic.severity.ERROR] = "",
-      [vim.diagnostic.severity.WARN] = "",
-      [vim.diagnostic.severity.INFO] = "",
-      [vim.diagnostic.severity.HINT] = "",
-    },
-    numhl = {
-      [vim.diagnostic.severity.ERROR] = "ErrorMsg",
-      [vim.diagnostic.severity.WARN] = "WarningMsg",
-      [vim.diagnostic.severity.INFO] = "InfoMsg",
-      [vim.diagnostic.severity.HINT] = "HintMsg",
-    },
-  },
-})
-
 -- Don't show `~` outside of buffer
 vim.o.fillchars = "eob: "
 
@@ -68,11 +47,8 @@ vim.o.pumheight = 10 -- popup
 
 -- Decreate update time
 vim.opt.updatetime = 250
--- Decrease mapped sequence wait time
--- Displays which-key popup sooner
+-- Decrease mapped sequence wait time - Displays which-key popup sooner
 vim.opt.timeoutlen = 300
-
---vim.opt.guicursor = ""
 
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
@@ -121,15 +97,28 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
 vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
   border = _border,
 })
+
+-- Nicer and less noicy signcolumn
+vim.wo.signcolumn = "yes"
+vim.opt.statuscolumn = "%s%=%{%v:relnum ? '%r ' : '%l '%}"
 vim.diagnostic.config({
   float = { border = _border },
+  severity_sort = true,
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN] = "",
+      [vim.diagnostic.severity.INFO] = "",
+      [vim.diagnostic.severity.HINT] = "",
+    },
+    numhl = {
+      [vim.diagnostic.severity.ERROR] = "ErrorMsg",
+      [vim.diagnostic.severity.WARN] = "WarningMsg",
+      [vim.diagnostic.severity.INFO] = "InfoMsg",
+      [vim.diagnostic.severity.HINT] = "HintMsg",
+    },
+  },
 })
-
--- Disable health checks for these providers.
-vim.g.loaded_python3_provider = 0
-vim.g.loaded_ruby_provider = 0
-vim.g.loaded_perl_provider = 0
-vim.g.loaded_node_provider = 0
 
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.handlers["$/progress"] = function(_, progress, ctx)
@@ -159,3 +148,9 @@ vim.lsp.handlers["$/progress"] = function(_, progress, ctx)
 
   vim.api.nvim_command([[echo "]] .. out .. [["]])
 end
+
+-- Disable health checks for these providers.
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0
