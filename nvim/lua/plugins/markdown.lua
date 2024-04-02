@@ -224,36 +224,17 @@ return {
     end,
   },
   {
-    "ekickx/clipboard-image.nvim",
-    config = function()
-      require("clipboard-image").setup({
-        default = {
-          img_name = function()
-            -- If in visual mode use selected text
-            local mode = vim.api.nvim_get_mode().mode
-            if mode == "v" then
-              -- Recover visual selection by: `v` to exit visual mode then `gv`
-              -- (If you don't exit then gv will select your previous selection)
-              -- finally yank the the `a` register
-              vim.cmd('normal! vgv"ay')
-              -- Evaluate contents of `a` register
-              local selection = vim.api.nvim_eval("@a")
-              -- Delete the selection (will be replaced by clipboard-image)
-              vim.cmd("normal! gvd")
-              return selection
-            else
-              -- Prompt for name
-              vim.fn.inputsave()
-              local name = vim.fn.input("Image Name: ")
-              vim.fn.inputrestore()
-              if name == nil or name == "" then
-                return os.date("%y-%m-%d-%H-%M-%S")
-              end
-              return name
-            end
-          end,
-        },
-      })
-    end,
+    "HakonHarnes/img-clip.nvim",
+    opts = {
+      default = {
+        dir_path = "img",
+      },
+      markdown = {
+        download_images = true,
+      },
+    },
+    keys = {
+      { "<leader>p", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
+    },
   },
 }
