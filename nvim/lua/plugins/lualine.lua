@@ -27,7 +27,11 @@ return {
       lualine_b = { "branch", "diff", "diagnostics" },
       lualine_c = {},
       lualine_x = {},
-      lualine_y = { { "diagnostics", sources = { "nvim_workspace_diagnostic" } } },
+      lualine_y = { {
+        "diagnostics",
+        sources = { "nvim_workspace_diagnostic" },
+        sections = { "error", "warn" },
+      } },
       lualine_z = { "grapple" },
     },
     inactive_sections = {},
