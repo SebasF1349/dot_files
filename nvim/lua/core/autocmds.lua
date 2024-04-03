@@ -1,18 +1,6 @@
 -- General Settings
 local general = vim.api.nvim_create_augroup("General Settings", { clear = true })
 
-vim.api.nvim_create_autocmd({ "VimEnter" }, {
-  callback = function(data)
-    local directory = vim.fn.isdirectory(data.file) == 1
-    if directory then
-      require("telescope") -- needed of error message for loop of something
-      require("utils.telescopeFiles").Telescope_git_or_files()
-    end
-  end,
-  group = general,
-  desc = "Open Telescope when it's a Directory",
-})
-
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   pattern = "*",
   -- command = 'silent! normal! g`"zv',
