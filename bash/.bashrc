@@ -115,6 +115,7 @@ elif [ "$DISTRO" = "arch" ]; then
 	export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
 fi
 # Options to fzf command
+export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
 export FZF_COMPLETION_OPTS='--border --info=inline'
 # Use fd (https://github.com/sharkdp/fd) instead of the default find
 # command for listing path candidates.
@@ -202,7 +203,9 @@ nvf() {
 		selected_dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
 	fi
 	if [[ -n "$selected_dir" ]]; then
-		cd "$selected_dir" && ${EDITOR} .
+		cd "$selected_dir" || exit #&& ${EDITOR} .
+		files=("$(fzf --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}")")
+		[[ -n "${files[*]}" ]] && ${EDITOR:-vim} "${files[@]}"
 	fi
 }
 
