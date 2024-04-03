@@ -1,6 +1,6 @@
 return {
   "nvim-telescope/telescope.nvim",
-  keys = "<leader>",
+  keys = { "<leader>f", "<leader><leader>", "<leader>/" },
   branch = "0.1.x",
   dependencies = {
     "nvim-lua/plenary.nvim",
