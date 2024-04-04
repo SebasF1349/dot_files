@@ -114,9 +114,9 @@ return {
 
     local builtin = require("telescope.builtin")
     -- Miscelaneous
-    vim.keymap.set("n", "<leader>ft", function()
+    vim.keymap.set("n", "<leader>fn", function()
       customPickers.prettyGrepPicker({ picker = "grep_string", options = { search = "(note|todo|fix):", use_regex = true } })
-    end, { desc = "[F]ind [T]odos or Notes" })
+    end, { desc = "[F]ind [N]otes" })
     vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
     vim.keymap.set("n", "<leader>fb", builtin.git_branches, { desc = "[F]ind Git [B]ranch" })
     vim.keymap.set("n", "<leader>fs", builtin.git_status, { desc = "[F]ind Git [S]tatus" })

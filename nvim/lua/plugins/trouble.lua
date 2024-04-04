@@ -13,6 +13,10 @@ return {
     vim.keymap.set("n", "<leader>xd", function()
       trouble.toggle("document_diagnostics")
     end, { desc = "[X]Trouble [D]ocument" })
+    vim.keymap.set("n", "<leader>xn", function()
+      vim.cmd("silent grep! -i -w -R -E '(note\\|todo\\|fix):' .")
+      trouble.toggle("quickfix")
+    end, { desc = "[X]Trouble [N]otes" })
     vim.keymap.set("n", "]x", function()
       if trouble.is_open() then
         trouble.next({ skip_groups = true, jump = true })
