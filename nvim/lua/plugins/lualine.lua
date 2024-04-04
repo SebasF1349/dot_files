@@ -1,3 +1,5 @@
+local mocha = require("catppuccin.palettes").get_palette("mocha")
+
 return {
   "nvim-lualine/lualine.nvim",
   event = { "BufReadPre", "BufNewFile" },
@@ -35,7 +37,7 @@ return {
             return gitsigns
               and (gitsigns.added and gitsigns.added > 0 or gitsigns.removed and gitsigns.removed > 0 or gitsigns.modified and gitsigns.modified > 0)
           end,
-          color = { fg = "#f9e2af" },
+          color = { fg = mocha.yellow },
         },
         "diagnostics",
       },
