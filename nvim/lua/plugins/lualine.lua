@@ -24,7 +24,21 @@ return {
     },
     sections = {
       lualine_a = { "mode" },
-      lualine_b = { "branch", "diff", "diagnostics" },
+      lualine_b = {
+        "branch",
+        {
+          function()
+            return "󰜥"
+          end,
+          cond = function()
+            local gitsigns = vim.b.gitsigns_status_dict
+            return gitsigns
+              and (gitsigns.added and gitsigns.added > 0 or gitsigns.removed and gitsigns.removed > 0 or gitsigns.modified and gitsigns.modified > 0)
+          end,
+          color = { fg = "#f9e2af" },
+        },
+        "diagnostics",
+      },
       lualine_c = {},
       lualine_x = {},
       lualine_y = { {
