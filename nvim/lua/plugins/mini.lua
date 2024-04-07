@@ -55,8 +55,5 @@ return { -- Collection of various small independent plugins/modules
     -- NOTE: mini-surround for better surroundings?
 
     require("mini.splitjoin").setup({ mappings = { toggle = "<leader>j", split = "", join = "" } })
-
-    require("mini.comment").setup({ mappings = { comment_visual = "C" } })
-    -- NOTE: only missing is block comments for inline comments, but I barely use them
   end,
 }
