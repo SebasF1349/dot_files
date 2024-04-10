@@ -213,3 +213,74 @@ local function open_notes()
   end
 end
 vim.keymap.set("n", "<leader>tn", open_notes, { desc = "[T]oggle [N]otes" })
+
+-- Quickfix
+-- https://gitlab.com/ranjithshegde/dotbare/-/blob/master/.config/nvim/lua/r/extensions/qf.lua
+local function find_qf(type)
+  local wininfo = vim.fn.getwininfo()
+  local win_tbl = {}
+  for _, win in pairs(wininfo) do
+    local found = false
+    if type == "l" and win["loclist"] == 1 then
+      found = true
+    end
+    -- loclist window has 'quickfix' set, eliminate those
+    if type == "q" and win["quickfix"] == 1 and win["loclist"] == 0 then
+      found = true
+    end
+    if found then
+      table.insert(win_tbl, { winid = win["winid"], bufnr = win["bufnr"] })
+    end
+  end
+  return win_tbl
+end
+
+-- open quickfix if not empty
+local function open_qf()
+  if not vim.tbl_isempty(vim.fn.getqflist()) then
+    vim.cmd.copen()
+    vim.cmd.wincmd("J")
+  else
+    vim.notify("qflist is empty.")
+  end
+end
+
+-- loclist on current window where not empty
+local function open_loclist()
+  if not vim.tbl_isempty(vim.fn.getloclist(0)) then
+    vim.cmd.lopen()
+  else
+    vim.notify("loclist is empty.")
+  end
+end
+
+--- type='*': qf toggle and send to bottom
+--- type='l': loclist toggle (all windows)
+--- map to ":lua require'utils'.toggle_qf('l')"
+local function toggle_qf(type)
+  local windows = find_qf(type)
+  if not vim.tbl_isempty(windows) then
+    -- hide all visible windows
+    for _, win in pairs(windows) do
+      vim.api.nvim_win_hide(win.winid)
+    end
+  else
+    -- no windows are visible, attempt to open
+    if type == "l" then
+      open_loclist()
+    else
+      open_qf()
+    end
+  end
+end
+
+vim.keymap.set("n", "<leader>tq", function()
+  toggle_qf("q")
+end, { desc = "[T]oggle [Q]uickfix" })
+vim.keymap.set("n", "<leader>qd", function()
+  vim.diagnostic.setqflist({
+    open = true,
+    title = "Diagnostics",
+    -- severity = { min = vim.diagnostic.severity.HINT },
+  })
+end, { desc = "[Q]uickfix [D]iagnostics" })
