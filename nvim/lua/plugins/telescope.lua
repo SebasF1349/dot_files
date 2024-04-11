@@ -15,9 +15,25 @@ return {
   },
   config = function()
     local telescope = require("telescope")
+    local actions = require("telescope.actions")
+    local actions_state = require("telescope.actions.state")
 
     telescope.setup({
       defaults = {
+        mappings = {
+          i = {
+            ["<leader>q"] = function(bufnr)
+              local picker = actions_state.get_current_picker(bufnr)
+              if #picker:get_multi_selection() > 0 then
+                actions.send_selected_to_qflist(bufnr)
+                actions.open_qflist(bufnr)
+              else
+                actions.send_to_qflist(bufnr)
+                actions.open_qflist(bufnr)
+              end
+            end,
+          },
+        },
         vimgrep_arguments = {
           "rg",
           "--color=never",
