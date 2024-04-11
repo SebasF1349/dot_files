@@ -278,9 +278,34 @@ vim.keymap.set("n", "<leader>tq", function()
   toggle_qf("q")
 end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
-  vim.diagnostic.setqflist({
-    open = true,
-    title = "Diagnostics",
-    -- severity = { min = vim.diagnostic.severity.HINT },
-  })
+  vim.diagnostic.setqflist()
 end, { desc = "[Q]uickfix [D]iagnostics" })
+
+local qf_group = vim.api.nvim_create_augroup("qflist", { clear = true })
+
+vim.api.nvim_create_autocmd("DiagnosticChanged", {
+  group = qf_group,
+  callback = function()
+    vim.diagnostic.setqflist({
+      open = false,
+    })
+  end,
+  desc = "Update quickfix diagnostics ",
+})
+
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = qf_group,
+  pattern = "quickfix",
+  callback = function()
+    vim.bo.modifiable = true
+    -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
+    vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
+    vim.keymap.set(
+      "n",
+      "<C-s>",
+      '<Cmd>cgetbuffer|set nomodified|echo "quickfix/location list updated"<CR>',
+      { buffer = true, desc = "Update quickfix/location list with changes made in quickfix window" }
+    )
+  end,
+  desc = "Allow updating quickfix window",
+})
