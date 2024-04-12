@@ -21,6 +21,7 @@ return {
         ["f"] = { name = "[F]ind" },
         ["t"] = { name = "[T]oggle" },
         ["x"] = { name = "[X]Trouble" },
+        ["q"] = { name = "[Q]uickfix" },
         ["m"] = { name = "[M]arkdown" },
         ["r"] = { name = "[R]eplace current word" },
       },

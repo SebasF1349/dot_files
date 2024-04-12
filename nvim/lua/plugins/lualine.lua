@@ -58,7 +58,7 @@ return {
       lualine_c = {},
       lualine_x = {},
       lualine_y = { { "filetype", icon_only = true } },
-      lualine_z = { { "filename", path = 1 } },
+      lualine_z = { { "filename", path = 1, symbols = { unnamed = "" } } },
     },
     inactive_winbar = {
       lualine_a = { "diagnostics" },
@@ -68,6 +68,6 @@ return {
       lualine_y = { { "filetype", icon_only = true } },
       lualine_z = { { "filename", path = 1 } },
     },
-    extensions = { "fugitive", "trouble" },
+    extensions = { "fugitive", "trouble", "quickfix" },
   },
 }
