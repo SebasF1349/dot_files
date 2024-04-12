@@ -251,6 +251,8 @@ return {
         callback = function(event)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
 
+          vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP:[C]ode [A]ction" })
+
           vim.lsp.inlay_hint.enable(event.buf, true)
           vim.keymap.set("n", "<leader>ti", function()
             vim.lsp.inlay_hint.enable(event.buf, not vim.lsp.inlay_hint.is_enabled())

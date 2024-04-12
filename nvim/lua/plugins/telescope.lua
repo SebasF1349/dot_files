@@ -12,6 +12,7 @@ return {
       end,
     },
     "nvim-tree/nvim-web-devicons",
+    "nvim-telescope/telescope-ui-select.nvim",
   },
   config = function()
     local telescope = require("telescope")
@@ -78,11 +79,17 @@ return {
           "yarn.lock",
           "pnpm-lock.yaml",
         },
+        extensions = {
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown({}),
+          },
+        },
       },
     })
 
     -- Enable telescope extensions, if installed
     telescope.load_extension("fzf")
+    telescope.load_extension("ui-select")
 
     local customPickers = require("utils.telescopePickers")
 
