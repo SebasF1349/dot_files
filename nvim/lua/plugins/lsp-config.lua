@@ -287,7 +287,9 @@ return {
             end
           end, { desc = "LSP: [O]rganize [I]mports" })
 
-          require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
+          if client and client.name ~= "jdtls" then
+            require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
+          end
 
           if client and client.server_capabilities.documentHighlightProvider then
             -- Highlight references of the word under your cursor
