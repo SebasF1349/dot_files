@@ -287,8 +287,9 @@ return {
             end
           end, { desc = "LSP: [O]rganize [I]mports" })
 
-          if client and client.name ~= "jdtls" then
-            require("workspace-diagnostics").populate_workspace_diagnostics(client, event.buf)
+          local ok_wd, wd = pcall(require, "workspace-diagnostics")
+          if ok_wd then
+            wd.populate_workspace_diagnostics(client, event.buf)
           end
 
           if client and client.server_capabilities.documentHighlightProvider then
