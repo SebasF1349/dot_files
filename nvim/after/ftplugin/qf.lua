@@ -3,6 +3,8 @@ local function t_filter(item)
   return item ~= false
 end
 
+vim.opt.wrap = true
+
 local function delete(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local qfl = vim.fn.getqflist()

@@ -161,6 +161,12 @@ vim.opt.grepformat = "%f:%l:%c:%m"
 function _G.qftf(info)
   local items
   local ret = {}
+  local signs = {
+    E = "",
+    W = "",
+    H = "",
+    I = "",
+  }
   -- The name of item in list is based on the directory of quickfix window.
   -- Change the directory for quickfix window make the name of item shorter.
   -- It's a good opportunity to change current directory in quickfixtextfunc :)
@@ -176,7 +182,6 @@ function _G.qftf(info)
   end
   local limit = 31
   local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
-  -- local validFmt = "%s │%5d:%-3d│%s %s"
   local validFmt = "%s │ %s %s"
   for i = info.start_idx, info.end_idx do
     local e = items[i]
@@ -197,7 +202,7 @@ function _G.qftf(info)
           fname = fnameFmt2:format(fname:sub(1 - limit))
         end
       end
-      local qtype = e.type == "" and "" or " " .. e.type:sub(1, 1):upper()
+      local qtype = e.type == "" and "" or ((signs[e.type] and signs[e.type] or signs.I) .. " ")
       str = validFmt:format(fname, qtype, e.text)
     else
       str = e.text
