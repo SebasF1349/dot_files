@@ -4,4 +4,4 @@ install=(starship exa bat fd-find fzf ripgrep xlip ttf-jetbrains-mono wezterm ke
 # localectl set-x11-keymap us default intl
 
 # update mirrors
-# sudo reflector --country [COUNTRY CODE - BR] --threads 10 --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+# sudo reflector --country BR,CL,CO,US --threads 10 --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
