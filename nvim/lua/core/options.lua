@@ -55,11 +55,6 @@ vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-vim.opt.foldtext = require("extras.fold")
-vim.opt.foldlevelstart = 99
-
 vim.opt.smartindent = true
 
 vim.opt.wrap = false

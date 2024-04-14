@@ -123,4 +123,7 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   callback = set_fold_hl,
 })
 
-return 'luaeval("HighlightedFoldtext")()'
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldtext = 'luaeval("HighlightedFoldtext")()'
+vim.opt.foldlevelstart = 99
