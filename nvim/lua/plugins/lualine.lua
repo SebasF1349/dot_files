@@ -68,6 +68,6 @@ return {
       lualine_y = { { "filetype", icon_only = true } },
       lualine_z = { { "filename", path = 1 } },
     },
-    extensions = { "fugitive", "trouble", "quickfix" },
+    extensions = { "fugitive", "trouble", "quickfix", "navim-dap-ui", "man" },
   },
 }
