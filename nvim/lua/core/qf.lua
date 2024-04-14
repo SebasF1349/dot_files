@@ -79,7 +79,7 @@ end
 vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 
 --------------------------------------------------
--- Quickfix Toggle Keymaps
+-- Quickfix Keymaps
 --------------------------------------------------
 
 -- based on https://gitlab.com/ranjithshegde/dotbare/-/blob/master/.config/nvim/lua/r/extensions/qf.lua
@@ -152,6 +152,8 @@ vim.keymap.set("n", "<leader>qd", function()
   diagnostics_open = false
   toggle_qf("d")
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
+vim.keymap.set("n", "]q", "<cmd>cnext<CR>", { desc = "Next [Q]uickfix Item" })
+vim.keymap.set("n", "[q", "<cmd>cprev<CR>", { desc = "Previous [Q]uickfix Item" })
 
 --------------------------------------------------
 -- Quickfix Autocmds
