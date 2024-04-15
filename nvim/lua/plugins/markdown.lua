@@ -14,7 +14,7 @@ return {
           lists = true,
           maps = true,
           paths = true,
-          tables = false,
+          tables = true,
           yaml = false,
           cmp = false,
         },
@@ -73,7 +73,7 @@ return {
         },
         tables = {
           trim_whitespace = true,
-          format_on_move = false,
+          format_on_move = true,
           auto_extend_rows = false,
           auto_extend_cols = false,
           style = {
@@ -124,92 +124,6 @@ return {
           MkdnUnfoldSection = { "n", "<leader>mF" },
         },
       })
-    end,
-  },
-  {
-    -- preferably replace it with mkdnflow when they fix their tables
-    "Myzel394/easytables.nvim",
-    ft = { "markdown" },
-    config = function()
-      local easytables = require("easytables")
-      easytables.setup({
-        table = {
-          -- Whether to enable the header by default
-          header_enabled_by_default = true,
-          window = {
-            preview_title = "Table Preview",
-            prompt_title = "Cell content",
-            -- Either "auto" to automatically size the window, or a string
-            -- in the format of "<width>x<height>" (e.g. "20x10")
-            size = "auto",
-          },
-          cell = {
-            -- Min width of a cell (excluding padding)
-            min_width = 3,
-            -- Filler character for empty cells
-            filler = " ",
-            align = "left",
-          },
-          -- Characters used to draw the table
-          -- Do not worry about multibyte characters, they are handled correctly
-          border = {
-            top_left = "┌",
-            top_right = "┐",
-            bottom_left = "└",
-            bottom_right = "┘",
-            horizontal = "─",
-            vertical = "│",
-            left_t = "├",
-            right_t = "┤",
-            top_t = "┬",
-            bottom_t = "┴",
-            cross = "┼",
-            header_left_t = "╞",
-            header_right_t = "╡",
-            header_bottom_t = "╧",
-            header_cross = "╪",
-            header_horizontal = "═",
-          },
-        },
-        export = {
-          markdown = {
-            -- Padding around the cell content, applied BOTH left AND right
-            -- E.g: padding = 1, content = "foo" -> " foo "
-            padding = 1,
-            -- What markdown characters are used for the export, you probably
-            -- don't want to change these
-            characters = {
-              horizontal = "-",
-              vertical = "|",
-              -- Filler for padding
-              filler = " ",
-            },
-          },
-        },
-        set_mappings = function(buf)
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Left>", "<cmd>JumpLeft<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Left>", "<cmd>SwapWithLeftCell<CR>", {})
-
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Right>", "<cmd>JumpRight<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Right>", "<cmd>SwapWithRightCell<CR>", {})
-
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Up>", "<cmd>JumpUp<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Up>", "<cmd>SwapWithUpperCell<CR>", {})
-
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Down>", "<cmd>JumpDown<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Down>", "<cmd>SwapWithLowerCell<CR>", {})
-
-          vim.api.nvim_buf_set_keymap(buf, "n", "<Tab>", "<cmd>JumpToNextCell<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<S-Tab>", "<cmd>JumpToPreviousCell<CR>", {})
-
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Left>", "<cmd>SwapWithLeftColumn<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Right>", "<cmd>SwapWithRightColumn<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Up>", "<cmd>SwapWithUpperRow<CR>", {})
-          vim.api.nvim_buf_set_keymap(buf, "n", "<C-Down>", "<cmd>SwapWithLowerRow<CR>", {})
-        end,
-      })
-      vim.keymap.set("n", "<leader>mi", "<cmd>EasyTablesImportThisTable<CR>", { desc = "[M]arkdown Table [I]mport" })
-      vim.keymap.set("n", "<leader>me", "<cmd>ExportTable<CR>", { desc = "[M]arkdown Table [E]xport" })
     end,
   },
   {
