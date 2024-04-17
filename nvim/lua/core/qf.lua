@@ -14,14 +14,34 @@ local diagnostics_open = false
 -- Better Grep
 --------------------------------------------------
 
-vim.opt.grepprg = "rg --vimgrep"
+vim.opt.grepprg = "rg --vimgrep --smart-case"
 vim.opt.grepformat = "%f:%l:%c:%m"
 
-vim.api.nvim_create_user_command("Grep", function(opts)
+vim.api.nvim_create_user_command("Rg", function(opts)
   diagnostics_open = false
-  vim.cmd("silent grep! --smart-case " .. opts.args)
+  vim.cmd('silent grep!"' .. opts.args .. '"')
   vim.cmd("copen")
 end, { nargs = 1 })
+
+-- https://github.com/oncomouse/dotfiles/blob/5abf79588d28379aa071fc7767dda46b9d90fb74/conf/vim/init.lua#L190-L205
+local function grep_or_filter()
+  if vim.opt.buftype:get() == "quickfix" then
+    vim.cmd([[packadd cfilter]])
+    local input = vim.fn.input("QFGrep/")
+    if #input > 0 then
+      local prefix = vim.fn.getwininfo(vim.fn.win_getid())[1].loclist == 1 and "L" or "C"
+      vim.cmd(prefix .. "filter /" .. input .. "/")
+    end
+  else
+    local input = vim.fn.input("Grep/")
+    if #input > 0 then
+      vim.cmd('silent! grep! "' .. input .. '"')
+      vim.cmd("copen")
+    end
+  end
+end
+
+vim.keymap.set("n", "<leader>rg", grep_or_filter, { desc = "[R]ip[G]rep" })
 
 --------------------------------------------------
 -- Better Quickfix Window Style
