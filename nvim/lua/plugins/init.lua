@@ -8,8 +8,14 @@ return {
     dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
     event = { "BufReadPre", "BufNewFile" },
     opts = {
+      max_count = 1,
       hint = true,
       notification = false,
+      restricted_keys = {
+        ["b"] = { "n", "x" },
+        ["w"] = { "n", "x" },
+        ["e"] = { "n", "x" },
+      },
       disabled_filetypes = {
         "TelescopePrompt",
         "checkhealth",
