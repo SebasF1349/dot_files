@@ -82,75 +82,44 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Quickfix Keymaps
 --------------------------------------------------
 
--- based on https://gitlab.com/ranjithshegde/dotbare/-/blob/master/.config/nvim/lua/r/extensions/qf.lua
-local function find_qf(type)
-  local wininfo = vim.fn.getwininfo()
-  local win_tbl = {}
-  for _, win in pairs(wininfo) do
-    local found = false
-    if type == "l" and win["loclist"] == 1 then
-      found = true
-    end
-    -- loclist window has 'quickfix' set, eliminate those
-    if (type == "q" or type == "d") and win["quickfix"] == 1 and win["loclist"] == 0 then
-      found = true
-    end
-    if found then
-      table.insert(win_tbl, { winid = win["winid"], bufnr = win["bufnr"] })
-    end
-  end
-  return win_tbl
-end
-
--- open quickfix if not empty
-local function open_qf()
-  if not vim.tbl_isempty(vim.fn.getqflist()) then
-    vim.cmd.copen()
-    vim.cmd.wincmd("J")
-  else
-    vim.notify("qflist is empty.")
-  end
-end
-
--- loclist on current window where not empty
-local function open_loclist()
-  if not vim.tbl_isempty(vim.fn.getloclist(0)) then
-    vim.cmd.lopen()
-  else
-    vim.notify("loclist is empty.")
-  end
-end
-
---- type='q': qf toggle and send to bottom
+--- type='c': qf toggle and send to bottom
 --- type='d': qf toggle with diagnostics
 --- type='l': loclist toggle (all windows)
-local function toggle_qf(type)
-  local windows = find_qf(type)
-  if not vim.tbl_isempty(windows) then
-    -- hide all visible windows
-    for _, win in pairs(windows) do
-      vim.api.nvim_win_hide(win.winid)
-    end
+local function list_toggle(type)
+  local status
+  if type == "c" or type == "d" then
+    status = vim.fn.getqflist({ winid = 0 }).winid ~= 0
   else
-    -- no windows are visible, attempt to open
-    if type == "l" then
-      open_loclist()
-    elseif type == "d" then
+    status = vim.fn.getloclist(0, { winid = 0 }).winid ~= 0
+  end
+  if status then
+    if type == "c" or type == "d" then
+      vim.cmd("cclose")
+    else
+      vim.cmd("lclose")
+    end
+    diagnostics_open = false
+  elseif (type == "l" and #vim.fn.getloclist(0) == 0) or (type == "c" and #vim.fn.getqflist() == 0) or (type == "d" and #vim.diagnostic.get() == 0) then
+    vim.cmd([[echohl ErrorMsg
+			echo 'List is Empty.'
+			echohl NONE]])
+  else
+    if type == "d" then
       vim.diagnostic.setqflist()
       diagnostics_open = true
     else
-      open_qf()
+      vim.cmd(type .. "open")
     end
   end
 end
 
 vim.keymap.set("n", "<leader>tq", function()
   diagnostics_open = false
-  toggle_qf("q")
+  list_toggle("c")
 end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
   diagnostics_open = false
-  toggle_qf("d")
+  list_toggle("d")
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
 vim.keymap.set("n", "]q", "<cmd>cnext<CR>", { desc = "Next [Q]uickfix Item" })
 vim.keymap.set("n", "[q", "<cmd>cprev<CR>", { desc = "Previous [Q]uickfix Item" })
