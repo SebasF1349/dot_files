@@ -88,8 +88,8 @@ return {
         },
         mappings = {
           MkdnEnter = { { "n", "v", "i" }, "<CR>" },
-          MkdnTab = { "i", "<leader>mi" },
-          MkdnSTab = { "i", "<leader>mI" },
+          MkdnTab = { "i", ">" },
+          MkdnSTab = { "i", "<" },
           MkdnNextLink = { "n", "<Tab>" },
           MkdnPrevLink = { "n", "<S-Tab>" },
           MkdnNextHeading = { "n", "]]" },
