@@ -94,7 +94,9 @@ return {
     local customPickers = require("utils.telescopePickers")
 
     -- Browsing
-    vim.keymap.set("n", "<leader>ff", require("utils.telescopeFiles").Telescope_git_or_files, { desc = "[F]ind [F]iles" })
+    vim.keymap.set("n", "<leader>ff", function()
+      customPickers.prettyFilesPicker({ picker = "find_files", options = { hidden = true } })
+    end, { desc = "[F]ind [F]iles" })
     vim.keymap.set("n", "<leader><leader>", function()
       customPickers.prettyBuffersPicker({ sort_mru = true, ignore_current_buffer = true })
     end, { desc = "Find another [ ] opened buffers" })
