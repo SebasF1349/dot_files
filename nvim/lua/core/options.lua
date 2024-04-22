@@ -68,9 +68,6 @@ vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 
--- Sync clipboard between OS and Neovim.
-vim.opt.clipboard = "unnamedplus"
-
 -- split windows
 vim.opt.splitright = true -- split vertical window to the right
 vim.opt.splitbelow = true -- split horizontal window to the bottom

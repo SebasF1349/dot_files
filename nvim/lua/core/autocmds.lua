@@ -14,32 +14,6 @@ vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   desc = "Open file at the last position it was edited earlier",
 })
 
-vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
-  once = true,
-  callback = function()
-    -- In wsl 2, just install xclip
-    -- Ubuntu
-    -- sudo apt install xclip
-    -- Arch linux
-    -- sudo pacman -S xclip
-    vim.opt.clipboard = "unnamedplus" -- allows neovim to access the system clipboard
-  end,
-  group = general,
-  desc = "Lazy load clipboard",
-})
-
-vim.api.nvim_create_autocmd({ "FocusGained" }, {
-  pattern = { "*" },
-  command = [[call setreg("@", getreg("+"))]],
-  group = general,
-  desc = "Sync with system clipboard on focus",
-})
-vim.api.nvim_create_autocmd({ "FocusLost" }, {
-  pattern = { "*" },
-  command = [[call setreg("+", getreg("@"))]],
-  group = general,
-  desc = "Sync with system clipboard on focus",
-})
 
 vim.api.nvim_create_autocmd({ "BufLeave", "InsertLeave" }, {
   callback = function(args)
