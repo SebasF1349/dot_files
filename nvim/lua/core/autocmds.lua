@@ -14,8 +14,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost" }, {
   desc = "Open file at the last position it was edited earlier",
 })
 
-
-vim.api.nvim_create_autocmd({ "BufLeave", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusGained" }, {
   callback = function(args)
     if vim.bo.filetype ~= "" and vim.bo.buftype == "" and vim.bo.modified and not vim.bo.readonly then
       require("conform").format({ bufnr = args.buf })
@@ -24,7 +23,6 @@ vim.api.nvim_create_autocmd({ "BufLeave", "InsertLeave" }, {
         vim.cmd("TailwindSort")
       end
       vim.cmd("silent! wa")
-      -- vim.notify("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"), vim.log.levels.INFO)
     end
   end,
   group = general,
