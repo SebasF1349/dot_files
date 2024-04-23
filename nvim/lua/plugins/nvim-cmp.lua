@@ -1,16 +1,6 @@
 return {
   "hrsh7th/nvim-cmp",
-  init = function()
-    -- Make cmp not open in Telescope start
-    vim.api.nvim_create_autocmd("InsertEnter", {
-      callback = function()
-        if not vim.tbl_contains({ "Telescope" }, vim.bo.ft) then
-          return true
-        end
-        return false
-      end,
-    })
-  end,
+  event = { "InsertEnter" },
   dependencies = {
     {
       "L3MON4D3/LuaSnip",
