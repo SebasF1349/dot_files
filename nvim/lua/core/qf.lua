@@ -51,20 +51,12 @@ vim.keymap.set("n", "<leader>rg", grep_or_filter, { desc = "[R]ip[G]rep" })
 function _G.qftf(info)
   local items
   local ret = {}
-  -- The name of item in list is based on the directory of quickfix window.
-  -- Change the directory for quickfix window make the name of item shorter.
-  -- It's a good opportunity to change current directory in quickfixtextfunc :)
-  --
-  -- local alterBufnr = fn.bufname('#') -- alternative buffer is the buffer before enter qf window
-  -- local root = getRootByAlterBufnr(alterBufnr)
-  -- vim.cmd(('noa lcd %s'):format(fn.fnameescape(root)))
-  --
   if info.quickfix == 1 then
     items = vim.fn.getqflist({ id = info.id, items = 0 }).items
   else
     items = vim.fn.getloclist(info.winid, { id = info.id, items = 0 }).items
   end
-  local limit = 31
+  local limit = math.floor(math.max(31, vim.o.columns / 3))
   local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
   local validFmt = "%s │ %s %s"
   for i = info.start_idx, info.end_idx do
@@ -77,14 +69,19 @@ function _G.qftf(info)
         if fname == "" then
           fname = "[No Name]"
         else
-          fname = fname:gsub("^" .. vim.env.HOME, "~")
+          fname = vim.fn.fnamemodify(fname, ":p:~:.")
+          local file_name = vim.fn.fnamemodify(fname, ":p:t")
+          local file_path = vim.fn.fnamemodify(fname, ":h")
+          if #file_name > limit then
+            fname = fnameFmt2:format(file_name:sub(1 - limit))
+          elseif #file_path + #file_name + 2 > limit then
+            file_path = fnameFmt2:format(file_path:sub(2 - limit + #file_name))
+            fname = file_name .. " " .. file_path
+          else
+            fname = file_name .. " " .. (file_path ~= "." and file_path or "")
+          end
         end
-        -- char in fname may occur more than 1 width, ignore this issue in order to keep performance
-        if #fname <= limit then
-          fname = fnameFmt1:format(fname)
-        else
-          fname = fnameFmt2:format(fname:sub(1 - limit))
-        end
+        fname = fnameFmt1:format(fname)
       end
       local qtype = e.type == "" and "" or ((signs[e.type] and signs[e.type] or signs.I) .. " ")
       str = validFmt:format(fname, qtype, vim.fn.trim(e.text))
@@ -167,7 +164,8 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   pattern = "quickfix",
   callback = function()
     local syntax = [[
-      syn match qfFileName /^[^│]*/ nextgroup=qfSeparatorRight
+      syn match qfFileName /^[^ ]*/ nextgroup=qfFilePath
+      syn match qfFilePath / [^│]*/ nextgroup=qfSeparatorRight
       syn match qfSeparatorRight '│' contained nextgroup=qfError,qfWarning,qfInfo,qfNote,qfManual
       syn match qfManual / .*$/ contained
       syn match qfError / %s.*$/ contained
@@ -176,12 +174,13 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       syn match qfInfo / %s.*$/ contained
 
       hi def link qfFileName Directory
+      hi def link qfFilePath NonText
       hi def link qfSeparatorRight Delimiter
       hi def link qfError DiagnosticError
       hi def link qfWarning DiagnosticWarn
       hi def link qfInfo DiagnosticInfo
       hi def link qfNote DiagnosticHint
-      hi def link qfManual DiagnosticHint
+      hi def link qfManual FloatTitle
       ]]
     local command = syntax:format(signs.E, signs.W, signs.H, signs.I)
     vim.cmd(command)
