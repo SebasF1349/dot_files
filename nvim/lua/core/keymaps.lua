@@ -1,17 +1,9 @@
 -- Keymaps for better default experience
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+vim.keymap.set("n", "Q", "<nop>")
 
 -- Remap Escape
 vim.keymap.set("i", "jk", "<Esc>")
-
--- Select all
-vim.keymap.set("n", "<C-a>", "gg<S-v>G")
-
--- Reselect latest changed, put, or yanked text
-vim.keymap.set("n", "gV", '"`[" . strpart(getregtype(), 0, 1) . "`]"', { expr = true, replace_keycodes = false, desc = "Visually select changed text" })
-
--- Save
-vim.keymap.set({ "n", "i", "x", "s" }, "<C-s>", "<cmd>w<CR>")
 
 -- Remap for dealing with word wrap
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -36,10 +28,6 @@ vim.keymap.set("n", "U", "<C-r>")
 vim.keymap.set("n", "gO", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>", { desc = "Create new line above" })
 vim.keymap.set("n", "go", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>", { desc = "Create new line below" })
 
-vim.keymap.set("n", "<leader>rp", ":%s/\\<<C-r><C-w>\\>/<C-r><C-w>/gcI<Left><Left><Left><Left>", {
-  desc = "Search and [R]e[P]lace current word",
-})
-
 -- Center buffer while navigating
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
@@ -55,31 +43,9 @@ vim.keymap.set("n", "%", "%zz")
 vim.keymap.set("n", "*", "*zz")
 vim.keymap.set("n", "#", "#zz")
 
-vim.keymap.set("n", "Q", "<nop>")
-
---Make files executable
-vim.keymap.set("n", "<leader>+x", "<cmd>!chmod +x %<CR>", { silent = true, desc = "Make files executable" })
-
 -- Stay in indent mode
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
-
--- Do things without affecting the registers
-vim.keymap.set({ "n", "v" }, "x", '"_x')
-vim.keymap.set({ "n", "v" }, "X", '"_X')
-vim.keymap.set({ "n", "v" }, "c", '"_c')
-vim.keymap.set({ "n", "v" }, "C", '"_C')
-vim.keymap.set("n", "dd", function()
-  if vim.fn.getline(".") == "" then
-    return '"_dd'
-  end
-  return "dd"
-end, { desc = "Only yank from non-empty lines", expr = true })
-
--- Copy/paste with system clipboard
-vim.keymap.set({ "n", "x" }, "gy", '"+y', { desc = "Copy to system clipboard" })
-vim.keymap.set("n", "gp", '"+p', { desc = "Paste from system clipboard" })
-vim.keymap.set("x", "gp", '"+P', { desc = "Paste from system clipboard" })
 
 -- Terminal
 local terms = {}
