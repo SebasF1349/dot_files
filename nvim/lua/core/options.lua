@@ -62,6 +62,8 @@ vim.opt.linebreak = true
 vim.opt.textwidth = 0
 
 vim.opt.incsearch = true
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = "split"
 
 vim.opt.termguicolors = true
 
@@ -69,13 +71,10 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 
 -- split windows
-vim.opt.splitright = true -- split vertical window to the right
-vim.opt.splitbelow = true -- split horizontal window to the bottom
+vim.opt.splitright = true
+vim.opt.splitbelow = true
 
 vim.opt.fileencoding = "utf-8"
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = "split"
 
 vim.opt.iskeyword:append("-")
 vim.opt.wildignore:append({ "*/node_modules/*", "*/.git/*" })
@@ -117,6 +116,7 @@ vim.diagnostic.config({
   },
 })
 
+-- LSP progress messages on cmdline
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.handlers["$/progress"] = function(_, progress, ctx)
   local msg = progress.value
