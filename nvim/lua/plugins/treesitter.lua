@@ -46,7 +46,6 @@ return {
         -- misc
         "sql",
         "regex",
-        "dockerfile",
       },
       auto_install = true,
       sync_install = false,
