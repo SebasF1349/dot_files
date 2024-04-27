@@ -111,9 +111,12 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 vim.api.nvim_create_autocmd({ "FileType" }, {
   pattern = "markdown",
   callback = function()
-    vim.opt_local.textwidth = 80
+    vim.opt_local.textwidth = 0
+    vim.opt_local.columns = 80
     vim.opt_local.colorcolumn = "81"
     vim.opt_local.wrap = true
+    vim.opt_local.wrapmargin = true
+    vim.opt_local.linebreak = true
     vim.opt_local.spell = true
     vim.opt_local.spelllang = { "es", "en" }
     vim.opt_local.tabstop = 2
@@ -121,4 +124,5 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     vim.opt_local.shiftwidth = 2
     vim.opt_local.expandtab = true
   end,
+  desc = "Markdown defaults",
 })
