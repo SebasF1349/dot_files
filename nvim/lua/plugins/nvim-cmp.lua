@@ -57,6 +57,7 @@ return {
       view = {
         entries = {
           follow_cursor = true,
+          selection_order = "near_cursor",
         },
       },
       formatting = {
