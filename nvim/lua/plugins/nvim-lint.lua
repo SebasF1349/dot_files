@@ -28,8 +28,8 @@ return {
       end,
     })
 
-    vim.keymap.set("n", "<leader>l", function()
+    vim.keymap.set("n", "<leader>cl", function()
       lint.try_lint()
-    end, { desc = "[L]inting current file" })
+    end, { desc = "[C]ode [L]int current file" })
   end,
 }
