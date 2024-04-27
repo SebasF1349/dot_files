@@ -80,7 +80,7 @@ end, { desc = "[T]oggle [T]erminal 1" })
 -- window management
 vim.keymap.set("n", "<C-\\>", "<C-w>v", { desc = "Split Window [|]Vertically" })
 vim.keymap.set("n", "<C-->", "<C-w>s", { desc = "Split Window [-]Horizontally" })
-vim.keymap.set("n", "<C-e>", "<C-w>=", { desc = "Window [E]qual Size" })
+vim.keymap.set("n", "<C-=>", "<C-w>=", { desc = "Window [=]Equal Size" })
 vim.keymap.set("n", "<C-q>", "<cmd>close<CR>", { desc = "Window [Q]uit" })
 -- Resize window
 vim.keymap.set("n", "<C-<>", "5<C-w><", { desc = "Resize Window [<]Smaller Vertically" })
