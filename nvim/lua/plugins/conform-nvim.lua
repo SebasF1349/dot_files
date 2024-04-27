@@ -1,29 +1,57 @@
 return {
   "stevearc/conform.nvim",
-  event = { "BufReadPre", "BufNewFile" },
-  opts = {
-    formatters_by_ft = {
-      lua = { "stylua" },
-      svelte = { { "prettierd", "prettier" } },
-      javascript = { { "prettierd", "prettier" } },
-      typescript = { { "prettierd", "prettier" } },
-      javascriptreact = { { "prettierd", "prettier" } },
-      typescriptreact = { { "prettierd", "prettier" } },
-      css = { { "prettierd", "prettier" } },
-      json = { { "prettierd", "prettier" } },
-      markdown = { { "prettierd", "prettier" } },
-      html = { { "prettierd", "prettier" } },
-      sh = { "shfmt" },
-      rust = { "rustfmt" },
-      yaml = { "yamlfmt" },
-      toml = { "taplo" },
-      java = { "google-java-format" },
-    },
-    format_on_save = {
-      -- These options will be passed to conform.format()
-      timeout_ms = 500,
-      lsp_fallback = true,
-    },
-    notify_on_error = false,
-  },
+  event = { "BufWritePre" },
+  cmd = { "ConformInfo" },
+  keys = { "<leader>cf" },
+  config = function()
+    local conform = require("conform")
+
+    local slow_format_filetypes = {}
+    local opts = {
+      formatters_by_ft = {
+        lua = { "stylua" },
+        svelte = { { "prettierd", "prettier" } },
+        javascript = { { "prettierd", "prettier" } },
+        typescript = { { "prettierd", "prettier" } },
+        javascriptreact = { { "prettierd", "prettier" } },
+        typescriptreact = { { "prettierd", "prettier" } },
+        css = { { "prettierd", "prettier" } },
+        json = { { "prettierd", "prettier" } },
+        markdown = { { "prettierd", "prettier" } },
+        html = { { "prettierd", "prettier" } },
+        sh = { "shfmt" },
+        rust = { "rustfmt" },
+        yaml = { "yamlfmt" },
+        toml = { "taplo" },
+        java = { "google-java-format" },
+      },
+      format_on_save = function(bufnr)
+        if slow_format_filetypes[vim.bo[bufnr].filetype] then
+          return
+        end
+        local function on_format(err)
+          if err and err:match("timeout$") then
+            slow_format_filetypes[vim.bo[bufnr].filetype] = true
+          end
+        end
+
+        return { timeout_ms = 200, lsp_fallback = true }, on_format
+      end,
+
+      format_after_save = function(bufnr)
+        if not slow_format_filetypes[vim.bo[bufnr].filetype] then
+          return
+        end
+        return { lsp_fallback = true }
+      end,
+      notify_on_error = false,
+    }
+
+    conform.setup(opts)
+
+    vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
+    vim.keymap.set("n", "<leader>cf", function()
+      conform.format({ bufnr = 0 })
+    end, { desc = "[C]ode [F]ormat current file" })
+  end,
 }
