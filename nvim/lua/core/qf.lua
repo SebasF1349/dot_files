@@ -8,7 +8,6 @@ local signs = {
   H = "",
   I = "",
 }
-local diagnostics_open = false
 
 --------------------------------------------------
 -- Better Grep
@@ -18,7 +17,6 @@ vim.opt.grepprg = "rg --vimgrep --smart-case"
 vim.opt.grepformat = "%f:%l:%c:%m"
 
 vim.api.nvim_create_user_command("Rg", function(opts)
-  diagnostics_open = false
   vim.cmd('silent grep!"' .. opts.args .. '"')
   vim.cmd("copen")
 end, { nargs = 1 })
@@ -115,15 +113,13 @@ local function list_toggle(type)
     else
       vim.cmd("lclose")
     end
-    diagnostics_open = false
   elseif (type == "l" and #vim.fn.getloclist(0) == 0) or (type == "c" and #vim.fn.getqflist() == 0) or (type == "d" and #vim.diagnostic.get() == 0) then
     vim.cmd([[echohl ErrorMsg
 			echo 'List is Empty.'
 			echohl NONE]])
   else
     if type == "d" then
-      vim.diagnostic.setqflist()
-      diagnostics_open = true
+      vim.diagnostic.setqflist({ title = "All Diagnostics" })
     else
       vim.cmd(type .. "open")
     end
@@ -131,11 +127,9 @@ local function list_toggle(type)
 end
 
 vim.keymap.set("n", "<leader>tq", function()
-  diagnostics_open = false
   list_toggle("c")
 end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
-  diagnostics_open = false
   list_toggle("d")
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
 vim.keymap.set("n", "]q", "<cmd>cnext<CR>", { desc = "Next [Q]uickfix Item" })
@@ -147,16 +141,39 @@ vim.keymap.set("n", "[q", "<cmd>cprev<CR>", { desc = "Previous [Q]uickfix Item" 
 
 local qf_group = vim.api.nvim_create_augroup("qflist", { clear = true })
 
-vim.api.nvim_create_autocmd("DiagnosticChanged", {
-  group = qf_group,
-  callback = function()
-    if diagnostics_open then
-      vim.diagnostic.setqflist({
-        open = false,
-      })
+-- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941
+-- mine simple autocmd was breaking syntax, this one one
+-- my guess is that the vim.schedule is necessary in this async stuff
+vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
+  group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
+  callback = function(args)
+    local diagnostics = vim.diagnostic.get()
+    if #args.data.diagnostics == 0 and #diagnostics > 0 then
+      return
     end
+
+    local qf_info = vim.fn.getqflist({ title = 0, id = 0 })
+    local qf_items = vim.diagnostic.toqflist(
+      -- TODO: Can the event data have items not returned by vim.diagnostic.get?
+      -- If not, we don't need to extend the diagnostics variable here.
+      vim.tbl_deep_extend("force", diagnostics, args.data.diagnostics)
+    )
+
+    vim.schedule(function()
+      vim.fn.setqflist({}, qf_info.title == "All Diagnostics" and "r" or " ", {
+        title = "All Diagnostics",
+        items = qf_items,
+      })
+
+      -- Don't steal focus from other qflists. For example, when working through
+      -- vimgrep results, you likely want :cnext to take you to the next match,
+      -- rather than the next diagnostic. Use :cnew to switch to the diagnostic
+      -- qflist when you want it.
+      if qf_info.id ~= 0 and qf_info.title ~= "All Diagnostics" then
+        vim.cmd.cold()
+      end
+    end)
   end,
-  desc = "Update quickfix diagnostics",
 })
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
@@ -220,12 +237,18 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
           qfl[i] = false
         end
         qfl = vim.tbl_filter(t_filter, qfl)
-        vim.fn.setqflist({}, "r", { items = qfl })
+        vim.fn.setqflist({}, "r", {
+          title = "All Diagnostics",
+          items = qfl,
+        })
         vim.api.nvim_input("<Esc>")
       else
         local line = unpack(vim.api.nvim_win_get_cursor(0))
         table.remove(qfl, line)
-        vim.fn.setqflist({}, "r", { items = qfl })
+        vim.fn.setqflist({}, "r", {
+          title = "All Diagnostics",
+          items = qfl,
+        })
         vim.fn.setpos(".", { bufnr, line, 1, 0 })
       end
     end
