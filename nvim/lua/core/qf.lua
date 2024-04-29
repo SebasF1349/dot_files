@@ -202,7 +202,11 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     local command = syntax:format(signs.E, signs.W, signs.H, signs.I)
     vim.cmd(command)
 
-    vim.opt.wrap = true
+    vim.opt.number = true
+    vim.opt_local.relativenumber = false
+    vim.opt_local.statuscolumn = ""
+    vim.opt_local.wrap = true
+    vim.opt_local.hidden = true
     vim.bo.modifiable = true
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
@@ -213,7 +217,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       { buffer = true, desc = "Update quickfix/location list with changes made in quickfix window" }
     )
   end,
-  desc = "Allow updating quickfix window",
+  desc = "Qf syntax + options",
 })
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
