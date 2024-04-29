@@ -148,9 +148,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
   callback = function(args)
     local diagnostics = vim.diagnostic.get()
-    if #args.data.diagnostics == 0 and #diagnostics > 0 then
-      return
-    end
+    -- if #args.data.diagnostics == 0 and #diagnostics > 0 then
+    --   return
+    -- end
 
     local qf_info = vim.fn.getqflist({ title = 0, id = 0 })
     local qf_items = vim.diagnostic.toqflist(
