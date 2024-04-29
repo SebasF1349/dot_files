@@ -257,8 +257,9 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       end
     end
 
-    vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
-    vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
+    -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
+    -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
+    vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
   end,
