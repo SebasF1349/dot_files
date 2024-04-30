@@ -132,8 +132,25 @@ end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
   list_toggle("d")
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
-vim.keymap.set("n", "]q", "<cmd>cnext<CR>", { desc = "Next [Q]uickfix Item" })
-vim.keymap.set("n", "[q", "<cmd>cprev<CR>", { desc = "Previous [Q]uickfix Item" })
+
+local function cnext_wrap()
+  ---@diagnostic disable-next-line: param-type-mismatch
+  local ok, _ = pcall(vim.cmd, "cnext")
+  if not ok then
+    vim.cmd("cfirst")
+  end
+end
+
+local function cprev_wrap()
+  ---@diagnostic disable-next-line: param-type-mismatch
+  local ok, _ = pcall(vim.cmd, "cprev")
+  if not ok then
+    vim.cmd("clast")
+  end
+end
+
+vim.keymap.set("n", "]q", cnext_wrap, { desc = "Next [Q]uickfix Item Wrapping" })
+vim.keymap.set("n", "[q", cprev_wrap, { desc = "Previous [Q]uickfix Item Wrapping" })
 
 --------------------------------------------------
 -- Quickfix Autocmds
@@ -260,6 +277,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
+    vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
   end,
