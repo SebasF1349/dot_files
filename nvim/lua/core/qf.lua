@@ -170,6 +170,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
     -- end
 
     local qf_info = vim.fn.getqflist({ title = 0, id = 0 })
+    if qf_info.title ~= "All Diagnostics" then
+      return
+    end
     local qf_items = vim.diagnostic.toqflist(
       -- TODO: Can the event data have items not returned by vim.diagnostic.get?
       -- If not, we don't need to extend the diagnostics variable here.
