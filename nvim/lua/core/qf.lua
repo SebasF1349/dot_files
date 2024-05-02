@@ -149,8 +149,30 @@ local function cprev_wrap()
   end
 end
 
+local function getPath(line)
+  local path, _ = line:gsub("│.*$", "")
+  return path
+end
+
+local function jumpFileChunk(move)
+  local path = getPath(vim.fn.getline("."))
+  local direction = move == "down" and "j" or "k"
+  local finish = move == "down" and "$" or 1
+
+  while path == getPath(vim.fn.getline(".")) and vim.fn.getline(".") ~= vim.fn.getline(finish) do
+    vim.cmd("normal! " .. direction)
+  end
+  vim.cmd("normal o")
+end
+
 vim.keymap.set("n", "]q", cnext_wrap, { desc = "Next [Q]uickfix Item Wrapping" })
 vim.keymap.set("n", "[q", cprev_wrap, { desc = "Previous [Q]uickfix Item Wrapping" })
+vim.keymap.set("n", "]Q", function()
+  jumpFileChunk("down")
+end, { desc = "Next [Q]uickfix File" })
+vim.keymap.set("n", "[Q", function()
+  jumpFileChunk("up")
+end, { desc = "Previous [Q]uickfix File" })
 
 --------------------------------------------------
 -- Quickfix Autocmds
