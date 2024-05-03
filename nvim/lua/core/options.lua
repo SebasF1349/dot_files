@@ -96,7 +96,7 @@ vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.s
 
 -- Nicer and less noicy signcolumn
 vim.wo.signcolumn = "yes"
-vim.opt.statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum} "
+vim.opt.statuscolumn = "%s%=%{%v:relnum ? '%r ' : '%l '%}"
 vim.diagnostic.config({
   float = { border = _border },
   severity_sort = true,
