@@ -284,7 +284,6 @@ local function jumpFileChunk(move)
   vim.cmd("normal o")
 end
 
--- https://gitlab.com/ranjithshegde/dotbare/-/blob/master/.config/nvim/lua/r/extensions/qf.lua
 local function t_filter(item)
   return item ~= false
 end
@@ -359,3 +358,22 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   once = true,
   desc = "Keymaps inside quickfix window",
 })
+
+--------------------------------------------------
+-- Ideas to Implement
+--------------------------------------------------
+-- quit Vim if the last window is a location/quickfix window (qf.vim)
+-- maybe open the qf window automatically after :make, :grep, :lvimgrep
+--          and friends if there are valid locations/errors (qf.vim)
+-- automatically set the height of location/quickfix windows to the number of list items
+--          if less than Vim's default height (10) or the user's prefered height (qf.vim)
+-- shorten filepaths for better legibility (qf.vim)
+
+-- location list
+-- make every qf feature available for location windows too (qf.vim)
+-- close the location window automatically when quitting parent window (qf.vim)
+
+--------------------------------------------------
+-- Credits
+--------------------------------------------------
+-- https://github.com/romainl/vim-qf
