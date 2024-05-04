@@ -255,7 +255,7 @@ return {
 
           vim.lsp.inlay_hint.enable(true)
           vim.keymap.set("n", "<leader>ti", function()
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
           end, { desc = "LSP: [T]oggle [I]nlay Hints" })
 
           -- Diagnostic keymaps
