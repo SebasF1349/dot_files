@@ -175,6 +175,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
   callback = function(args)
     local diagnostics = vim.diagnostic.get()
+    if #diagnostics == 0 then
+      vim.cmd("cclose")
+    end
     -- if #args.data.diagnostics == 0 and #diagnostics > 0 then
     --   return
     -- end
