@@ -54,7 +54,18 @@ function _G.qftf(info)
   else
     items = vim.fn.getloclist(info.winid, { id = info.id, items = 0 }).items
   end
-  local limit = math.floor(math.max(31, vim.o.columns / 3))
+  local limit = 0
+  for i = info.start_idx, info.end_idx do
+    local e = items[i]
+    if e.valid == 1 and e.bufnr > 0 then
+      local fname = vim.fn.bufname(e.bufnr)
+      fname = vim.fn.fnamemodify(fname, ":p:~:.")
+      if #fname > limit then
+        limit = #fname
+      end
+    end
+  end
+  limit = math.floor(math.min(limit + 2, 2 * vim.o.columns / 3))
   local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
   local validFmt = "%s │ %s %s"
   for i = info.start_idx, info.end_idx do
