@@ -206,6 +206,17 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   end,
 })
 
+local function getHeight(listType)
+  local list
+  if listType == "q" then
+    list = vim.fn.getqflist({ size = 1 })
+  else
+    list = vim.fn.getloclist(0, { size = 1 })
+  end
+  local height = list.size
+  return math.min(height, 10) + 1
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
@@ -238,6 +249,9 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.opt_local.wrap = true
     vim.opt_local.hidden = true
     vim.bo.modifiable = true
+    vim.bo.buflisted = false
+    vim.wo.winfixheight = true
+    vim.api.nvim_win_set_height(0, getHeight("q"))
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
     vim.keymap.set(
