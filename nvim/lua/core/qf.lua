@@ -254,17 +254,31 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- Keymaps inside Quickfix
 --------------------------------------------------
 
-local function getPath(line)
+local function getDisplayedPath(line)
   local path, _ = line:gsub("│.*$", "")
   return path
 end
 
+local function getRealPath(line)
+  local path = getDisplayedPath(line)
+  local sep = "%s"
+  local t = {}
+  for str in string.gmatch(path, "([^" .. sep .. "]+)") do
+    table.insert(t, str)
+  end
+  path = (t[2] or ".") .. "/" .. t[1]
+  if path:find("…") ~= nil then
+    return nil
+  end
+  return path
+end
+
 local function jumpFileChunk(move)
-  local path = getPath(vim.fn.getline("."))
+  local path = getDisplayedPath(vim.fn.getline("."))
   local direction = move == "down" and "j" or "k"
   local finish = move == "down" and "$" or 1
 
-  while path == getPath(vim.fn.getline(".")) and vim.fn.getline(".") ~= vim.fn.getline(finish) do
+  while path == getDisplayedPath(vim.fn.getline(".")) and vim.fn.getline(".") ~= vim.fn.getline(finish) do
     vim.cmd("normal! " .. direction)
   end
   vim.cmd("normal o")
@@ -303,6 +317,27 @@ local function delete(bufnr)
   end
 end
 
+local function getPreview()
+  local wins = vim.api.nvim_list_wins()
+  for _, win in ipairs(wins) do
+    local preview = vim.api.nvim_get_option_value("previewwindow", { win = win })
+    if preview then
+      return win
+    end
+  end
+  return nil
+end
+
+local function openPreview()
+  local path = getRealPath(vim.fn.getline("."))
+  local preview = getPreview()
+  vim.cmd("pedit " .. path)
+  if preview == nil then
+    local key = vim.api.nvim_replace_termcodes("<C-w>", true, false, true)
+    vim.api.nvim_feedkeys(key .. "J", "n", false)
+  end
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
@@ -311,6 +346,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
+    vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set("n", "]Q", function()
