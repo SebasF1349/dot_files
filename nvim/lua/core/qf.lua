@@ -263,6 +263,26 @@ local function getHeight(listType)
   return math.min(height, 10) + 1
 end
 
+---@diagnostic disable-next-line: duplicate-set-field
+function _G.foldexprfunc()
+  local line = vim.split(vim.fn.getline(vim.v.lnum), "│")[1]
+  local next_line = vim.split(vim.fn.getline(vim.v.lnum + 1), "│")[1]
+  if line == next_line then
+    return "1"
+  else
+    return "<1"
+  end
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function _G.foldtextfunc()
+  local line = vim.fn.getline(vim.v.foldstart)
+  local splitted = vim.split(line, "│")
+  local sub = splitted[1] .. "│ "
+  local count = vim.v.foldend - vim.v.foldstart + 1
+  return sub .. " +-- " .. count .. " lines"
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
@@ -275,6 +295,9 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
+    vim.wo.foldmethod = "expr"
+    vim.wo.foldexpr = "v:lua._G.foldexprfunc()"
+    vim.wo.foldtext = "v:lua._G.foldtextfunc()"
     vim.api.nvim_win_set_height(0, getHeight("q"))
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
