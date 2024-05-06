@@ -59,14 +59,19 @@ function _G.qftf(info)
   local list
   local ret = {}
   if info.quickfix == 1 then
-    list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1 })
+    list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1, winid = 1 })
   else
-    list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1 })
+    list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1, winid = 1 })
   end
-  local qf_bufnr = list.qfbufnr
+  local qfwinid = list.winid
+  vim.api.nvim_set_option_value("foldmethod", "expr", { win = qfwinid, scope = "local" })
+  -- vim.api.nvim_set_option_value("fillchars", "eob: ,fold: ", { win = qfwinid })
+  vim.api.nvim_set_option_value("foldexpr", "v:lua._G.foldexprfunc()", { win = qfwinid, scope = "local" })
+  vim.api.nvim_set_option_value("foldtext", "v:lua._G.foldtextfunc()", { win = qfwinid, scope = "local" })
+  local qfbufnr = list.qfbufnr
   list = list.items
   if info.start_idx == 1 then
-    vim.api.nvim_buf_clear_namespace(qf_bufnr, qfim_namespace, 0, -1)
+    vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
   end
   local items = {}
   local limit = 0
@@ -139,7 +144,7 @@ function _G.qftf(info)
   end
   vim.schedule(function()
     for _, hl in ipairs(highlighting) do
-      vim.highlight.range(qf_bufnr, qfim_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
+      vim.highlight.range(qfbufnr, qfim_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
     end
   end)
   return ret
@@ -295,9 +300,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
-    vim.wo.foldmethod = "expr"
-    vim.wo.foldexpr = "v:lua._G.foldexprfunc()"
-    vim.wo.foldtext = "v:lua._G.foldtextfunc()"
     vim.api.nvim_win_set_height(0, getHeight("q"))
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
