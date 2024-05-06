@@ -437,4 +437,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 --------------------------------------------------
 -- Credits
 --------------------------------------------------
--- https://github.com/romainl/vim-qf
+-- https://github.com/romainl/vim-qf (taken a lot of viml code of it)
+-- https://github.com/yorickpeterse/nvim-pqf/tree/main (to make highlighting in lua)
+-- https://github.com/ashfinal/qfview.nvim (for the folding code)
+-- https://github.com/ten3roberts/qf.nvim (for some ideas)
