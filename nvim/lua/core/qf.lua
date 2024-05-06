@@ -9,6 +9,13 @@ local signs = {
   I = "",
 }
 
+local highlights = {
+  E = "DiagnosticError",
+  W = "DiagnosticWarn",
+  H = "DiagnosticHint",
+  I = "DiagnosticInfo",
+}
+
 --------------------------------------------------
 -- Better Grep
 --------------------------------------------------
@@ -45,60 +52,96 @@ vim.keymap.set("n", "<leader>rg", grep_or_filter, { desc = "[R]ip[G]rep" })
 -- Better Quickfix Window Style
 --------------------------------------------------
 
+local qfim_namespace = vim.api.nvim_create_namespace("qfim")
+
 ---@diagnostic disable-next-line: duplicate-set-field
 function _G.qftf(info)
-  local items
+  local list
   local ret = {}
   if info.quickfix == 1 then
-    items = vim.fn.getqflist({ id = info.id, items = 0 }).items
+    list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1 })
   else
-    items = vim.fn.getloclist(info.winid, { id = info.id, items = 0 }).items
+    list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1 })
   end
+  local qf_bufnr = list.qfbufnr
+  list = list.items
+  if info.start_idx == 1 then
+    vim.api.nvim_buf_clear_namespace(qf_bufnr, qfim_namespace, 0, -1)
+  end
+  local items = {}
   local limit = 0
   for i = info.start_idx, info.end_idx do
-    local e = items[i]
-    if e.valid == 1 and e.bufnr > 0 then
-      local fname = vim.fn.bufname(e.bufnr)
-      fname = vim.fn.fnamemodify(fname, ":p:~:.")
-      if #fname > limit then
-        limit = #fname
-      end
-    end
-  end
-  limit = math.floor(math.min(limit + 2, 2 * vim.o.columns / 3))
-  local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
-  local validFmt = "%s │ %s %s"
-  for i = info.start_idx, info.end_idx do
-    local e = items[i]
-    local fname = ""
-    local str
+    local item = { index = i }
+    local e = list[i]
     if e.valid == 1 then
       if e.bufnr > 0 then
-        fname = vim.fn.bufname(e.bufnr)
+        local fname = vim.fn.bufname(e.bufnr)
         if fname == "" then
-          fname = "[No Name]"
+          item.name = " "
         else
           fname = vim.fn.fnamemodify(fname, ":p:~:.")
-          local file_name = vim.fn.fnamemodify(fname, ":p:t")
-          local file_path = vim.fn.fnamemodify(fname, ":h")
-          if #file_name > limit then
-            fname = fnameFmt2:format(file_name:sub(1 - limit))
-          elseif #file_path + #file_name + 2 > limit then
-            file_path = fnameFmt2:format(file_path:sub(2 - limit + #file_name))
-            fname = file_name .. " " .. file_path
-          else
-            fname = file_name .. " " .. (file_path ~= "." and file_path or "")
+          if #fname > limit then
+            limit = #fname
           end
+          item.name = vim.fn.fnamemodify(fname, ":p:t")
+          item.path = vim.fn.fnamemodify(fname, ":h")
         end
-        fname = fnameFmt1:format(fname)
       end
-      local qtype = e.type == "" and "" or ((signs[e.type] and signs[e.type] or signs.I) .. " ")
-      str = validFmt:format(fname, qtype, vim.fn.trim(e.text))
+      item.type = e.type
+      item.message = vim.fn.trim(e.text)
     else
-      str = e.text
+      item.name = " "
+      item.message = e.text
     end
+    table.insert(items, item)
+  end
+  limit = math.floor(math.min(limit + 1, 2 * vim.o.columns / 3))
+  local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
+  local validFmt = "%s │ %s %s"
+  local highlighting = {}
+  for _, item in ipairs(items) do
+    local fname = ""
+    local str
+    if #item.name > limit then
+      item.name = fnameFmt2:format(item.name:sub(1 - limit))
+      item.path = ""
+      fname = item.name
+    elseif #item.path + #item.name + 2 > limit then
+      item.path = fnameFmt2:format(item.path:sub(2 - limit + #item.name))
+      fname = item.name .. " " .. item.path
+    else
+      fname = item.name .. " " .. (item.path ~= "." and item.path or "")
+    end
+    fname = fnameFmt1:format(fname)
+    local type = item.type == "" and "" or ((signs[item.type] and signs[item.type] or signs.I) .. " ")
+    str = validFmt:format(fname, type, vim.fn.trim(item.message))
+    table.insert(highlighting, {
+      group = "Directory",
+      line = item.index - 1,
+      col = 0,
+      end_col = #item.name,
+    })
+    if item.path ~= "" then
+      table.insert(highlighting, {
+        group = "Comment",
+        line = item.index - 1,
+        col = #item.name + 1,
+        end_col = limit,
+      })
+    end
+    table.insert(highlighting, {
+      group = highlights[item.type] or "FloatTitle",
+      line = item.index - 1,
+      col = limit + 3,
+      end_col = limit + 3 + #type + 3 + #item.message,
+    })
     table.insert(ret, str)
   end
+  vim.schedule(function()
+    for _, hl in ipairs(highlighting) do
+      vim.highlight.range(qf_bufnr, qfim_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
+    end
+  end)
   return ret
 end
 
@@ -224,28 +267,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
   callback = function()
-    local syntax = [[
-      syn match qfFileName /^[^ ]*/ nextgroup=qfFilePath
-      syn match qfFilePath / [^│]*/ nextgroup=qfSeparatorRight
-      syn match qfSeparatorRight '│' contained nextgroup=qfError,qfWarning,qfInfo,qfNote,qfManual
-      syn match qfManual / .*$/ contained
-      syn match qfError / %s.*$/ contained
-      syn match qfWarning / %s.*$/ contained
-      syn match qfNote / %s.*$/ contained
-      syn match qfInfo / %s.*$/ contained
-
-      hi def link qfFileName Directory
-      hi def link qfFilePath NonText
-      hi def link qfSeparatorRight Delimiter
-      hi def link qfError DiagnosticError
-      hi def link qfWarning DiagnosticWarn
-      hi def link qfInfo DiagnosticInfo
-      hi def link qfNote DiagnosticHint
-      hi def link qfManual FloatTitle
-      ]]
-    local command = syntax:format(signs.E, signs.W, signs.H, signs.I)
-    vim.cmd(command)
-
     vim.opt.number = true
     vim.opt_local.relativenumber = false
     vim.opt_local.statuscolumn = ""
