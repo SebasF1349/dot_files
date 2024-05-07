@@ -223,9 +223,6 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
   callback = function(args)
     local diagnostics = vim.diagnostic.get()
-    if #diagnostics == 0 then
-      vim.cmd("cclose")
-    end
     -- if #args.data.diagnostics == 0 and #diagnostics > 0 then
     --   return
     -- end
@@ -233,6 +230,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
     local qf_info = vim.fn.getqflist({ title = 0, id = 0 })
     if qf_info.title ~= "All Diagnostics" then
       return
+    end
+    if #diagnostics == 0 then
+      vim.cmd("cclose")
     end
     local qf_items = vim.diagnostic.toqflist(
       -- TODO: Can the event data have items not returned by vim.diagnostic.get?
