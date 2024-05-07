@@ -295,7 +295,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.opt.number = true
     vim.opt_local.relativenumber = false
     vim.opt_local.statuscolumn = ""
-    vim.opt_local.wrap = true
+    -- vim.opt_local.wrap = true
     vim.opt_local.hidden = true
     vim.bo.modifiable = true
     vim.bo.buflisted = false
@@ -333,6 +333,17 @@ local function getRealPath(line)
   if path:find("…") ~= nil then
     return nil
   end
+  return path
+end
+
+local function getFileType(line)
+  local path = getRealPath(line)
+  local fileType, _ = line:gsub("^.*.", "")
+  return fileType
+end
+
+local function getMessage(line)
+  local path, _ = line:gsub("^.*│", "")
   return path
 end
 
@@ -400,6 +411,11 @@ local function openPreview()
   end
 end
 
+local function hover()
+  local message = getMessage(vim.fn.getline("."))
+  vim.lsp.util.open_floating_preview(vim.split(vim.trim(message), "\n"), "markdown", { border = "rounded" })
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
@@ -409,6 +425,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
+    vim.keymap.set("n", "K", hover, { buffer = 0, desc = "Show full line on hover" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set("n", "]Q", function()
@@ -443,3 +460,4 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- https://github.com/yorickpeterse/nvim-pqf/tree/main (to make highlighting in lua)
 -- https://github.com/ashfinal/qfview.nvim (for the folding code)
 -- https://github.com/ten3roberts/qf.nvim (for some ideas)
+-- https://github.com/folke/trouble.nvim (for the hover ider)
