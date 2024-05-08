@@ -85,7 +85,7 @@ end
 
 function HighlightedFoldtext()
   local result = parse_line(vim.v.foldstart)
-  if not result then
+  if not result or #result == 0 then
     return vim.fn.foldtext()
   end
 
