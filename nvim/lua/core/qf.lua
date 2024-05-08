@@ -66,8 +66,8 @@ function _G.qftf(info)
   local qfwinid = list.winid
   vim.api.nvim_set_option_value("foldmethod", "expr", { win = qfwinid, scope = "local" })
   -- vim.api.nvim_set_option_value("fillchars", "eob: ,fold: ", { win = qfwinid })
-  vim.api.nvim_set_option_value("foldexpr", "v:lua._G.foldexprfunc()", { win = qfwinid, scope = "local" })
-  vim.api.nvim_set_option_value("foldtext", "v:lua._G.foldtextfunc()", { win = qfwinid, scope = "local" })
+  vim.api.nvim_set_option_value("foldexpr", "v:lua._G.qffoldexprfunc()", { win = qfwinid, scope = "local" })
+  vim.api.nvim_set_option_value("foldtext", "v:lua._G.qffoldtextfunc()", { win = qfwinid, scope = "local" })
   local qfbufnr = list.qfbufnr
   list = list.items
   if info.start_idx == 1 then
@@ -269,7 +269,7 @@ local function getHeight(listType)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
-function _G.foldexprfunc()
+function _G.qffoldexprfunc()
   local line = vim.split(vim.fn.getline(vim.v.lnum), "│")[1]
   local next_line = vim.split(vim.fn.getline(vim.v.lnum + 1), "│")[1]
   if line == next_line then
@@ -280,7 +280,7 @@ function _G.foldexprfunc()
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
-function _G.foldtextfunc()
+function _G.qffoldtextfunc()
   local line = vim.fn.getline(vim.v.foldstart)
   local splitted = vim.split(line, "│")
   local sub = splitted[1] .. "│ "
