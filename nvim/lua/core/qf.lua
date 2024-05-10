@@ -329,22 +329,12 @@ end
 
 local function getRealPath(line)
   local path = getDisplayedPath(line)
-  local sep = "%s"
-  local t = {}
-  for str in string.gmatch(path, "([^" .. sep .. "]+)") do
-    table.insert(t, str)
-  end
-  path = (t[2] or ".") .. "/" .. t[1]
+  local p = vim.split(vim.trim(path), " ")
+  path = (p[2] or ".") .. "/" .. p[1]
   if path:find("…") ~= nil then
     return nil
   end
   return path
-end
-
-local function getFileType(line)
-  local path = getRealPath(line)
-  local fileType, _ = line:gsub("^.*.", "")
-  return fileType
 end
 
 local function getMessage(line)
@@ -408,6 +398,11 @@ end
 
 local function openPreview()
   local path = getRealPath(vim.fn.getline("."))
+  if not path then
+    -- NOTE: this should be improved checking the actual qflist
+    vim.print("Not possible to get path")
+    return nil
+  end
   local preview = getPreview()
   vim.cmd("pedit " .. path)
   if preview == nil then
@@ -418,6 +413,7 @@ end
 
 local function hover()
   local message = getMessage(vim.fn.getline("."))
+  -- NOTE: crashes if qf window it too short (I think)
   vim.lsp.util.open_floating_preview(vim.split(vim.trim(message), "\n"), "markdown", { border = "rounded" })
 end
 
