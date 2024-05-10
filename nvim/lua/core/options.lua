@@ -11,8 +11,8 @@ vim.opt.showmode = false
 -- Don't show number of lines of characters selected
 vim.opt.showcmd = false
 
--- Enable mouse mode
-vim.o.mouse = "a"
+-- Disable mouse mode
+vim.o.mouse = ""
 
 -- Enable break indent
 vim.o.breakindent = true
