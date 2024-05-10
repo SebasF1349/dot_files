@@ -85,11 +85,14 @@ function _G.qftf(info)
           item.name = " "
         else
           fname = vim.fn.fnamemodify(fname, ":p:~:.")
-          if #fname > limit then
-            limit = #fname
-          end
           item.name = vim.fn.fnamemodify(fname, ":p:t")
           item.path = vim.fn.fnamemodify(fname, ":h")
+          if item.path == "." then
+            item.path = ""
+          end
+          if #item.name + #item.path > limit then
+            limit = #fname
+          end
         end
       end
       item.type = e.type
@@ -111,11 +114,13 @@ function _G.qftf(info)
       item.name = fnameFmt2:format(item.name:sub(1 - limit))
       item.path = ""
       fname = item.name
+    elseif #item.path == 0 then
+      fname = item.name
     elseif #item.path + #item.name + 2 > limit then
       item.path = fnameFmt2:format(item.path:sub(2 - limit + #item.name))
       fname = item.name .. " " .. item.path
     else
-      fname = item.name .. " " .. (item.path ~= "." and item.path or "")
+      fname = item.name .. " " .. item.path
     end
     fname = fnameFmt1:format(fname)
     local type = item.type == "" and "" or ((signs[item.type] and signs[item.type] or signs.I) .. " ")
