@@ -4,40 +4,6 @@ return {
   { "NMAC427/guess-indent.nvim", event = "InsertEnter", opts = {} },
 
   {
-    "m4xshen/hardtime.nvim",
-    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {
-      max_count = 1,
-      hint = true,
-      notification = false,
-      restricted_keys = {
-        ["b"] = { "n", "x" },
-        ["w"] = { "n", "x" },
-        ["e"] = { "n", "x" },
-      },
-      disabled_filetypes = {
-        "TelescopePrompt",
-        "checkhealth",
-        "dapui-repl",
-        "dapui_breakpoints",
-        "dapui_console",
-        "dapui_scopes",
-        "dapui_stacks",
-        "dapui_watches",
-        "help",
-        "lazy",
-        "mason",
-        "netrw",
-        "prompt",
-        "qf",
-        "Trouble",
-        "fugitive",
-      },
-    },
-  },
-
-  {
     "saecki/crates.nvim",
     ft = { "rust", "toml" },
     config = function(_, opts)
