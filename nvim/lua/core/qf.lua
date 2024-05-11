@@ -116,9 +116,9 @@ function _G.qftf(info)
       fname = item.name
     elseif #item.path == 0 then
       fname = item.name
-    elseif #item.path + #item.name + 2 > limit then
-      item.path = fnameFmt2:format(item.path:sub(2 - limit + #item.name))
-      fname = item.name .. " " .. item.path
+    elseif #item.path + #item.name + 3 > limit then
+      item.path = fnameFmt2:format(item.path:sub(3 - limit + #item.name))
+      fname = item.name .. " " .. item.path .. " "
     else
       fname = item.name .. " " .. item.path
     end
@@ -131,19 +131,17 @@ function _G.qftf(info)
       col = 0,
       end_col = #item.name,
     })
-    if item.path ~= "" then
-      table.insert(highlighting, {
-        group = "Comment",
-        line = item.index - 1,
-        col = #item.name + 1,
-        end_col = limit,
-      })
-    end
+    table.insert(highlighting, {
+      group = "Comment",
+      line = item.index - 1,
+      col = #item.name + 1,
+      end_col = limit + 4,
+    })
     table.insert(highlighting, {
       group = highlights[item.type] or "FloatTitle",
       line = item.index - 1,
-      col = limit + 3,
-      end_col = limit + 3 + #type + 3 + #item.message,
+      col = limit + 6,
+      end_col = limit + 6 + #type + 3 + #item.message,
     })
     table.insert(ret, str)
   end
