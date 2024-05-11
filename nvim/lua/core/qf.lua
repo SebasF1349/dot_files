@@ -286,9 +286,14 @@ end
 function _G.qffoldtextfunc()
   local line = vim.fn.getline(vim.v.foldstart)
   local splitted = vim.split(line, "│")
-  local sub = splitted[1] .. "│ "
-  local count = vim.v.foldend - vim.v.foldstart + 1
-  return sub .. " +-- " .. count .. " lines"
+  local path = vim.split(splitted[1], " ")
+  local highlighting = {
+    { path[1] .. " ", "DiagnosticInfo" },
+    { path[2] .. (" "):rep(#splitted[1] - #vim.trim(splitted[1])), "Comment" },
+    { "│", "Comment" },
+    { " +-- " .. vim.v.foldend - vim.v.foldstart + 1 .. " lines", "DiagnosticInfo" },
+  }
+  return highlighting
 end
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
