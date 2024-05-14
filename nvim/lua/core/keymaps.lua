@@ -77,9 +77,9 @@ vim.keymap.set({ "n", "t" }, "tt", function()
   toggle_term(1)
 end, { desc = "[T]oggle [T]erminal 1" })
 
--- window management
+-- window management (NOTE: Check what to do with these keymaps)
 vim.keymap.set("n", "<C-\\>", "<C-w>v", { desc = "Split Window [|]Vertically" })
-vim.keymap.set("n", "<C-->", "<C-w>s", { desc = "Split Window [-]Horizontally" })
+vim.keymap.set("n", "<CR>", "<C-w>s", { desc = "Split Window [-]Horizontally" }) -- <C--> and <CR> map to the same key in the terminal
 vim.keymap.set("n", "<C-=>", "<C-w>=", { desc = "Window [=]Equal Size" })
 vim.keymap.set("n", "<C-q>", "<cmd>close<CR>", { desc = "Window [Q]uit" })
 -- Resize window
