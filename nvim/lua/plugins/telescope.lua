@@ -42,14 +42,21 @@ return {
         layout_strategy = "flex",
         layout_config = {
           horizontal = {
-            width = 0.95,
-            height = 0.95,
+            width = function(_, cols, _)
+              return cols
+            end,
+            height = function(_, _, rows)
+              return rows
+            end,
             preview_cutoff = 0,
           },
           vertical = {
-            width = 0.95,
-            height = 0.95,
-            padding = 0,
+            width = function(_, cols, _)
+              return cols
+            end,
+            height = function(_, _, rows)
+              return rows
+            end,
             preview_cutoff = 0,
           },
         },
