@@ -162,7 +162,7 @@ local function open_notes()
     if vim.tbl_isempty(vim.fs.find(project_file_name, { type = "file", path = projects_notes_directory })) then
       os.execute("touch " .. note_file_path)
     end
-    local note_buf = vim.api.nvim_create_buf(true, false)
+    local note_buf = vim.api.nvim_create_buf(false, false)
     vim.api.nvim_open_win(note_buf, true, { split = "right" })
     vim.cmd.edit(note_file_path)
     notes_cache = { buf = note_buf, is_open = true, file_path = note_file_path }

@@ -21,7 +21,7 @@ return {
         filetypes = { md = true, rmd = true, markdown = true },
         create_dirs = true,
         perspective = {
-          priority = "root",
+          priority = "first",
           fallback = "current",
           root_tell = "index.md",
           nvim_wd_heel = false,
