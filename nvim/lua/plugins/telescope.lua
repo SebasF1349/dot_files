@@ -1,7 +1,7 @@
 return {
   "nvim-telescope/telescope.nvim",
   keys = { "<leader>f", "<leader><leader>", "<leader>/" },
-  branch = "0.1.x",
+  -- branch = "0.1.x",
   dependencies = {
     "nvim-lua/plenary.nvim",
     {
@@ -38,16 +38,18 @@ return {
         prompt_prefix = " ",
         selection_caret = " ",
         dynamic_preview_title = true,
+        path_display = { "filename_first" },
         layout_strategy = "flex",
         layout_config = {
           horizontal = {
-            width = 0.9,
-            height = 0.9,
+            width = 0.95,
+            height = 0.95,
             preview_cutoff = 0,
           },
           vertical = {
-            width = 0.9,
-            height = 0.9,
+            width = 0.95,
+            height = 0.95,
+            padding = 0,
             preview_cutoff = 0,
           },
         },
@@ -81,56 +83,46 @@ return {
     telescope.load_extension("fzf")
     telescope.load_extension("ui-select")
 
-    local customPickers = require("utils.telescopePickers")
+    local builtin = require("telescope.builtin")
 
     -- Browsing
-    vim.keymap.set("n", "<leader>ff", function()
-      customPickers.prettyFilesPicker({ picker = "find_files", options = { hidden = true } })
-    end, { desc = "[F]ind [F]iles" })
-    vim.keymap.set("n", "<leader><leader>", function()
-      customPickers.prettyBuffersPicker({ sort_mru = true, ignore_current_buffer = true })
-    end, { desc = "Find another [ ] opened buffers" })
+    vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "[F]ind [F]iles" })
+    vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "Find another [ ] opened buffers" })
 
     -- Searching
     vim.keymap.set("n", "<leader>fg", function()
-      customPickers.prettyGrepPicker({ picker = "live_grep" })
+      builtin.live_grep({ disable_coordinates = true })
     end, { desc = "[F]ind by [G]rep" })
     vim.keymap.set("n", "<leader>/", function()
-      customPickers.prettyGrepPicker({
-        picker = "live_grep",
-        options = {
-          search_dirs = { vim.api.nvim_buf_get_name(0) },
-          prompt_title = "Live Grep in Current Buffer",
-        },
+      builtin.live_grep({
+        disable_coordinates = true,
+        search_dirs = { vim.api.nvim_buf_get_name(0) },
+        prompt_title = "Live Grep in Current Buffer",
       })
     end, { desc = "Find [/] in Current Buffer" })
     vim.keymap.set("n", "<leader>f/", function()
-      customPickers.prettyGrepPicker({
-        picker = "live_grep",
-        options = {
-          grep_open_files = true,
-          prompt_title = "Live Grep in Open Buffers",
-        },
+      builtin.live_grep({
+        disable_coordinates = true,
+        grep_open_files = true,
+        prompt_title = "Live Grep in Open Buffers",
       })
     end, { desc = "[F]ind [/] in Open Buffers" })
-    vim.keymap.set("n", "<leader>fw", function()
-      customPickers.prettyGrepPicker({ picker = "grep_string" })
-    end, { desc = "[F]ind current [W]ord" })
-    vim.keymap.set("n", "<leader>fW", function()
-      local word = vim.fn.expand("<cWORD>")
-      customPickers.prettyGrepPicker({ picker = "grep_string", options = { search = word } })
-    end, { desc = "[F]ind current [W]ORD until space" })
+    vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
     vim.keymap.set("v", "<leader>fs", function()
       local visual_selection = vim.fn.getregion(vim.fn.getpos("."), vim.fn.getpos("v"), { mode = vim.fn.mode() })
-      customPickers.prettyGrepPicker({ picker = "live_grep", options = {
-        default_text = vim.fn.escape(table.concat(visual_selection), ".()"),
-      } })
+      builtin.live_grep({
+        disable_coordinates = true,
+        default_text = vim.fn.escape(table.concat(visual_selection), ".(){}"),
+      })
     end, { desc = "[F]ind [S]elected Text" })
 
-    local builtin = require("telescope.builtin")
     -- Miscelaneous
     vim.keymap.set("n", "<leader>fn", function()
-      customPickers.prettyGrepPicker({ picker = "grep_string", options = { search = "(note|todo|fix):", use_regex = true } })
+      builtin.grep_string({
+        disable_coordinates = true,
+        search = "(note|todo|fix):",
+        use_regex = true,
+      })
     end, { desc = "[F]ind [N]otes" })
     vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
     vim.keymap.set("n", "<leader>fb", builtin.git_branches, { desc = "[F]ind Git [B]ranch" })
