@@ -272,10 +272,7 @@ return {
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP:[R]e[n]ame" })
           vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "LSP:Hover Documentation" })
 
-          -- java doesn't support the same gd that telescope uses, this should be fixed soon
-          if client and client.supports_method("textDocument/definition") then
-            vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
-          end
+          vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
 
           vim.keymap.set("n", "gr", require("telescope.builtin").lsp_references, { desc = "LSP: [G]oto [R]eferences" })
 
