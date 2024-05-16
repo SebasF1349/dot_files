@@ -3,10 +3,10 @@
 --------------------------------------------------
 
 local signs = {
-  E = "",
-  W = "",
+  E = " ",
+  W = " ",
   H = "",
-  I = "",
+  I = " ",
 }
 
 local highlights = {
@@ -91,7 +91,7 @@ function _G.qftf(info)
             item.path = ""
           end
           if #item.name + #item.path > limit then
-            limit = #fname
+            limit = #item.name + #item.path
           end
         end
       end
@@ -105,7 +105,7 @@ function _G.qftf(info)
   end
   limit = math.floor(math.min(limit + 1, 2 * vim.o.columns / 3))
   local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
-  local validFmt = "%s │ %s %s"
+  local validFmt = "%s │ %s%s"
   local highlighting = {}
   for _, item in ipairs(items) do
     local fname = ""
@@ -116,14 +116,14 @@ function _G.qftf(info)
       fname = item.name
     elseif #item.path == 0 then
       fname = item.name
-    elseif #item.path + #item.name + 3 > limit then
-      item.path = fnameFmt2:format(item.path:sub(3 - limit + #item.name))
-      fname = item.name .. " " .. item.path .. " "
+    elseif #item.path + #item.name + 1 > limit then
+      item.path = fnameFmt2:format(item.path:sub(1 - limit + #item.name))
+      fname = item.name .. " " .. item.path
     else
       fname = item.name .. " " .. item.path
     end
     fname = fnameFmt1:format(fname)
-    local type = item.type == "" and "" or ((signs[item.type] and signs[item.type] or signs.I) .. " ")
+    local type = item.type == "" and "" or (signs[item.type] and signs[item.type] or signs.I)
     str = validFmt:format(fname, type, vim.fn.trim(item.message))
     table.insert(highlighting, {
       group = "Directory",
@@ -140,8 +140,8 @@ function _G.qftf(info)
     table.insert(highlighting, {
       group = highlights[item.type] or "FloatTitle",
       line = item.index - 1,
-      col = limit + 6,
-      end_col = limit + 6 + #type + 3 + #item.message,
+      col = limit + 4,
+      end_col = limit + 4 + #type + 2 + #item.message,
     })
     table.insert(ret, str)
   end
