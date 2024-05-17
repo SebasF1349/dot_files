@@ -2,7 +2,14 @@ return {
   "stevearc/conform.nvim",
   event = { "BufWritePre" },
   cmd = { "ConformInfo" },
-  keys = { "<leader>cf" },
+  keys = {
+    "<leader>cf",
+    function()
+      require("conform").format({ bufnr = 0, async = true, lsp_fallback = true })
+    end,
+    mode = "",
+    desc = "[C]ode [F]ormat current file",
+  },
   config = function()
     local conform = require("conform")
 
@@ -50,8 +57,5 @@ return {
     conform.setup(opts)
 
     vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
-    vim.keymap.set("n", "<leader>cf", function()
-      conform.format({ bufnr = 0 })
-    end, { desc = "[C]ode [F]ormat current file" })
   end,
 }
