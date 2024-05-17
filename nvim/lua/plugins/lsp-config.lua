@@ -267,10 +267,10 @@ return {
             vim.diagnostic.goto_next()
             vim.api.nvim_feedkeys("zz", "n", false)
           end, { desc = "LSP: Go to next [D]iagnostic message" })
+
           vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "LSP: Open floating diagnostic message" })
 
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP:[R]e[n]ame" })
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "LSP:Hover Documentation" })
 
           vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
 
