@@ -290,16 +290,28 @@ return {
           end
 
           if client and client.server_capabilities.documentHighlightProvider then
+            local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
             -- Highlight references of the word under your cursor
             vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+              group = highlight_augroup,
               buffer = event.buf,
               callback = vim.lsp.buf.document_highlight,
             })
 
             -- When you move your cursor, the highlights will be cleared
             vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+              group = highlight_augroup,
               buffer = event.buf,
               callback = vim.lsp.buf.clear_references,
+            })
+
+            -- Clear highlight when detaching lsp (fix some lsp errors)
+            vim.api.nvim_create_autocmd("LspDetach", {
+              group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
+              callback = function(local_event)
+                vim.lsp.buf.clear_references()
+                vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = local_event.buf })
+              end,
             })
           end
         end,
