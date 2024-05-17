@@ -425,6 +425,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   callback = function()
     -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
+    vim.keymap.set("n", "<CR>", "<CR>", { buffer = 0, desc = "Open QF item" }) -- idk why this is needed
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
