@@ -268,7 +268,7 @@ local function getHeight(listType)
     list = vim.fn.getloclist(0, { size = 1 })
   end
   local height = list.size
-  return math.min(height, 10) + 1
+  return math.max(math.min(height, 10), 5) + 1
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -416,7 +416,6 @@ end
 
 local function hover()
   local message = getMessage(vim.fn.getline("."))
-  -- NOTE: crashes if qf window it too short (I think)
   vim.lsp.util.open_floating_preview(vim.split(vim.trim(message), "\n"), "markdown", { border = "rounded" })
 end
 
