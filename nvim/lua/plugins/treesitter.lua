@@ -48,6 +48,7 @@ return {
         -- misc
         "sql",
         "regex",
+        "diff",
       },
       auto_install = true,
       sync_install = false,
