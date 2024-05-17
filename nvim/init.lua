@@ -1,4 +1,4 @@
--- UPDATED KICKSTARTER UNTIL 2024-02-26
+-- UPDATED KICKSTARTER UNTIL 2024-05-11
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
