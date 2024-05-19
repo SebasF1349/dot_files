@@ -130,6 +130,12 @@ return {
       }),
     })
 
+    vim.api.nvim_create_autocmd("CmdWinEnter", {
+      callback = function()
+        require("cmp").close()
+      end,
+    })
+
     -- Inside a snippet, use backspace to remove the placeholder.
     vim.keymap.set("s", "<BS>", "<C-O>s")
   end,

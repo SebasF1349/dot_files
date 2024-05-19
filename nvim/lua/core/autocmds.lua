@@ -88,14 +88,6 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
   desc = "Resize splits after resizing nvim",
 })
 
-vim.api.nvim_create_autocmd({ "CmdWinEnter" }, {
-  callback = function()
-    vim.cmd("quit")
-  end,
-  group = general,
-  desc = "Automagically close command-line window.",
-})
-
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   callback = function(event)
     if event.match:match("^%w%w+://") then
