@@ -43,6 +43,7 @@ return {
         "bash",
         "hyprlang",
         "git_config",
+        "gitcommit",
         "rasi",
         "readline",
         -- misc
