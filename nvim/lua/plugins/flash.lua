@@ -46,4 +46,11 @@ return {
       desc = "Flash Treesitter [G]o [E]nd",
     },
   },
+  opts = {
+    modes = {
+      char = {
+        enabled = false,
+      },
+    },
+  },
 }
