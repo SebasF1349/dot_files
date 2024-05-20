@@ -1,6 +1,6 @@
 -- Keymaps for better default experience
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
-vim.keymap.set("n", "Q", "<nop>")
+vim.keymap.set("n", "Q", "@q")
 
 -- Remap Escape
 vim.keymap.set("i", "jk", "<Esc>")
