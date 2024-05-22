@@ -36,6 +36,46 @@ return {
     local config = {
       cmd = cmd(),
       init_options = { bundles = bundles },
+      settings = {
+        java = {
+          configuration = {
+            updateBuildConfiguration = "interactive",
+          },
+          eclipse = {
+            downloadSources = true,
+          },
+          maven = {
+            downloadSources = true,
+          },
+          references = {
+            includeAccessors = true,
+            includeDecompiledSources = true,
+          },
+          format = {
+            enabled = true,
+          },
+          signatureHelp = {
+            enabled = true,
+          },
+          inlayHints = {
+            parameterNames = {
+              enabled = "all",
+            },
+          },
+          sources = {
+            organizeImports = {
+              starThreshold = 9999,
+              staticStarThreshold = 9999,
+            },
+          },
+          codeGeneration = {
+            toString = {
+              template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+            },
+            useBlocks = true,
+          },
+        },
+      },
       capabilities = require("cmp_nvim_lsp").default_capabilities(),
       dap = { hotcodereplace = "auto", config_overrides = {} },
       dap_main = {},
