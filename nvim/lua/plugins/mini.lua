@@ -19,6 +19,15 @@ return { -- Collection of various small independent plugins/modules
       c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
       ["/"] = ai.gen_spec.treesitter({ a = "@comment.outer", i = "@comment.outer" }, {}),
       t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" },
+      s = { -- subword (for camelCase or snake_case), overwrites sentence that I never use
+        {
+          "%u[%l%d]+%f[^%l%d]",
+          "%f[%S][%l%d]+%f[^%l%d]",
+          "%f[%P][%l%d]+%f[^%l%d]",
+          "^[%l%d]+%f[^%l%d]",
+        },
+        "^().*()$",
+      },
     }
     ai.setup({
       n_lines = 500,
