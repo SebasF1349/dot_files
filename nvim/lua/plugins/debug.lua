@@ -68,80 +68,23 @@ return {
     -- Lua adapter.
     {
       "jbyuki/one-small-step-for-vimkind",
+      -- stylua: ignore
       keys = {
-        {
-          "<leader>dl",
-          function()
-            require("osv").launch({ port = 8086 })
-          end,
-          desc = "[D]ebug: [L]ua",
-        },
+        { "<leader>dl", function() require("osv").launch({ port = 8086 }) end, desc = "[D]ebug: [L]ua",},
       },
     },
   },
 
+  -- stylua: ignore
   keys = {
-    {
-      "<leader>db",
-      function()
-        require("dap").toggle_breakpoint()
-      end,
-      desc = "[D]ebug: Toggle [B]reakpoint",
-    },
-
-    {
-      "<leader>dB",
-      "<cmd>FzfLua dap_breakpoints<cr>",
-      desc = "[D]ebug: List [B]reakpoints",
-    },
-
-    {
-      "<leader>dC",
-      function()
-        require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
-      end,
-      desc = "[D]ebug: Breakpoint [C]ondition",
-    },
-
-    {
-      "<leader>dc",
-      function()
-        require("dap").continue()
-      end,
-      desc = "[D]ebug: [C]ontinue",
-    },
-
-    {
-      "<leader>dt",
-      function()
-        require("dap").terminate()
-      end,
-      desc = "[D]ebug: [T]erminate",
-    },
-
-    {
-      "<leader>dO",
-      function()
-        require("dap").step_over()
-      end,
-      desc = "[D]ebug: Step [O]ver",
-    },
-
-    {
-      "<leader>di",
-      function()
-        require("dap").step_into()
-      end,
-      desc = "[D]ebug: Step [I]nto",
-    },
-
-    {
-      "<leader>do",
-      function()
-        require("dap").step_out()
-      end,
-      desc = "[D]ebug: Step [O]ut",
-    },
+    { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "[D]ebug: Toggle [B]reakpoint",},
+    { "<leader>dB", "<cmd>FzfLua dap_breakpoints<cr>", desc = "[D]ebug: List [B]reakpoints",},
+    { "<leader>dC", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, desc = "[D]ebug: Breakpoint [C]ondition",},
+    { "<leader>dc", function() require("dap").continue() end, desc = "[D]ebug: [C]ontinue",},
+    { "<leader>dt", function() require("dap").terminate() end, desc = "[D]ebug: [T]erminate",},
+    { "<leader>dO", function() require("dap").step_over() end, desc = "[D]ebug: Step [O]ver",},
+    { "<leader>di", function() require("dap").step_into() end, desc = "[D]ebug: Step [I]nto",},
+    { "<leader>do", function() require("dap").step_out() end, desc = "[D]ebug: Step [O]ut",},
   },
   config = function()
     local sign = vim.fn.sign_define
