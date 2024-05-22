@@ -268,7 +268,7 @@ local function getHeight(listType)
     list = vim.fn.getloclist(0, { size = 1 })
   end
   local height = list.size
-  return math.max(math.min(height, 10), 5) + 1
+  return math.max(math.min(height, 10), 5)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
