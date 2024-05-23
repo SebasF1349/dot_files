@@ -20,7 +20,7 @@ return {
         typescriptreact = { { "prettierd", "prettier" } },
         css = { { "prettierd", "prettier" } },
         json = { { "prettierd", "prettier" } },
-        markdown = { { "prettierd", "prettier" } },
+        markdown = { { "prettierd", "prettier" }, "markdownlint", "markdown-toc" },
         html = { { "prettierd", "prettier" } },
         sh = { "shfmt" },
         rust = { "rustfmt" },

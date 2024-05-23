@@ -202,6 +202,7 @@ return {
         "prettier",
         -- markdown
         "markdownlint",
+        "markdown-toc",
         -- lua
         "stylua", -- formatter
         -- java
