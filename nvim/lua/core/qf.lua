@@ -1,4 +1,13 @@
 --------------------------------------------------
+-- Types
+--------------------------------------------------
+
+---@alias ListType
+---| '"c"' # quickfix list
+---| '"d"' # quickfix list with diagnostics
+---| '"l"' # location list
+
+--------------------------------------------------
 -- "Global" variables in this file
 --------------------------------------------------
 
@@ -174,31 +183,33 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Quickfix Keymaps
 --------------------------------------------------
 
---- type='c': qf toggle and send to bottom
---- type='d': qf toggle with diagnostics
---- type='l': loclist toggle (all windows)
-local function list_toggle(type)
+---@param listType ListType
+local function list_toggle(listType)
   local status
-  if type == "c" or type == "d" then
+  if listType == "c" or listType == "d" then
     status = vim.fn.getqflist({ winid = 0 }).winid ~= 0
   else
     status = vim.fn.getloclist(0, { winid = 0 }).winid ~= 0
   end
   if status then
-    if type == "c" or type == "d" then
+    if listType == "c" or listType == "d" then
       vim.cmd("cclose")
     else
       vim.cmd("lclose")
     end
-  elseif (type == "l" and #vim.fn.getloclist(0) == 0) or (type == "c" and #vim.fn.getqflist() == 0) or (type == "d" and #vim.diagnostic.get() == 0) then
+  elseif
+    (listType == "l" and #vim.fn.getloclist(0) == 0)
+    or (listType == "c" and #vim.fn.getqflist() == 0)
+    or (listType == "d" and #vim.diagnostic.get() == 0)
+  then
     vim.cmd([[echohl ErrorMsg
 			echo 'List is Empty.'
 			echohl NONE]])
   else
-    if type == "d" then
+    if listType == "d" then
       vim.diagnostic.setqflist({ title = "All Diagnostics" })
     else
-      vim.cmd(type .. "open")
+      vim.cmd(listType .. "open")
     end
   end
 end
@@ -225,6 +236,7 @@ local function cprev_wrap()
     vim.cmd("clast")
   end
 end
+
 vim.keymap.set("n", "]q", cnext_wrap, { desc = "Next [Q]uickfix Item Wrapping" })
 vim.keymap.set("n", "[q", cprev_wrap, { desc = "Previous [Q]uickfix Item Wrapping" })
 
@@ -275,15 +287,16 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   end,
 })
 
+---@param listType ListType
+---@return number
 local function getHeight(listType)
   local list
-  if listType == "q" then
+  if listType == "c" or listType == "d" then
     list = vim.fn.getqflist({ size = 1 })
   else
     list = vim.fn.getloclist(0, { size = 1 })
   end
-  local height = list.size
-  return math.max(math.min(height, 10), 5)
+  return math.max(math.min(list.size, 10), 5)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -341,11 +354,13 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- Keymaps inside Quickfix
 --------------------------------------------------
 
+---@param line string
 local function getMessage(line)
   local path, _ = line:gsub("^.*│", "")
   return path
 end
 
+---@param move "up" | "down"
 local function jumpFileChunk(move)
   local path = getPath(vim.fn.line("."))
   local direction = move == "down" and "j" or "k"
@@ -357,10 +372,12 @@ local function jumpFileChunk(move)
   vim.cmd("normal o")
 end
 
+---@param item table | boolean
 local function t_filter(item)
   return item ~= false
 end
 
+---@param bufnr number
 local function delete(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local qfl = vim.fn.getqflist()
@@ -405,7 +422,7 @@ local function openPreview()
   if not path then
     -- NOTE: this should be improved checking the actual qflist
     vim.print("Not possible to get path")
-    return nil
+    return
   end
   local preview = getPreview()
   vim.cmd("pedit " .. path)
