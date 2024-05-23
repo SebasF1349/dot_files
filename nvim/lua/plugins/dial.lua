@@ -1,4 +1,4 @@
----@type table<string, table<string, string[]>>
+---@type table<string, string>>
 local dials_by_ft = {}
 
 ---@param increment boolean
