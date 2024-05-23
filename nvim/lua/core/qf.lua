@@ -302,9 +302,10 @@ function _G.qffoldtextfunc()
   local line = vim.fn.getline(vim.v.foldstart)
   local splitted = vim.split(line, "│")
   local path = vim.split(splitted[1], " ")
+  local whitespace = #path[2] ~= 0 and #splitted[1] - #vim.trim(splitted[1]) or #splitted[1] - #vim.trim(splitted[1]) - 1
   local highlighting = {
     { path[1] .. " ", "DiagnosticInfo" },
-    { path[2] .. (" "):rep(#splitted[1] - #vim.trim(splitted[1])), "Comment" },
+    { path[2] .. (" "):rep(whitespace), "Comment" },
     { "│", "Comment" },
     { " +-- " .. vim.v.foldend - vim.v.foldstart + 1 .. " lines", "DiagnosticInfo" },
   }
