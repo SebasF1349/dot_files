@@ -283,11 +283,12 @@ return {
 
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP:[R]e[n]ame" })
 
-          vim.keymap.set("n", "gd", require("telescope.builtin").lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
-
-          vim.keymap.set("n", "gr", require("telescope.builtin").lsp_references, { desc = "LSP: [G]oto [R]eferences" })
-
-          vim.keymap.set("n", "<leader>s", vim.lsp.buf.signature_help, { desc = "LSP: [S]ignature Documentation" })
+          local telescope = require("telescope.builtin")
+          vim.keymap.set("n", "gd", telescope.lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
+          vim.keymap.set("n", "gr", telescope.lsp_references, { desc = "LSP: [G]oto [R]eferences" })
+          vim.keymap.set("n", "gI", telescope.lsp_implementations, { desc = "LSP: [G]oto [I]mplementation" })
+          vim.keymap.set("n", "gy", telescope.lsp_type_definitions, { desc = "LSP: [G]oto T[y]pe Definition" })
+          vim.keymap.set("n", "gK", vim.lsp.buf.signature_help, { desc = "LSP: Signature Documentation on [K]Hover" })
 
           vim.keymap.set("n", "<leader>oi", function()
             if vim.fn.exists(":OrganizeImports") > 0 then
