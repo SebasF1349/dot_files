@@ -17,6 +17,21 @@ local highlights = {
 }
 
 --------------------------------------------------
+-- Utils
+--------------------------------------------------
+
+---@param linenr number
+local function getPath(linenr)
+  local qflist = vim.fn.getqflist()
+  if linenr > #qflist then
+    return ""
+  end
+  local item = qflist[linenr]
+  local path = vim.fn.bufname(item.bufnr)
+  return path
+end
+
+--------------------------------------------------
 -- Better Grep
 --------------------------------------------------
 
@@ -273,8 +288,8 @@ end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function _G.qffoldexprfunc()
-  local line = vim.split(vim.fn.getline(vim.v.lnum), "│")[1]
-  local next_line = vim.split(vim.fn.getline(vim.v.lnum + 1), "│")[1]
+  local line = getPath(vim.v.lnum)
+  local next_line = getPath(vim.v.lnum + 1)
   if line == next_line then
     return "1"
   else
@@ -325,32 +340,17 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- Keymaps inside Quickfix
 --------------------------------------------------
 
-local function getDisplayedPath(line)
-  local path, _ = line:gsub("│.*$", "")
-  return path
-end
-
-local function getRealPath(line)
-  local path = getDisplayedPath(line)
-  local p = vim.split(vim.trim(path), " ")
-  path = (p[2] or ".") .. "/" .. p[1]
-  if path:find("…") ~= nil then
-    return nil
-  end
-  return path
-end
-
 local function getMessage(line)
   local path, _ = line:gsub("^.*│", "")
   return path
 end
 
 local function jumpFileChunk(move)
-  local path = getDisplayedPath(vim.fn.getline("."))
+  local path = getPath(vim.fn.line("."))
   local direction = move == "down" and "j" or "k"
   local finish = move == "down" and "$" or 1
 
-  while path == getDisplayedPath(vim.fn.getline(".")) and vim.fn.getline(".") ~= vim.fn.getline(finish) do
+  while path == getPath(vim.fn.line(".")) and vim.fn.getline(".") ~= vim.fn.getline(finish) do
     vim.cmd("normal! " .. direction)
   end
   vim.cmd("normal o")
@@ -400,7 +400,7 @@ local function getPreview()
 end
 
 local function openPreview()
-  local path = getRealPath(vim.fn.getline("."))
+  local path = getPath(vim.fn.line("."))
   if not path then
     -- NOTE: this should be improved checking the actual qflist
     vim.print("Not possible to get path")
@@ -449,8 +449,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- quit Vim if the last window is a location/quickfix window (qf.vim)
 -- maybe open the qf window automatically after :make, :grep, :lvimgrep
 --          and friends if there are valid locations/errors (qf.vim)
--- automatically set the height of location/quickfix windows to the number of list items
---          if less than Vim's default height (10) or the user's prefered height (qf.vim)
 -- shorten filepaths for better legibility (qf.vim)
 
 -- location list
@@ -464,4 +462,4 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- https://github.com/yorickpeterse/nvim-pqf/tree/main (to make highlighting in lua)
 -- https://github.com/ashfinal/qfview.nvim (for the folding code)
 -- https://github.com/ten3roberts/qf.nvim (for some ideas)
--- https://github.com/folke/trouble.nvim (for the hover ider)
+-- https://github.com/folke/trouble.nvim (for the hover idea)
