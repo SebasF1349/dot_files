@@ -30,6 +30,12 @@ return {
       cyclic = true,
     })
 
+    local order = augend.constant.new({
+      elements = { ">", "<", "=", "!" },
+      word = false,
+      cyclic = true,
+    })
+
     local ordinal_numbers = augend.constant.new({
       elements = {
         "first",
@@ -104,6 +110,7 @@ return {
         ordinal_numbers,
         weekdays,
         months,
+        order,
       },
       css = {
         augend.integer.alias.decimal,
@@ -118,6 +125,7 @@ return {
         ordinal_numbers,
         weekdays,
         months,
+        order,
       },
       json = {
         augend.integer.alias.decimal,
@@ -132,6 +140,7 @@ return {
         ordinal_numbers,
         weekdays,
         months,
+        order,
       },
       lua = {
         augend.integer.alias.decimal,
@@ -145,14 +154,12 @@ return {
         ordinal_numbers,
         weekdays,
         months,
+        order,
       },
       python = {
         augend.integer.alias.decimal,
         augend.constant.new({
-          elements = {
-            "True",
-            "False",
-          },
+          elements = { "True", "False" },
           word = true,
           cyclic = true,
         }),
@@ -161,6 +168,7 @@ return {
         ordinal_numbers,
         weekdays,
         months,
+        order,
       },
     }
 
