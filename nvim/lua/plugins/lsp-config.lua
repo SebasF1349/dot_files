@@ -130,7 +130,16 @@ local servers = {
       })
     end,
     settings = {
-      Lua = {},
+      Lua = {
+        hint = {
+          enable = true,
+          setType = false,
+          paramType = true,
+          paramName = "Disable",
+          semicolon = "Disable",
+          arrayIndex = "Disable",
+        },
+      },
     },
   },
 
@@ -253,10 +262,12 @@ return {
 
           vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP:[C]ode [A]ction" })
 
-          vim.lsp.inlay_hint.enable(true)
-          vim.keymap.set("n", "<leader>ti", function()
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
-          end, { desc = "LSP: [T]oggle [I]nlay Hints" })
+          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+            vim.lsp.inlay_hint.enable(true)
+            vim.keymap.set("n", "<leader>ti", function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
+            end, { desc = "LSP: [T]oggle [I]nlay Hints" })
+          end
 
           -- Diagnostic keymaps
           vim.keymap.set("n", "[d", function()
