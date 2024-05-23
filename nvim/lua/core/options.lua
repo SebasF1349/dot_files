@@ -102,6 +102,10 @@ vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.s
 vim.wo.signcolumn = "yes"
 vim.opt.statuscolumn = "%s%=%{%v:relnum ? '%r ' : '%l '%}"
 
+-- Change color to current line number
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = "number"
+
 -- Diagnostics
 vim.diagnostic.config({
   underline = false,

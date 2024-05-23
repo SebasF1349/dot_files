@@ -44,10 +44,6 @@ return {
           FloatBorder = { fg = colors.blue, bg = colors.none },
           FloatTitle = { fg = colors.lavender, bg = colors.none },
 
-          LineNrAbove = { fg = colors.overlay0 },
-          LineNr = { fg = colors.lavender },
-          LineNrBelow = { fg = colors.overlay0 },
-
           -- make the references to the word under the cursor darker
           LspReferenceRead = { bg = colors.surface0 },
           LspReferenceWrite = { bg = colors.surface0 },
