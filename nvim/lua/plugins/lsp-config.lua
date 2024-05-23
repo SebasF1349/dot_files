@@ -129,18 +129,7 @@ local servers = {
         telemetry = { enable = false },
       })
     end,
-    settings = {
-      Lua = {
-        hint = {
-          enable = true,
-          setType = false,
-          paramType = true,
-          paramName = "Disable",
-          semicolon = "Disable",
-          arrayIndex = "Disable",
-        },
-      },
-    },
+    settings = { Lua = {} },
   },
 
   svelte = {},
