@@ -2,7 +2,7 @@
 -- Types
 --------------------------------------------------
 
----@alias ListType
+---@alias listType
 ---| '"c"' # quickfix list
 ---| '"d"' # quickfix list with diagnostics
 ---| '"l"' # location list
@@ -183,7 +183,7 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Quickfix Keymaps
 --------------------------------------------------
 
----@param listType ListType
+---@param listType listType
 local function list_toggle(listType)
   local status
   if listType == "c" or listType == "d" then
@@ -287,7 +287,7 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   end,
 })
 
----@param listType ListType
+---@param listType listType
 ---@return number
 local function getHeight(listType)
   local list
@@ -337,7 +337,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
-    vim.api.nvim_win_set_height(0, getHeight("q"))
+    vim.api.nvim_win_set_height(0, getHeight("c"))
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
     vim.keymap.set(
