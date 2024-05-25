@@ -2,9 +2,8 @@
 -- Types
 --------------------------------------------------
 
----@alias listType
+---@alias ListSelected
 ---| '"c"' # quickfix list
----| '"d"' # quickfix list with diagnostics
 ---| '"l"' # location list
 
 --------------------------------------------------
@@ -183,33 +182,30 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Quickfix Keymaps
 --------------------------------------------------
 
----@param listType listType
-local function list_toggle(listType)
+---@param list ListSelected
+---@param diagnostics? boolean
+local function list_toggle(list, diagnostics)
   local status
-  if listType == "c" or listType == "d" then
+  if list == "c" then
     status = vim.fn.getqflist({ winid = 0 }).winid ~= 0
   else
     status = vim.fn.getloclist(0, { winid = 0 }).winid ~= 0
   end
   if status then
-    if listType == "c" or listType == "d" then
+    if list == "c" then
       vim.cmd("cclose")
     else
       vim.cmd("lclose")
     end
-  elseif
-    (listType == "l" and #vim.fn.getloclist(0) == 0)
-    or (listType == "c" and #vim.fn.getqflist() == 0)
-    or (listType == "d" and #vim.diagnostic.get() == 0)
-  then
+  elseif (list == "l" and #vim.fn.getloclist(0) == 0) or (list == "c" and #vim.fn.getqflist() == 0) or (diagnostics and #vim.diagnostic.get() == 0) then
     vim.cmd([[echohl ErrorMsg
 			echo 'List is Empty.'
 			echohl NONE]])
   else
-    if listType == "d" then
+    if diagnostics then
       vim.diagnostic.setqflist({ title = "All Diagnostics" })
     else
-      vim.cmd(listType .. "open")
+      vim.cmd(list .. "open")
     end
   end
 end
@@ -218,7 +214,7 @@ vim.keymap.set("n", "<leader>tq", function()
   list_toggle("c")
 end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
-  list_toggle("d")
+  list_toggle("c", true)
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
 
 local function cnext_wrap()
@@ -287,11 +283,11 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   end,
 })
 
----@param listType listType
+---@param listType ListSelected
 ---@return number
 local function getHeight(listType)
   local list
-  if listType == "c" or listType == "d" then
+  if listType == "c" then
     list = vim.fn.getqflist({ size = 1 })
   else
     list = vim.fn.getloclist(0, { size = 1 })
