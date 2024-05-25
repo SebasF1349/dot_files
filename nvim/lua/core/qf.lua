@@ -2,7 +2,8 @@
 -- Types
 --------------------------------------------------
 
----@alias ListSelected
+---@diagnostic disable-next-line: duplicate-doc-alias
+---@alias ListType
 ---| '"c"' # quickfix list
 ---| '"l"' # location list
 
@@ -179,10 +180,10 @@ end
 vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 
 --------------------------------------------------
--- Quickfix Keymaps
+-- Keymaps
 --------------------------------------------------
 
----@param list ListSelected
+---@param list ListType
 ---@param diagnostics? boolean
 local function list_toggle(list, diagnostics)
   local status
@@ -197,15 +198,22 @@ local function list_toggle(list, diagnostics)
     else
       vim.cmd("lclose")
     end
-  elseif (list == "l" and #vim.fn.getloclist(0) == 0) or (list == "c" and #vim.fn.getqflist() == 0) or (diagnostics and #vim.diagnostic.get() == 0) then
+  elseif
+    (list == "l" and not diagnostics and #vim.fn.getloclist(0) == 0)
+    or (list == "l" and diagnostics and #vim.diagnostic.get(0) == 0)
+    or (list == "c" and not diagnostics and #vim.fn.getqflist() == 0)
+    or (list == "c" and diagnostics and #vim.diagnostic.get() == 0)
+  then
     vim.cmd([[echohl ErrorMsg
-			echo 'List is Empty.'
-			echohl NONE]])
+  	echo 'List is Empty.'
+  	echohl NONE]])
   else
-    if diagnostics then
+    if not diagnostics then
+      vim.cmd(list .. "open")
+    elseif list == "c" then
       vim.diagnostic.setqflist({ title = "All Diagnostics" })
     else
-      vim.cmd(list .. "open")
+      vim.diagnostic.setloclist({ title = "Local Diagnostics" })
     end
   end
 end
@@ -216,6 +224,13 @@ end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
   list_toggle("c", true)
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
+
+vim.keymap.set("n", "<leader>tl", function()
+  list_toggle("l")
+end, { desc = "[T]oggle [L]ocation List" })
+vim.keymap.set("n", "<leader>ld", function()
+  list_toggle("l", true)
+end, { desc = "[L]ocation List [D]iagnostics Toggle" })
 
 local function cnext_wrap()
   ---@diagnostic disable-next-line: param-type-mismatch
@@ -243,20 +258,15 @@ vim.keymap.set("n", "[q", cprev_wrap, { desc = "Previous [Q]uickfix Item Wrappin
 local qf_group = vim.api.nvim_create_augroup("qflist", { clear = true })
 
 -- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941
--- mine simple autocmd was breaking syntax, this one one
--- my guess is that the vim.schedule is necessary in this async stuff
+-- NOTE: extend to update location list too
 vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
   callback = function(args)
-    local diagnostics = vim.diagnostic.get()
-    -- if #args.data.diagnostics == 0 and #diagnostics > 0 then
-    --   return
-    -- end
-
     local qf_info = vim.fn.getqflist({ title = 0, id = 0 })
     if qf_info.title ~= "All Diagnostics" then
       return
     end
+    local diagnostics = vim.diagnostic.get()
     if #diagnostics == 0 then
       vim.cmd("cclose")
     end
@@ -283,7 +293,7 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   end,
 })
 
----@param listType ListSelected
+---@param listType ListType
 ---@return number
 local function getHeight(listType)
   local list
