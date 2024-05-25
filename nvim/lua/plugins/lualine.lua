@@ -1,34 +1,21 @@
 local mocha = require("catppuccin.palettes").get_palette("mocha")
 
-local signs = {
-  " ",
-  " ",
-  "",
-  " ",
-}
-local levels = {
-  vim.diagnostic.severity.ERROR,
-  vim.diagnostic.severity.WARN,
-  vim.diagnostic.severity.INFO,
-  vim.diagnostic.severity.HINT,
-}
-local levels_hi = {
-  "StatusLineError",
-  "StatusLineWarn",
-  "StatusLineInfo",
-  "StatusLineHint",
+local diagnostics_data = {
+  { icon = " ", hi = "StatusLineError", fg = mocha.red },
+  { icon = " ", hi = "StatusLineWarn", fg = mocha.yellow },
+  { icon = "", hi = "StatusLineInfo", fg = mocha.sky },
+  { icon = " ", hi = "StatusLineHint", fg = mocha.teal },
 }
 
-vim.api.nvim_set_hl(0, levels_hi[1], { fg = mocha.red, bg = mocha.surface0 })
-vim.api.nvim_set_hl(0, levels_hi[2], { fg = mocha.yellow, bg = mocha.surface0 })
-vim.api.nvim_set_hl(0, levels_hi[3], { fg = mocha.sky, bg = mocha.surface0 })
-vim.api.nvim_set_hl(0, levels_hi[4], { fg = mocha.teal, bg = mocha.surface0 })
+for _, data in ipairs(diagnostics_data) do
+  vim.api.nvim_set_hl(0, data.hi, { fg = data.fg, bg = mocha.surface0 })
+end
 
 local function local_diagnostics()
-  for i, _ in ipairs(levels) do
+  for i, data in ipairs(diagnostics_data) do
     local count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
     if count > 0 then
-      return "%#" .. levels_hi[i] .. "#" .. signs[i]
+      return "%#" .. data[i].hi .. "#" .. data[i].icon
     end
   end
 
@@ -38,11 +25,11 @@ end
 vim.api.nvim_set_hl(0, "StatusLineWorkspace", { fg = mocha.comment, bg = mocha.surface0 })
 
 local function workspace_diagnostics()
-  for i, _ in ipairs(levels) do
+  for i, data in ipairs(diagnostics_data) do
     local count = vim.tbl_count(vim.diagnostic.get(nil, { severity = i }))
     local local_count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
     if count > local_count then
-      return "%#StatusLineWorkspace#" .. signs[i]
+      return "%#StatusLineWorkspace#" .. data[i].icon
     end
   end
 
