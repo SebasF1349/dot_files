@@ -57,7 +57,7 @@ local function update_mode_colors()
 end
 
 ---- FILENAME ----
-vim.api.nvim_set_hl(0, "StatusLineFile", { fg = mocha.text, bg = background })
+vim.api.nvim_set_hl(0, "StatusLineNormal", { fg = mocha.text, bg = background })
 
 local function file()
   local fpath = vim.fn.fnamemodify(vim.fn.expand("%"), ":~:.:h")
@@ -66,11 +66,67 @@ local function file()
   end
   local fname = vim.fn.expand("%:t")
   -- TODO: Maybe add icon
-  return string.format("%%#StatusLineFile# %s/%s", fpath, fname)
+  -- TODO: Change filename in special buffers (telescope, fugitive, etc.)
+  return string.format("%%#StatusLineNormal# %s/%s", fpath, fname)
 end
 
 ---- GIT ----
--- TODO: show git status & branch
+vim.api.nvim_set_hl(0, "StatusLineGitBranch", { bg = background, fg = mocha.pink })
+
+local head = ""
+local function git_branch()
+  local git_info = vim.b.gitsigns_status_dict
+  if not git_info then
+    require("gitsigns")
+  else
+    head = git_info.head
+  end
+  return string.format("%%#StatusLineGitBranch# %s", head)
+end
+
+local gstatus = { ahead = 0, behind = 0, modified = 0 }
+local function update_gstatus()
+  local Job = require("plenary.job")
+  Job:new({
+    command = "git",
+    args = { "rev-list", "--left-right", "--count", "HEAD...@{upstream}" },
+    on_exit = function(job, _)
+      local res = job:result()[1]
+      if type(res) ~= "string" then
+        gstatus = { ahead = "0", behind = "0" }
+        return
+      end
+      local ok, ahead, behind = pcall(string.match, res, "(%d+)%s*(%d+)")
+      if not ok then
+        ahead, behind = "0", "0"
+      end
+      gstatus = { ahead = ahead, behind = behind }
+    end,
+  }):start()
+  Job:new({
+    command = "git",
+    args = { "status", "--porcelain" },
+    on_exit = function(job, _)
+      gstatus.modified = job:result()[1]
+    end,
+  }):start()
+end
+
+if _G.Gstatus_timer == nil then
+  _G.Gstatus_timer = vim.loop.new_timer()
+else
+  _G.Gstatus_timer:stop()
+end
+_G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
+
+vim.api.nvim_set_hl(0, "StatusLineGit", { bg = background, fg = mocha.red })
+
+local function git_status()
+  local ahead = gstatus.ahead ~= "0" and "" or ""
+  local behind = gstatus.behind ~= "0" and "" or ""
+  local modified = gstatus.modified ~= "0" and "~" or ""
+  return string.format("%%#StatusLineGit# [%s%s%s] ", ahead, behind, modified)
+end
 
 ---- DIAGNOSTICS ----
 local diagnostics_data = {
@@ -127,14 +183,14 @@ end
 Statusline = {
   active = function()
     return table.concat({
-      "%#Statusline#",
+      "%#StatusLineNormal#",
       update_mode_colors(),
       mode(),
-      -- "%#Normal# ",
       file(),
-      -- "%#Normal#",
       "%=%#StatusLineExtra#",
       custom_diagnostics(),
+      git_branch(),
+      git_status(),
     })
   end,
 
