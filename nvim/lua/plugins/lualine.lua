@@ -15,7 +15,7 @@ local function local_diagnostics()
   for i, data in ipairs(diagnostics_data) do
     local count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
     if count > 0 then
-      return "%#" .. data[i].hi .. "#" .. data[i].icon
+      return "%#" .. data.hi .. "#" .. data.icon
     end
   end
 
@@ -29,7 +29,7 @@ local function workspace_diagnostics()
     local count = vim.tbl_count(vim.diagnostic.get(nil, { severity = i }))
     local local_count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
     if count > local_count then
-      return "%#StatusLineWorkspace#" .. data[i].icon
+      return "%#StatusLineWorkspace#" .. data.icon
     end
   end
 
@@ -50,7 +50,7 @@ end
 
 return {
   "nvim-lualine/lualine.nvim",
-  event = { "BufReadPre", "BufNewFile" },
+  -- event = { "BufReadPre", "BufNewFile" },
   dependencies = { "nvim-tree/nvim-web-devicons" },
   opts = {
     options = {

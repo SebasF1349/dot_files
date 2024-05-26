@@ -66,7 +66,7 @@ local function file()
   end
   local fname = vim.fn.expand("%:t")
   -- TODO: Maybe add icon
-  -- TODO: Change filename in special buffers (telescope, fugitive, etc.)
+  -- TODO: Change filename in special buffers (telescope, fugitive, lazy, mason, etc.)
   return string.format("%%#StatusLineNormal# %s/%s", fpath, fname)
 end
 
@@ -76,9 +76,7 @@ vim.api.nvim_set_hl(0, "StatusLineGitBranch", { bg = background, fg = mocha.pink
 local head = ""
 local function git_branch()
   local git_info = vim.b.gitsigns_status_dict
-  if not git_info then
-    require("gitsigns")
-  else
+  if git_info then
     head = git_info.head
   end
   return string.format("%%#StatusLineGitBranch# %s", head)
