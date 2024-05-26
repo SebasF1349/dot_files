@@ -50,7 +50,7 @@ end
 local function update_mode_colors()
   local current_mode = vim.api.nvim_get_mode().mode
   if modes[current_mode] then
-    return "%#StatusLineMode" .. modes[current_mode] .. "#"
+    return string.format("%%#StatusLineMode%s#", modes[current_mode])
   else
     return "%#StatusLineModeInactive#"
   end
@@ -87,7 +87,7 @@ local function local_diagnostics()
   for i, data in ipairs(diagnostics_data) do
     local count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
     if count > 0 then
-      return "%#" .. data.hi .. "#" .. data.icon
+      return string.format("%%#%s#%s", data.hi, data.icon)
     end
   end
 
