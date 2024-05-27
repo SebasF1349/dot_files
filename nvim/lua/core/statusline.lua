@@ -35,7 +35,7 @@ local modes_hi = {
   Command = { bg = background, fg = mocha.peach },
   Visual = { bg = background, fg = mocha.mauve },
   Replace = { bg = background, fg = mocha.red },
-  Inactive = { bg = background, fg = mocha.surface1 },
+  Others = { bg = background, fg = mocha.overlay2 },
 }
 
 for mode, hi in pairs(modes_hi) do
@@ -52,7 +52,7 @@ local function update_mode_colors()
   if modes[current_mode] then
     return string.format("%%#StatusLineMode%s#", modes[current_mode])
   else
-    return "%#StatusLineModeInactive#"
+    return "%#StatusLineModeOthers#"
   end
 end
 
@@ -67,7 +67,7 @@ local function file()
   local fname = vim.fn.expand("%:t")
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (telescope, fugitive, lazy, mason, etc.)
-  return string.format("%%#StatusLineNormal# %s/%s", fpath, fname)
+  return string.format("%%#StatusLineModeOthers# %s/%%#StatusLineNormal#%s", fpath, fname)
 end
 
 ---- GIT ----
