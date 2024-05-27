@@ -65,6 +65,9 @@ local function file()
     fpath = " "
   end
   local fname = vim.fn.expand("%:t")
+  if fname == "" then
+    fname = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
+  end
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (telescope, fugitive, lazy, mason, etc.)
   return string.format("%%#StatusLineModeOthers# %s/%%#StatusLineNormal#%s", fpath, fname)
