@@ -79,10 +79,10 @@ local function git_branch()
   if git_info then
     head = git_info.head
   end
-  return string.format("%%#StatusLineGitBranch# %s", head)
+  return string.format("%%#StatusLineGitBranch# %s ", head)
 end
 
-local gstatus = { ahead = 0, behind = 0, modified = 0 }
+local gstatus = { ahead = "0", behind = "0", modified = 0 }
 local function update_gstatus()
   local Job = require("plenary.job")
   Job:new({
@@ -105,7 +105,8 @@ local function update_gstatus()
     command = "git",
     args = { "status", "--porcelain" },
     on_exit = function(job, _)
-      gstatus.modified = job:result()[1]
+      local res = job:result()[1]
+      gstatus.modified = res and #res or 0
     end,
   }):start()
 end
@@ -122,8 +123,11 @@ vim.api.nvim_set_hl(0, "StatusLineGit", { bg = background, fg = mocha.red })
 local function git_status()
   local ahead = gstatus.ahead ~= "0" and "" or ""
   local behind = gstatus.behind ~= "0" and "" or ""
-  local modified = gstatus.modified ~= "0" and "~" or ""
-  return string.format("%%#StatusLineGit# [%s%s%s] ", ahead, behind, modified)
+  local modified = (gstatus.modified and gstatus.modified ~= 0) and "~" or ""
+  if ahead == "" and behind == "" and modified == "" then
+    return ""
+  end
+  return string.format("%%#StatusLineGit#[%s%s%s] ", ahead, behind, modified)
 end
 
 ---- DIAGNOSTICS ----
