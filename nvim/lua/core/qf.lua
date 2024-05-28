@@ -204,9 +204,7 @@ local function list_toggle(list, diagnostics)
     or (list == "c" and not diagnostics and #vim.fn.getqflist() == 0)
     or (list == "c" and diagnostics and #vim.diagnostic.get() == 0)
   then
-    vim.cmd([[echohl ErrorMsg
-  	echo 'List is Empty.'
-  	echohl NONE]])
+    vim.notify("List is Empty", vim.log.levels.WARN)
   else
     if not diagnostics then
       vim.cmd(list .. "open")

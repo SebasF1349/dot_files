@@ -159,7 +159,7 @@ vim.lsp.handlers["$/progress"] = function(_, progress, ctx)
     out = out .. " starting..."
   end
 
-  vim.api.nvim_command([[echo "]] .. out .. [["]])
+  vim.notify(out, vim.log.levels.INFO)
 end
 
 -- Disable health checks for these providers.
