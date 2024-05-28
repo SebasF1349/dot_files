@@ -60,13 +60,13 @@ end
 vim.api.nvim_set_hl(0, "StatusLineNormal", { fg = mocha.text, bg = background })
 
 local function file()
-  local fpath = vim.fn.fnamemodify(vim.fn.expand("%"), ":~:.:h")
-  if fpath == "" or fpath == "." then
-    fpath = " "
-  end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
     fname = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
+  end
+  local fpath = vim.fn.fnamemodify(vim.fn.expand("%"), ":~:.:h")
+  if fpath == "" or fpath == "." then
+    return string.format("%%#StatusLineNormal#%s", fname)
   end
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (telescope, fugitive, lazy, mason, etc.)
