@@ -179,3 +179,20 @@ local function open_notes()
   end
 end
 vim.keymap.set("n", "<leader>tn", open_notes, { desc = "[T]oggle [N]otes" })
+
+-- https://github.com/neovim/neovim/pull/25833/files
+-- Change default implementation of z= for spell checking
+local spell_on_choice = vim.schedule_wrap(function(_, idx)
+  if type(idx) == "number" then
+    vim.cmd.normal({ idx .. "z=", bang = true })
+  end
+end)
+local spell_select = function()
+  if vim.v.count > 0 then
+    spell_on_choice(nil, vim.v.count)
+    return
+  end
+  local cword = vim.fn.expand("<cword>")
+  vim.ui.select(vim.fn.spellsuggest(cword, vim.o.lines), { prompt = "Change " .. cword .. " to:" }, spell_on_choice)
+end
+vim.keymap.set("n", "z=", spell_select, { desc = "Shows spelling suggestions" })
