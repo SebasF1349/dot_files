@@ -75,6 +75,14 @@ end
 vim.api.nvim_set_hl(0, "StatusLineNormal", { fg = mocha.text, bg = background })
 
 local function file()
+  local buftype = vim.bo.buftype
+  if buftype == "terminal" then
+    local tname, _ = vim.api.nvim_buf_get_name(0):gsub(".*:", "")
+    return string.format("%%#StatusLineModeOthers# term:%%#StatusLineNormal#%s", tname)
+  elseif buftype == "help" then
+    local fname = vim.fn.expand("%:t:r:r")
+    return string.format("%%#StatusLineModeOthers# help: %%#StatusLineNormal#%s", fname)
+  end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
     fname = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
