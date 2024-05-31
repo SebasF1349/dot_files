@@ -115,6 +115,7 @@ vim.diagnostic.config({
     severity_sort = true,
     source = true,
   },
+  jump = { float = true },
   severity_sort = true,
   signs = {
     text = {

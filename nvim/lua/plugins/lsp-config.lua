@@ -1,3 +1,4 @@
+local nvim_version = require("utils.nvim-version")
 local lsp_mappings = require("utils.lsp-packages").lspconfig_to_package
 
 local function organize_imports()
@@ -274,14 +275,16 @@ return {
           end
 
           -- Diagnostic keymaps
-          vim.keymap.set("n", "[d", function()
-            vim.diagnostic.goto_prev()
-            vim.api.nvim_feedkeys("zz", "n", false)
-          end, { desc = "LSP: Go to previous [D]iagnostic message" })
-          vim.keymap.set("n", "]d", function()
-            vim.diagnostic.goto_next()
-            vim.api.nvim_feedkeys("zz", "n", false)
-          end, { desc = "LSP: Go to next [D]iagnostic message" })
+          if not nvim_version.is_nightly then
+            vim.keymap.set("n", "[d", function()
+              vim.diagnostic.goto_prev()
+              vim.api.nvim_feedkeys("zz", "n", false)
+            end, { desc = "LSP: Go to previous [D]iagnostic message" })
+            vim.keymap.set("n", "]d", function()
+              vim.diagnostic.goto_next()
+              vim.api.nvim_feedkeys("zz", "n", false)
+            end, { desc = "LSP: Go to next [D]iagnostic message" })
+          end
 
           vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "LSP: Open floating diagnostic message" })
 
