@@ -81,21 +81,20 @@ local function file()
   local buftype = vim.bo.buftype
   if buftype == "terminal" then
     local tname, _ = vim.api.nvim_buf_get_name(0):gsub(".*:", "")
-    return string.format("%%#StatusLineModeOthers# term: %%#StatusLineNormal#%s", tname)
+    return string.format("%%#StatusLineModeOthers# Term %%#StatusLineNormal#%s", tname)
   elseif buftype == "help" then
     local fname = vim.fn.expand("%:t:r:r")
-    return string.format("%%#StatusLineModeOthers# help: %%#StatusLineNormal#%s", fname)
+    return string.format("%%#StatusLineModeOthers# Help %%#StatusLineNormal#%s", fname)
   end
   local ftype = vim.o.filetype
   if ftype == "fugitive" then
     local fname = vim.fn.expand("%:h:h:t")
-    return string.format("%%#StatusLineModeOthers# fugitive: %%#StatusLineNormal#%s", fname)
+    return string.format("%%#StatusLineModeOthers# Fugitive %%#StatusLineNormal#%s", fname)
     -- NOTE: Do I want somethign for Telescope? elseif ftype:find("Telescope") then
   elseif ftype == "qf" then
-    -- NOTE: I can't change qf statusline
     local label = is_loclist() and "Location List" or "Quickfix List"
     local title = is_loclist() and vim.fn.getloclist(0, { title = 0 }).title or vim.fn.getqflist({ title = 0 }).title
-    return string.format("%%#StatusLineModeOthers# %s: %%#StatusLineNormal#%s", label, title)
+    return string.format("%%#StatusLineModeOthers# %s %%#StatusLineNormal#%s", label, title)
   elseif vim.list_contains({ "lazy", "mason" }, ftype) then
     return ""
   end
@@ -260,6 +259,7 @@ Statusline = {
 --   {}
 -- )
 
+vim.g.qf_disable_statusline = true
 vim.opt.statusline = "%!v:lua.Statusline.active()"
 vim.opt.laststatus = 3
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
