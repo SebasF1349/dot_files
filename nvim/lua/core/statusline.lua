@@ -73,36 +73,31 @@ end
 ---- FILENAME ----
 vim.api.nvim_set_hl(0, "StatusLineNormal", { fg = mocha.text, bg = background })
 
-local function is_loclist()
-  return vim.fn.getloclist(0, { filewinid = 1 }).filewinid ~= 0
-end
-
 local function file()
   local buftype = vim.bo.buftype
-  if buftype == "terminal" then
-    local tname, _ = vim.api.nvim_buf_get_name(0):gsub(".*:", "")
-    return string.format("%%#StatusLineModeOthers# Term %%#StatusLineNormal#%s", tname)
-  elseif buftype == "help" then
-    local fname = vim.fn.expand("%:t:r:r")
-    return string.format("%%#StatusLineModeOthers# Help %%#StatusLineNormal#%s", fname)
-  end
   local ftype = vim.o.filetype
-  if ftype == "fugitive" then
-    local fname = vim.fn.expand("%:h:h:t")
-    return string.format("%%#StatusLineModeOthers# Fugitive %%#StatusLineNormal#%s", fname)
-    -- NOTE: Do I want somethign for Telescope? elseif ftype:find("Telescope") then
+  local label, title
+  if buftype == "terminal" then
+    title, label = vim.fn.expand("%:t"), "Term"
+  elseif buftype == "help" then
+    title, label = vim.fn.expand("%:t:r:r"), "Help"
+  elseif ftype == "fugitive" then
+    title, label = vim.fn.expand("%:h:h:t"), "Fugitive"
   elseif ftype == "qf" then
-    local label = is_loclist() and "Location List" or "Quickfix List"
-    local title = is_loclist() and vim.fn.getloclist(0, { title = 0 }).title or vim.fn.getqflist({ title = 0 }).title
-    return string.format("%%#StatusLineModeOthers# %s %%#StatusLineNormal#%s", label, title)
-  elseif vim.list_contains({ "lazy", "mason" }, ftype) then
+    local isLoclist = vim.fn.getloclist(0, { filewinid = 1 }).filewinid ~= 0
+    label = isLoclist and "Location List" or "Quickfix List"
+    title = isLoclist and vim.fn.getloclist(0, { title = 0 }).title or vim.fn.getqflist({ title = 0 }).title
+  elseif vim.list_contains({ "lazy", "mason", "TelescopePrompt" }, ftype) then
     return ""
+  end
+  if label then
+    return string.format("%%#StatusLineModeOthers# [%s] %%#StatusLineNormal#%s", label, title)
   end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
     fname = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
   end
-  local fpath = vim.fn.fnamemodify(vim.fn.expand("%"), ":~:.:h")
+  local fpath = vim.fn.expand("%:~:.:h")
   if fpath == "" or fpath == "." then
     return string.format("%%#StatusLineNormal#%s", fname)
   end
@@ -236,28 +231,7 @@ Statusline = {
       git_status(),
     })
   end,
-
-  inactive = function()
-    return " %F"
-  end,
-
-  -- TODO: check integration with special buffers
-  NvimTree = function()
-    return "%#StatusLineNC#   NvimTree"
-  end,
 }
-
--- vim.api.nvim_exec2(
---   [[
---   augroup Statusline
---   au!
---   au WinEnter,BufEnter * setlocal statusline=%!v:lua.Statusline.active()
---   au WinLeave,BufLeave * setlocal statusline=%!v:lua.Statusline.inactive()
---   au WinEnter,BufEnter,FileType NvimTree setlocal statusline=%!v:lua.Statusline.short()
---   augroup END
---   ]],
---   {}
--- )
 
 vim.g.qf_disable_statusline = true
 vim.opt.statusline = "%!v:lua.Statusline.active()"
