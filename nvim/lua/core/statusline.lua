@@ -1,5 +1,4 @@
 -- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
-
 local mocha = require("catppuccin.palettes").get_palette("mocha")
 
 local background = mocha.surface0
@@ -85,7 +84,7 @@ local function file()
   end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
-    fname = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
+    fname = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
   end
   local fpath = vim.fn.fnamemodify(vim.fn.expand("%"), ":~:.:h")
   if fpath == "" or fpath == "." then
