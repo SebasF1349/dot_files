@@ -73,14 +73,31 @@ end
 ---- FILENAME ----
 vim.api.nvim_set_hl(0, "StatusLineNormal", { fg = mocha.text, bg = background })
 
+local function is_loclist()
+  return vim.fn.getloclist(0, { filewinid = 1 }).filewinid ~= 0
+end
+
 local function file()
   local buftype = vim.bo.buftype
   if buftype == "terminal" then
     local tname, _ = vim.api.nvim_buf_get_name(0):gsub(".*:", "")
-    return string.format("%%#StatusLineModeOthers# term:%%#StatusLineNormal#%s", tname)
+    return string.format("%%#StatusLineModeOthers# term: %%#StatusLineNormal#%s", tname)
   elseif buftype == "help" then
     local fname = vim.fn.expand("%:t:r:r")
     return string.format("%%#StatusLineModeOthers# help: %%#StatusLineNormal#%s", fname)
+  end
+  local ftype = vim.o.filetype
+  if ftype == "fugitive" then
+    local fname = vim.fn.expand("%:h:h:t")
+    return string.format("%%#StatusLineModeOthers# fugitive: %%#StatusLineNormal#%s", fname)
+    -- NOTE: Do I want somethign for Telescope? elseif ftype:find("Telescope") then
+  elseif ftype == "qf" then
+    -- NOTE: I can't change qf statusline
+    local label = is_loclist() and "Location List" or "Quickfix List"
+    local title = is_loclist() and vim.fn.getloclist(0, { title = 0 }).title or vim.fn.getqflist({ title = 0 }).title
+    return string.format("%%#StatusLineModeOthers# %s: %%#StatusLineNormal#%s", label, title)
+  elseif vim.list_contains({ "lazy", "mason" }, ftype) then
+    return ""
   end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
@@ -91,7 +108,7 @@ local function file()
     return string.format("%%#StatusLineNormal#%s", fname)
   end
   -- TODO: Maybe add icon
-  -- TODO: Change filename in special buffers (telescope, fugitive, lazy, mason, etc.)
+  -- TODO: Change filename in special buffers (dap)
   return string.format("%%#StatusLineModeOthers# %s/%%#StatusLineNormal#%s", fpath, fname)
 end
 
@@ -214,6 +231,7 @@ Statusline = {
       update_mode_colors(),
       mode(),
       file(),
+      "TEST",
       "%=%#StatusLineExtra#",
       custom_diagnostics(),
       git_branch(),
