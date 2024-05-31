@@ -275,7 +275,20 @@ return {
           end
 
           -- Diagnostic keymaps
+<<<<<<< HEAD
           if not nvim_version.is_nightly then
+||||||| parent of be6209a (chore(nv): update next diagnostics keymap for nightly)
+          vim.keymap.set("n", "[d", function()
+            vim.diagnostic.goto_prev()
+            vim.api.nvim_feedkeys("zz", "n", false)
+          end, { desc = "LSP: Go to previous [D]iagnostic message" })
+          vim.keymap.set("n", "]d", function()
+            vim.diagnostic.goto_next()
+            vim.api.nvim_feedkeys("zz", "n", false)
+          end, { desc = "LSP: Go to next [D]iagnostic message" })
+=======
+          if not nvim_version.is_nightly() then
+>>>>>>> be6209a (chore(nv): update next diagnostics keymap for nightly)
             vim.keymap.set("n", "[d", function()
               vim.diagnostic.goto_prev()
               vim.api.nvim_feedkeys("zz", "n", false)
