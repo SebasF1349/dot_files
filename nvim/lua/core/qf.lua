@@ -222,6 +222,8 @@ end, { desc = "[T]oggle [Q]uickfix" })
 vim.keymap.set("n", "<leader>qd", function()
   list_toggle("c", true)
 end, { desc = "[Q]uickfix [D]iagnostics Toggle" })
+vim.keymap.set("n", "<leader>qr", vim.lsp.buf.references, { desc = "[Q]uickfix [R]eferences" })
+vim.keymap.set("n", "<leader>qi", vim.lsp.buf.implementation, { desc = "[Q]uickfix [I]mplementation" })
 
 vim.keymap.set("n", "<leader>tl", function()
   list_toggle("l")
