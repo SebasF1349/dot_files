@@ -48,6 +48,8 @@ local modes_hi = {
   Terminal = { bg = background, fg = mocha.green },
   Command = { bg = background, fg = mocha.peach },
   Visual = { bg = background, fg = mocha.mauve },
+  ["V-Line"] = { bg = background, fg = mocha.mauve },
+  ["V-Block"] = { bg = background, fg = mocha.mauve },
   Replace = { bg = background, fg = mocha.red },
   Others = { bg = background, fg = mocha.overlay2 },
 }
