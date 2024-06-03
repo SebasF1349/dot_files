@@ -193,11 +193,7 @@ local function list_toggle(list, diagnostics)
     status = vim.fn.getloclist(0, { winid = 0 }).winid ~= 0
   end
   if status then
-    if list == "c" then
-      vim.cmd("cclose")
-    else
-      vim.cmd("lclose")
-    end
+    vim.cmd(list .. "close")
   elseif
     (list == "l" and not diagnostics and #vim.fn.getloclist(0) == 0)
     or (list == "l" and diagnostics and #vim.diagnostic.get(0) == 0)
