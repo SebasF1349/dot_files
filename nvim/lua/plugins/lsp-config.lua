@@ -277,10 +277,12 @@ return {
           -- Diagnostic keymaps
           if not nvim_version.is_nightly() then
             vim.keymap.set("n", "[d", function()
+              ---@diagnostic disable-next-line: deprecated
               vim.diagnostic.goto_prev()
               vim.api.nvim_feedkeys("zz", "n", false)
             end, { desc = "LSP: Go to previous [D]iagnostic message" })
             vim.keymap.set("n", "]d", function()
+              ---@diagnostic disable-next-line: deprecated
               vim.diagnostic.goto_next()
               vim.api.nvim_feedkeys("zz", "n", false)
             end, { desc = "LSP: Go to next [D]iagnostic message" })
