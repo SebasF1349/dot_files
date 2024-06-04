@@ -36,7 +36,7 @@ vim.o.smartcase = true
 vim.o.fillchars = "eob: "
 
 -- Reduce command line messages
-vim.opt.shortmess = "aoOstTWIcCFS"
+vim.opt.shortmess = "aoOstTWICF"
 
 -- Reduce scroll during window split
 vim.o.splitkeep = "screen"
