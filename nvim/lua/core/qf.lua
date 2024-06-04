@@ -262,6 +262,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
     if qf_info.title ~= "All Diagnostics" then
       return
     end
+    if vim.o.filetype == "lazy" then
+      return
+    end
     local diagnostics = vim.diagnostic.get()
     if #diagnostics == 0 then
       vim.cmd("cclose")
