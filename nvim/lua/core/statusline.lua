@@ -227,7 +227,7 @@ Statusline = {
       update_mode_colors(),
       mode(),
       file(),
-      "%=%#StatusLineExtra#",
+      "%=",
       custom_diagnostics(),
       git_branch(),
       git_status(),
