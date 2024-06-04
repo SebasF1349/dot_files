@@ -228,24 +228,44 @@ vim.keymap.set("n", "<leader>ld", function()
   list_toggle("l", true)
 end, { desc = "[L]ocation List [D]iagnostics Toggle" })
 
-local function cnext_wrap()
+---@param listType ListType
+---@param direction "n" | "p"
+---@param file boolean
+local function move(listType, direction, file)
   ---@diagnostic disable-next-line: param-type-mismatch
-  local ok, _ = pcall(vim.cmd, "cnext")
+  local ok, _ = pcall(vim.cmd, file and listType .. direction .. "f" or listType .. direction)
   if not ok then
-    vim.cmd("cfirst")
+    vim.cmd(listType .. (direction == "n" and "first" or "last"))
   end
 end
 
-local function cprev_wrap()
-  ---@diagnostic disable-next-line: param-type-mismatch
-  local ok, _ = pcall(vim.cmd, "cprev")
-  if not ok then
-    vim.cmd("clast")
-  end
-end
+vim.keymap.set("n", "]q", function()
+  move("c", "n", false)
+end, { desc = "Next [Q]uickfix Item Wrapping" })
+vim.keymap.set("n", "[q", function()
+  move("c", "p", false)
+end, { desc = "Previous [Q]uickfix Item Wrapping" })
 
-vim.keymap.set("n", "]q", cnext_wrap, { desc = "Next [Q]uickfix Item Wrapping" })
-vim.keymap.set("n", "[q", cprev_wrap, { desc = "Previous [Q]uickfix Item Wrapping" })
+vim.keymap.set("n", "]Q", function()
+  move("c", "n", true)
+end, { desc = "Next [Q]uickfix File Wrapping" })
+vim.keymap.set("n", "[Q", function()
+  move("c", "p", true)
+end, { desc = "Previous [Q]uickfix File Wrapping" })
+
+vim.keymap.set("n", "]l", function()
+  move("l", "n", false)
+end, { desc = "Next [L]ocation List Item Wrapping" })
+vim.keymap.set("n", "[l", function()
+  move("l", "p", false)
+end, { desc = "Previous [L]ocation List Item Wrapping" })
+
+vim.keymap.set("n", "]L", function()
+  move("l", "n", true)
+end, { desc = "Next [L]ocation List File Wrapping" })
+vim.keymap.set("n", "[L", function()
+  move("l", "p", true)
+end, { desc = "Previous [L]ocation List File Wrapping" })
 
 --------------------------------------------------
 -- Quickfix Autocmds
@@ -365,18 +385,6 @@ local function getMessage(line)
   return path
 end
 
----@param move "up" | "down"
-local function jumpFileChunk(move)
-  local path = getPath(vim.fn.line("."))
-  local direction = move == "down" and "j" or "k"
-  local finish = move == "down" and "$" or 1
-
-  while path == getPath(vim.fn.line(".")) and vim.fn.getline(".") ~= vim.fn.getline(finish) do
-    vim.cmd("normal! " .. direction)
-  end
-  vim.cmd("normal o")
-end
-
 ---@param item table | boolean
 local function t_filter(item)
   return item ~= false
@@ -455,12 +463,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.keymap.set("n", "K", hover, { buffer = 0, desc = "Show full line on hover" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
-    vim.keymap.set("n", "]Q", function()
-      jumpFileChunk("down")
-    end, { desc = "Next [Q]uickfix File" })
-    vim.keymap.set("n", "[Q", function()
-      jumpFileChunk("up")
-    end, { desc = "Previous [Q]uickfix File" })
   end,
   once = true,
   desc = "Keymaps inside quickfix window",
