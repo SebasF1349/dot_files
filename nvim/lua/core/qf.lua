@@ -432,11 +432,6 @@ end
 
 local function openPreview()
   local path = getPath(vim.fn.line("."))
-  if not path then
-    -- NOTE: this should be improved checking the actual qflist
-    vim.print("Not possible to get path")
-    return
-  end
   local preview = getPreview()
   vim.cmd("pedit " .. path)
   if preview == nil then
@@ -450,13 +445,49 @@ local function hover()
   vim.lsp.util.open_floating_preview(vim.split(vim.trim(message), "\n"), "markdown", { border = "rounded" })
 end
 
+---@param direction "n" | "p"
+---@param listType ListType
+local function moveWithPreview(direction, listType)
+  local current_pos = vim.fn.getcurpos()
+  local move_line = direction == "n" and current_pos[2] + 1 or current_pos[2] - 1
+  local list_size
+  -- NOTE: Make it automatically to detect which list is opened
+  if listType == "c" then
+    list_size = vim.fn.getqflist({ size = 1 }).size
+  else
+    list_size = vim.fn.getloclist(0, { size = 1 }).size
+  end
+  if move_line < 0 then
+    move_line = list_size
+  elseif move_line > list_size then
+    move_line = 0
+  end
+  vim.fn.cursor(move_line, 0)
+  openPreview()
+end
+
+local function selectItem()
+  local preview = getPreview()
+  if preview then
+    vim.cmd("pclose")
+  end
+  local key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+  vim.api.nvim_feedkeys(key, "n", false)
+end
+
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
   callback = function()
     -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
-    vim.keymap.set("n", "<CR>", "<CR>", { buffer = 0, desc = "Open QF item" }) -- idk why this is needed
+    vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" }) -- idk why this is needed
+    vim.keymap.set("n", "<C-n>", function()
+      moveWithPreview("n", "c")
+    end, { buffer = 0, desc = "Move and Preview Next QF item" })
+    vim.keymap.set("n", "<C-p>", function()
+      moveWithPreview("p", "c")
+    end, { buffer = 0, desc = "Move and Preview Previous QF item" }) -- idk why this is needed
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
