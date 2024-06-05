@@ -29,26 +29,42 @@ local highlights = {
 -- Utils
 --------------------------------------------------
 
----@param linenr number
-local function getItem(linenr)
-  local qflist = vim.fn.getqflist()
-  if linenr > #qflist then
-    return ""
+---@param listType ListType
+local function getListInfo(listType)
+  if listType == "c" then
+    return vim.fn.getqflist({ size = 0, winid = 0, title = 0, id = 0 })
+  else
+    return vim.fn.getloclist(0, { size = 0, winid = 0, title = 0, id = 0 })
   end
-  return qflist[linenr]
+end
+
+---@param listType ListType
+local function getList(listType)
+  if listType == "c" then
+    return vim.fn.getqflist()
+  else
+    return vim.fn.getloclist(0)
+  end
 end
 
 ---@param linenr number
 local function getPath(linenr)
-  local item = getItem(linenr)
-  return vim.fn.bufname(item.bufnr)
+  local list = getList("c")
+  if linenr > #list then
+    return ""
+  end
+  return vim.fn.bufname(list[linenr].bufnr)
 end
 
 ---@param linenr number
 local function getPos(linenr)
-  local item = getItem(linenr)
-  return { line = item.lnum, col = item.col }
+  local list = getList("c")
+  if linenr > #list then
+    return ""
+  end
+  return { line = list[linenr].lnum, col = list[linenr].col }
 end
+
 --------------------------------------------------
 -- Better Grep
 --------------------------------------------------
@@ -192,28 +208,23 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Keymaps
 --------------------------------------------------
 
----@param list ListType
+---@param listType ListType
 ---@param diagnostics? boolean
-local function list_toggle(list, diagnostics)
-  local status
-  if list == "c" then
-    status = vim.fn.getqflist({ winid = 0 }).winid ~= 0
-  else
-    status = vim.fn.getloclist(0, { winid = 0 }).winid ~= 0
-  end
-  if status then
-    vim.cmd(list .. "close")
+local function list_toggle(listType, diagnostics)
+  local list = getList(listType)
+  local winid = getListInfo(listType).winid
+  if winid ~= 0 then
+    vim.cmd(listType .. "close")
   elseif
-    (list == "l" and not diagnostics and #vim.fn.getloclist(0) == 0)
-    or (list == "l" and diagnostics and #vim.diagnostic.get(0) == 0)
-    or (list == "c" and not diagnostics and #vim.fn.getqflist() == 0)
-    or (list == "c" and diagnostics and #vim.diagnostic.get() == 0)
+    (not diagnostics and #list == 0)
+    or (listType == "l" and diagnostics and #vim.diagnostic.get(0) == 0)
+    or (listType == "c" and diagnostics and #vim.diagnostic.get() == 0)
   then
     vim.notify("List is Empty", vim.log.levels.WARN)
   else
     if not diagnostics then
-      vim.cmd(list .. "open")
-    elseif list == "c" then
+      vim.cmd(listType .. "open")
+    elseif listType == "c" then
       vim.diagnostic.setqflist({ title = "All Diagnostics" })
     else
       vim.diagnostic.setloclist({ title = "Local Diagnostics" })
@@ -287,7 +298,7 @@ local qf_group = vim.api.nvim_create_augroup("qflist", { clear = true })
 vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
   callback = function(args)
-    local qf_info = vim.fn.getqflist({ title = 0, id = 0 })
+    local qf_info = getListInfo("c")
     if qf_info.title ~= "All Diagnostics" then
       return
     end
@@ -324,13 +335,8 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 ---@param listType ListType
 ---@return number
 local function getHeight(listType)
-  local list
-  if listType == "c" then
-    list = vim.fn.getqflist({ size = 1 })
-  else
-    list = vim.fn.getloclist(0, { size = 1 })
-  end
-  return math.max(math.min(list.size, 10), 5)
+  local size = getListInfo(listType).size
+  return math.max(math.min(size, 10), 5)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -402,7 +408,7 @@ end
 ---@param bufnr number
 local function delete(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local qfl = vim.fn.getqflist()
+  local qfl = getList("c")
 
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" then
@@ -461,13 +467,8 @@ end
 local function moveWithPreview(direction, listType)
   local current_pos = vim.fn.getcurpos()
   local move_line = direction == "n" and current_pos[2] + 1 or current_pos[2] - 1
-  local list_size
   -- NOTE: Make it automatically to detect which list is opened
-  if listType == "c" then
-    list_size = vim.fn.getqflist({ size = 1 }).size
-  else
-    list_size = vim.fn.getloclist(0, { size = 1 }).size
-  end
+  local list_size = getListInfo(listType).size
   if move_line < 0 then
     move_line = list_size
   elseif move_line > list_size then
