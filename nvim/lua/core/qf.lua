@@ -30,6 +30,7 @@ local highlights = {
 --------------------------------------------------
 
 ---@param listType ListType
+---@return { size:number, winid:number, title:string, id:number }
 local function getListInfo(listType)
   if listType == "c" then
     return vim.fn.getqflist({ size = 0, winid = 0, title = 0, id = 0 })
@@ -57,10 +58,11 @@ local function getPath(linenr)
 end
 
 ---@param linenr number
+---@return { line : number, col : number }
 local function getPos(linenr)
   local list = getList("c")
   if linenr > #list then
-    return ""
+    return { line = 0, col = 0 }
   end
   return { line = list[linenr].lnum, col = list[linenr].col }
 end
