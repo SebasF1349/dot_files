@@ -30,16 +30,25 @@ local highlights = {
 --------------------------------------------------
 
 ---@param linenr number
-local function getPath(linenr)
+local function getItem(linenr)
   local qflist = vim.fn.getqflist()
   if linenr > #qflist then
     return ""
   end
-  local item = qflist[linenr]
-  local path = vim.fn.bufname(item.bufnr)
-  return path
+  return qflist[linenr]
 end
 
+---@param linenr number
+local function getPath(linenr)
+  local item = getItem(linenr)
+  return vim.fn.bufname(item.bufnr)
+end
+
+---@param linenr number
+local function getPos(linenr)
+  local item = getItem(linenr)
+  return { line = item.lnum, col = item.col }
+end
 --------------------------------------------------
 -- Better Grep
 --------------------------------------------------
