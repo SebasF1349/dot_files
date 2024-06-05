@@ -440,9 +440,11 @@ local function getPreview()
 end
 
 local function openPreview()
-  local path = getPath(vim.fn.line("."))
+  local qfLinenr = vim.fn.line(".")
+  local path = getPath(qfLinenr)
   local preview = getPreview()
-  vim.cmd("pedit " .. path)
+  local pos = getPos(qfLinenr)
+  vim.cmd("pedit +" .. pos.line .. " " .. path)
   if preview == nil then
     local key = vim.api.nvim_replace_termcodes("<C-w>", true, false, true)
     vim.api.nvim_feedkeys(key .. "J", "n", false)
