@@ -75,8 +75,13 @@ vim.opt.grepprg = "rg --vimgrep --smart-case"
 vim.opt.grepformat = "%f:%l:%c:%m"
 
 vim.api.nvim_create_user_command("Rg", function(opts)
-  vim.cmd('silent grep!"' .. opts.args .. '"')
+  vim.cmd('silent grep! "' .. opts.args .. '"')
   vim.cmd("copen")
+end, { nargs = 1 })
+
+vim.api.nvim_create_user_command("Rgl", function(opts)
+  vim.cmd('silent lgrep! "' .. opts.args .. '" %')
+  vim.cmd("lopen")
 end, { nargs = 1 })
 
 -- https://github.com/oncomouse/dotfiles/blob/5abf79588d28379aa071fc7767dda46b9d90fb74/conf/vim/init.lua#L190-L205
