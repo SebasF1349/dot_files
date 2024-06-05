@@ -25,6 +25,9 @@ local highlights = {
   I = "DiagnosticInfo",
 }
 
+---@type ListType
+local listOpened
+
 --------------------------------------------------
 -- Utils
 --------------------------------------------------
@@ -50,7 +53,7 @@ end
 
 ---@param linenr number
 local function getPath(linenr)
-  local list = getList("c")
+  local list = getList(listOpened)
   if linenr > #list then
     return ""
   end
@@ -60,7 +63,7 @@ end
 ---@param linenr number
 ---@return { line : number, col : number }
 local function getPos(linenr)
-  local list = getList("c")
+  local list = getList(listOpened)
   if linenr > #list then
     return { line = 0, col = 0 }
   end
@@ -116,8 +119,10 @@ function _G.qftf(info)
   local ret = {}
   if info.quickfix == 1 then
     list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1, winid = 1 })
+    listOpened = "c"
   else
     list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1, winid = 1 })
+    listOpened = "l"
   end
   local qfwinid = list.winid
   vim.api.nvim_set_option_value("foldmethod", "expr", { win = qfwinid, scope = "local" })
@@ -339,10 +344,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   end,
 })
 
----@param listType ListType
 ---@return number
-local function getHeight(listType)
-  local size = getListInfo(listType).size
+local function getHeight()
+  local size = getListInfo(listOpened).size
   return math.max(math.min(size, 10), 5)
 end
 
@@ -384,7 +388,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
-    vim.api.nvim_win_set_height(0, getHeight("c"))
+    vim.api.nvim_win_set_height(0, getHeight())
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
     vim.keymap.set(
@@ -470,12 +474,10 @@ local function hover()
 end
 
 ---@param direction "n" | "p"
----@param listType ListType
-local function moveWithPreview(direction, listType)
+local function moveWithPreview(direction)
   local current_pos = vim.fn.getcurpos()
   local move_line = direction == "n" and current_pos[2] + 1 or current_pos[2] - 1
-  -- NOTE: Make it automatically to detect which list is opened
-  local list_size = getListInfo(listType).size
+  local list_size = getListInfo(listOpened).size
   if move_line < 0 then
     move_line = list_size
   elseif move_line > list_size then
@@ -502,10 +504,10 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
     vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" }) -- idk why this is needed
     vim.keymap.set("n", "<C-n>", function()
-      moveWithPreview("n", "c")
+      moveWithPreview("n")
     end, { buffer = 0, desc = "Move and Preview Next QF item" })
     vim.keymap.set("n", "<C-p>", function()
-      moveWithPreview("p", "c")
+      moveWithPreview("p")
     end, { buffer = 0, desc = "Move and Preview Previous QF item" }) -- idk why this is needed
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
