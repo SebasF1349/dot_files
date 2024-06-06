@@ -33,27 +33,18 @@ local listOpened
 --------------------------------------------------
 
 ---@param listType ListType
----@return { size:number, winid:number, title:string, id:number }
-local function getListInfo(listType)
-  if listType == "c" then
-    return vim.fn.getqflist({ size = 0, winid = 0, title = 0, id = 0 })
-  else
-    return vim.fn.getloclist(0, { size = 0, winid = 0, title = 0, id = 0 })
-  end
-end
-
----@param listType ListType
+---@return { items: table, size:number, winid:number, title:string, id:number }
 local function getList(listType)
   if listType == "c" then
-    return vim.fn.getqflist()
+    return vim.fn.getqflist({ items = 0, size = 0, winid = 0, title = 0, id = 0 })
   else
-    return vim.fn.getloclist(0)
+    return vim.fn.getloclist(0, { items = 0, size = 0, winid = 0, title = 0, id = 0 })
   end
 end
 
 ---@param linenr number
 local function getPath(linenr)
-  local list = getList(listOpened)
+  local list = getList(listOpened).items
   if linenr > #list then
     return ""
   end
@@ -63,7 +54,7 @@ end
 ---@param linenr number
 ---@return { line : number, col : number }
 local function getPos(linenr)
-  local list = getList(listOpened)
+  local list = getList(listOpened).items
   if linenr > #list then
     return { line = 0, col = 0 }
   end
@@ -224,11 +215,10 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 ---@param diagnostics? boolean
 local function list_toggle(listType, diagnostics)
   local list = getList(listType)
-  local winid = getListInfo(listType).winid
-  if winid ~= 0 then
+  if list.winid ~= 0 then
     vim.cmd(listType .. "close")
   elseif
-    (not diagnostics and #list == 0)
+    (not diagnostics and list.size == 0)
     or (listType == "l" and diagnostics and #vim.diagnostic.get(0) == 0)
     or (listType == "c" and diagnostics and #vim.diagnostic.get() == 0)
   then
@@ -310,7 +300,7 @@ local qf_group = vim.api.nvim_create_augroup("qflist", { clear = true })
 vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
   group = vim.api.nvim_create_augroup("user_diagnostic_qflist", {}),
   callback = function(args)
-    local qf_info = getListInfo("c")
+    local qf_info = getList("c")
     if qf_info.title ~= "All Diagnostics" then
       return
     end
@@ -346,7 +336,7 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 
 ---@return number
 local function getHeight()
-  local size = getListInfo(listOpened).size
+  local size = getList(listOpened).size
   return math.max(math.min(size, 10), 5)
 end
 
@@ -419,7 +409,7 @@ end
 ---@param bufnr number
 local function delete(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local qfl = getList("c")
+  local qfl = getList("c").items
 
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" then
@@ -477,7 +467,7 @@ end
 local function moveWithPreview(direction)
   local current_pos = vim.fn.getcurpos()
   local move_line = direction == "n" and current_pos[2] + 1 or current_pos[2] - 1
-  local list_size = getListInfo(listOpened).size
+  local list_size = getList(listOpened).size
   if move_line < 0 then
     move_line = list_size
   elseif move_line > list_size then
