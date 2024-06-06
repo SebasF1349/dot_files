@@ -53,13 +53,11 @@ local function toggle_term(num)
   local term = terms[num]
   if term.buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
-    vim.cmd("startinsert")
     term.buf_num = vim.fn.bufnr()
     term.win_id = vim.fn.win_getid()
     term.is_hidden = 0
   elseif term.is_hidden == 1 then
     vim.cmd("vsplit | vertical resize 50 | b" .. term.buf_num)
-    vim.cmd("startinsert")
     term.win_id = vim.fn.win_getid()
     term.is_hidden = 0
   else
@@ -76,6 +74,7 @@ end
 vim.keymap.set({ "n", "t" }, "tt", function()
   toggle_term(1)
 end, { desc = "[T]oggle [T]erminal 1" })
+vim.keymap.set("t", "jk", "<C-\\><C-n>", { desc = "Escape Terminal Mode" })
 
 -- window management (NOTE: Check what to do with these keymaps)
 vim.keymap.set("n", "<C-\\>", "<C-w>v", { desc = "Split Window [|]Vertically" })

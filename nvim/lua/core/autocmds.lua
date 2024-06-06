@@ -48,8 +48,8 @@ vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
 vim.api.nvim_create_autocmd({ "TermOpen" }, {
   callback = function()
     vim.cmd("startinsert")
-    vim.cmd("setlocal nonumber")
-    vim.cmd("setlocal norelativenumber")
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
   end,
   group = general,
   desc = "Remove line numbers from terminal and start on insert",
