@@ -82,7 +82,7 @@ vim.api.nvim_create_user_command("Rg", function(opts)
   vim.cmd("copen")
 end, { nargs = 1 })
 
-vim.api.nvim_create_user_command("Rgl", function(opts)
+vim.api.nvim_create_user_command("LRg", function(opts)
   vim.cmd('silent lgrep! "' .. opts.args .. '" %')
   vim.cmd("lopen")
 end, { nargs = 1 })
