@@ -389,6 +389,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
+    vim.wo.winfixbuf = true
     vim.api.nvim_win_set_height(0, getHeight())
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
     -- vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
