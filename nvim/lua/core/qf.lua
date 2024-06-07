@@ -494,12 +494,20 @@ local function moveWithPreview(direction)
   openPreview()
 end
 
-local function selectItem()
+---@param split? "v" | "h"
+local function selectItem(split)
   local preview = getPreview()
   if preview then
     vim.cmd("pclose")
   end
-  local key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+  local key
+  if not split then
+    key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+  elseif split == "h" then
+    key = vim.api.nvim_replace_termcodes("<C-w><CR>", true, false, true)
+  else
+    key = vim.api.nvim_replace_termcodes("<C-w>k<C-w>v<C-w>j<CR>", true, false, true)
+  end
   vim.api.nvim_feedkeys(key, "n", false)
 end
 
@@ -510,16 +518,22 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
     vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" }) -- idk why this is needed
+    vim.keymap.set("n", "<C-s>", function()
+      selectItem("h")
+    end, { buffer = 0, desc = "Open QF Item in Horizontal [S]plit" })
+    vim.keymap.set("n", "<C-v>", function()
+      selectItem("v")
+    end, { buffer = 0, desc = "Open QF Item in [V]ertical Split" })
     vim.keymap.set("n", "<C-n>", function()
       moveWithPreview("n")
-    end, { buffer = 0, desc = "Move and Preview Next QF item" })
+    end, { buffer = 0, desc = "Move and Preview Next QF Item" })
     vim.keymap.set("n", "<C-p>", function()
       moveWithPreview("p")
-    end, { buffer = 0, desc = "Move and Preview Previous QF item" }) -- idk why this is needed
+    end, { buffer = 0, desc = "Move and Preview Previous QF Item" })
     vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
-    vim.keymap.set("n", "K", hover, { buffer = 0, desc = "Show full line on hover" })
+    vim.keymap.set("n", "K", hover, { buffer = 0, desc = "Show Message on Hover" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
   end,
