@@ -32,6 +32,23 @@ local listOpened
 -- Utils
 --------------------------------------------------
 
+---@return number[], number[]
+local function getListsWin()
+  local current_win = vim.api.nvim_get_current_win()
+  local current_tab = vim.fn.getwininfo(current_win)[1].tabnr
+  local qfwin, llwin = {}, {}
+  for _, win_data in ipairs(vim.fn.getwininfo()) do
+    if win_data.tabnr == current_tab and win_data.quickfix == 1 then
+      if win_data.loclist == 1 then
+        table.insert(qfwin, win_data.winid)
+      else
+        table.insert(llwin, win_data.winid)
+      end
+    end
+  end
+  return qfwin, llwin
+end
+
 ---@param listType ListType
 ---@return { items: table, size:number, winid:number, title:string, id:number }
 local function getList(listType)
