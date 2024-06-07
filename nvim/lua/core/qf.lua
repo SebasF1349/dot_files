@@ -517,7 +517,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   callback = function()
     -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
-    vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" }) -- idk why this is needed
+    vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" })
     vim.keymap.set("n", "<C-s>", function()
       selectItem("h")
     end, { buffer = 0, desc = "Open QF Item in Horizontal [S]plit" })
@@ -542,9 +542,24 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 })
 
 --------------------------------------------------
+-- Extras
+--------------------------------------------------
+
+vim.api.nvim_create_autocmd("QuitPre", {
+  group = qf_group,
+  callback = function()
+    if vim.o.filetype ~= "qf" then
+      vim.cmd("silent! cclose | silent! lclose")
+    end
+  end,
+  once = true,
+  desc = "Close Neovim if the last window is a quickfix window",
+})
+
+--------------------------------------------------
 -- Ideas to Implement
 --------------------------------------------------
--- quit Vim if the last window is a location/quickfix window (qf.vim)
+
 -- maybe open the qf window automatically after :make, :grep, :lvimgrep
 --          and friends if there are valid locations/errors (qf.vim)
 -- shorten filepaths for better legibility (qf.vim)
