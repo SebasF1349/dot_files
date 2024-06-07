@@ -381,6 +381,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
   callback = function()
+    vim.cmd("wincmd J")
     vim.opt.number = true
     vim.opt_local.relativenumber = false
     vim.opt_local.statuscolumn = ""
