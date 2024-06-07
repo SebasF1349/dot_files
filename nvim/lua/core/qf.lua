@@ -145,14 +145,12 @@ function _G.qftf(info)
   local items = {}
   local limit = 0
   for i = info.start_idx, info.end_idx do
-    local item = { index = i }
     local e = list[i]
+    local item = { index = i, name = " ", path = "", message = vim.fn.trim(e.text) }
     if e.valid == 1 then
       if e.bufnr > 0 then
         local fname = vim.fn.bufname(e.bufnr)
-        if fname == "" then
-          item.name = " "
-        else
+        if fname ~= "" then
           fname = vim.fn.fnamemodify(fname, ":p:~:.")
           item.name = vim.fn.fnamemodify(fname, ":p:t")
           item.path = vim.fn.fnamemodify(fname, ":h")
@@ -165,10 +163,6 @@ function _G.qftf(info)
         end
       end
       item.type = e.type
-      item.message = vim.fn.trim(e.text)
-    else
-      item.name = " "
-      item.message = e.text
     end
     table.insert(items, item)
   end
