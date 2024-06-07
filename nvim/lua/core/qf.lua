@@ -386,18 +386,12 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.opt_local.statuscolumn = ""
     -- vim.opt_local.wrap = true
     vim.opt_local.hidden = true
-    vim.bo.modifiable = true
+    -- vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
     vim.api.nvim_win_set_height(0, getHeight())
     -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
-    vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
-    vim.keymap.set(
-      "n",
-      "<C-s>",
-      '<Cmd>cgetbuffer|set nomodified|echo "quickfix/location list updated"<CR>',
-      { buffer = true, desc = "Update quickfix/location list with changes made in quickfix window" }
-    )
+    -- vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
   end,
   desc = "Qf syntax + options",
 })
@@ -431,7 +425,6 @@ local function delete(bufnr)
     end
     qfl = vim.tbl_filter(t_filter, qfl)
     vim.fn.setqflist({}, "r", {
-      title = "All Diagnostics",
       items = qfl,
     })
     vim.api.nvim_input("<Esc>")
@@ -439,7 +432,6 @@ local function delete(bufnr)
     local line = unpack(vim.api.nvim_win_get_cursor(0))
     table.remove(qfl, line)
     vim.fn.setqflist({}, "r", {
-      title = "All Diagnostics",
       items = qfl,
     })
     vim.fn.setpos(".", { bufnr, line, 1, 0 })
