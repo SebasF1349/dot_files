@@ -572,6 +572,55 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- Extras
 --------------------------------------------------
 
+vim.api.nvim_create_autocmd("CursorMoved", {
+  group = qf_group,
+  callback = function()
+    local list = getActiveList()
+    if list.winid == 0 or vim.bo.buftype ~= "" then
+      return
+    end
+    local bufnr = vim.api.nvim_get_current_buf()
+    local qf_pos = 0
+    local buf_list = vim.tbl_filter(
+      function(item)
+        return item.valid == 1 and item.bufnr == bufnr and item.lnum > 0
+      end,
+      vim.tbl_map(function(item)
+        qf_pos = qf_pos + 1
+        return vim.tbl_extend("force", item, { qf_pos = qf_pos })
+      end, list.items)
+    )
+    if vim.tbl_isempty(buf_list) then
+      return
+    end
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    local prev_lnum = -1
+    local prev_col = -1
+    local pos = buf_list[1].qf_pos
+    for _, entry in ipairs(buf_list) do
+      -- If we detect that the list isn't sorted, bail.
+      if prev_lnum == -1 then
+      -- pass
+      elseif entry.lnum < prev_lnum then
+        return
+      elseif entry.lnum == prev_lnum and entry.col <= prev_col then
+        return
+      end
+
+      if cursor[1] > entry.lnum or (cursor[1] == entry.lnum and cursor[2] + 1 >= entry.col) then
+        pos = entry.qf_pos
+      end
+      prev_lnum = entry.lnum
+      prev_col = entry.col
+    end
+    if list.winid then
+      vim.api.nvim_win_set_cursor(list.winid, { pos, 0 })
+      vim.api.nvim_set_option_value("cursorline", true, { scope = "local", win = list.winid })
+    end
+  end,
+  desc = "Update location in quickfix window",
+})
+
 vim.api.nvim_create_autocmd("WinEnter", {
   group = qf_group,
   callback = function()
@@ -608,3 +657,4 @@ vim.api.nvim_create_autocmd("WinEnter", {
 -- https://github.com/ashfinal/qfview.nvim (for the folding code)
 -- https://github.com/ten3roberts/qf.nvim (for some ideas)
 -- https://github.com/folke/trouble.nvim (for the hover idea)
+-- https://github.com/stevearc/qf_helper.nvim (sync qflist cursor position)
