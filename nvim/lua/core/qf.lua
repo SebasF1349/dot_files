@@ -533,14 +533,13 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- Extras
 --------------------------------------------------
 
-vim.api.nvim_create_autocmd("QuitPre", {
+vim.api.nvim_create_autocmd("WinEnter", {
   group = qf_group,
   callback = function()
-    if vim.o.filetype ~= "qf" then
-      vim.cmd("silent! cclose | silent! lclose")
+    if vim.bo.filetype == "qf" and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+      vim.cmd("quit")
     end
   end,
-  once = true,
   desc = "Close Neovim if the last window is a quickfix window",
 })
 
@@ -556,6 +555,7 @@ vim.api.nvim_create_autocmd("QuitPre", {
 -- highlight messages (it is even possible?)
 -- make it possible to have only one set of keymaps that understand if you want to use qf or loclist
 --          (considering which list is open or which is not open and have a fallback just in case)
+-- not sure about making qf editable like replacer.nvim
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
