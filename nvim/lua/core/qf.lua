@@ -25,12 +25,23 @@ local highlights = {
   I = "DiagnosticInfo",
 }
 
----@type ListType
-local listOpened
-
 --------------------------------------------------
 -- Utils
 --------------------------------------------------
+
+---@param winid? integer
+---@return nil| ListType
+local function getListType(winid)
+  winid = winid or vim.api.nvim_get_current_win()
+  local info = vim.fn.getwininfo(winid)[1]
+  if info.quickfix == 0 then
+    return nil
+  elseif info.loclist == 0 then
+    return "c"
+  else
+    return "l"
+  end
+end
 
 ---@return number[], number[]
 local function getListsWin()
@@ -59,9 +70,39 @@ local function getList(listType)
   end
 end
 
+-- NOTE: This supposes only one list is opened, if there is more than one quickfix wins
+---@return { qftype:string, items: table, size:number, winid:number, title:string, id:number }
+local function getActiveList()
+  local loclist = getList("l")
+  local qflist = getList("c")
+
+  local lret = vim.tbl_extend("force", loclist, { qftype = "l" })
+  local cret = vim.tbl_extend("force", qflist, { qftype = "c" })
+  local wintype = getListType()
+  if wintype == "c" then
+    return cret
+  elseif wintype == "l" then
+    return lret
+  -- If loclist is empty, use quickfix
+  elseif loclist.size == 0 then
+    return cret
+  -- If quickfix is empty, use loclist
+  elseif qflist.size == 0 then
+    return lret
+  elseif qflist.winid ~= 0 then
+    if loclist.winid == 0 then
+      return cret
+    end
+  elseif loclist.winid ~= 0 then
+    return lret
+  end
+  -- They're either both empty or both open
+  return cret
+end
+
 ---@param linenr number
 local function getPath(linenr)
-  local list = getList(listOpened).items
+  local list = getActiveList().items
   if linenr > #list then
     return ""
   end
@@ -71,7 +112,7 @@ end
 ---@param linenr number
 ---@return { line : number, col : number }
 local function getPos(linenr)
-  local list = getList(listOpened).items
+  local list = getActiveList().items
   if linenr > #list then
     return { line = 0, col = 0 }
   end
@@ -127,10 +168,8 @@ function _G.qftf(info)
   local ret = {}
   if info.quickfix == 1 then
     list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1, winid = 1 })
-    listOpened = "c"
   else
     list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1, winid = 1 })
-    listOpened = "l"
   end
   local qfwinid = list.winid
   vim.api.nvim_set_option_value("foldmethod", "expr", { win = qfwinid, scope = "local" })
@@ -347,7 +386,7 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 
 ---@return number
 local function getHeight()
-  local size = getList(listOpened).size
+  local size = getActiveList().size
   return math.max(math.min(size, 10), 5)
 end
 
@@ -472,7 +511,7 @@ end
 local function moveWithPreview(direction)
   local current_pos = vim.fn.getcurpos()
   local move_line = direction == "n" and current_pos[2] + 1 or current_pos[2] - 1
-  local list_size = getList(listOpened).size
+  local list_size = getActiveList().size
   if move_line < 0 then
     move_line = list_size
   elseif move_line > list_size then
