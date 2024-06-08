@@ -43,15 +43,13 @@ local modes = {
 }
 
 local modes_hi = {
-  Normal = { bg = background, fg = mocha.blue },
-  Insert = { bg = background, fg = mocha.green },
-  Terminal = { bg = background, fg = mocha.green },
-  Command = { bg = background, fg = mocha.peach },
-  Visual = { bg = background, fg = mocha.mauve },
-  ["V-Line"] = { bg = background, fg = mocha.mauve },
-  ["V-Block"] = { bg = background, fg = mocha.mauve },
-  Replace = { bg = background, fg = mocha.red },
-  Others = { bg = background, fg = mocha.overlay2 },
+  N = { bg = background, fg = mocha.blue },
+  I = { bg = background, fg = mocha.green },
+  T = { bg = background, fg = mocha.green },
+  C = { bg = background, fg = mocha.peach },
+  V = { bg = background, fg = mocha.mauve },
+  R = { bg = background, fg = mocha.red },
+  O = { bg = background, fg = mocha.overlay2 },
 }
 
 for mode, hi in pairs(modes_hi) do
@@ -65,15 +63,17 @@ end
 
 local function update_mode_colors()
   local current_mode = vim.api.nvim_get_mode().mode
-  if modes[current_mode] then
-    return string.format("%%#StatusLineMode%s#", modes[current_mode])
+  local first_char = modes[current_mode]:sub(1, 1)
+  if first_char then
+    return string.format("%%#StatusLineMode%s#", first_char)
   else
-    return "%#StatusLineModeOthers#"
+    return "%#StatusLineModeO#"
   end
 end
 
 ---- FILENAME ----
-vim.api.nvim_set_hl(0, "StatusLineNormal", { fg = mocha.text, bg = background })
+vim.api.nvim_set_hl(0, "StatusLineNormal", { bg = background, fg = mocha.text })
+vim.api.nvim_set_hl(0, "StatusLineGhost", { bg = background, fg = mocha.overlay2 })
 
 local function file()
   local buftype = vim.bo.buftype
@@ -93,7 +93,7 @@ local function file()
     return ""
   end
   if label then
-    return string.format("%%#StatusLineModeOthers# [%s] %%#StatusLineNormal#%s", label, title)
+    return string.format("%%#StatusLineGhost# [%s] %%#StatusLineNormal#%s", label, title)
   end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
@@ -105,7 +105,7 @@ local function file()
   end
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (dap)
-  return string.format("%%#StatusLineModeOthers# %s/%%#StatusLineNormal#%s", fpath, fname)
+  return string.format("%%#StatusLineGhost# %s/%%#StatusLineNormal#%s", fpath, fname)
 end
 
 ---- GIT ----
