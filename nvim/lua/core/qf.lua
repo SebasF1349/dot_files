@@ -551,6 +551,11 @@ vim.api.nvim_create_autocmd("QuitPre", {
 -- maybe open the qf window automatically after :make, :grep, :lvimgrep
 --          and friends if there are valid locations/errors (qf.vim)
 -- shorten filepaths for better legibility (qf.vim)
+-- have qf win ALWAYS on bottom, when opened in split or when creating new splits
+-- make possible to undo deleted qf items
+-- highlight messages (it is even possible?)
+-- make it possible to have only one set of keymaps that understand if you want to use qf or loclist
+--          (considering which list is open or which is not open and have a fallback just in case)
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
