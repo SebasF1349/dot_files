@@ -261,6 +261,21 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Keymaps
 --------------------------------------------------
 
+--- @param symbols string[]
+local function document_symbols(symbols)
+  vim.lsp.buf.document_symbol({
+    on_list = function(options)
+      local functions = vim.tbl_filter(function(item)
+        return vim.tbl_contains(symbols, string.lower(item.kind))
+      end, options.items)
+      vim.fn.setloclist(0, functions)
+      vim.schedule(function()
+        vim.cmd("lopen")
+      end)
+    end,
+  })
+end
+
 ---@param listType ListType
 ---@param diagnostics? boolean
 local function list_toggle(listType, diagnostics)
@@ -299,6 +314,9 @@ end, { desc = "[T]oggle [L]ocation List" })
 vim.keymap.set("n", "<leader>ld", function()
   list_toggle("l", true)
 end, { desc = "[L]ocation List [D]iagnostics Toggle" })
+vim.keymap.set("n", "<leader>ls", function()
+  document_symbols({ "functions" })
+end, { desc = "[L]ocation List [S]ymbols" })
 
 ---@param listType ListType
 ---@param direction "next" | "prev"
