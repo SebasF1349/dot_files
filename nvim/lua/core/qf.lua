@@ -261,14 +261,27 @@ vim.o.qftf = "{info -> v:lua._G.qftf(info)}"
 -- Keymaps
 --------------------------------------------------
 
---- @param symbols string[]
+--- @param symbols? string[]
 local function document_symbols(symbols)
+  symbols = symbols or {}
   vim.lsp.buf.document_symbol({
     on_list = function(options)
-      local functions = vim.tbl_filter(function(item)
-        return vim.tbl_contains(symbols, string.lower(item.kind))
-      end, options.items)
-      vim.fn.setloclist(0, functions)
+      local items = options.items
+      if not vim.tbl_isempty(symbols) then
+        items = vim.tbl_filter(function(item)
+          return vim.tbl_contains(symbols, string.lower(item.kind))
+        end, items)
+        if vim.tbl_isempty(items) then
+          vim.notify("No Symbols in the Document", vim.lsp.log_levels.WARN)
+          return
+        end
+      end
+      items = vim.tbl_map(function(item)
+        item.text = string.format("[%s] %s", item.kind, vim.fn.trim(vim.fn.getline(item.lnum)))
+        return item
+      end, items)
+      local title = vim.tbl_isempty(symbols) and "All" or vim.fn.join(symbols, ", ")
+      vim.fn.setloclist(0, {}, " ", { title = "Document Symbols: " .. title, items = items })
       vim.schedule(function()
         vim.cmd("lopen")
       end)
