@@ -315,7 +315,7 @@ vim.keymap.set("n", "<leader>ld", function()
   list_toggle("l", true)
 end, { desc = "[L]ocation List [D]iagnostics Toggle" })
 vim.keymap.set("n", "<leader>ls", function()
-  document_symbols({ "functions" })
+  document_symbols({ "function" })
 end, { desc = "[L]ocation List [S]ymbols" })
 
 ---@param listType ListType
