@@ -128,12 +128,22 @@ vim.opt.grepformat = "%f:%l:%c:%m"
 
 vim.api.nvim_create_user_command("Rg", function(opts)
   vim.cmd('silent grep! "' .. opts.args .. '"')
-  vim.cmd("copen")
+  local list = getList("c")
+  if list.size == 0 then
+    vim.notify("No results found", vim.log.levels.WARN)
+  else
+    vim.cmd("copen")
+  end
 end, { nargs = 1 })
 
 vim.api.nvim_create_user_command("LRg", function(opts)
   vim.cmd('silent lgrep! "' .. opts.args .. '" %')
-  vim.cmd("lopen")
+  local list = getList("l")
+  if list.size == 0 then
+    vim.notify("No results found", vim.log.levels.WARN)
+  else
+    vim.cmd("lopen")
+  end
 end, { nargs = 1 })
 
 -- https://github.com/oncomouse/dotfiles/blob/5abf79588d28379aa071fc7767dda46b9d90fb74/conf/vim/init.lua#L190-L205
