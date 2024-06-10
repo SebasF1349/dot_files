@@ -688,6 +688,17 @@ vim.api.nvim_create_autocmd("WinEnter", {
   desc = "Close Neovim if the last window is a quickfix window",
 })
 
+vim.api.nvim_create_autocmd("WinClosed", {
+  group = qf_group,
+  callback = function(opt)
+    local loclist = vim.fn.getloclist(opt.file, { winid = 0 })
+    if loclist and loclist.winid ~= 0 then
+      vim.cmd("close " .. loclist.winid)
+    end
+  end,
+  desc = "Close location list if parent window is closed",
+})
+
 --------------------------------------------------
 -- Ideas to Implement
 --------------------------------------------------
@@ -701,10 +712,10 @@ vim.api.nvim_create_autocmd("WinEnter", {
 -- make it possible to have only one set of keymaps that understand if you want to use qf or loclist
 --          (considering which list is open or which is not open and have a fallback just in case)
 -- not sure about making qf editable like replacer.nvim
+-- show definition, references, implementations, type definition and declarations from word under the cursor (trouble)
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
--- close the location window automatically when quitting parent window (qf.vim)
 
 --------------------------------------------------
 -- Credits
