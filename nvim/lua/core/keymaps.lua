@@ -1,6 +1,14 @@
 -- Keymaps for better default experience
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
+
+-- Execute q macro
 vim.keymap.set("n", "Q", "@q")
+
+-- Return to basics: manage open buffers
+vim.keymap.set("n", "gbb", "<cmd>ls<CR>:b<space>", { desc = "Change Open [B]uffer" })
+vim.keymap.set("n", "gbd", "<cmd>:bdelete<CR>", { desc = "[D]elete Open Buffer" })
+vim.keymap.set("n", "gbn", "<cmd>:bnext<CR>", { desc = "[N]ext Open Buffer" })
+vim.keymap.set("n", "gbp", "<cmd>:bprevious<CR>", { desc = "[P]revious Open Buffer" })
 
 -- Remap Escape
 vim.keymap.set("i", "jk", "<Esc>")
