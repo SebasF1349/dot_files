@@ -3,12 +3,6 @@ return { -- Collection of various small independent plugins/modules
   event = { "BufReadPre", "BufNewFile" },
   dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
   config = function()
-    -- Better Around/Inside textobjects
-    --
-    -- Examples:
-    --  - va)  - [V]isually select [A]round [)]paren
-    --  - yinq - [Y]ank [I]nside [N]ext [']quote
-    --  - ci'  - [C]hange [I]nside [']quote
     local ai = require("mini.ai")
     local custom_textobjects = {
       o = ai.gen_spec.treesitter({
@@ -19,7 +13,7 @@ return { -- Collection of various small independent plugins/modules
       c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
       ["/"] = ai.gen_spec.treesitter({ a = "@comment.outer", i = "@comment.outer" }, {}),
       t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" },
-      s = { -- subword (for camelCase or snake_case), overwrites sentence that I never use
+      e = { -- subword (for camelCase or snake_case)
         {
           "%u[%l%d]+%f[^%l%d]",
           "%f[%S][%l%d]+%f[^%l%d]",
