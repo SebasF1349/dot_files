@@ -100,25 +100,6 @@ local function getActiveList()
   return cret
 end
 
----@param linenr number
-local function getPath(linenr)
-  local list = getActiveList().items
-  if linenr > #list then
-    return ""
-  end
-  return vim.fn.bufname(list[linenr].bufnr)
-end
-
----@param linenr number
----@return { line : number, col : number }
-local function getPos(linenr)
-  local list = getActiveList().items
-  if linenr > #list then
-    return { line = 0, col = 0 }
-  end
-  return { line = list[linenr].lnum, col = list[linenr].col }
-end
-
 --------------------------------------------------
 -- Better Grep
 --------------------------------------------------
@@ -449,8 +430,9 @@ end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function _G.qffoldexprfunc()
-  local line = getPath(vim.v.lnum)
-  local next_line = getPath(vim.v.lnum + 1)
+  local list = getActiveList().items
+  local line = vim.fn.bufname(list[vim.v.lnum].bufnr)
+  local next_line = #list < (vim.v.lnum + 1) and "" or vim.fn.bufname(list[vim.v.lnum + 1].bufnr)
   if line == next_line then
     return "1"
   else
@@ -548,11 +530,15 @@ local function getPreview()
 end
 
 local function openPreview()
-  local qfLinenr = vim.fn.line(".")
-  local path = getPath(qfLinenr)
   local preview = getPreview()
-  local pos = getPos(qfLinenr)
-  vim.cmd("pedit +" .. pos.line .. " " .. path)
+  local qfLinenr = vim.fn.line(".")
+  local list = getActiveList().items
+  if qfLinenr > #list then
+    return
+  end
+  local path = vim.fn.bufname(list[qfLinenr].bufnr)
+  local line = list[qfLinenr].lnum
+  vim.cmd("pedit +" .. line .. " " .. path)
   if preview == nil then
     local key = vim.api.nvim_replace_termcodes("<C-w>", true, false, true)
     vim.api.nvim_feedkeys(key .. "J", "n", false)
@@ -713,6 +699,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
 --          (considering which list is open or which is not open and have a fallback just in case)
 -- not sure about making qf editable like replacer.nvim
 -- show definition, references, implementations, type definition and declarations from word under the cursor (trouble)
+-- use buf_request_all for definitions/symbols/etc for async requests
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
