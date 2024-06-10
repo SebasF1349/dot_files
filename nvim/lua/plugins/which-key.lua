@@ -11,6 +11,7 @@ return {
 
     which_key.register({
       ["g"] = { name = "[G]o to" },
+      ["gb"] = { name = "[B]uffer Management" },
       ["]"] = { name = "Next" },
       ["["] = { name = "Prev" },
       ["<leader>"] = {
