@@ -579,6 +579,13 @@ local function selectItem(split)
     key = vim.api.nvim_replace_termcodes("<C-w>k<C-w>v<C-w>j<CR>", true, false, true)
   end
   vim.api.nvim_feedkeys(key, "n", false)
+
+local function closeList()
+  local preview = getPreview()
+  if preview then
+    vim.cmd("pclose")
+  end
+  vim.cmd.close()
 end
 
 vim.api.nvim_create_autocmd("BufWinEnter", {
@@ -587,6 +594,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   callback = function()
     -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
     -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
+    vim.keymap.set("n", "q", closeList, { buffer = 0, desc = "Close QF list" })
     vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" })
     vim.keymap.set("n", "<C-s>", function()
       selectItem("h")
