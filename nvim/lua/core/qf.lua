@@ -565,7 +565,8 @@ local function moveWithPreview(direction)
 end
 
 ---@param split? "v" | "h"
-local function selectItem(split)
+---@param close? boolean
+local function selectItem(split, close)
   local preview = getPreview()
   if preview then
     vim.cmd("pclose")
@@ -579,6 +580,11 @@ local function selectItem(split)
     key = vim.api.nvim_replace_termcodes("<C-w>k<C-w>v<C-w>j<CR>", true, false, true)
   end
   vim.api.nvim_feedkeys(key, "n", false)
+  if close then
+    local list = getActiveList()
+    vim.cmd(list.qftype .. "close")
+  end
+end
 
 local function closeList()
   local preview = getPreview()
@@ -608,8 +614,14 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.keymap.set("n", "<C-p>", function()
       moveWithPreview("p")
     end, { buffer = 0, desc = "Move and Preview Previous QF Item" })
-    vim.keymap.set("n", "o", "<CR><C-w>p", { buffer = 0, desc = "Open and Stay in QF" })
-    vim.keymap.set("n", "O", "<CR><cmd>cclose<CR>", { buffer = 0, desc = "Open and Close QF" })
+    vim.keymap.set("n", "o", function()
+      selectItem(nil, true)
+    end, { buffer = 0, desc = "Open and Close QF" })
+    vim.keymap.set("n", "O", function()
+      selectItem()
+      local key = vim.api.nvim_replace_termcodes("<C-w>p", true, false, true)
+      vim.api.nvim_feedkeys(key, "n", false)
+    end, { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "K", hover, { buffer = 0, desc = "Show Message on Hover" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
