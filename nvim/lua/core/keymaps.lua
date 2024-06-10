@@ -25,8 +25,8 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("n", "U", "<C-r>")
 
 -- Add empty lines before and after cursor line
-vim.keymap.set("n", "gO", "<Cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>", { desc = "Create new line above" })
-vim.keymap.set("n", "go", "<Cmd>call append(line('.'),     repeat([''], v:count1))<CR>", { desc = "Create new line below" })
+vim.keymap.set("n", "gO", "<cmd>call append(line('.') - 1, repeat([''], v:count1))<CR>", { desc = "Create new line above" })
+vim.keymap.set("n", "go", "<cmd>call append(line('.'),     repeat([''], v:count1))<CR>", { desc = "Create new line below" })
 
 -- Center buffer while navigating
 vim.keymap.set("n", "n", "nzzzv")
