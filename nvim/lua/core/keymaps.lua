@@ -9,14 +9,6 @@ vim.keymap.set("i", "jk", "<Esc>")
 vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
-vim.keymap.set("n", "<leader>n", function()
-  local function getPath(str)
-    return str:match("(.*[/\\])")
-  end
-  local currentfile = getPath(vim.fn.expand("%:p"))
-  vim.cmd("Lexplore!" .. currentfile)
-end, { desc = "Open Explorer [N]etrw" })
-
 --Move things around when in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
