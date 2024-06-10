@@ -370,6 +370,22 @@ vim.keymap.set("n", "[L", function()
   move("l", "prev", true)
 end, { desc = "Previous [L]ocation List File Wrapping" })
 
+---@param listType? ListType
+local function addToQuickfix(listType)
+  local cursor_pos = vim.fn.getpos(".")
+  local new_qf_item = { { bufnr = vim.api.nvim_get_current_buf(), lnum = cursor_pos[2], col = cursor_pos[3], text = vim.fn.getline(".") } }
+  if not listType or listType == "c" then
+    vim.fn.setqflist(new_qf_item, "a")
+  else
+    vim.fn.setloclist(0, new_qf_item, "a")
+  end
+end
+
+vim.keymap.set("n", "<leader>qa", addToQuickfix, { desc = "[A]dd cursor position to [Q]uickfix List" })
+vim.keymap.set("n", "<leader>la", function()
+  addToQuickfix("l")
+end, { desc = "[A]dd cursor position to [L]ocation List" })
+
 --------------------------------------------------
 -- Quickfix Autocmds
 --------------------------------------------------
