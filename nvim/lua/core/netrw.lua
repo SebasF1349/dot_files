@@ -1,8 +1,10 @@
 -- netrw options
-vim.g.netrw_liststyle = 0
+vim.g.netrw_liststyle = 3
 vim.g.netrw_banner = 0
 vim.g.netrw_sort_options = "i"
-vim.g.netrw_winsize = 20
+vim.g.netrw_winsize = 25
+vim.g.netrw_preview = 1
+vim.g.netrw_altfile = 1
 
 vim.keymap.set("n", "<leader>n", function()
   local function getPath(str)
@@ -19,14 +21,14 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     vim.o.nu = true
     vim.o.rnu = true
-    vim.keymap.set("n", "w", "<cmd>Ex " .. vim.fn.getcwd() .. "<CR>", { noremap = true, silent = true, buffer = true })
+    vim.keymap.set("n", "w", "<cmd>Ex " .. vim.fn.getcwd() .. "<CR>", { desc = "Move to C[W]D", noremap = true, silent = true, buffer = true })
+    vim.keymap.set("n", "m", "gn", { desc = "[M]ove to selected directory", noremap = true, silent = true, buffer = true })
     vim.keymap.set("n", "<C-C>", "<cmd>bdel<CR>", { noremap = true, silent = true, buffer = true })
     vim.keymap.set("n", "q", "<cmd>bdel<CR>", { noremap = true, silent = true, buffer = true })
-    vim.keymap.set("n", "h", "gh", { remap = true, silent = true, buffer = true })
-    vim.keymap.set("n", "r", "R", { remap = true, silent = true, buffer = true })
+    vim.keymap.set("n", "h", "gh", { desc = "Toggle [H]idden files", remap = true, silent = true, buffer = true })
+    vim.keymap.set("n", "r", "R", { desc = "[R]ename", remap = true, silent = true, buffer = true })
     local unbinds = {
       "<del>",
-      "<c-h>",
       "<c-r>",
       "<c-tab>",
       "a",
@@ -34,7 +36,6 @@ vim.api.nvim_create_autocmd("FileType", {
       "gb",
       "gd",
       "gf",
-      "gn",
       "gp",
       "i",
       "I",
@@ -57,7 +58,6 @@ vim.api.nvim_create_autocmd("FileType", {
       "mz",
       "o",
       "O",
-      "p",
       "P",
       "qb",
       "qf",
