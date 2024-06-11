@@ -47,7 +47,6 @@ vim.keymap.set("n", "#", "#zz")
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
--- NOTE: make it more robust as it breaks if I delete a terminal by accident
 -- Terminal
 ---@class term
 ---@field buf_num number
@@ -59,6 +58,12 @@ local terms = {}
 ---@param num 1|2
 local function toggle_term(num)
   local term = terms[num]
+  if term.win_id ~= -1 and not vim.list_contains(vim.api.nvim_list_wins(), term.win_id) then
+    if vim.list_contains(vim.api.nvim_list_bufs(), term.buf_num) then
+      vim.api.nvim_buf_delete(term.buf_num, { force = true })
+    end
+    term = { buf_num = -1, win_id = -1, is_hidden = -1 }
+  end
   if term.buf_num == -1 then
     vim.cmd("vsplit | vertical resize 50 | term")
     term.buf_num = vim.fn.bufnr()
@@ -72,6 +77,7 @@ local function toggle_term(num)
     vim.api.nvim_win_close(term.win_id, true)
     term.is_hidden = 1
   end
+  terms[num] = term
 end
 for pos = 1, 2 do
   terms[pos] = { buf_num = -1, win_id = -1, is_hidden = -1 }
