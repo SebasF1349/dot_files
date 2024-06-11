@@ -83,7 +83,6 @@ return {
     }
 
     local function attach_jdtls()
-      ---@diagnostic disable-next-line: different-requires
       require("jdtls").start_or_attach(config)
     end
 
@@ -96,7 +95,6 @@ return {
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         if client and client.name == "jdtls" then
-          ---@diagnostic disable-next-line: different-requires
           require("jdtls").setup_dap(config.dap)
           require("jdtls.dap").setup_dap_main_class_configs(config.dap_main)
         end

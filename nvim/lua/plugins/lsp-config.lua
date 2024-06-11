@@ -122,15 +122,20 @@ local servers = {
           checkThirdParty = false,
           library = {
             "${3rd}/luv/library",
-            unpack(vim.api.nvim_get_runtime_file("", true)),
+            vim.env.VIMRUNTIME, -- this apparently gives faster and better diagnostics than `unpack`
+            -- unpack(vim.api.nvim_get_runtime_file("", true)),
           },
         },
+      })
+    end,
+    settings = {
+      Lua = {
+        format = { enable = false },
         completion = { callSnippet = "Replace" },
         hint = { enable = true, arrayIndex = "Disable" },
         telemetry = { enable = false },
-      })
-    end,
-    settings = { Lua = {} },
+      },
+    },
   },
 
   svelte = {},

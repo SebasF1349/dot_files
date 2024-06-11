@@ -36,6 +36,7 @@ return { -- Collection of various small independent plugins/modules
     local map_previous = function(lhs, side, textobj_id)
       for _, mode in ipairs({ "n", "x", "o" }) do
         vim.keymap.set(mode, lhs, function()
+          ---@diagnostic disable-next-line: undefined-global
           MiniAi.move_cursor(side, "a", textobj_id, { search_method = "prev" })
         end, { desc = "Move to Previous " .. side .. " " .. textobj_id .. " text object" })
       end
@@ -47,6 +48,7 @@ return { -- Collection of various small independent plugins/modules
     local map_next = function(lhs, side, textobj_id)
       for _, mode in ipairs({ "n", "x", "o" }) do
         vim.keymap.set(mode, lhs, function()
+          ---@diagnostic disable-next-line: undefined-global
           MiniAi.move_cursor(side, "a", textobj_id, { search_method = "next" })
         end, { desc = "Move to Next " .. side .. " " .. textobj_id .. " text object" })
       end

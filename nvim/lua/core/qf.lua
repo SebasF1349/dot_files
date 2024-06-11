@@ -2,7 +2,6 @@
 -- Types
 --------------------------------------------------
 
----@diagnostic disable-next-line: duplicate-doc-alias
 ---@alias ListType
 ---| '"c"' # quickfix list
 ---| '"l"' # location list
@@ -153,7 +152,6 @@ vim.keymap.set("n", "<leader>rg", grep_or_filter, { desc = "[R]ip[G]rep" })
 
 local qfim_namespace = vim.api.nvim_create_namespace("qfim")
 
----@diagnostic disable-next-line: duplicate-set-field
 function _G.qftf(info)
   local list
   local ret = {}
@@ -263,6 +261,7 @@ local function document_symbols(symbols)
           return vim.tbl_contains(symbols, string.lower(item.kind))
         end, items)
         if vim.tbl_isempty(items) then
+          ---@diagnostic disable-next-line: param-type-mismatch
           vim.notify("No Symbols in the Document", vim.lsp.log_levels.WARN)
           return
         end
@@ -428,7 +427,6 @@ local function getHeight()
   return math.max(math.min(size, 10), 5)
 end
 
----@diagnostic disable-next-line: duplicate-set-field
 function _G.qffoldexprfunc()
   local list = getActiveList().items
   local line = vim.fn.bufname(list[vim.v.lnum].bufnr)
@@ -440,7 +438,6 @@ function _G.qffoldexprfunc()
   end
 end
 
----@diagnostic disable-next-line: duplicate-set-field
 function _G.qffoldtextfunc()
   local line = vim.fn.getline(vim.v.foldstart)
   local splitted = vim.split(line, "│")
