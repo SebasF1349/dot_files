@@ -30,6 +30,9 @@ return { -- Collection of various small independent plugins/modules
       custom_textobjects = custom_textobjects,
     })
 
+    ---@param lhs string
+    ---@param side "left"|"right"
+    ---@param textobj_id string
     local map_previous = function(lhs, side, textobj_id)
       for _, mode in ipairs({ "n", "x", "o" }) do
         vim.keymap.set(mode, lhs, function()
@@ -37,6 +40,10 @@ return { -- Collection of various small independent plugins/modules
         end, { desc = "Move to Previous " .. side .. " " .. textobj_id .. " text object" })
       end
     end
+
+    ---@param lhs string
+    ---@param side "left"|"right"
+    ---@param textobj_id string
     local map_next = function(lhs, side, textobj_id)
       for _, mode in ipairs({ "n", "x", "o" }) do
         vim.keymap.set(mode, lhs, function()
@@ -44,6 +51,7 @@ return { -- Collection of various small independent plugins/modules
         end, { desc = "Move to Next " .. side .. " " .. textobj_id .. " text object" })
       end
     end
+
     for key, _ in pairs(custom_textobjects) do
       map_previous("[" .. key, "left", key)
       map_previous("[" .. key:upper(), "right", key)

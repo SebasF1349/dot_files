@@ -47,8 +47,16 @@ vim.keymap.set("n", "#", "#zz")
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
+-- NOTE: make it more robust as it breaks if I delete a terminal by accident
 -- Terminal
+---@class term
+---@field buf_num number
+---@field win_id number
+---@field is_hidden number
+
+---@type term[]
 local terms = {}
+---@param num 1|2
 local function toggle_term(num)
   local term = terms[num]
   if term.buf_num == -1 then
@@ -66,7 +74,7 @@ local function toggle_term(num)
   end
 end
 for pos = 1, 2 do
-  terms[pos] = { buf_num = -1 }
+  terms[pos] = { buf_num = -1, win_id = -1, is_hidden = -1 }
   vim.keymap.set({ "n", "t" }, "t" .. pos, function()
     toggle_term(pos)
   end, { desc = "Toggle [T]erminal [" .. pos .. "]" })
@@ -101,6 +109,8 @@ local nav = {
   l = "Right",
 }
 
+---@param dir "h"|"j"|"k"|"l"
+---@return function
 local function navigate(dir)
   return function()
     local win = vim.api.nvim_get_current_win()
