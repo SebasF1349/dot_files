@@ -93,7 +93,6 @@ return {
       json = "json",
       lua = "lua",
       markdown = "markdown",
-      python = "python",
       sass = "css",
       scss = "css",
       typescript = "typescript",
@@ -131,46 +130,13 @@ return {
         augend.integer.alias.decimal,
         augend.semver.alias.semver,
       },
-      typescript = {
-        augend.integer.alias.decimal,
-        augend.constant.alias.bool,
-        augend.constant.new({ elements = { "let", "const" } }),
-        augend.paren.alias.quote,
-        logical_alias,
-        ordinal_numbers,
-        weekdays,
-        months,
-        order,
-      },
-      lua = {
-        augend.integer.alias.decimal,
-        augend.constant.alias.bool,
-        augend.constant.new({
-          elements = { "and", "or" },
-          word = true,
-          cyclic = true,
-        }),
-        augend.paren.alias.quote,
-        ordinal_numbers,
-        weekdays,
-        months,
-        order,
-      },
-      python = {
-        augend.integer.alias.decimal,
-        augend.constant.new({
-          elements = { "True", "False" },
-          word = true,
-          cyclic = true,
-        }),
-        augend.paren.alias.quote,
-        logical_alias,
-        ordinal_numbers,
-        weekdays,
-        months,
-        order,
-      },
     }
+
+    groups.typescript = vim.tbl_extend("force", groups.default, { augend.constant.new({ elements = { "let", "const" } }) })
+    groups.lua = vim.tbl_extend("force", groups.default, {
+      augend.constant.new({ elements = { "and", "or" }, word = true, cyclic = true }),
+      augend.constant.new({ elements = { ">", "<", "=", "~" }, word = false, cyclic = true }), --check this overwrittes order augend
+    })
 
     require("dial.config").augends:register_group(groups)
   end,
