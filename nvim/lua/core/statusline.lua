@@ -83,6 +83,13 @@ local function file()
     title, label = vim.fn.expand("%:t"), "Term"
   elseif buftype == "help" then
     title, label = vim.fn.expand("%:t:r:r"), "Help"
+  elseif ftype == "netrw" then
+    label = "Netrw"
+    title = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
+    local target = vim.api.nvim_call_function("netrw#Expose", { "netrwmftgt" })
+    if target ~= "n/a" then
+      title = string.format("%s - Target: %s", title, target:gsub("^" .. vim.loop.os_homedir(), "~"))
+    end
   elseif ftype == "fugitive" then
     title, label = vim.fn.expand("%:h:h:t"), "Fugitive"
   elseif ftype == "qf" then
