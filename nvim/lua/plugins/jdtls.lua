@@ -1,6 +1,12 @@
 -- based on https://github.com/LazyVim/LazyVim/blob/6e57e86c9952986a0e90055e13aa86dcde5e478e/lua/lazyvim/plugins/extras/lang/java.lua
 return {
   "mfussenegger/nvim-jdtls",
+  dependencies = {
+    "mfussenegger/nvim-dap",
+    "williamboman/mason.nvim",
+    "neovim/nvim-lspconfig",
+    "hrsh7th/cmp-nvim-lsp",
+  },
   ft = "java",
   config = function()
     local bundles = {} ---@type string[]
