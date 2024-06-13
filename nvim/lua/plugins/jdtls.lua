@@ -33,58 +33,60 @@ return {
       return cmd
     end
 
-    local config = {
-      cmd = cmd(),
-      init_options = { bundles = bundles },
-      settings = {
-        java = {
-          configuration = {
-            updateBuildConfiguration = "interactive",
-          },
-          eclipse = {
-            downloadSources = true,
-          },
-          maven = {
-            downloadSources = true,
-          },
-          references = {
-            includeAccessors = true,
-            includeDecompiledSources = true,
-          },
-          format = {
-            enabled = true,
-          },
-          signatureHelp = {
-            enabled = true,
-          },
-          inlayHints = {
-            parameterNames = {
-              enabled = "all",
+    local config = function()
+      return {
+        cmd = cmd(),
+        init_options = { bundles = bundles },
         filetypes = { "java" },
+        settings = {
+          java = {
+            configuration = {
+              updateBuildConfiguration = "interactive",
             },
-          },
-          sources = {
-            organizeImports = {
-              starThreshold = 9999,
-              staticStarThreshold = 9999,
+            eclipse = {
+              downloadSources = true,
             },
-          },
-          codeGeneration = {
-            toString = {
-              template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+            maven = {
+              downloadSources = true,
             },
-            useBlocks = true,
+            references = {
+              includeAccessors = true,
+              includeDecompiledSources = true,
+            },
+            format = {
+              enabled = true,
+            },
+            signatureHelp = {
+              enabled = true,
+            },
+            inlayHints = {
+              parameterNames = {
+                enabled = "all",
+              },
+            },
+            sources = {
+              organizeImports = {
+                starThreshold = 9999,
+                staticStarThreshold = 9999,
+              },
+            },
+            codeGeneration = {
+              toString = {
+                template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+              },
+              useBlocks = true,
+            },
           },
         },
-      },
-      capabilities = require("cmp_nvim_lsp").default_capabilities(),
-      dap = { hotcodereplace = "auto", config_overrides = {} },
-      dap_main = {},
-      test = true,
-    }
+        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+        dap = { hotcodereplace = "auto", config_overrides = {} },
+        dap_main = {},
+        test = true,
+      }
+    end
 
     local function attach_jdtls()
-      require("jdtls").start_or_attach(config)
+      require("jdtls").start_or_attach(config())
     end
 
     vim.api.nvim_create_autocmd("FileType", {
@@ -96,8 +98,9 @@ return {
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         if client and client.name == "jdtls" then
-          require("jdtls").setup_dap(config.dap)
-          require("jdtls.dap").setup_dap_main_class_configs(config.dap_main)
+          local jdtls_dap = require("jdtls.dap")
+          require("jdtls").setup_dap(config().dap)
+          jdtls_dap.setup_dap_main_class_configs(config().dap_main)
         end
       end,
     })
