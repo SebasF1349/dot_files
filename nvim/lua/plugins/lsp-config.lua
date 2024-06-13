@@ -201,6 +201,8 @@ return {
         -- lua
         "stylua", -- formatter
         -- java
+        "java-debug-adapter",
+        "java-test",
         "google-java-format",
         -- shell
         "shellcheck", -- linter
