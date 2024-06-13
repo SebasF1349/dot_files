@@ -101,6 +101,11 @@ return {
           local jdtls_dap = require("jdtls.dap")
           require("jdtls").setup_dap(config().dap)
           jdtls_dap.setup_dap_main_class_configs(config().dap_main)
+          if config().test then
+            vim.keymap.set("n", "<leader>nt", jdtls_dap.test_class, { desc = "[N]eotest [T]est" })
+            vim.keymap.set("n", "<leader>nn", jdtls_dap.test_nearest_method, { desc = "[N]eotest Test [N]earest" })
+            vim.keymap.set("n", "<leader>np", jdtls_dap.pick_test, { desc = "[N]eotest [P]ick Test" })
+          end
         end
       end,
     })
