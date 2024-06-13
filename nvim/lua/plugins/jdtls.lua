@@ -60,6 +60,7 @@ return {
           inlayHints = {
             parameterNames = {
               enabled = "all",
+        filetypes = { "java" },
             },
           },
           sources = {
