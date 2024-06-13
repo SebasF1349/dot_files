@@ -47,6 +47,9 @@ vim.keymap.set("n", "#", "#zz")
 vim.keymap.set("v", "<", "<gv")
 vim.keymap.set("v", ">", ">gv")
 
+-- Invert comments line by line
+vim.keymap.set("x", "gci", ":normal gcc<CR>", { desc = "Invert comments" })
+
 -- gX: Web search
 vim.keymap.set("n", "gX", function()
   vim.ui.open(("https://google.com/search?q=%s"):format(vim.fn.expand("<cword>")))
