@@ -5,45 +5,28 @@ return {
     {
       "rcarriga/nvim-dap-ui",
       dependencies = "nvim-neotest/nvim-nio",
+      -- stylua: ignore
       keys = {
-        {
-          "<leader>de",
-          function()
-            -- Calling this twice to open and jump into the window.
-            require("dapui").eval()
-            require("dapui").eval()
-          end,
-          desc = "[D]ebug: [E]valuate Expression",
-        },
+        { "<leader>du", function() require("dapui").toggle() end, desc = "[D]ebut: Toggle [U]I", },
+        { "<leader>de", function() require("dapui").eval() require("dapui").eval() end, desc = "[D]ebug: [E]valuate Expression", },
       },
-      opts = {
-        icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
-        controls = {
-          icons = {
-            pause = "⏸",
-            play = "▶",
-            step_into = "⏎",
-            step_over = "⏭",
-            step_out = "⏮",
-            step_back = "b",
-            run_last = "▶▶",
-            terminate = "⏹",
-            disconnect = "⏏",
-          },
-        },
-        floating = { border = "rounded" },
-        layouts = {
-          {
-            elements = {
-              { id = "stacks", size = 0.30 },
-              { id = "breakpoints", size = 0.20 },
-              { id = "scopes", size = 0.50 },
-            },
-            position = "right",
-            size = 40,
-          },
-        },
-      },
+      config = function()
+        local dap = require("dap")
+        local dapui = require("dapui")
+        dapui.setup()
+        -- somehow the ui doesn't close the first time
+        dap.listeners.after.event_initialized["dapui_config"] = function()
+          dapui.open({})
+        end
+        dap.listeners.before.event_terminated["dapui_config"] = function()
+          dapui.close({})
+          dapui.close({})
+        end
+        dap.listeners.before.event_exited["dapui_config"] = function()
+          dapui.close({})
+          dapui.close({})
+        end
+      end,
     },
 
     -- Virtual text.
@@ -92,15 +75,6 @@ return {
     sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
     sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
     local dap = require("dap")
-    local dapui = require("dapui")
-
-    -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
-    vim.keymap.set("n", "<leader>ds", dapui.toggle, { desc = "[D]ebug: See Last [S]ession Result" })
-
-    dap.listeners.after.event_initialized["dapui_config"] = dapui.open
-    dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-    dap.listeners.before.event_exited["dapui_config"] = dapui.close
-
     -- Lua configurations.
     dap.adapters.nlua = function(callback, config)
       callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
