@@ -540,8 +540,8 @@ local function openPreview()
   local line = list[qfLinenr].lnum
   vim.cmd("pedit +" .. line .. " " .. path)
   if preview == nil then
-    local key = vim.api.nvim_replace_termcodes("<C-w>", true, false, true)
-    vim.api.nvim_feedkeys(key .. "J", "n", false)
+    local key = vim.api.nvim_replace_termcodes("<C-w>J", true, false, true)
+    vim.api.nvim_feedkeys(key, "n", false)
   end
 end
 
