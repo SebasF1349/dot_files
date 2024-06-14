@@ -543,9 +543,27 @@ local function openPreview()
   end
 end
 
-local function hover()
-  local message = getMessage(vim.fn.getline("."))
-  vim.lsp.util.open_floating_preview(vim.split(vim.trim(message), "\n"), "markdown", { border = "rounded" })
+-- NOTE: Should show lines or diagnostics in diagnostics qf?
+local function previewHover()
+  local line = vim.fn.getpos(".")
+  local list = getActiveList().items[line[2]]
+  if not vim.api.nvim_buf_is_loaded(list.bufnr) then
+    vim.fn.bufload(list.bufnr)
+  end
+  local start = list.lnum - 3
+  local end_ = list.lnum + 5
+  local message = vim.api.nvim_buf_get_lines(list.bufnr, start, end_, false)
+  if #message ~= 0 then
+    -- NOTE: idk what syntax to use, for example svelte files are tricky, markdown is easiest, filetype is nicer
+    --      Can I get the real syntax?
+    local filetype = vim.api.nvim_get_option_value("filetype", { buf = list.bufnr })
+    -- NOTE: Take into account it doesn't show more lines that space has in the window
+    vim.lsp.util.open_floating_preview(message, filetype, { border = "rounded", height = 10, focusable = true })
+  else
+    -- NOTE: shouldn't be needed, but just in case
+    message = vim.split(vim.trim(getMessage(vim.fn.getline("."))), "\n")
+    vim.lsp.util.open_floating_preview(message, "markdown", { border = "rounded" })
+  end
 end
 
 ---@param direction "n" | "p"
@@ -621,7 +639,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       vim.api.nvim_feedkeys(key, "n", false)
     end, { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
-    vim.keymap.set("n", "K", hover, { buffer = 0, desc = "Show Message on Hover" })
+    vim.keymap.set("n", "K", previewHover, { buffer = 0, desc = "Show Message on Hover" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
   end,
