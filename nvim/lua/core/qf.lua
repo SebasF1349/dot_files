@@ -70,7 +70,8 @@ local function getList(listType)
 end
 
 -- NOTE: This supposes only one list is opened, if there is more than one quickfix wins
----@return { qftype:string, items: table, size:number, winid:number, title:string, id:number }
+---@alias qfitem { bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
+---@return { qftype:string, items: qfitem[] , size:number, winid:number, title:string, id:number }
 local function getActiveList()
   local loclist = getList("l")
   local qflist = getList("c")
