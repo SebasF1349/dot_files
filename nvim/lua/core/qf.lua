@@ -529,8 +529,8 @@ local function getPreview()
 end
 
 -- NOTE: creating preview does clean diagnostics causing error on the autocmd
+-- NOTE: cursor position changes in qflist when using pedit (WHY???)
 local function openPreview()
-  local preview = getPreview()
   local qfLinenr = vim.fn.line(".")
   local list = getActiveList().items
   if qfLinenr > #list then
@@ -538,11 +538,7 @@ local function openPreview()
   end
   local path = vim.fn.bufname(list[qfLinenr].bufnr)
   local line = list[qfLinenr].lnum
-  vim.cmd("pedit +" .. line .. " " .. path)
-  if preview == nil then
-    local key = vim.api.nvim_replace_termcodes("<C-w>J", true, false, true)
-    vim.api.nvim_feedkeys(key, "n", false)
-  end
+  vim.cmd("aboveleft pedit +" .. line .. " " .. path)
 end
 
 -- NOTE: Should show lines or diagnostics in diagnostics qf?
