@@ -93,8 +93,6 @@ return {
         callback = function(event)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-          vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP:[C]ode [A]ction" })
-
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
             vim.lsp.inlay_hint.enable(true)
             vim.keymap.set("n", "<leader>ti", function()
@@ -118,14 +116,10 @@ return {
 
           vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "LSP: Open floating diagnostic message" })
 
-          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP:[R]e[n]ame" })
-
-          local telescope = require("telescope.builtin")
-          vim.keymap.set("n", "gd", telescope.lsp_definitions, { desc = "LSP: [G]oto [D]efinition" })
-          vim.keymap.set("n", "gr", telescope.lsp_references, { desc = "LSP: [G]oto [R]eferences" })
-          vim.keymap.set("n", "gI", telescope.lsp_implementations, { desc = "LSP: [G]oto [I]mplementation" })
-          vim.keymap.set("n", "gy", telescope.lsp_type_definitions, { desc = "LSP: [G]oto T[y]pe Definition" })
-          vim.keymap.set("n", "gK", vim.lsp.buf.signature_help, { desc = "LSP: Signature Documentation on [K]Hover" })
+          vim.keymap.set("n", "grd", "<C-]>", { desc = "LSP: [G]oto [D]efinition" })
+          vim.keymap.set("n", "gri", vim.lsp.buf.implementation, { desc = "LSP: [G]oto [I]mplementation" })
+          vim.keymap.set("n", "grt", vim.lsp.buf.type_definition, { desc = "LSP: [G]oto T[y]pe Definition" })
+          vim.keymap.set("n", "grs", vim.lsp.buf.signature_help, { desc = "LSP: Signature Documentation on [K]Hover" })
 
           vim.keymap.set("n", "<leader>oi", function()
             if vim.fn.exists(":OrganizeImports") > 0 then
