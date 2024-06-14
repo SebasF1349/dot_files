@@ -396,9 +396,10 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
       return
     end
     local diagnostics = vim.diagnostic.get()
-    if #diagnostics == 0 then
-      vim.cmd("cclose")
-    end
+    -- NOTE: commented this out because it crashes when opening second preview
+    -- if #diagnostics == 0 then
+    --   vim.cmd("cclose")
+    -- end
     local qf_items = vim.diagnostic.toqflist(
       -- TODO: Can the event data have items not returned by vim.diagnostic.get?
       -- If not, we don't need to extend the diagnostics variable here.
@@ -527,6 +528,7 @@ local function getPreview()
   return nil
 end
 
+-- NOTE: creating preview does clean diagnostics causing error on the autocmd
 local function openPreview()
   local preview = getPreview()
   local qfLinenr = vim.fn.line(".")
