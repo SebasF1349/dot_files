@@ -551,17 +551,14 @@ local function previewHover()
   local start = list.lnum - 3
   local end_ = list.lnum + 5
   local message = vim.api.nvim_buf_get_lines(list.bufnr, start, end_, false)
-  if #message ~= 0 then
-    -- NOTE: idk what syntax to use, for example svelte files are tricky, markdown is easiest, filetype is nicer
-    --      Can I get the real syntax?
-    local filetype = vim.api.nvim_get_option_value("filetype", { buf = list.bufnr })
-    -- NOTE: Take into account it doesn't show more lines that space has in the window
-    vim.lsp.util.open_floating_preview(message, filetype, { border = "rounded", height = 10, focusable = true })
-  else
-    -- NOTE: shouldn't be needed, but just in case
+  if #message == 0 then
     message = vim.split(vim.trim(getMessage(vim.fn.getline("."))), "\n")
-    vim.lsp.util.open_floating_preview(message, "markdown", { border = "rounded" })
   end
+  -- NOTE: idk what syntax to use, for example svelte files are tricky, markdown is easiest, filetype is nicer
+  --      Can I get the real syntax?
+  local filetype = vim.api.nvim_get_option_value("filetype", { buf = list.bufnr })
+  -- NOTE: Take into account it doesn't show more lines that space has in the window
+  vim.lsp.util.open_floating_preview(message, filetype, { border = "rounded", height = 10, focusable = true })
 end
 
 ---@param direction "n" | "p"
