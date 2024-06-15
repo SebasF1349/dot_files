@@ -585,10 +585,12 @@ local function selectItem(split, close)
     key = vim.api.nvim_replace_termcodes("<C-w>k<C-w>v<C-w>j<CR>", true, false, true)
   end
   vim.api.nvim_feedkeys(key, "n", false)
-  if close then
-    local list = getActiveList()
-    vim.cmd(list.qftype .. "close")
-  end
+  vim.schedule(function()
+    if close then
+      local list = getActiveList()
+      vim.cmd(list.qftype .. "close")
+    end
+  end)
 end
 
 local function closeList()
