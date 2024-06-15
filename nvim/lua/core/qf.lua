@@ -175,65 +175,62 @@ function _G.qftf(info)
   local limit = 0
   for i = info.start_idx, info.end_idx do
     local e = list[i]
-    local item = { index = i, name = " ", path = "", message = vim.fn.trim(e.text) }
-    if e.valid == 1 then
-      if e.bufnr > 0 then
-        local fname = vim.fn.bufname(e.bufnr)
-        if fname ~= "" then
-          fname = vim.fn.fnamemodify(fname, ":p:~:.")
-          item.name = vim.fn.fnamemodify(fname, ":p:t")
-          item.path = vim.fn.fnamemodify(fname, ":h")
-          if item.path == "." then
-            item.path = ""
-          end
-          if #item.name + #item.path > limit then
-            limit = #item.name + #item.path
-          end
+    local item = { name = " ", path = "", message = vim.fn.trim(e.text), type = e.type }
+    if e.valid == 1 and e.bufnr > 0 then
+      local fname = vim.fn.bufname(e.bufnr)
+      if fname ~= "" then
+        fname = vim.fn.fnamemodify(fname, ":p:~:.")
+        item.name = vim.fn.fnamemodify(fname, ":p:t")
+        item.path = vim.fn.fnamemodify(fname, ":h")
+        if item.path == "." then
+          item.path = ""
+        end
+        if #item.name + #item.path > limit then
+          limit = #item.name + #item.path
         end
       end
-      item.type = e.type
     end
     table.insert(items, item)
   end
   limit = math.floor(math.min(limit + 1, 2 * vim.o.columns / 3))
-  local fnameFmt1, fnameFmt2 = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s"
-  local validFmt = "%s │ %s%s"
+  local formatSpaces, formatLong, validFmt = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s", "%s │ %s%s"
   local highlighting = {}
-  for _, item in ipairs(items) do
+  for i, item in ipairs(items) do
     local fname = ""
-    local str
     if #item.name > limit then
-      item.name = fnameFmt2:format(item.name:sub(1 - limit))
+      item.name = formatLong:format(item.name:sub(1 - limit))
       item.path = ""
       fname = item.name
     elseif #item.path == 0 then
       fname = item.name
     elseif #item.path + #item.name + 1 > limit then
-      item.path = fnameFmt2:format(item.path:sub(1 - limit + #item.name))
+      item.path = formatLong:format(item.path:sub(2 - limit + #item.name))
       fname = item.name .. " " .. item.path
     else
       fname = item.name .. " " .. item.path
     end
-    fname = fnameFmt1:format(fname)
+    fname = formatSpaces:format(fname)
     local type = item.type == "" and "" or (signs[item.type] and signs[item.type] or signs.I)
-    str = validFmt:format(fname, type, vim.fn.trim(item.message))
-    table.insert(highlighting, {
-      group = "Directory",
-      line = item.index - 1,
-      col = 0,
-      end_col = #item.name,
-    })
-    table.insert(highlighting, {
-      group = "Comment",
-      line = item.index - 1,
-      col = #item.name + 1,
-      end_col = limit + 4,
-    })
-    table.insert(highlighting, {
-      group = highlights[item.type] or "FloatTitle",
-      line = item.index - 1,
-      col = limit + 4,
-      end_col = limit + 4 + #type + 2 + #item.message,
+    local str = validFmt:format(fname, type, item.message)
+    vim.list_extend(highlighting, {
+      {
+        group = "Directory",
+        line = i - 1,
+        col = 0,
+        end_col = #item.name,
+      },
+      {
+        group = "Comment",
+        line = i - 1,
+        col = #item.name + 1,
+        end_col = limit + 4,
+      },
+      {
+        group = highlights[item.type] or "FloatTitle",
+        line = i - 1,
+        col = limit + 4,
+        end_col = limit + 4 + #type + 2 + #item.message,
+      },
     })
     table.insert(ret, str)
   end
