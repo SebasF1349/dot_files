@@ -451,15 +451,12 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.opt.number = true
     vim.opt_local.relativenumber = false
     vim.opt_local.statuscolumn = ""
-    -- vim.opt_local.wrap = true
     vim.opt_local.hidden = true
-    -- vim.bo.modifiable = true
     vim.bo.buflisted = false
     vim.wo.winfixheight = true
     vim.wo.winfixbuf = true
     vim.api.nvim_win_set_height(0, getHeight())
-    -- :vimgrep's quickfix window display format now includes start and end column (in vim and nvim) so adding 2nd format to match that
-    -- vim.bo.errorformat = "%f|%l col %c| %m,%f|%l col %c-%k| %m"
+    vim.o.previewheight = 10
   end,
   desc = "Qf syntax + options",
 })
@@ -514,7 +511,6 @@ local function getPreview()
   return nil
 end
 
--- NOTE: cursor position changes in qflist when using pedit (WHY???)
 local function openPreview()
   local qfLinenr = vim.fn.line(".")
   local list = getActiveList().items
@@ -552,12 +548,12 @@ local function moveWithPreview(direction)
   local current_pos = vim.fn.getcurpos()
   local move_line = direction == "n" and current_pos[2] + 1 or current_pos[2] - 1
   local list_size = getActiveList().size
-  if move_line < 0 then
+  if move_line < 1 then
     move_line = list_size
   elseif move_line > list_size then
-    move_line = 0
+    move_line = 1
   end
-  vim.fn.cursor(move_line, 0)
+  vim.api.nvim_win_set_cursor(0, { move_line, 0 })
   openPreview()
 end
 
