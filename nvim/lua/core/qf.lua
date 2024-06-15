@@ -60,7 +60,8 @@ local function getListsWin()
 end
 
 ---@param listType ListType
----@return { items: table, size:number, winid:number, title:string, id:number }
+---@alias qfitem { bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
+---@return { items: qfitem[], size: number, winid: number, title: string, id: number }
 local function getList(listType)
   if listType == "c" then
     return vim.fn.getqflist({ items = 0, size = 0, winid = 0, title = 0, id = 0 })
@@ -70,8 +71,7 @@ local function getList(listType)
 end
 
 -- NOTE: This supposes only one list is opened, if there is more than one quickfix wins
----@alias qfitem { bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
----@return { qftype:string, items: qfitem[] , size:number, winid:number, title:string, id:number }
+---@return { qftype: string, items: qfitem[] , size: number, winid: number, title: string, id: number }
 local function getActiveList()
   local loclist = getList("l")
   local qflist = getList("c")
