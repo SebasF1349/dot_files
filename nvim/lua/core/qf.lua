@@ -552,7 +552,7 @@ local function previewHover()
   -- NOTE: idk what syntax to use, for example svelte files are tricky, markdown is easiest, filetype is nicer
   --      Can I get the real syntax?
   local filetype = vim.api.nvim_get_option_value("filetype", { buf = list.bufnr })
-  vim.lsp.util.open_floating_preview(message, filetype, { border = "rounded", height = 10, focusable = true })
+  vim.lsp.util.open_floating_preview(message, filetype, { title = vim.fn.bufname(list.bufnr), border = "rounded", height = 10, focusable = true })
 end
 
 ---@param direction "n" | "p"
