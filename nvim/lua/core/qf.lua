@@ -192,26 +192,18 @@ function _G.qftf(info)
     end
     table.insert(items, item)
   end
-  limit = math.floor(math.min(limit + 1, 2 * vim.o.columns / 3))
-  local formatSpaces, formatLong, validFmt = "%-" .. limit .. "s", "…%." .. (limit - 1) .. "s", "%s │ %s%s"
+  limit = math.floor(math.min(limit + 1, vim.o.columns / 2))
+  local formatLong, validFmt = "…%s", "%s %s%s │ %s%s"
   local highlighting = {}
   for i, item in ipairs(items) do
-    local fname = ""
     if #item.name > limit then
       item.name = formatLong:format(item.name:sub(1 - limit))
       item.path = ""
-      fname = item.name
-    elseif #item.path == 0 then
-      fname = item.name
     elseif #item.path + #item.name + 1 > limit then
       item.path = formatLong:format(item.path:sub(2 - limit + #item.name))
-      fname = item.name .. " " .. item.path
-    else
-      fname = item.name .. " " .. item.path
     end
-    fname = formatSpaces:format(fname)
     local type = item.type == "" and "" or (signs[item.type] and signs[item.type] or signs.I)
-    local str = validFmt:format(fname, type, item.message)
+    local str = validFmt:format(item.name, item.path, (" "):rep(limit - #item.name - #item.path - 1), type, item.message)
     vim.list_extend(highlighting, {
       {
         group = "Directory",
@@ -223,13 +215,13 @@ function _G.qftf(info)
         group = "Comment",
         line = i - 1,
         col = #item.name + 1,
-        end_col = limit + 4,
+        end_col = limit + 2,
       },
       {
         group = highlights[item.type] or "FloatTitle",
         line = i - 1,
-        col = limit + 4,
-        end_col = limit + 4 + #type + 2 + #item.message,
+        col = limit + 2,
+        end_col = limit + 2 + #type + 3 + #item.message,
       },
     })
     table.insert(ret, str)
