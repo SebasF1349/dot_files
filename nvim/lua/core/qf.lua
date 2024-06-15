@@ -634,7 +634,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
     vim.keymap.set({ "v" }, "d", delete, { buffer = 0, desc = "Delete QF Item" })
   end,
-  once = true,
   desc = "Keymaps inside quickfix window",
 })
 
