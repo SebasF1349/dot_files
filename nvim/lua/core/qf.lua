@@ -446,7 +446,8 @@ function _G.qffoldtextfunc()
     { path[1] .. " ", "DiagnosticInfo" },
     { path[2] .. (" "):rep(whitespace), "Comment" },
     { "│", "Comment" },
-    { " +-- " .. vim.v.foldend - vim.v.foldstart + 1 .. " lines", "DiagnosticInfo" },
+    { "⎯⎯ " .. vim.v.foldend - vim.v.foldstart + 1 .. " lines", "DiagnosticInfo" },
+    { ("⎯"):rep(vim.o.columns), "DiagnosticInfo" },
   }
   return highlighting
 end
