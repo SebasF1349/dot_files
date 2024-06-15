@@ -1,5 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
+  dependencies = { "sudogoku/nvim-treesitter-textsubjects" },
   event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
   config = function()
@@ -64,6 +65,16 @@ return {
           node_incremental = "gn",
           scope_incremental = "gs",
           node_decremental = "gr",
+        },
+      },
+      -- Needs testing if I realy like it, looks nice but too magical
+      textsubjects = {
+        enable = true,
+        prev_selection = ",",
+        keymaps = {
+          ["."] = { "textsubjects-smart", desc = "Patterns" },
+          [";"] = { "textsubjects-container-outer", desc = "Inside containers (classes, functions, strucs and methods)" },
+          ["i;"] = { "textsubjects-container-inner", desc = "Inside containers (classes, functions, strucs and methods)" },
         },
       },
     })
