@@ -385,10 +385,9 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
       return
     end
     local diagnostics = vim.diagnostic.get()
-    -- NOTE: commented this out because it crashes when opening second preview
-    -- if #diagnostics == 0 then
-    --   vim.cmd("cclose")
-    -- end
+    if #diagnostics == 0 then
+      vim.cmd("cclose")
+    end
     local qf_items = vim.diagnostic.toqflist(
       -- TODO: Can the event data have items not returned by vim.diagnostic.get?
       -- If not, we don't need to extend the diagnostics variable here.
@@ -515,7 +514,6 @@ local function getPreview()
   return nil
 end
 
--- NOTE: creating preview does clean diagnostics causing error on the autocmd
 -- NOTE: cursor position changes in qflist when using pedit (WHY???)
 local function openPreview()
   local qfLinenr = vim.fn.line(".")
@@ -525,7 +523,8 @@ local function openPreview()
   end
   local path = vim.fn.bufname(list[qfLinenr].bufnr)
   local line = list[qfLinenr].lnum
-  vim.cmd("aboveleft pedit +" .. line .. " " .. path)
+  vim.cmd("pclose")
+  vim.cmd("keepjumps aboveleft pedit +" .. line .. " " .. path)
 end
 
 -- NOTE: Should show lines or diagnostics in diagnostics qf?
