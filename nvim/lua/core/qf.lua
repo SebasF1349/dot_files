@@ -525,6 +525,7 @@ local function openPreview()
   local line = list[qfLinenr].lnum
   vim.cmd("pclose")
   vim.cmd("keepjumps aboveleft pedit +" .. line .. " " .. path)
+  vim.api.nvim_win_set_cursor(0, { qfLinenr, 0 })
 end
 
 -- NOTE: Should show lines or diagnostics in diagnostics qf?
