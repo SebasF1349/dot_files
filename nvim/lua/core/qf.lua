@@ -542,16 +542,15 @@ local function previewHover()
   if not vim.api.nvim_buf_is_loaded(list.bufnr) then
     vim.fn.bufload(list.bufnr)
   end
-  local start = list.lnum - 3
-  local end_ = list.lnum + 5
-  local message = vim.api.nvim_buf_get_lines(list.bufnr, start, end_, false)
+  -- NOTE: Take into account it doesn't show more lines that space has in the window
+  local message = vim.api.nvim_buf_get_lines(list.bufnr, list.lnum - 2, list.lnum + 2, false)
   if #message == 0 then
+    -- NOTE: I don't think this is necessary now, there should be always a message
     message = vim.split(vim.trim(getMessage(vim.fn.getline("."))), "\n")
   end
   -- NOTE: idk what syntax to use, for example svelte files are tricky, markdown is easiest, filetype is nicer
   --      Can I get the real syntax?
   local filetype = vim.api.nvim_get_option_value("filetype", { buf = list.bufnr })
-  -- NOTE: Take into account it doesn't show more lines that space has in the window
   vim.lsp.util.open_floating_preview(message, filetype, { border = "rounded", height = 10, focusable = true })
 end
 
@@ -605,8 +604,6 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   group = qf_group,
   pattern = "quickfix",
   callback = function()
-    -- vim.keymap.set("n", "j", "<down><CR><C-w>p", { buffer = 0, desc = "Next QF Item" })
-    -- vim.keymap.set("n", "k", "<up><CR><C-w>p", { buffer = 0, desc = "Previous QF Item" })
     vim.keymap.set("n", "q", closeList, { buffer = 0, desc = "Close QF list" })
     vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" })
     vim.keymap.set("n", "<C-s>", function()
@@ -641,6 +638,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 -- Extras
 --------------------------------------------------
 
+-- NOTE: return early in an horizontal move maybe caching line and buffer
 vim.api.nvim_create_autocmd("CursorMoved", {
   group = qf_group,
   callback = function()
@@ -716,8 +714,8 @@ vim.api.nvim_create_autocmd("WinClosed", {
 --------------------------------------------------
 
 -- maybe open the qf window automatically after :make, :grep, :lvimgrep
---          and friends if there are valid locations/errors (qf.vim)
--- shorten filepaths for better legibility (qf.vim)
+--          and friends if there are valid locations/errors (qf.vim) -- use QuickFixCmdPost event on autocmd
+-- shorten filepaths for better legibility (qf.vim) -- don't like it, but can use pathshorten
 -- have qf win ALWAYS on bottom, when opened in split or when creating new splits
 -- make possible to undo deleted qf items
 -- highlight messages (it is even possible?)
@@ -726,6 +724,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
 -- not sure about making qf editable like replacer.nvim
 -- show definition, references, implementations, type definition and declarations from word under the cursor (trouble)
 -- use buf_request_all for definitions/symbols/etc for async requests
+-- use qf to list buffers and/or open buffers
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
