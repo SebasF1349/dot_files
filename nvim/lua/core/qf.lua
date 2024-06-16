@@ -557,9 +557,9 @@ local function moveWithPreview(direction)
   openPreview()
 end
 
+---@param cursor_position? "move" | "stay" | "close"
 ---@param split? "v" | "h"
----@param close? boolean
-local function selectItem(split, close)
+local function selectItem(cursor_position, split)
   local preview = getPreview()
   if preview then
     vim.cmd("pclose")
@@ -574,9 +574,12 @@ local function selectItem(split, close)
   end
   vim.api.nvim_feedkeys(key, "n", false)
   vim.schedule(function()
-    if close then
+    if cursor_position == "close" then
       local list = getActiveList()
       vim.cmd(list.qftype .. "close")
+    elseif cursor_position == "stay" then
+      key = vim.api.nvim_replace_termcodes("<C-w>p", true, false, true)
+      vim.api.nvim_feedkeys(key, "n", false)
     end
   end)
 end
@@ -596,10 +599,10 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.keymap.set("n", "q", closeList, { buffer = 0, desc = "Close QF list" })
     vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" })
     vim.keymap.set("n", "<C-s>", function()
-      selectItem("h")
+      selectItem("move", "h")
     end, { buffer = 0, desc = "Open QF Item in Horizontal [S]plit" })
     vim.keymap.set("n", "<C-v>", function()
-      selectItem("v")
+      selectItem("move", "v")
     end, { buffer = 0, desc = "Open QF Item in [V]ertical Split" })
     vim.keymap.set("n", "<C-n>", function()
       moveWithPreview("n")
@@ -608,12 +611,10 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
       moveWithPreview("p")
     end, { buffer = 0, desc = "Move and Preview Previous QF Item" })
     vim.keymap.set("n", "o", function()
-      selectItem(nil, true)
+      selectItem("close")
     end, { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "O", function()
-      selectItem()
-      local key = vim.api.nvim_replace_termcodes("<C-w>p", true, false, true)
-      vim.api.nvim_feedkeys(key, "n", false)
+      selectItem("stay")
     end, { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "K", previewHover, { buffer = 0, desc = "Show Message on Hover" })
