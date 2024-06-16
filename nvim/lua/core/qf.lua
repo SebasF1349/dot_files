@@ -570,6 +570,7 @@ local function selectItem(cursor_position, split)
   elseif split == "h" then
     key = vim.api.nvim_replace_termcodes("<C-w><CR>", true, false, true)
   else
+    -- NOTE: this makes the new split "on the left" and taking control of the location list
     key = vim.api.nvim_replace_termcodes("<C-w>k<C-w>v<C-w>j<CR>", true, false, true)
   end
   vim.api.nvim_feedkeys(key, "n", false)
@@ -715,6 +716,8 @@ vim.api.nvim_create_autocmd("WinClosed", {
 -- show definition, references, implementations, type definition and declarations from word under the cursor (trouble)
 -- use buf_request_all for definitions/symbols/etc for async requests
 -- use qf to list buffers and/or open buffers
+-- use more the api and less cmd/vim.fn
+-- use more keepjumps in cmd (https://github.com/ronakg/quickr-preview.vim/blob/master/after/ftplugin/qf.vim#L190)
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
