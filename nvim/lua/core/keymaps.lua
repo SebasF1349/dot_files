@@ -225,3 +225,6 @@ local spell_select = function()
   vim.ui.select(vim.fn.spellsuggest(cword, vim.o.lines), { prompt = "Change " .. cword .. " to:" }, spell_on_choice)
 end
 vim.keymap.set("n", "z=", spell_select, { desc = "Shows spelling suggestions" })
+
+-- abbreviations
+vim.keymap.set("ca", "Wa", "wa")
