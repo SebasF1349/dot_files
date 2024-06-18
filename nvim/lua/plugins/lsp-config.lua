@@ -114,12 +114,11 @@ return {
             end, { desc = "LSP: Go to next [D]iagnostic message" })
           end
 
-          vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "LSP: Open floating diagnostic message" })
-
+          vim.keymap.set("n", "gre", vim.diagnostic.open_float, { desc = "LSP: Open Floating [E]rror Message" })
           vim.keymap.set("n", "grd", "<C-]>", { desc = "LSP: [G]oto [D]efinition" })
           vim.keymap.set("n", "gri", vim.lsp.buf.implementation, { desc = "LSP: [G]oto [I]mplementation" })
-          vim.keymap.set("n", "grt", vim.lsp.buf.type_definition, { desc = "LSP: [G]oto T[y]pe Definition" })
-          vim.keymap.set("n", "grs", vim.lsp.buf.signature_help, { desc = "LSP: Signature Documentation on [K]Hover" })
+          vim.keymap.set("n", "grt", vim.lsp.buf.type_definition, { desc = "LSP: [G]oto [T]ype Definition" })
+          vim.keymap.set("n", "grs", vim.lsp.buf.signature_help, { desc = "LSP: [S]ignature Documentation on Hover" })
 
           vim.keymap.set("n", "<leader>oi", function()
             if vim.fn.exists(":OrganizeImports") > 0 then
