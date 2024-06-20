@@ -215,13 +215,13 @@ function _G.qftf(info)
         group = "Comment",
         line = i - 1,
         col = #item.name + 1,
-        end_col = limit + 2,
+        end_col = limit + 4,
       },
       {
         group = highlights[item.type] or "FloatTitle",
         line = i - 1,
-        col = limit + 2,
-        end_col = limit + 2 + #type + 3 + #item.message,
+        col = limit + 4,
+        end_col = vim.o.columns,
       },
     })
     table.insert(ret, str)
