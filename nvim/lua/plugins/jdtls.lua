@@ -56,6 +56,12 @@ return {
             maven = {
               downloadSources = true,
             },
+            implementationsCodeLens = {
+              enabled = true,
+            },
+            referencesCodeLens = {
+              enabled = true,
+            },
             references = {
               includeAccessors = true,
               includeDecompiledSources = true,
@@ -94,6 +100,16 @@ return {
 
     local function attach_jdtls()
       require("jdtls").start_or_attach(config())
+
+      -- codelens
+      pcall(vim.lsp.codelens.refresh)
+      vim.api.nvim_create_autocmd("BufWritePost", {
+        buffer = 0,
+        callback = function()
+          pcall(vim.lsp.codelens.refresh)
+        end,
+        desc = "Refresh Codelens",
+      })
     end
 
     vim.api.nvim_create_autocmd("FileType", {
