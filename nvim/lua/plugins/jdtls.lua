@@ -94,9 +94,10 @@ return {
         capabilities = require("cmp_nvim_lsp").default_capabilities(),
         dap = { hotcodereplace = "auto", config_overrides = {} },
         dap_main = {},
-        test = true,
       }
     end
+
+    local java_autocmd = vim.api.nvim_create_augroup("Java Autocommands", { clear = true })
 
     local function attach_jdtls()
       require("jdtls").start_or_attach(config())
@@ -104,6 +105,7 @@ return {
       -- codelens
       pcall(vim.lsp.codelens.refresh)
       vim.api.nvim_create_autocmd("BufWritePost", {
+        group = java_autocmd,
         buffer = 0,
         callback = function()
           pcall(vim.lsp.codelens.refresh)
@@ -113,22 +115,22 @@ return {
     end
 
     vim.api.nvim_create_autocmd("FileType", {
+      group = java_autocmd,
       pattern = "java",
       callback = attach_jdtls,
     })
 
     vim.api.nvim_create_autocmd("LspAttach", {
+      group = java_autocmd,
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
         if client and client.name == "jdtls" then
           local jdtls_dap = require("jdtls.dap")
           require("jdtls").setup_dap(config().dap)
-          jdtls_dap.setup_dap_main_class_configs(config().dap_main)
-          if config().test then
-            vim.keymap.set("n", "<leader>nt", jdtls_dap.test_class, { desc = "[N]eotest [T]est" })
-            vim.keymap.set("n", "<leader>nn", jdtls_dap.test_nearest_method, { desc = "[N]eotest Test [N]earest" })
-            vim.keymap.set("n", "<leader>np", jdtls_dap.pick_test, { desc = "[N]eotest [P]ick Test" })
-          end
+          jdtls_dap.setup_dap_main_class_configs(config().dap_main) -- errors on start because eclipse is not fully loaded
+          vim.keymap.set("n", "<leader>nt", jdtls_dap.test_class, { desc = "[N]eotest [T]est" })
+          vim.keymap.set("n", "<leader>nn", jdtls_dap.test_nearest_method, { desc = "[N]eotest Test [N]earest" })
+          vim.keymap.set("n", "<leader>np", jdtls_dap.pick_test, { desc = "[N]eotest [P]ick Test" })
         end
       end,
     })
