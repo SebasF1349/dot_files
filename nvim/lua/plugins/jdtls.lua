@@ -42,6 +42,7 @@ return {
     local config = function()
       return {
         cmd = cmd(),
+        root_dir = require("jdtls.setup").find_root({ "pom.xml", "mvnw", "gradlew", ".git" }), -- update to vim.fs.root in nv0.10
         init_options = { bundles = bundles },
         filetypes = { "java" },
         settings = {
