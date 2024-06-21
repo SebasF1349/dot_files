@@ -226,7 +226,5 @@ local spell_select = function()
 end
 vim.keymap.set("n", "z=", spell_select, { desc = "Shows spelling suggestions" })
 
-if not require("utils.nvim-version").is_old() then
-  -- abbreviations
-  vim.keymap.set("ca", "Wa", "wa")
-end
+-- abbreviations
+vim.keymap.set("ca", "Wa", "wa")
