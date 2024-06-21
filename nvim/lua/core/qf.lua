@@ -318,7 +318,7 @@ local function move(listType, direction, file)
   ---@diagnostic disable-next-line: param-type-mismatch
   local ok, _ = pcall(vim.cmd, file and listType .. direction .. "f" or listType .. direction)
   if not ok then
-    vim.cmd(listType .. (direction == "n" and "first" or "last"))
+    vim.cmd(listType .. (direction == "next" and "first" or "last"))
   end
 end
 
