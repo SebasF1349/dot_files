@@ -118,16 +118,27 @@ end
 ---- GIT ----
 vim.api.nvim_set_hl(0, "StatusLineGitBranch", { bg = background, fg = mocha.pink })
 
-local head = ""
+local head_cache = ""
 local function git_branch()
   local git_info = vim.b.gitsigns_status_dict
   if git_info then
-    head = git_info.head
+    head_cache = git_info.head
   end
-  return string.format("%%#StatusLineGitBranch# %s ", head)
+  return head_cache
 end
 
 local gstatus = { ahead = "0", behind = "0", modified = 0 }
+
+local function git_modified()
+  local git_info = vim.b.gitsigns_status_dict
+  if git_info.added ~= 0 or git_info.changed ~= 0 or git_info.removed ~= 0 then
+    gstatus.modified = 1
+    return true
+  end
+  return false
+end
+git_modified()
+
 local function update_gstatus()
   local Job = require("plenary.job")
   Job:new({
@@ -136,14 +147,14 @@ local function update_gstatus()
     on_exit = function(job, _)
       local res = job:result()[1]
       if type(res) ~= "string" then
-        gstatus = { ahead = "0", behind = "0" }
+        gstatus.ahead, gstatus.behind = "0", "0"
         return
       end
       local ok, ahead, behind = pcall(string.match, res, "(%d+)%s*(%d+)")
       if not ok then
         ahead, behind = "0", "0"
       end
-      gstatus = { ahead = ahead, behind = behind }
+      gstatus.ahead, gstatus.behind = ahead, behind
     end,
   }):start()
   Job:new({
@@ -165,14 +176,15 @@ _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
 
 vim.api.nvim_set_hl(0, "StatusLineGit", { bg = background, fg = mocha.red })
 
-local function git_status()
+local function git()
+  local head = git_branch()
   local ahead = gstatus.ahead ~= "0" and "" or ""
   local behind = gstatus.behind ~= "0" and "" or ""
-  local modified = (gstatus.modified and gstatus.modified ~= 0) and "~" or ""
+  local modified = gstatus.modified ~= 0 and "~" or ""
   if ahead == "" and behind == "" and modified == "" then
-    return ""
+    return string.format(" %%#StatusLineGitBranch#%s ", head)
   end
-  return string.format("%%#StatusLineGit#[%s%s%s] ", ahead, behind, modified)
+  return string.format(" %%#StatusLineGitBranch#%s%%#StatusLineGit#[%s%s%s] ", head, ahead, behind, modified)
 end
 
 ---- DIAGNOSTICS ----
@@ -233,11 +245,10 @@ Statusline = {
       "%#StatusLineNormal#",
       update_mode_colors(),
       mode(),
+      git(),
       file(),
       "%=",
       custom_diagnostics(),
-      git_branch(),
-      git_status(),
     })
   end,
 }
