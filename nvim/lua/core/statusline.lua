@@ -79,6 +79,8 @@ local function file()
     end
   elseif ftype == "fugitive" then
     title, label = vim.fn.expand("%:h:h:t"), "Fugitive"
+  elseif ftype == "gitcommit" then
+    title, label = "Git Commit Message", "Fugitive"
   elseif ftype == "qf" then
     local isLoclist = vim.fn.getloclist(0, { filewinid = 1 }).filewinid ~= 0
     label = isLoclist and "Location List" or "Quickfix List"
