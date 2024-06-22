@@ -143,6 +143,10 @@ local function update_gstatus()
   local Job = require("plenary.job")
   Job:new({
     command = "git",
+    args = { "fetch" },
+  })
+  Job:new({
+    command = "git",
     args = { "rev-list", "--left-right", "--count", "HEAD...@{upstream}" },
     on_exit = function(job, _)
       local res = job:result()[1]
