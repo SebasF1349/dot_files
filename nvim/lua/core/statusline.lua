@@ -131,7 +131,7 @@ local gstatus = { ahead = "0", behind = "0", modified = 0 }
 
 local function git_modified()
   local git_info = vim.b.gitsigns_status_dict
-  if git_info.added ~= 0 or git_info.changed ~= 0 or git_info.removed ~= 0 then
+  if git_info and (git_info.added ~= 0 or git_info.changed ~= 0 or git_info.removed ~= 0) then
     gstatus.modified = 1
     return true
   end
