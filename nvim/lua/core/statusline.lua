@@ -1,8 +1,6 @@
 -- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
 local mocha = require("catppuccin.palettes").get_palette("mocha")
 
-local background = mocha.surface0
-
 ---- MODE ----
 local modes = {
   ["n"] = "Normal",
@@ -43,13 +41,13 @@ local modes = {
 }
 
 local modes_hi = {
-  N = { bg = background, fg = mocha.blue },
-  I = { bg = background, fg = mocha.green },
-  T = { bg = background, fg = mocha.green },
-  C = { bg = background, fg = mocha.peach },
-  V = { bg = background, fg = mocha.mauve },
-  R = { bg = background, fg = mocha.red },
-  O = { bg = background, fg = mocha.overlay2 },
+  N = { fg = mocha.blue },
+  I = { fg = mocha.green },
+  T = { fg = mocha.green },
+  C = { fg = mocha.peach },
+  V = { fg = mocha.mauve },
+  R = { fg = mocha.red },
+  O = { fg = mocha.overlay2 },
 }
 
 for mode, hi in pairs(modes_hi) do
@@ -58,23 +56,12 @@ end
 
 local function mode()
   local current_mode = vim.api.nvim_get_mode().mode
-  return string.format(" %s ", modes[current_mode]:sub(1, 1))
-end
-
-local function update_mode_colors()
-  local current_mode = vim.api.nvim_get_mode().mode
   local first_char = modes[current_mode]:sub(1, 1)
-  if first_char then
-    return string.format("%%#StatusLineMode%s#", first_char)
-  else
-    return "%#StatusLineModeO#"
-  end
+  local mode_hi = modes[current_mode] and ("StatusLineMode" .. first_char) or "StatusLineModeO"
+  return string.format(" %%#%s#%s ", mode_hi, modes[current_mode]:sub(1, 1))
 end
 
 ---- FILENAME ----
-vim.api.nvim_set_hl(0, "StatusLineNormal", { bg = background, fg = mocha.text })
-vim.api.nvim_set_hl(0, "StatusLineGhost", { bg = background, fg = mocha.overlay2 })
-
 local function file()
   local buftype = vim.bo.buftype
   local ftype = vim.o.filetype
@@ -100,7 +87,7 @@ local function file()
     return ""
   end
   if label then
-    return string.format("%%#StatusLineGhost# [%s] %%#StatusLineNormal#%s ", label, title)
+    return string.format("%%#NonText# [%s] %%#Normal#%s ", label, title)
   end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
@@ -108,16 +95,14 @@ local function file()
   end
   local fpath = vim.fn.expand("%:~:.:h")
   if fpath == "" or fpath == "." then
-    return string.format("%%#StatusLineNormal#%s ", fname)
+    return string.format("%%#Normal#%s ", fname)
   end
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (dap)
-  return string.format("%%#StatusLineGhost# %s/%%#StatusLineNormal#%s ", fpath, fname)
+  return string.format("%%#NonText# %s/%%#Normal#%s ", fpath, fname)
 end
 
 ---- GIT ----
-vim.api.nvim_set_hl(0, "StatusLineGitBranch", { bg = background, fg = mocha.pink })
-
 local head_cache = ""
 local function git_branch()
   local git_info = vim.b.gitsigns_status_dict
@@ -176,7 +161,8 @@ else
 end
 _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
 
-vim.api.nvim_set_hl(0, "StatusLineGit", { bg = background, fg = mocha.red })
+vim.api.nvim_set_hl(0, "StatusLineGitBranch", { fg = mocha.pink })
+vim.api.nvim_set_hl(0, "StatusLineGit", { fg = mocha.red })
 
 local function git()
   local head = git_branch()
@@ -191,14 +177,11 @@ end
 
 ---- DIAGNOSTICS ----
 local diagnostics_data = {
-  { icon = " ", hi = "StatusLineError", fg = mocha.red },
-  { icon = " ", hi = "StatusLineWarn", fg = mocha.yellow },
-  { icon = "", hi = "StatusLineInfo", fg = mocha.sky },
-  { icon = " ", hi = "StatusLineHint", fg = mocha.teal },
+  { icon = " ", hi = "DiagnosticError" },
+  { icon = " ", hi = "DiagnosticWarn" },
+  { icon = "", hi = "DiagnosticInfo" },
+  { icon = " ", hi = "DiagnosticHint" },
 }
-for _, data in ipairs(diagnostics_data) do
-  vim.api.nvim_set_hl(0, data.hi, { fg = data.fg, bg = background })
-end
 
 local function local_diagnostics()
   for i, data in ipairs(diagnostics_data) do
@@ -211,14 +194,12 @@ local function local_diagnostics()
   return ""
 end
 
-vim.api.nvim_set_hl(0, "StatusLineWorkspace", { fg = mocha.comment, bg = mocha.surface0 })
-
 local function workspace_diagnostics()
   for i, data in ipairs(diagnostics_data) do
     local count = vim.tbl_count(vim.diagnostic.get(nil, { severity = i }))
     local local_count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
     if count > local_count then
-      return "%#StatusLineWorkspace#" .. data.icon
+      return "%#Conceal#" .. data.icon
     end
   end
 
@@ -226,14 +207,9 @@ local function workspace_diagnostics()
 end
 
 local function custom_diagnostics()
-  local format = " %s%s%s"
   local local_diag = local_diagnostics()
   local workspace_diag = workspace_diagnostics()
-  if #local_diag == 0 or #workspace_diag == 0 then
-    return format:format(local_diag, "", workspace_diag)
-  else
-    return format:format(local_diag, " ", workspace_diag)
-  end
+  return string.format(" %s%s", local_diag, workspace_diag)
 end
 
 ---- GRAPPLE ----
@@ -243,15 +219,13 @@ end
 Statusline = {
   active = function()
     return table.concat({
-      "%#StatusLineNormal#",
-      update_mode_colors(),
       mode(),
-      "%#StatusLineNormal#─",
+      "%#FloatBorder#─",
       git(),
-      "%#StatusLineNormal#",
+      "%#FloatBorder#",
       "%=",
       file(),
-      "%#StatusLineNormal#",
+      "%#FloatBorder#",
       "%=",
       custom_diagnostics(),
     })
@@ -264,7 +238,5 @@ vim.opt.laststatus = 3
 vim.opt.fillchars = {
   stl = "─",
   stlnc = "─",
-  -- stl = "━",
-  -- stlnc = "━",
 }
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
