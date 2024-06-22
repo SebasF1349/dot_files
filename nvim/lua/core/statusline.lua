@@ -228,14 +228,13 @@ local function workspace_diagnostics()
 end
 
 local function custom_diagnostics()
+  local format = " %s%s%s"
   local local_diag = local_diagnostics()
   local workspace_diag = workspace_diagnostics()
-  if #local_diag == 0 then
-    return workspace_diag
-  elseif #workspace_diag == 0 then
-    return local_diag
+  if #local_diag == 0 or #workspace_diag == 0 then
+    return format:format(local_diag, "", workspace_diag)
   else
-    return local_diag .. " " .. workspace_diag
+    return format:format(local_diag, " ", workspace_diag)
   end
 end
 
