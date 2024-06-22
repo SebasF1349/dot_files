@@ -105,15 +105,6 @@ local function file()
 end
 
 ---- GIT ----
-local head_cache = ""
-local function git_branch()
-  local git_info = vim.b.gitsigns_status_dict
-  if git_info then
-    head_cache = git_info.head
-  end
-  return head_cache
-end
-
 local gstatus = { ahead = "0", behind = "0", modified = 0 }
 
 local function git_modified()
@@ -161,8 +152,12 @@ else
 end
 _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
 
+local head = ""
 local function git()
-  local head = git_branch()
+  local git_info = vim.b.gitsigns_status_dict
+  if git_info then
+    head = git_info.head
+  end
   local ahead = gstatus.ahead ~= "0" and "" or ""
   local behind = gstatus.behind ~= "0" and "" or ""
   local modified = gstatus.modified ~= 0 and "~" or ""
