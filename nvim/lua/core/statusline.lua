@@ -180,33 +180,21 @@ local diagnostics_data = {
   { icon = " ", hi = "DiagnosticHint" },
 }
 
-local function local_diagnostics()
-  for i, data in ipairs(diagnostics_data) do
-    local count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
-    if count > 0 then
-      return string.format("%%#%s#%s", data.hi, data.icon)
-    end
-  end
-
-  return ""
-end
-
-local function workspace_diagnostics()
-  for i, data in ipairs(diagnostics_data) do
-    local count = vim.tbl_count(vim.diagnostic.get(nil, { severity = i }))
-    local local_count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
-    if count > local_count then
-      return "%#Conceal#" .. data.icon
-    end
-  end
-
-  return ""
-end
-
 local function custom_diagnostics()
-  local local_diag = local_diagnostics()
-  local workspace_diag = workspace_diagnostics()
-  return string.format(" %s%s", local_diag, workspace_diag)
+  local local_diagnostics = ""
+  local workspace_diagnostics = ""
+  for i, data in ipairs(diagnostics_data) do
+    local workspace_count = vim.tbl_count(vim.diagnostic.get(nil, { severity = i }))
+    local local_count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
+    if #local_diagnostics == 0 and local_count > 0 then
+      local_diagnostics = string.format("%%#%s#%s", data.hi, data.icon)
+    end
+    if #workspace_diagnostics == 0 and workspace_count > local_count then
+      workspace_diagnostics = string.format("%%#Conceal#%s", data.icon)
+    end
+  end
+
+  return string.format(" %s%s", local_diagnostics, workspace_diagnostics)
 end
 
 ---- GRAPPLE ----
