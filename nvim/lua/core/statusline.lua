@@ -100,7 +100,7 @@ local function file()
     return ""
   end
   if label then
-    return string.format("%%#StatusLineGhost# [%s] %%#StatusLineNormal#%s", label, title)
+    return string.format("%%#StatusLineGhost# [%s] %%#StatusLineNormal#%s ", label, title)
   end
   local fname = vim.fn.expand("%:t")
   if fname == "" then
@@ -108,11 +108,11 @@ local function file()
   end
   local fpath = vim.fn.expand("%:~:.:h")
   if fpath == "" or fpath == "." then
-    return string.format("%%#StatusLineNormal#%s", fname)
+    return string.format("%%#StatusLineNormal#%s ", fname)
   end
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (dap)
-  return string.format("%%#StatusLineGhost# %s/%%#StatusLineNormal#%s", fpath, fname)
+  return string.format("%%#StatusLineGhost# %s/%%#StatusLineNormal#%s ", fpath, fname)
 end
 
 ---- GIT ----
@@ -246,8 +246,12 @@ Statusline = {
       "%#StatusLineNormal#",
       update_mode_colors(),
       mode(),
+      "%#StatusLineNormal#─",
       git(),
+      "%#StatusLineNormal#",
+      "%=",
       file(),
+      "%#StatusLineNormal#",
       "%=",
       custom_diagnostics(),
     })
@@ -257,4 +261,10 @@ Statusline = {
 vim.g.qf_disable_statusline = true
 vim.opt.statusline = "%!v:lua.Statusline.active()"
 vim.opt.laststatus = 3
+vim.opt.fillchars = {
+  stl = "─",
+  stlnc = "─",
+  -- stl = "━",
+  -- stlnc = "━",
+}
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
