@@ -58,7 +58,7 @@ end
 
 local function mode()
   local current_mode = vim.api.nvim_get_mode().mode
-  return string.format(" %s ", modes[current_mode]):upper()
+  return string.format(" %s ", modes[current_mode]:sub(1, 1))
 end
 
 local function update_mode_colors()
