@@ -120,9 +120,7 @@ local function git_modified()
   local git_info = vim.b.gitsigns_status_dict
   if git_info and (git_info.added ~= 0 or git_info.changed ~= 0 or git_info.removed ~= 0) then
     gstatus.modified = 1
-    return true
   end
-  return false
 end
 git_modified()
 
@@ -163,18 +161,15 @@ else
 end
 _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
 
-vim.api.nvim_set_hl(0, "StatusLineGitBranch", { fg = mocha.pink })
-vim.api.nvim_set_hl(0, "StatusLineGit", { fg = mocha.red })
-
 local function git()
   local head = git_branch()
   local ahead = gstatus.ahead ~= "0" and "" or ""
   local behind = gstatus.behind ~= "0" and "" or ""
   local modified = gstatus.modified ~= 0 and "~" or ""
   if ahead == "" and behind == "" and modified == "" then
-    return string.format(" %%#StatusLineGitBranch#%s ", head)
+    return string.format(" %%#Special#%s ", head)
   end
-  return string.format(" %%#StatusLineGitBranch#%s%%#StatusLineGit#[%s%s%s] ", head, ahead, behind, modified)
+  return string.format(" %%#Special#%s%%#Error#[%s%s%s] ", head, ahead, behind, modified)
 end
 
 ---- DIAGNOSTICS ----
