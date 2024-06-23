@@ -58,7 +58,7 @@ local function mode()
   local current_mode = vim.api.nvim_get_mode().mode
   local first_char = modes[current_mode]:sub(1, 1)
   local mode_hi = modes[current_mode] and ("StatusLineMode" .. first_char) or "StatusLineModeO"
-  return string.format(" %%#%s#%s ", mode_hi, modes[current_mode]:sub(1, 1))
+  return string.format(" %%#%s#%s", mode_hi, modes[current_mode]:sub(1, 1))
 end
 
 ---- FILENAME ----
@@ -102,6 +102,36 @@ local function file()
   -- TODO: Maybe add icon
   -- TODO: Change filename in special buffers (dap)
   return string.format("%%#NonText# %s/%%#Normal#%s ", fpath, fname)
+end
+
+local function open_buffers()
+  local buffers = {}
+  local current_bufnr = vim.api.nvim_get_current_buf()
+  local is_buf = false
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
+      local bufname = vim.api.nvim_buf_get_name(bufnr)
+      local fname = vim.fn.fnamemodify(bufname, ":t")
+      if fname == "" then
+        fname = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
+      end
+      if bufnr == current_bufnr then
+        is_buf = true
+        local fpath = vim.fn.fnamemodify(bufname, ":~:.:h")
+        if fpath == "" or fpath == "." or vim.startswith(bufname, "term://") then
+          vim.list_extend(buffers, { string.format("%%#Normal#%s", fname) })
+        else
+          vim.list_extend(buffers, { string.format("%%#NonText#%s/%%#Normal#%s", fpath, fname) })
+        end
+      else
+        vim.list_extend(buffers, { string.format("%%#NonText#%s", fname) })
+      end
+    end
+  end
+  if not is_buf then
+    return file()
+  end
+  return string.format(" %s ", table.concat(buffers, " %#FloatBorder#| "))
 end
 
 ---- GIT ----
@@ -200,14 +230,11 @@ Statusline = {
   active = function()
     return table.concat({
       mode(),
-      "%#FloatBorder#─",
-      git(),
-      "%#FloatBorder#",
-      "%=",
-      file(),
-      "%#FloatBorder#",
-      "%=",
       custom_diagnostics(),
+      "%#FloatBorder#%=",
+      open_buffers(),
+      "%#FloatBorder#%=",
+      git(),
     })
   end,
 }
@@ -218,5 +245,5 @@ vim.opt.laststatus = 3
 vim.opt.fillchars = {
   stl = "─",
   stlnc = "─",
-}
+} -- somehow this doesn't work with floating windows
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
