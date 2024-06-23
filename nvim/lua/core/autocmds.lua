@@ -50,6 +50,7 @@ vim.api.nvim_create_autocmd({ "TermOpen" }, {
     vim.cmd("startinsert")
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
+    vim.opt.statuscolumn = ""
   end,
   group = general,
   desc = "Remove line numbers from terminal and start on insert",
