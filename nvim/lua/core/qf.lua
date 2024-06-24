@@ -61,12 +61,12 @@ end
 
 ---@param listType ListType
 ---@alias qfitem { bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
----@return { items: qfitem[], size: number, winid: number, title: string, id: number }
+---@return { items: qfitem[], size: number, winid: number, title: string, id: number, filewinid?: number }
 local function getList(listType)
   if listType == "c" then
     return vim.fn.getqflist({ items = 0, size = 0, winid = 0, title = 0, id = 0 })
   else
-    return vim.fn.getloclist(0, { items = 0, size = 0, winid = 0, title = 0, id = 0 })
+    return vim.fn.getloclist(0, { items = 0, size = 0, winid = 0, title = 0, id = 0, filewinid = 0 })
   end
 end
 
