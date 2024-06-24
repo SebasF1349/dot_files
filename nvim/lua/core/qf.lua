@@ -420,7 +420,8 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
     end
     local diagnostics = vim.diagnostic.get()
     if #diagnostics == 0 then
-      vim.cmd("cclose")
+      ---@diagnostic disable-next-line: param-type-mismatch
+      pcall(vim.cmd, "cclose")
     end
     local qf_items = vim.diagnostic.toqflist(
       -- TODO: Can the event data have items not returned by vim.diagnostic.get?
