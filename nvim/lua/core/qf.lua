@@ -575,7 +575,7 @@ end
 
 ---@class SelectItemOpts
 ---@field keep_cursor? boolean false by default
----@field split? "v" | "h" | "" "" by default
+---@field split? "v" | "h" nil by default
 ---@field close? boolean false by default
 
 ---@param selectItemOpts SelectItemOpts
@@ -591,7 +591,7 @@ local function selectItem(selectItemOpts)
   if preview then
     vim.cmd("pclose")
   end
-  if not opts.split or opts.split == "" then
+  if not opts.split then
     vim.cmd(".cc")
   else
     local prev_win = qflist.filewinid or get_prev_win(qflist.winid)
@@ -605,7 +605,7 @@ local function selectItem(selectItemOpts)
     if opts.close then
       local list = getActiveList()
       vim.cmd(list.qftype .. "close")
-    elseif opts.keep_cursor and (not opts.split or opts.split == "") then
+    elseif opts.keep_cursor and not opts.split then
       vim.api.nvim_set_current_win(qflist.winid)
     end
   end)
