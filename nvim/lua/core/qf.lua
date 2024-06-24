@@ -557,30 +557,36 @@ local function moveWithPreview(direction)
   openPreview()
 end
 
----@param cursor_position? "move" | "stay" | "close"
----@param split? "v" | "h"
-local function selectItem(cursor_position, split)
+---@class SelectItemOpts
+---@field keep_cursor? boolean false by default
+---@field split? "v" | "h" | "" "" by default
+---@field close? boolean false by default
+
+---@param selectItemOpts SelectItemOpts
+local function selectItem(selectItemOpts)
+  local opts = selectItemOpts or {}
+  local qftype = getListType()
+  if not qftype then
+    return
+  end
+  local qflist = getList(qftype)
+  local qfitempos = vim.fn.getpos(".")
   local preview = getPreview()
   if preview then
     vim.cmd("pclose")
   end
-  local key
-  if not split then
-    key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
-  elseif split == "h" then
-    key = vim.api.nvim_replace_termcodes("<C-w><CR>", true, false, true)
+  if not opts or not opts.split or opts.split == "" then
+    vim.cmd(".cc")
   else
-    -- NOTE: this makes the new split "on the left" and taking control of the location list
-    key = vim.api.nvim_replace_termcodes("<C-w>k<C-w>v<C-w>j<CR>", true, false, true)
+    local prev_win = qflist.filewinid or vim.fn.win_getid(vim.fn.winnr("#"))
+    vim.api.nvim_open_win(qflist.items[qfitempos[2]].bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == "v" })
   end
-  vim.api.nvim_feedkeys(key, "n", false)
   vim.schedule(function()
-    if cursor_position == "close" then
+    if not opts or opts.close then
       local list = getActiveList()
       vim.cmd(list.qftype .. "close")
-    elseif cursor_position == "stay" then
-      key = vim.api.nvim_replace_termcodes("<C-w>p", true, false, true)
-      vim.api.nvim_feedkeys(key, "n", false)
+    elseif opts.keep_cursor then
+      vim.api.nvim_set_current_win(qflist.winid)
     end
   end)
 end
@@ -600,23 +606,23 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
     vim.keymap.set("n", "q", closeList, { buffer = 0, desc = "Close QF list" })
     vim.keymap.set("n", "<CR>", selectItem, { buffer = 0, desc = "Open QF item" })
     vim.keymap.set("n", "<C-s>", function()
-      selectItem("move", "h")
+      selectItem({ split = "h" })
     end, { buffer = 0, desc = "Open QF Item in Horizontal [S]plit" })
     vim.keymap.set("n", "<C-v>", function()
-      selectItem("move", "v")
+      selectItem({ split = "v" })
     end, { buffer = 0, desc = "Open QF Item in [V]ertical Split" })
+    vim.keymap.set("n", "o", function()
+      selectItem({ close = true })
+    end, { buffer = 0, desc = "Open and Close QF" })
+    vim.keymap.set("n", "O", function()
+      selectItem({ keep_cursor = true })
+    end, { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "<C-n>", function()
       moveWithPreview("n")
     end, { buffer = 0, desc = "Move and Preview Next QF Item" })
     vim.keymap.set("n", "<C-p>", function()
       moveWithPreview("p")
     end, { buffer = 0, desc = "Move and Preview Previous QF Item" })
-    vim.keymap.set("n", "o", function()
-      selectItem("close")
-    end, { buffer = 0, desc = "Open and Close QF" })
-    vim.keymap.set("n", "O", function()
-      selectItem("stay")
-    end, { buffer = 0, desc = "Open and Stay in QF" })
     vim.keymap.set("n", "p", openPreview, { buffer = 0, desc = "Open and Close QF" })
     vim.keymap.set("n", "K", previewHover, { buffer = 0, desc = "Show Message on Hover" })
     vim.keymap.set("n", "dd", delete, { buffer = 0, desc = "Delete QF Item" })
