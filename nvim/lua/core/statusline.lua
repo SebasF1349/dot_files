@@ -66,9 +66,8 @@ local function file()
   local buftype = vim.bo.buftype
   local ftype = vim.o.filetype
   local label, title
-  if buftype == "terminal" then
-    title, label = vim.fn.expand("%:t"), "Term"
-  elseif buftype == "help" then
+  -- TODO: Change filename in special buffers (dap)
+  if buftype == "help" then
     title, label = vim.fn.expand("%:t:r:r"), "Help"
   elseif ftype == "netrw" then
     label = "Netrw"
@@ -91,23 +90,8 @@ local function file()
   if label then
     return string.format("%%#NonText# [%s] %%#Normal#%s ", label, title)
   end
-  local fname = vim.fn.expand("%:t")
-  if fname == "" then
-    fname = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
-  end
-  local fpath = vim.fn.expand("%:~:.:h")
-  if fpath == "" or fpath == "." then
-    return string.format("%%#Normal#%s ", fname)
-  end
-  -- TODO: Maybe add icon
-  -- TODO: Change filename in special buffers (dap)
-  return string.format("%%#NonText# %s/%%#Normal#%s ", fpath, fname)
-end
-
-local function open_buffers()
   local buffers = {}
   local current_bufnr = vim.api.nvim_get_current_buf()
-  local is_buf = false
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
       local bufname = vim.api.nvim_buf_get_name(bufnr)
@@ -116,7 +100,6 @@ local function open_buffers()
         fname = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
       end
       if bufnr == current_bufnr then
-        is_buf = true
         local fpath = vim.fn.fnamemodify(bufname, ":~:.:h")
         if fpath == "" or fpath == "." or vim.startswith(bufname, "term://") then
           vim.list_extend(buffers, { string.format("%%#Normal#%s", fname) })
@@ -127,9 +110,6 @@ local function open_buffers()
         vim.list_extend(buffers, { string.format("%%#NonText#%s", fname) })
       end
     end
-  end
-  if not is_buf then
-    return file()
   end
   return string.format(" %s ", table.concat(buffers, " %#FloatBorder#| "))
 end
@@ -232,7 +212,7 @@ Statusline = {
       mode(),
       custom_diagnostics(),
       "%#FloatBorder#%=",
-      open_buffers(),
+      file(),
       "%#FloatBorder#%=",
       git(),
     })
