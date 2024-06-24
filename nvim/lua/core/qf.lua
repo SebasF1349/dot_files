@@ -575,7 +575,7 @@ local function selectItem(selectItemOpts)
   if preview then
     vim.cmd("pclose")
   end
-  if not opts or not opts.split or opts.split == "" then
+  if not opts.split or opts.split == "" then
     vim.cmd(".cc")
   else
     local item = qflist.items[qfitempos[2]]
@@ -584,10 +584,10 @@ local function selectItem(selectItemOpts)
     vim.api.nvim_win_set_cursor(split, { item.lnum, item.col - 1 })
   end
   vim.schedule(function()
-    if not opts or opts.close then
+    if opts.close then
       local list = getActiveList()
       vim.cmd(list.qftype .. "close")
-    elseif opts.keep_cursor then
+    elseif opts.keep_cursor and (not opts.split or opts.split == "") then
       vim.api.nvim_set_current_win(qflist.winid)
     end
   end)
