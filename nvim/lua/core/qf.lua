@@ -626,7 +626,7 @@ local function selectItem(selectItemOpts)
     vim.cmd("pclose")
   end
   if not opts.split then
-    vim.cmd(".cc")
+    vim.cmd("." .. qftype .. qftype)
   else
     local prev_win = qflist.filewinid or get_prev_win(qflist.winid)
     if prev_win and prev_win > 0 and vim.fn.win_gettype(prev_win) == "" then
