@@ -60,7 +60,7 @@ local function getListsWin()
 end
 
 ---@param listType ListType
----@alias qfitem { bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
+---@alias qfitem { id: number, bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
 ---@return { items: qfitem[], size: number, winid: number, title: string, id: number, filewinid?: number }
 local function getList(listType)
   if listType == "c" then
@@ -98,6 +98,30 @@ local function getActiveList()
   end
   -- They're either both empty or both open
   return cret
+end
+
+---@param listType ListType
+---@param title string
+---@return qfitem | nil
+local function getListByTitle(listType, title)
+  local size
+  if listType == "c" then
+    size = vim.fn.getqflist({ nr = "$" }).nr
+  else
+    size = vim.fn.getloclist(0, { nr = "$" }).nr
+  end
+  local list
+  for i = size, 1, -1 do
+    if listType == "c" then
+      list = vim.fn.getqflist({ nr = i, all = 0 })
+    else
+      list = vim.fn.getloclist(0, { nr = i, all = 0 })
+    end
+    if list.title == title then
+      return list
+    end
+  end
+  return nil
 end
 
 --------------------------------------------------
@@ -285,9 +309,19 @@ local function list_toggle(listType, diagnostics)
     if not diagnostics then
       vim.cmd(listType .. "open")
     elseif listType == "c" then
-      vim.diagnostic.setqflist({ title = "All Diagnostics" })
+      local clist = getListByTitle("c", "All Diagnostics")
+      if not clist then
+        vim.diagnostic.setqflist({ title = "All Diagnostics" })
+      else
+        vim.cmd(clist.nr .. "chistory | copen")
+      end
     else
-      vim.diagnostic.setloclist({ title = "Local Diagnostics" })
+      local llist = getListByTitle("l", "Local Diagnostics")
+      if not llist then
+        vim.diagnostic.setloclist({ title = "Local Diagnostics" })
+      else
+        vim.cmd(llist.nr .. "lhistory | lopen")
+      end
     end
   end
 end
