@@ -557,6 +557,22 @@ local function moveWithPreview(direction)
   openPreview()
 end
 
+---@param winnr integer
+---@return integer
+local function get_prev_win(winnr)
+  local prev_win = vim.fn.win_getid(vim.fn.winnr("#"))
+  if prev_win <= 0 or vim.fn.win_gettype(prev_win) ~= "" then
+    local tab = vim.fn.getwininfo(winnr)[1].tabnr
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      if vim.fn.win_gettype(win) == "" then
+        prev_win = win
+        break
+      end
+    end
+  end
+  return prev_win
+end
+
 ---@class SelectItemOpts
 ---@field keep_cursor? boolean false by default
 ---@field split? "v" | "h" | "" "" by default
@@ -578,10 +594,12 @@ local function selectItem(selectItemOpts)
   if not opts.split or opts.split == "" then
     vim.cmd(".cc")
   else
-    local item = qflist.items[qfitempos[2]]
-    local prev_win = qflist.filewinid or vim.fn.win_getid(vim.fn.winnr("#"))
-    local split = vim.api.nvim_open_win(item.bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == "v" })
-    vim.api.nvim_win_set_cursor(split, { item.lnum, item.col - 1 })
+    local prev_win = qflist.filewinid or get_prev_win(qflist.winid)
+    if prev_win and prev_win > 0 and vim.fn.win_gettype(prev_win) == "" then
+      local item = qflist.items[qfitempos[2]]
+      local split = vim.api.nvim_open_win(item.bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == "v" })
+      vim.api.nvim_win_set_cursor(split, { item.lnum, item.col - 1 })
+    end
   end
   vim.schedule(function()
     if opts.close then
