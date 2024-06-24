@@ -578,8 +578,10 @@ local function selectItem(selectItemOpts)
   if not opts or not opts.split or opts.split == "" then
     vim.cmd(".cc")
   else
+    local item = qflist.items[qfitempos[2]]
     local prev_win = qflist.filewinid or vim.fn.win_getid(vim.fn.winnr("#"))
-    vim.api.nvim_open_win(qflist.items[qfitempos[2]].bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == "v" })
+    local split = vim.api.nvim_open_win(item.bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == "v" })
+    vim.api.nvim_win_set_cursor(split, { item.lnum, item.col - 1 })
   end
   vim.schedule(function()
     if not opts or opts.close then
