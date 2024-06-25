@@ -222,8 +222,8 @@ Statusline = {
 vim.g.qf_disable_statusline = true
 vim.opt.statusline = "%!v:lua.Statusline.active()"
 vim.opt.laststatus = 3
-vim.opt.fillchars = {
+vim.opt.fillchars:append({
   stl = "─",
   stlnc = "─",
-} -- somehow this doesn't work with floating windows
+})
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
