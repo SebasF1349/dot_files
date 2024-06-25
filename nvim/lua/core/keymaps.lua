@@ -4,12 +4,21 @@ vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 -- Execute q macro
 vim.keymap.set("n", "Q", "@q")
 
+local function delete_all()
+  local current_bufnr = vim.api.nvim_win_get_buf(0)
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and bufnr ~= current_bufnr then
+      vim.api.nvim_set_option_value("buflisted", false, { buf = bufnr })
+    end
+  end
+end
 -- Return to basics: manage open buffers
 vim.keymap.set("n", "gbb", "<cmd>ls<CR>:b<space>", { desc = "Change Open [B]uffer" })
 vim.keymap.set("n", "gbn", "<cmd>:bnext<CR>", { desc = "[N]ext Open Buffer" })
 vim.keymap.set("n", "gbp", "<cmd>:bprevious<CR>", { desc = "[P]revious Open Buffer" })
 vim.keymap.set("n", "gbd", "<cmd>:set nobuflisted | silent! bnext<CR>", { desc = "[D]elete Open Buffer" })
 -- not using :bdel as it removes the file from diagnostics
+vim.keymap.set("n", "gbo", delete_all, { desc = "Make [O]nly Buffer" })
 
 -- Remap Escape
 vim.keymap.set("i", "jk", "<Esc>")
