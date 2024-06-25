@@ -75,7 +75,6 @@ return {
     event = { "BufReadPost", "BufNewFile" },
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
-      "nvim-telescope/telescope.nvim",
       "artemave/workspace-diagnostics.nvim",
       { "dmmulroy/ts-error-translator.nvim", opts = {} },
     },
