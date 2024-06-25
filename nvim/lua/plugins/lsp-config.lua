@@ -113,6 +113,7 @@ return {
             end, { desc = "LSP: Go to next [D]iagnostic message" })
           end
 
+          vim.keymap.set("n", "gr", "<NOP>", { desc = "LSP mappings" })
           vim.keymap.set("n", "gre", vim.diagnostic.open_float, { desc = "LSP: Open Floating [E]rror Message" })
           vim.keymap.set("n", "grd", "<C-]>", { desc = "LSP: [G]oto [D]efinition" })
           vim.keymap.set("n", "gri", vim.lsp.buf.implementation, { desc = "LSP: [G]oto [I]mplementation" })
