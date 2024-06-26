@@ -6,20 +6,14 @@ return {
     require("catppuccin").setup({
       flavour = "mocha",
       transparent_background = true,
+      default_integrations = false,
       integrations = {
         cmp = true,
-        gitsigns = true,
-        treesitter = true,
-        telescope = true,
-        lsp_trouble = true,
-        which_key = true,
-        mason = true,
         dap = true,
         dap_ui = true,
-        mini = {
-          enabled = true,
-          indentscope_color = "",
-        },
+        gitsigns = true,
+        markdown = true,
+        mason = true,
         native_lsp = {
           enabled = true,
           virtual_text = {
@@ -27,17 +21,23 @@ return {
             hints = { "italic" },
             warnings = { "italic" },
             information = { "italic" },
+            ok = { "italic" },
           },
           underlines = {
             errors = { "underline" },
             hints = { "underline" },
             warnings = { "underline" },
             information = { "underline" },
+            ok = { "underline" },
           },
           inlay_hints = {
             background = true,
           },
         },
+        semantic_tokens = true,
+        telescope = true,
+        treesitter = true,
+        which_key = true,
       },
       custom_highlights = function(colors)
         return {
