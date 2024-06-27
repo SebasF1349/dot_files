@@ -762,6 +762,25 @@ vim.api.nvim_create_autocmd("WinClosed", {
 })
 
 --------------------------------------------------
+-- Features
+--------------------------------------------------
+
+-- grep commands: Rg, LRg & <leader>rg
+-- qf style
+-- toggle qf/ll and diagnostics and list symbols (functions)
+-- qf/ll next/prev item/file-item with wrapping
+-- add cursor position to qf/ll
+-- update diagnostics in qf
+-- folding
+-- qf/ll options
+-- preview, preview on move, preview on hover
+-- open item, with splits, staying, moving and/or closing
+-- delete item from qf (missing on ll)
+-- update qf list position on cursor move
+-- close neovim if qf is the last window (check what happens on bdel)
+-- close ll if parent window is closed
+
+--------------------------------------------------
 -- Ideas to Implement
 --------------------------------------------------
 
