@@ -145,7 +145,7 @@ local function navigate(dir)
   return function()
     local win = vim.api.nvim_get_current_win()
     vim.cmd.wincmd(dir)
-    local wsl_pane = (vim.uv or vim.loop).os_uname().release:find("WSL")
+    local wsl_pane = vim.uv.os_uname().release:find("WSL")
     if not wsl_pane and win == vim.api.nvim_get_current_win() then
       local pane_dir = nav[dir]
       vim.system({ "wezterm", "cli", "activate-pane-direction", pane_dir }, { text = true }, function(p)

@@ -71,10 +71,10 @@ local function file()
     title, label = vim.fn.expand("%:t:r:r"), "Help"
   elseif ftype == "netrw" then
     label = "Netrw"
-    title = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
+    title = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
     local target = vim.api.nvim_call_function("netrw#Expose", { "netrwmftgt" })
     if target ~= "n/a" then
-      title = string.format("%s - Target: %s", title, target:gsub("^" .. vim.loop.os_homedir(), "~"))
+      title = string.format("%s - Target: %s", title, target:gsub("^" .. vim.uv.os_homedir(), "~"))
     end
   elseif ftype == "fugitive" then
     title, label = vim.fn.expand("%:h:h:t"), "Fugitive"
@@ -97,7 +97,7 @@ local function file()
       local bufname = vim.api.nvim_buf_get_name(bufnr)
       local fname = vim.fn.fnamemodify(bufname, ":t")
       if fname == "" then
-        fname = vim.fn.fnamemodify((vim.uv or vim.loop).cwd() or "", ":t")
+        fname = vim.fn.fnamemodify(vim.uv.cwd() or "", ":t")
       end
       if bufnr == current_bufnr then
         local fpath = vim.fn.fnamemodify(bufname, ":~:.:h")
@@ -159,7 +159,7 @@ local function update_gstatus()
 end
 
 if _G.Gstatus_timer == nil then
-  _G.Gstatus_timer = vim.loop.new_timer()
+  _G.Gstatus_timer = vim.uv.new_timer()
 else
   _G.Gstatus_timer:stop()
 end
@@ -215,6 +215,7 @@ Statusline = {
       mode(),
       custom_diagnostics(),
       "%#FloatBorder#%=",
+      -- "%#FloatBorder#├%=┤",
       file(),
       "%#FloatBorder#%=",
       git(),
