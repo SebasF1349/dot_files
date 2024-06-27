@@ -111,6 +111,9 @@ local function file()
       end
     end
   end
+  if #buffers == 0 then
+    return ""
+  end
   return string.format(" %s ", table.concat(buffers, " %#FloatBorder#| "))
 end
 
