@@ -60,6 +60,23 @@ local function getListsWin()
 end
 
 ---@param listType ListType
+---@param items any[]
+---@param action? " " | "a" | "r"
+---@param winid? number
+local function setList(listType, items, action, winid)
+  action = action or " "
+  if listType == "c" then
+    vim.fn.setqflist({}, action, {
+      items = items,
+    })
+  else
+    vim.fn.setloclist(winid or 0, {}, action, {
+      items = items,
+    })
+  end
+end
+
+---@param listType ListType
 ---@alias qfitem { id: number, bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
 ---@return { items: qfitem[], size: number, winid: number, title: string, id: number, filewinid?: number }
 local function getList(listType)
