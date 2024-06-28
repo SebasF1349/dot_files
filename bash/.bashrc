@@ -221,12 +221,9 @@ alias tup="cd ~/tup"
 alias dot="cd ~/dot_files"
 alias repos="cd ~/repos"
 
-# cd to selected directory
 cdf() {
-	# nice idea: use just cd and run cd if no arguments
-	# sadly that would break cd to go to home
 	local dir
-	dir=$(fd . "${1:-.}" --hidden --type d | fzf +m)
+	dir=$(fd . "${1:-$HOME}" --type d | fzf +m)
 	if [[ -n "$dir" ]]; then
 		cd "$dir" || exit
 	fi
