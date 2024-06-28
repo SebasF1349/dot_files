@@ -403,12 +403,23 @@ end, { desc = "Previous [L]ocation List File Wrapping" })
 
 ---@param listType? ListType
 local function addToQuickfix(listType)
+  listType = listType or "c"
   local cursor_pos = vim.fn.getpos(".")
-  local new_qf_item = { { bufnr = vim.api.nvim_get_current_buf(), lnum = cursor_pos[2], col = cursor_pos[3], text = vim.fn.getline(".") } }
-  if not listType or listType == "c" then
-    vim.fn.setqflist(new_qf_item, "a")
-  else
-    vim.fn.setloclist(0, new_qf_item, "a")
+  local new_qf_item = {
+    {
+      bufnr = vim.api.nvim_get_current_buf(),
+      lnum = cursor_pos[2],
+      col = cursor_pos[3],
+      text = vim.fn.getline("."),
+    },
+  }
+  setList(listType, new_qf_item, "a")
+  local list = getList(listType)
+  if list.winid ~= 0 then
+    vim.schedule(function()
+      vim.cmd(listType .. "open") -- needed to rerender highlights
+      vim.cmd(list.size .. listType .. listType) -- don't know if if should enter or keep the same qfitem position
+    end)
   end
 end
 
