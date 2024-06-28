@@ -190,18 +190,13 @@ alias sourcebash='source ~/.bashrc'
 alias snv='sudo ${EDITOR}'
 
 nvf() {
-	local dir="$1"
-	local selected_dir
-	if [ -z "$dir" ]; then
-		selected_dir=$(fd . --type d --max-depth 2 | fzf)
-	else
-		if [[ "$dir" == "repos" ]]; then
-			dir="${HOME}/repos/"
-		elif [[ "$dir" == "dot" ]]; then
-			dir="${HOME}/dot_files/"
-		fi
-		selected_dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
+	local dir="${1:-.}"
+	if [[ "$dir" == "repos" ]]; then
+		dir="${HOME}/repos/"
+	elif [[ "$dir" == "dot" ]]; then
+		dir="${HOME}/dot_files/"
 	fi
+	selected_dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
 	if [[ -n "$selected_dir" ]]; then
 		cd "$selected_dir" || exit #&& ${EDITOR} .
 		files=("$(fzf --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}")")
@@ -230,8 +225,7 @@ cdf() {
 }
 
 cl() {
-	local dir="$1"
-	local dir="${dir:=$HOME}"
+	local dir="${1:=$HOME}"
 	if [[ -d "$dir" ]]; then
 		cd "$dir" >/dev/null || exit
 		eza -lah
