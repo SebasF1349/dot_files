@@ -523,31 +523,30 @@ local function getMessage(line)
   return path
 end
 
----@param bufnr number
-local function delete(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local qfl = getList("c").items
+local function delete()
+  local listType = getListType()
+  if not listType then
+    return
+  end
+  local qf = getList(listType)
+  local qfitems = qf.items
 
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" then
     local visual_start = vim.fn.getpos("v")
     local visual_end = vim.fn.getpos(".")
     for i = visual_start[2], visual_end[2] do
-      qfl[i] = {}
+      qfitems[i] = {}
     end
-    qfl = vim.tbl_filter(function(item)
+    qfitems = vim.tbl_filter(function(item)
       return not vim.tbl_isempty(item)
-    end, qfl)
-    vim.fn.setqflist({}, "r", {
-      items = qfl,
-    })
+    end, qfitems)
+    setList(listType, qfitems, "r", qf.filewinid)
     vim.api.nvim_input("<Esc>")
   else
     local line = vim.api.nvim_win_get_cursor(0)
-    table.remove(qfl, line[1])
-    vim.fn.setqflist({}, "r", {
-      items = qfl,
-    })
+    table.remove(qfitems, line[1])
+    setList(listType, qfitems, "r", qf.filewinid)
     vim.api.nvim_win_set_cursor(0, { line[1], 0 })
   end
 end
@@ -792,7 +791,7 @@ vim.api.nvim_create_autocmd("WinClosed", {
 -- qf/ll options
 -- preview, preview on move, preview on hover
 -- open item, with splits, staying, moving and/or closing
--- delete item from qf (missing on ll)
+-- delete item from qf
 -- update qf list position on cursor move
 -- close neovim if qf is the last window (check what happens on bdel)
 -- close ll if parent window is closed
