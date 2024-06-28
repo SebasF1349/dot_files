@@ -534,13 +534,14 @@ local function getMessage(line)
   return path
 end
 
+-- NOTE: take into account that this messes up with the error numbers
 local function delete()
   local listType = getListType()
   if not listType then
     return
   end
-  local qf = getList(listType)
-  local qfitems = qf.items
+  local list = getList(listType)
+  local qfitems = list.items
 
   local mode = vim.fn.mode()
   if mode == "v" or mode == "V" then
@@ -552,13 +553,14 @@ local function delete()
     qfitems = vim.tbl_filter(function(item)
       return not vim.tbl_isempty(item)
     end, qfitems)
-    setList(listType, qfitems, "r", qf.filewinid)
+    setList(listType, qfitems, "r", list.filewinid)
     vim.api.nvim_input("<Esc>")
   else
     local line = vim.api.nvim_win_get_cursor(0)
     table.remove(qfitems, line[1])
-    setList(listType, qfitems, "r", qf.filewinid)
-    vim.api.nvim_win_set_cursor(0, { line[1], 0 })
+    setList(listType, qfitems, "r", list.filewinid)
+    local new_pos = line[1] > #qfitems and #qfitems or line[1]
+    vim.api.nvim_win_set_cursor(0, { new_pos, 0 })
   end
 end
 
