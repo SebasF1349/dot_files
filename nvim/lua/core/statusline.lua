@@ -191,13 +191,15 @@ local diagnostics_data = {
 local function custom_diagnostics()
   local local_diagnostics = ''
   local workspace_diagnostics = ''
+  local workspace_count = vim.diagnostic.count(nil)
+  local local_count = vim.diagnostic.count(0)
   for i, data in ipairs(diagnostics_data) do
-    local workspace_count = vim.tbl_count(vim.diagnostic.get(nil, { severity = i }))
-    local local_count = vim.tbl_count(vim.diagnostic.get(0, { severity = i }))
-    if #local_diagnostics == 0 and local_count > 0 then
+    local local_diag = local_count[i] or 0
+    local works_diag = workspace_count[i] or 0
+    if #local_diagnostics == 0 and local_diag > 0 then
       local_diagnostics = string.format('%%#%s#%s', data.hi, data.icon)
     end
-    if #workspace_diagnostics == 0 and workspace_count > local_count then
+    if #workspace_diagnostics == 0 and works_diag > local_diag then
       workspace_diagnostics = string.format('%%#Conceal#%s', data.icon)
     end
   end
