@@ -33,6 +33,12 @@ return {
     local cmp = require('cmp')
     local luasnip = require('luasnip')
 
+    -- allows jump back from last position, although is deprecated (!)
+    -- TODO: find out why is deprecated
+    luasnip.setup({
+      history = true,
+    })
+
     cmp.setup({
       snippet = {
         expand = function(args)
@@ -85,14 +91,14 @@ return {
           behavior = cmp.ConfirmBehavior.Replace,
           select = true,
         }),
-        ['<Tab>'] = cmp.mapping(function(fallback)
+        ['<C-l>'] = cmp.mapping(function(fallback)
           if luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()
           else
             fallback()
           end
         end, { 'i', 's' }),
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
+        ['<C-h>'] = cmp.mapping(function(fallback)
           if luasnip.locally_jumpable(-1) then
             luasnip.jump(-1)
           else
