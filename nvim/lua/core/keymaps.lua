@@ -32,6 +32,16 @@ vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = 
 vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
 vim.keymap.set('n', 'gbo', delete_all, { desc = 'Make [O]nly Buffer' })
 
+-- Search using :global
+vim.keymap.set('n', 'g/', ':g//#<Left><Left>', { desc = 'Search with [G]lobal' })
+vim.keymap.set('c', '<CR>', function()
+  if vim.endswith(vim.fn.getcmdline(), '#') then
+    return '<CR>:'
+  else
+    return '<CR>'
+  end
+end, { desc = 'Search with [G]lobal', expr = true })
+
 -- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
 
