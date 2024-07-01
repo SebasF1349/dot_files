@@ -104,8 +104,13 @@ vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments' })
 
 -- gX: Web search
 vim.keymap.set('n', 'gX', function()
-  vim.ui.open(('https://google.com/search?q=%s'):format(vim.fn.expand('<cword>')))
-end)
+  local cfile = vim.fn.expand('<cfile>')
+  if vim.bo.filetype == 'lua' and cfile:match('.*/.*') then
+    vim.ui.open(('https://github.com/%s'):format(cfile))
+  else
+    vim.ui.open(('https://google.com/search?q=%s'):format(vim.fn.expand('<cword>')))
+  end
+end, { desc = 'Open Plugins Repo Or Search a Word' })
 vim.keymap.set('x', 'gX', function()
   vim.ui.open(
     ('https://google.com/search?q=%s'):format(
@@ -113,7 +118,7 @@ vim.keymap.set('x', 'gX', function()
     )
   )
   vim.api.nvim_input('<esc>')
-end)
+end, { desc = 'Search Selected Text' })
 
 -- Terminal
 ---@class term
