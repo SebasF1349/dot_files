@@ -1,10 +1,10 @@
 return {
-  "catppuccin/nvim",
-  name = "catppuccin",
+  'catppuccin/nvim',
+  name = 'catppuccin',
   priority = 1000,
   init = function()
-    require("catppuccin").setup({
-      flavour = "mocha",
+    require('catppuccin').setup({
+      flavour = 'mocha',
       transparent_background = true,
       default_integrations = false,
       integrations = {
@@ -17,18 +17,18 @@ return {
         native_lsp = {
           enabled = true,
           virtual_text = {
-            errors = { "italic" },
-            hints = { "italic" },
-            warnings = { "italic" },
-            information = { "italic" },
-            ok = { "italic" },
+            errors = { 'italic' },
+            hints = { 'italic' },
+            warnings = { 'italic' },
+            information = { 'italic' },
+            ok = { 'italic' },
           },
           underlines = {
-            errors = { "underline" },
-            hints = { "underline" },
-            warnings = { "underline" },
-            information = { "underline" },
-            ok = { "underline" },
+            errors = { 'underline' },
+            hints = { 'underline' },
+            warnings = { 'underline' },
+            information = { 'underline' },
+            ok = { 'underline' },
           },
           inlay_hints = {
             background = true,
@@ -48,18 +48,18 @@ return {
           LspReferenceRead = { bg = colors.surface0 },
           LspReferenceWrite = { bg = colors.surface0 },
 
-          MasonNormal = { link = "NormalFloat" },
+          MasonNormal = { link = 'NormalFloat' },
 
           PanelHeading = {
             fg = colors.lavender,
             bg = colors.none,
-            style = { "bold", "italic" },
+            style = { 'bold', 'italic' },
           },
 
           LazyH1 = {
             bg = colors.none,
             fg = colors.lavender,
-            style = { "bold" },
+            style = { 'bold' },
           },
           LazyButton = {
             bg = colors.none,
@@ -68,15 +68,15 @@ return {
           LazyButtonActive = {
             bg = colors.none,
             fg = colors.lavender,
-            style = { "bold" },
+            style = { 'bold' },
           },
           LazySpecial = { fg = colors.green },
 
           PmenuSel = { bg = colors.green, fg = colors.base },
 
-          CmpItemAbbrMatch = { fg = colors.blue, style = { "bold" } },
+          CmpItemAbbrMatch = { fg = colors.blue, style = { 'bold' } },
           CmpItemMenu = { fg = colors.subtext1 },
-          CmpDoc = { link = "NormalFloat" },
+          CmpDoc = { link = 'NormalFloat' },
           CmpDocBorder = { fg = colors.surface1, bg = colors.none },
 
           TroubleNormal = { bg = colors.none },
@@ -88,6 +88,6 @@ return {
         }
       end,
     })
-    vim.cmd.colorscheme("catppuccin")
+    vim.cmd.colorscheme('catppuccin')
   end,
 }

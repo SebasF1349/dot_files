@@ -1,9 +1,9 @@
 return {
   {
-    "jakewvincent/mkdnflow.nvim",
-    ft = { "markdown" },
+    'jakewvincent/mkdnflow.nvim',
+    ft = { 'markdown' },
     config = function()
-      require("mkdnflow").setup({
+      require('mkdnflow').setup({
         modules = {
           bib = false,
           buffers = true,
@@ -21,9 +21,9 @@ return {
         filetypes = { md = true, rmd = true, markdown = true },
         create_dirs = true,
         perspective = {
-          priority = "first",
-          fallback = "current",
-          root_tell = "index.md",
+          priority = 'first',
+          fallback = 'current',
+          root_tell = 'index.md',
           nvim_wd_heel = false,
           update = false,
         },
@@ -37,17 +37,17 @@ return {
           jump_patterns = nil,
         },
         links = {
-          style = "markdown",
+          style = 'markdown',
           name_is_source = false,
           conceal = false,
           context = 0,
           implicit_extension = nil,
           transform_implicit = false,
           transform_explicit = function(text)
-            text = text:gsub(" ", "-")
+            text = text:gsub(' ', '-')
             text = text:lower()
-            if text:find("date") then
-              text = text:gsub("date-", os.date("%Y-%m-%d_"))
+            if text:find('date') then
+              text = text:gsub('date-', os.date('%Y-%m-%d_'))
             end
             return text
           end,
@@ -57,19 +57,19 @@ return {
           use_template = false,
           placeholders = {
             before = {
-              title = "link_title",
-              date = "os_date",
+              title = 'link_title',
+              date = 'os_date',
             },
             after = {},
           },
-          template = "# {{ title }}",
+          template = '# {{ title }}',
         },
         to_do = {
-          symbols = { " ", "-", "X" },
+          symbols = { ' ', '-', 'X' },
           update_parents = true,
-          not_started = " ",
-          in_progress = "-",
-          complete = "X",
+          not_started = ' ',
+          in_progress = '-',
+          complete = 'X',
         },
         tables = {
           trim_whitespace = true,
@@ -87,39 +87,39 @@ return {
           bib = { override = false },
         },
         mappings = {
-          MkdnEnter = { { "n", "v", "i" }, "<CR>" },
-          MkdnTab = { "i", ">" },
-          MkdnSTab = { "i", "<" },
-          MkdnNextLink = { "n", "<Tab>" },
-          MkdnPrevLink = { "n", "<S-Tab>" },
-          MkdnNextHeading = { "n", "]]" },
-          MkdnPrevHeading = { "n", "[[" },
+          MkdnEnter = { { 'n', 'v', 'i' }, '<CR>' },
+          MkdnTab = { 'i', '>' },
+          MkdnSTab = { 'i', '<' },
+          MkdnNextLink = { 'n', '<Tab>' },
+          MkdnPrevLink = { 'n', '<S-Tab>' },
+          MkdnNextHeading = { 'n', ']]' },
+          MkdnPrevHeading = { 'n', '[[' },
           MkdnGoBack = false,
           MkdnGoForward = false,
           MkdnCreateLink = false,
-          MkdnCreateLinkFromClipboard = { { "n", "v" }, "<leader>mp" }, -- see MkdnEnter
+          MkdnCreateLinkFromClipboard = { { 'n', 'v' }, '<leader>mp' }, -- see MkdnEnter
           MkdnFollowLink = false,
-          MkdnDestroyLink = { "n", "<A-CR>" },
-          MkdnTagSpan = { "v", "<A-CR>" },
-          MkdnMoveSource = { "n", "<F2>" },
-          MkdnYankAnchorLink = { "n", "yaa" },
-          MkdnYankFileAnchorLink = { "n", "yfa" },
-          MkdnIncreaseHeading = { "n", "+" },
-          MkdnDecreaseHeading = { "n", "-" },
-          MkdnToggleToDo = { { "n", "v" }, "<leader>ml" },
+          MkdnDestroyLink = { 'n', '<A-CR>' },
+          MkdnTagSpan = { 'v', '<A-CR>' },
+          MkdnMoveSource = { 'n', '<F2>' },
+          MkdnYankAnchorLink = { 'n', 'yaa' },
+          MkdnYankFileAnchorLink = { 'n', 'yfa' },
+          MkdnIncreaseHeading = { 'n', '+' },
+          MkdnDecreaseHeading = { 'n', '-' },
+          MkdnToggleToDo = { { 'n', 'v' }, '<leader>ml' },
           MkdnNewListItem = false,
           MkdnNewListItemBelowInsert = false,
           MkdnNewListItemAboveInsert = false,
           MkdnExtendList = false,
-          MkdnUpdateNumbering = { "n", "<leader>mn" },
-          MkdnTableNextCell = { "i", "<Tab>" },
-          MkdnTablePrevCell = { "i", "<S-Tab>" },
+          MkdnUpdateNumbering = { 'n', '<leader>mn' },
+          MkdnTableNextCell = { 'i', '<Tab>' },
+          MkdnTablePrevCell = { 'i', '<S-Tab>' },
           MkdnTableNextRow = false,
-          MkdnTablePrevRow = { "i", "<A-CR>" },
-          MkdnTableNewRowBelow = { "n", "<leader>mr" },
-          MkdnTableNewRowAbove = { "n", "<leader>mR" },
-          MkdnTableNewColAfter = { "n", "<leader>mc" },
-          MkdnTableNewColBefore = { "n", "<leader>mC" },
+          MkdnTablePrevRow = { 'i', '<A-CR>' },
+          MkdnTableNewRowBelow = { 'n', '<leader>mr' },
+          MkdnTableNewRowAbove = { 'n', '<leader>mR' },
+          MkdnTableNewColAfter = { 'n', '<leader>mc' },
+          MkdnTableNewColBefore = { 'n', '<leader>mC' },
           MkdnFoldSection = false,
           MkdnUnfoldSection = false,
         },
@@ -127,28 +127,28 @@ return {
     end,
   },
   {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    ft = { 'markdown' },
     build = function()
-      vim.fn["mkdp#util#install"]()
+      vim.fn['mkdp#util#install']()
     end,
     config = function()
-      vim.keymap.set("n", "<leader>mt", "<cmd>MarkdownPreviewToggle<CR>", { desc = "[M]arkdown Preview [T]oggle" })
+      vim.keymap.set('n', '<leader>mt', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[M]arkdown Preview [T]oggle' })
     end,
   },
   {
-    "HakonHarnes/img-clip.nvim",
+    'HakonHarnes/img-clip.nvim',
     opts = {
       default = {
-        dir_path = "img",
+        dir_path = 'img',
       },
       markdown = {
         download_images = true,
       },
     },
     keys = {
-      { "<leader>p", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
+      { '<leader>p', '<cmd>PasteImage<cr>', desc = 'Paste image from system clipboard' },
     },
   },
 }

@@ -1,28 +1,28 @@
 return {
-  "mfussenegger/nvim-dap",
+  'mfussenegger/nvim-dap',
   dependencies = {
     -- Fancy UI for the debugger
     {
-      "rcarriga/nvim-dap-ui",
-      dependencies = "nvim-neotest/nvim-nio",
+      'rcarriga/nvim-dap-ui',
+      dependencies = 'nvim-neotest/nvim-nio',
       -- stylua: ignore
       keys = {
         { "<leader>du", function() require("dapui").toggle() end, desc = "[D]ebut: Toggle [U]I", },
         { "<leader>de", function() require("dapui").eval() require("dapui").eval() end, desc = "[D]ebug: [E]valuate Expression", },
       },
       config = function()
-        local dap = require("dap")
-        local dapui = require("dapui")
+        local dap = require('dap')
+        local dapui = require('dapui')
         dapui.setup()
         -- somehow the ui doesn't close the first time
-        dap.listeners.after.event_initialized["dapui_config"] = function()
+        dap.listeners.after.event_initialized['dapui_config'] = function()
           dapui.open({})
         end
-        dap.listeners.before.event_terminated["dapui_config"] = function()
+        dap.listeners.before.event_terminated['dapui_config'] = function()
           dapui.close({})
           dapui.close({})
         end
-        dap.listeners.before.event_exited["dapui_config"] = function()
+        dap.listeners.before.event_exited['dapui_config'] = function()
           dapui.close({})
           dapui.close({})
         end
@@ -31,26 +31,26 @@ return {
 
     -- Virtual text.
     {
-      "theHamsta/nvim-dap-virtual-text",
-      opts = { virt_text_pos = "eol" },
+      'theHamsta/nvim-dap-virtual-text',
+      opts = { virt_text_pos = 'eol' },
     },
 
     -- JS/TS debugging.
     {
-      "mxsdev/nvim-dap-vscode-js",
+      'mxsdev/nvim-dap-vscode-js',
       opts = {
-        debugger_path = vim.fn.stdpath("data") .. "/lazy/vscode-js-debug",
-        adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" },
+        debugger_path = vim.fn.stdpath('data') .. '/lazy/vscode-js-debug',
+        adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' },
       },
     },
     {
-      "microsoft/vscode-js-debug",
-      build = "npm i && npm run compile vsDebugServerBundle && rm -rf out && mv -f dist out",
+      'microsoft/vscode-js-debug',
+      build = 'npm i && npm run compile vsDebugServerBundle && rm -rf out && mv -f dist out',
     },
 
     -- Lua adapter.
     {
-      "jbyuki/one-small-step-for-vimkind",
+      'jbyuki/one-small-step-for-vimkind',
       -- stylua: ignore
       keys = {
         { "<leader>dl", function() require("osv").launch({ port = 8086 }) end, desc = "[D]ebug: [L]ua",},
@@ -71,37 +71,37 @@ return {
   },
   config = function()
     local sign = vim.fn.sign_define
-    sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
-    sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
-    sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
-    local dap = require("dap")
+    sign('DapBreakpoint', { text = '●', texthl = 'DapBreakpoint', linehl = '', numhl = '' })
+    sign('DapBreakpointCondition', { text = '●', texthl = 'DapBreakpointCondition', linehl = '', numhl = '' })
+    sign('DapLogPoint', { text = '◆', texthl = 'DapLogPoint', linehl = '', numhl = '' })
+    local dap = require('dap')
     -- Lua configurations.
     dap.adapters.nlua = function(callback, config)
-      callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
+      callback({ type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 })
     end
-    dap.configurations["lua"] = {
+    dap.configurations['lua'] = {
       {
-        type = "nlua",
-        request = "attach",
-        name = "Attach to running Neovim instance",
+        type = 'nlua',
+        request = 'attach',
+        name = 'Attach to running Neovim instance',
       },
     }
 
     -- C configurations.
     dap.adapters.codelldb = {
-      type = "server",
-      host = "localhost",
-      port = "${port}",
+      type = 'server',
+      host = 'localhost',
+      port = '${port}',
       executable = {
-        command = "codelldb",
-        args = { "--port", "${port}" },
+        command = 'codelldb',
+        args = { '--port', '${port}' },
       },
     }
 
     -- Add configurations from launch.json
-    require("dap.ext.vscode").load_launchjs(nil, {
-      ["codelldb"] = { "c" },
-      ["pwa-node"] = { "typescript", "javascript" },
+    require('dap.ext.vscode').load_launchjs(nil, {
+      ['codelldb'] = { 'c' },
+      ['pwa-node'] = { 'typescript', 'javascript' },
     })
   end,
 }

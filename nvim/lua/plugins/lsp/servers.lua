@@ -2,7 +2,7 @@ local M = {}
 
 local function organize_imports()
   local params = {
-    command = "_typescript.organizeImports",
+    command = '_typescript.organizeImports',
     arguments = { vim.api.nvim_buf_get_name(0) },
   }
   vim.lsp.buf.execute_command(params)
@@ -11,24 +11,24 @@ end
 M = {
   rust_analyzer = {
     settings = {
-      ["rust_analyzer"] = {
+      ['rust_analyzer'] = {
         diagnostics = {
           enable = true,
         },
         inlayHints = {
           enable = true,
           showParameterNames = true,
-          parameterHintsPrefix = "<- ",
-          otherHintsPrefix = "=> ",
+          parameterHintsPrefix = '<- ',
+          otherHintsPrefix = '=> ',
         },
         imports = {
           granularity = {
-            group = "module",
+            group = 'module',
           },
-          prefix = "self",
+          prefix = 'self',
         },
         cargo = {
-          features = { "all" }, -- does it do something?
+          features = { 'all' }, -- does it do something?
           allFeatures = true,
           buildScripts = {
             enable = true,
@@ -37,17 +37,17 @@ M = {
         procMacro = {
           enable = true,
           ignored = {
-            ["async-trait"] = { "async_trait" },
-            ["napi-derive"] = { "napi" },
-            ["async-recursion"] = { "async_recursion" },
+            ['async-trait'] = { 'async_trait' },
+            ['napi-derive'] = { 'napi' },
+            ['async-recursion'] = { 'async_recursion' },
           },
         },
         command = {
-          "cargo",
-          "clippy",
+          'cargo',
+          'clippy',
         },
         checkOnSave = {
-          command = "clippy",
+          command = 'clippy',
         },
       },
     },
@@ -57,7 +57,7 @@ M = {
     settings = {
       typescript = {
         inlayHints = {
-          includeInlayParameterNameHints = "all",
+          includeInlayParameterNameHints = 'all',
           includeInlayParameterNameHintsWhenArgumentMatchesName = true,
           includeInlayFunctionParameterTypeHints = true,
           includeInlayVariableTypeHints = true,
@@ -68,7 +68,7 @@ M = {
       },
       javascript = {
         inlayHints = {
-          includeInlayParameterNameHints = "all",
+          includeInlayParameterNameHints = 'all',
           includeInlayParameterNameHintsWhenArgumentMatchesName = true,
           includeInlayFunctionParameterTypeHints = true,
           includeInlayVariableTypeHints = true,
@@ -81,13 +81,13 @@ M = {
     commands = {
       OrganizeImports = {
         organize_imports,
-        description = "Organize Imports",
+        description = 'Organize Imports',
       },
     },
   },
 
   html = {
-    filetypes = { "html", "twig", "hbs" },
+    filetypes = { 'html', 'twig', 'hbs' },
     settings = {
       opts = {
         settings = {
@@ -95,7 +95,7 @@ M = {
             format = {
               templating = true,
               wrapLineLength = 120,
-              wrapAttributes = "auto",
+              wrapAttributes = 'auto',
             },
             hover = {
               documentation = true,
@@ -110,17 +110,17 @@ M = {
   lua_ls = {
     on_init = function(client)
       local path = client.workspace_folders[1].name
-      if vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc") then
+      if vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc') then
         return
       end
 
-      client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
-        runtime = { version = "LuaJIT" },
+      client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+        runtime = { version = 'LuaJIT' },
         -- Make the server aware of Neovim runtime files
         workspace = {
           checkThirdParty = false,
           library = {
-            "${3rd}/luv/library",
+            '${3rd}/luv/library',
             vim.env.VIMRUNTIME, -- this apparently gives faster and better diagnostics than `unpack`
             -- unpack(vim.api.nvim_get_runtime_file("", true)),
           },
@@ -130,8 +130,8 @@ M = {
     settings = {
       Lua = {
         format = { enable = false },
-        completion = { callSnippet = "Replace" },
-        hint = { enable = true, arrayIndex = "Disable" },
+        completion = { callSnippet = 'Replace' },
+        hint = { enable = true, arrayIndex = 'Disable' },
         telemetry = { enable = false },
       },
     },
@@ -143,33 +143,38 @@ M = {
 
   tailwindcss = {
     filetypes = {
-      "astro",
-      "astro-markdown",
-      "ejs",
-      "html",
-      "css",
-      "less",
-      "postcss",
-      "sass",
-      "scss",
-      "javascript",
-      "javascriptreact",
-      "typescript",
-      "typescriptreact",
-      "vue",
-      "svelte",
+      'astro',
+      'astro-markdown',
+      'ejs',
+      'html',
+      'css',
+      'less',
+      'postcss',
+      'sass',
+      'scss',
+      'javascript',
+      'javascriptreact',
+      'typescript',
+      'typescriptreact',
+      'vue',
+      'svelte',
     },
     hovers = true,
     suggestions = true,
     root_dir = function(fname)
-      local root_pattern = require("lspconfig").util.root_pattern("tailwind.config.cjs", "tailwind.config.js", "tailwind.config.ts", "postcss.config.js")
+      local root_pattern = require('lspconfig').util.root_pattern(
+        'tailwind.config.cjs',
+        'tailwind.config.js',
+        'tailwind.config.ts',
+        'postcss.config.js'
+      )
       return root_pattern(fname)
     end,
   },
 
   emmet_ls = {
     settings = {
-      filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
+      filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'sass', 'scss', 'less', 'svelte' },
     },
   },
 

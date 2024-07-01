@@ -13,7 +13,7 @@ local function parse_line(linenr)
     return nil
   end
 
-  local query = vim.treesitter.query.get(parser:lang(), "highlights")
+  local query = vim.treesitter.query.get(parser:lang(), 'highlights')
   if not query then
     return nil
   end
@@ -35,14 +35,14 @@ local function parse_line(linenr)
       if start_col > line_pos then
         table.insert(result, {
           line:sub(line_pos + 1, start_col),
-          { { "Folded", priority } },
+          { { 'Folded', priority } },
           range = { line_pos, start_col },
         })
       end
       line_pos = end_col
 
       local text = line:sub(start_col + 1, end_col)
-      table.insert(result, { text, { { "@" .. name, priority } }, range = { start_col, end_col } })
+      table.insert(result, { text, { { '@' .. name, priority } }, range = { start_col, end_col } })
     end
   end
 
@@ -90,9 +90,9 @@ function HighlightedFoldtext()
   end
 
   local folded = {
-    { " <", "FoldedIcon" },
-    { "+" .. vim.v.foldend - vim.v.foldstart .. " lines", "FoldedText" },
-    { "> ", "FoldedIcon" },
+    { ' <', 'FoldedIcon' },
+    { '+' .. vim.v.foldend - vim.v.foldstart .. ' lines', 'FoldedText' },
+    { '> ', 'FoldedIcon' },
   }
 
   for _, item in ipairs(folded) do
@@ -112,18 +112,18 @@ function HighlightedFoldtext()
 end
 
 local function set_fold_hl()
-  local cl = vim.api.nvim_get_hl(0, { name = "CursorLineNr" })
-  vim.api.nvim_set_hl(0, "FoldedIcon", { fg = cl.bg })
-  vim.api.nvim_set_hl(0, "FoldedText", { bg = cl.bg, fg = cl.fg, italic = true })
+  local cl = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' })
+  vim.api.nvim_set_hl(0, 'FoldedIcon', { fg = cl.bg })
+  vim.api.nvim_set_hl(0, 'FoldedText', { bg = cl.bg, fg = cl.fg, italic = true })
 end
 
 set_fold_hl()
 
-vim.api.nvim_create_autocmd("ColorScheme", {
+vim.api.nvim_create_autocmd('ColorScheme', {
   callback = set_fold_hl,
 })
 
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldtext = 'luaeval("HighlightedFoldtext")()'
 vim.opt.foldlevelstart = 99

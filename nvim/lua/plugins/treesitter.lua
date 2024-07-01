@@ -1,56 +1,56 @@
 return {
-  "nvim-treesitter/nvim-treesitter",
-  dependencies = { "sudogoku/nvim-treesitter-textsubjects" },
-  event = { "BufReadPost", "BufNewFile" },
-  build = ":TSUpdate",
+  'nvim-treesitter/nvim-treesitter',
+  dependencies = { 'sudogoku/nvim-treesitter-textsubjects' },
+  event = { 'BufReadPost', 'BufNewFile' },
+  build = ':TSUpdate',
   config = function()
-    require("nvim-treesitter.install").prefer_git = true
+    require('nvim-treesitter.install').prefer_git = true
 
     vim.filetype.add({
-      extension = { rasi = "rasi" },
+      extension = { rasi = 'rasi' },
       pattern = {
-        [".*/hypr/.*%.conf"] = "hyprlang",
-        [".*/waybar/config"] = "jsonc",
+        ['.*/hypr/.*%.conf'] = 'hyprlang',
+        ['.*/waybar/config'] = 'jsonc',
       },
     })
 
-    require("nvim-treesitter.configs").setup({
+    require('nvim-treesitter.configs').setup({
       ensure_installed = {
         -- langs
-        "c",
-        "cpp",
-        "go",
-        "lua",
-        "python",
-        "rust",
-        "java",
+        'c',
+        'cpp',
+        'go',
+        'lua',
+        'python',
+        'rust',
+        'java',
         -- web
-        "javascript",
-        "typescript",
-        "tsx",
-        "css",
-        "html",
-        "svelte",
+        'javascript',
+        'typescript',
+        'tsx',
+        'css',
+        'html',
+        'svelte',
         -- config
-        "json",
-        "jsonc",
-        "toml",
-        "yaml",
-        "markdown",
-        "markdown_inline",
+        'json',
+        'jsonc',
+        'toml',
+        'yaml',
+        'markdown',
+        'markdown_inline',
         -- specific config
-        "vimdoc",
-        "vim",
-        "bash",
-        "hyprlang",
-        "git_config",
-        "gitcommit",
-        "rasi",
-        "readline",
+        'vimdoc',
+        'vim',
+        'bash',
+        'hyprlang',
+        'git_config',
+        'gitcommit',
+        'rasi',
+        'readline',
         -- misc
-        "sql",
-        "regex",
-        "diff",
+        'sql',
+        'regex',
+        'diff',
       },
       auto_install = true,
       sync_install = false,
@@ -61,20 +61,26 @@ return {
       incremental_selection = {
         enable = true,
         keymaps = {
-          init_selection = "gn",
-          node_incremental = "gn",
-          scope_incremental = "gs",
-          node_decremental = "gr",
+          init_selection = 'gn',
+          node_incremental = 'gn',
+          scope_incremental = 'gs',
+          node_decremental = 'gr',
         },
       },
       -- Needs testing if I realy like it, looks nice but too magical
       textsubjects = {
         enable = true,
-        prev_selection = ",",
+        prev_selection = ',',
         keymaps = {
-          ["."] = { "textsubjects-smart", desc = "Patterns" },
-          [";"] = { "textsubjects-container-outer", desc = "Inside containers (classes, functions, strucs and methods)" },
-          ["i;"] = { "textsubjects-container-inner", desc = "Inside containers (classes, functions, strucs and methods)" },
+          ['.'] = { 'textsubjects-smart', desc = 'Patterns' },
+          [';'] = {
+            'textsubjects-container-outer',
+            desc = 'Inside containers (classes, functions, strucs and methods)',
+          },
+          ['i;'] = {
+            'textsubjects-container-inner',
+            desc = 'Inside containers (classes, functions, strucs and methods)',
+          },
         },
       },
     })

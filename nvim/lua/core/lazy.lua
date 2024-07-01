@@ -1,25 +1,25 @@
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable', -- latest stable release
     lazypath,
   })
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({ { import = "plugins" } }, {
+require('lazy').setup({ { import = 'plugins' } }, {
   install = {
-    colorscheme = { "catppuccin" },
+    colorscheme = { 'catppuccin' },
   },
   change_detection = {
     notify = false,
   },
   ui = {
-    border = "rounded",
+    border = 'rounded',
     backdrop = 100,
   },
   defaults = {
@@ -32,29 +32,29 @@ require("lazy").setup({ { import = "plugins" } }, {
     cache = { enabled = true },
     rtp = {
       disabled_plugins = {
-        "2html_plugin",
-        "bugreport",
+        '2html_plugin',
+        'bugreport',
         -- "compiler",
-        "ftplugin",
-        "getscript",
-        "getscriptPlugin",
-        "gzip",
-        "logipat",
-        "matchit",
-        "optwin",
-        "rplugin",
-        "rrhelper",
+        'ftplugin',
+        'getscript',
+        'getscriptPlugin',
+        'gzip',
+        'logipat',
+        'matchit',
+        'optwin',
+        'rplugin',
+        'rrhelper',
         -- "spellfile_plugin",
-        "synmenu",
-        "syntax",
-        "tar",
-        "tarPlugin",
-        "tohtml",
-        "tutor",
-        "vimball",
-        "vimballPlugin",
-        "zip",
-        "zipPlugin",
+        'synmenu',
+        'syntax',
+        'tar',
+        'tarPlugin',
+        'tohtml',
+        'tutor',
+        'vimball',
+        'vimballPlugin',
+        'zip',
+        'zipPlugin',
       },
     },
   },

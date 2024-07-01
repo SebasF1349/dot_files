@@ -1,7 +1,7 @@
 local M = {}
 
-local current_version = "nvim-0.10"
-local nightly_version = "nvim-0.11"
+local current_version = 'nvim-0.10'
+local nightly_version = 'nvim-0.11'
 
 M.is_old = function()
   return vim.fn.has(current_version) == 0

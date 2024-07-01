@@ -6,14 +6,14 @@ local dials_by_ft = {}
 local function dial(increment, g)
   local mode = vim.fn.mode(true)
   -- Use visual commands for VISUAL 'v', VISUAL LINE 'V' and VISUAL BLOCK '\22'
-  local is_visual = mode == "v" or mode == "V" or mode == "\22"
-  local func = (increment and "inc" or "dec") .. (g and "_g" or "_") .. (is_visual and "visual" or "normal")
-  local group = dials_by_ft[vim.bo.filetype] or "default"
-  return require("dial.map")[func](group)
+  local is_visual = mode == 'v' or mode == 'V' or mode == '\22'
+  local func = (increment and 'inc' or 'dec') .. (g and '_g' or '_') .. (is_visual and 'visual' or 'normal')
+  local group = dials_by_ft[vim.bo.filetype] or 'default'
+  return require('dial.map')[func](group)
 end
 
 return {
-  "monaqa/dial.nvim",
+  'monaqa/dial.nvim',
   -- stylua: ignore
   keys = {
     { "<C-a>", function() return dial(true) end, expr = true, desc = "Increment", mode = {"n", "v"} },
@@ -22,32 +22,32 @@ return {
     { "g<C-x>", function() return dial(false, true) end, expr = true, desc = "Decrement", mode = {"n", "v"} },
   },
   config = function()
-    local augend = require("dial.augend")
+    local augend = require('dial.augend')
 
     local logical_alias = augend.constant.new({
-      elements = { "&&", "||" },
+      elements = { '&&', '||' },
       word = false,
       cyclic = true,
     })
 
     local order = augend.constant.new({
-      elements = { ">", "<", "=", "!" },
+      elements = { '>', '<', '=', '!' },
       word = false,
       cyclic = true,
     })
 
     local ordinal_numbers = augend.constant.new({
       elements = {
-        "first",
-        "second",
-        "third",
-        "fourth",
-        "fifth",
-        "sixth",
-        "seventh",
-        "eighth",
-        "ninth",
-        "tenth",
+        'first',
+        'second',
+        'third',
+        'fourth',
+        'fifth',
+        'sixth',
+        'seventh',
+        'eighth',
+        'ninth',
+        'tenth',
       },
       word = false,
       cyclic = true,
@@ -55,13 +55,13 @@ return {
 
     local weekdays = augend.constant.new({
       elements = {
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
       },
       word = true,
       cyclic = true,
@@ -69,35 +69,35 @@ return {
 
     local months = augend.constant.new({
       elements = {
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       },
       word = true,
       cyclic = true,
     })
 
     dials_by_ft = {
-      css = "css",
-      javascript = "typescript",
-      javascriptreact = "typescript",
-      json = "json",
-      lua = "lua",
-      markdown = "markdown",
-      sass = "css",
-      scss = "css",
-      typescript = "typescript",
-      typescriptreact = "typescript",
-      svelte = "typescript",
+      css = 'css',
+      javascript = 'typescript',
+      javascriptreact = 'typescript',
+      json = 'json',
+      lua = 'lua',
+      markdown = 'markdown',
+      sass = 'css',
+      scss = 'css',
+      typescript = 'typescript',
+      typescriptreact = 'typescript',
+      svelte = 'typescript',
     }
 
     local groups = {
@@ -113,14 +113,14 @@ return {
       },
       css = {
         augend.integer.alias.decimal,
-        augend.hexcolor.new({ case = "lower" }),
-        augend.hexcolor.new({ case = "upper" }),
+        augend.hexcolor.new({ case = 'lower' }),
+        augend.hexcolor.new({ case = 'upper' }),
       },
       markdown = {
         augend.misc.alias.markdown_header,
-        augend.date.alias["%Y/%m/%d"],
-        augend.date.alias["%d/%m/%y"],
-        augend.date.alias["%Y-%m-%d"],
+        augend.date.alias['%Y/%m/%d'],
+        augend.date.alias['%d/%m/%y'],
+        augend.date.alias['%Y-%m-%d'],
         ordinal_numbers,
         weekdays,
         months,
@@ -132,12 +132,13 @@ return {
       },
     }
 
-    groups.typescript = vim.tbl_extend("force", groups.default, { augend.constant.new({ elements = { "let", "const" } }) })
-    groups.lua = vim.tbl_extend("force", groups.default, {
-      augend.constant.new({ elements = { "and", "or" }, word = true, cyclic = true }),
-      augend.constant.new({ elements = { ">", "<", "=", "~" }, word = false, cyclic = true }), --check this overwrittes order augend
+    groups.typescript =
+      vim.tbl_extend('force', groups.default, { augend.constant.new({ elements = { 'let', 'const' } }) })
+    groups.lua = vim.tbl_extend('force', groups.default, {
+      augend.constant.new({ elements = { 'and', 'or' }, word = true, cyclic = true }),
+      augend.constant.new({ elements = { '>', '<', '=', '~' }, word = false, cyclic = true }), --check this overwrittes order augend
     })
 
-    require("dial.config").augends:register_group(groups)
+    require('dial.config').augends:register_group(groups)
   end,
 }
