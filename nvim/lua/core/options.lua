@@ -162,6 +162,43 @@ vim.lsp.handlers['$/progress'] = function(_, progress, ctx)
   vim.notify(out, vim.log.levels.INFO)
 end
 
+-- overwrite default _get_url() to add github repos on plugins and google search
+---@diagnostic disable-next-line: duplicate-set-field
+vim.ui._get_url = function()
+  if vim.bo.filetype == 'markdown' then
+    local range = vim.api.nvim_win_get_cursor(0)
+    vim.treesitter.get_parser():parse(range)
+    -- marking the node as `markdown_inline` is required. Setting it to `markdown` does not
+    -- work.
+    local current_node = vim.treesitter.get_node({ lang = 'markdown_inline' })
+    while current_node do
+      local type = current_node:type()
+      if type == 'inline_link' or type == 'image' then
+        local child = assert(current_node:named_child(1))
+        return vim.treesitter.get_node_text(child, 0)
+      end
+      current_node = current_node:parent()
+    end
+  end
+
+  local url = vim._with({ go = { isfname = vim.o.isfname .. ',@-@' } }, function()
+    return vim.fn.expand('<cfile>')
+  end)
+
+  local is_uri = url:match('%w+:')
+  local is_repo = url:match('%w+/%w+') and vim.fn.count(url, '/') == 1
+  local is_dir = url:match('/%w+') or url:match('\\%w+')
+  if not is_uri then
+    if vim.bo.filetype == 'lua' and is_repo then
+      url = ('https://github.com/%s'):format(url)
+    elseif not is_dir then
+      url = ('https://google.com/search?q=%s'):format(vim.fn.expand('<cword>'))
+    end
+  end
+
+  return url
+end
+
 -- Disable health checks for these providers.
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
