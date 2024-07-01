@@ -42,6 +42,16 @@ vim.keymap.set('c', '<CR>', function()
   end
 end, { desc = 'Search with [G]lobal', expr = true })
 
+-- use <space> to 'fuzzy find' on search
+vim.keymap.set('c', '<space>', function()
+  local mode = vim.fn.getcmdtype()
+  if mode == '?' or mode == '/' or (mode == ':' and vim.startswith(vim.fn.getcmdline(), 'g/')) then
+    return '.*'
+  else
+    return ' '
+  end
+end, { expr = true })
+
 -- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
 
