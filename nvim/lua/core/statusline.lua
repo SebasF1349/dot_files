@@ -184,7 +184,7 @@ end
 local diagnostics_data = {
   { icon = ' ', hi = 'DiagnosticError' },
   { icon = ' ', hi = 'DiagnosticWarn' },
-  { icon = '', hi = 'DiagnosticInfo' },
+  { icon = ' ', hi = 'DiagnosticInfo' },
   { icon = ' ', hi = 'DiagnosticHint' },
 }
 
