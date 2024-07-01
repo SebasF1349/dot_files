@@ -174,14 +174,28 @@ local surround = {
   { "_", "_" },
 }
 for _, pair in ipairs(surround) do
-  vim.keymap.set("n", "<leader>" .. pair[1], "diwi" .. pair[1] .. "<ESC>pa" .. pair[2], { desc = "Surround with " .. pair[1] })
+  vim.keymap.set("n", "ys" .. pair[1], function()
+    local word = vim.fn.expand("<cword>") -- to avoid populating registers
+    return '"_ciw' .. pair[1] .. word .. pair[2] .. "<ESC>"
+  end, { desc = "[Y]ou [S]urround with [" .. pair[1] .. "]", expr = true })
   vim.keymap.set("v", "<leader>" .. pair[1], function()
     if vim.fn.mode() == "v" then
-      return "c" .. pair[1] .. pair[2] .. "<ESC>hp" .. "<ESC>"
+      return "c" .. pair[1] .. '<C-r>"' .. pair[2] .. "<ESC>"
     elseif vim.fn.mode() == "V" then
       return "<ESC>I" .. pair[1] .. "<ESC>A" .. pair[2] .. "<ESC>"
     end
-  end, { desc = "Surround with " .. pair[1], expr = true })
+  end, { desc = "[Y]ou [S]urround with [" .. pair[1] .. "]", expr = true })
+
+  vim.keymap.set("n", "ds" .. pair[1], "di" .. pair[1] .. "vhP", { desc = "[D]elete [S]urrounding [" .. pair[1] .. "]" })
+
+  for _, replace in ipairs(surround) do
+    vim.keymap.set(
+      "n",
+      "cs" .. pair[1] .. replace[1],
+      "di" .. pair[1] .. 'vh"_c' .. replace[1] .. '<C-r>"' .. replace[2],
+      { desc = "[C]hange [S]urround [" .. pair[1] .. "] with [" .. replace[1] .. "]" }
+    )
+  end
 end
 
 -- notetaking

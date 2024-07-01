@@ -1,6 +1,6 @@
 return {
   "folke/which-key.nvim",
-  keys = { "<leader>", "g", "[", "]", '"' },
+  keys = { "<leader>", "g", "[", "]", '"', "y", "d", "c" },
   ft = "markdown",
   config = function()
     local which_key = require("which-key")
@@ -14,6 +14,9 @@ return {
       ["gb"] = { name = "[B]uffer Management" },
       ["]"] = { name = "Next" },
       ["["] = { name = "Prev" },
+      ["ys"] = { name = "Surround" },
+      ["ds"] = { name = "Delete Surround" },
+      ["cs"] = { name = "Change Surround" },
       ["<leader>"] = {
         ["c"] = { name = "[C]ode" },
         ["d"] = { name = "[D]ebugger" },
