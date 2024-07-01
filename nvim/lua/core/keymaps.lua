@@ -14,9 +14,9 @@ local function delete_all()
 end
 -- Return to basics: manage open buffers
 vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
-vim.keymap.set('n', 'gbn', '<cmd>:bnext<CR>', { desc = '[N]ext Open Buffer' })
-vim.keymap.set('n', 'gbp', '<cmd>:bprevious<CR>', { desc = '[P]revious Open Buffer' })
-vim.keymap.set('n', 'gbd', '<cmd>:set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
+vim.keymap.set('n', 'gbn', '<cmd>bnext<CR>', { desc = '[N]ext Open Buffer' })
+vim.keymap.set('n', 'gbp', '<cmd>bprevious<CR>', { desc = '[P]revious Open Buffer' })
+vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
 -- not using :bdel as it removes the file from diagnostics
 vim.keymap.set('n', 'gbo', delete_all, { desc = 'Make [O]nly Buffer' })
 
