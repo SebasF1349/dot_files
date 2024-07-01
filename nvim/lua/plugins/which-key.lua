@@ -11,7 +11,7 @@ return {
 
     which_key.register({
       ['g'] = { name = '[G]o to' },
-      ['gb'] = { name = '[B]uffer Management' },
+      ['gb'] = { name = '[B]ufferlist Management' },
       [']'] = { name = 'Next' },
       ['['] = { name = 'Prev' },
       ['ys'] = { name = 'Surround' },

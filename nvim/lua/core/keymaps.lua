@@ -12,12 +12,24 @@ local function delete_all()
     end
   end
 end
+vim.api.nvim_create_user_command('CleanBuflist', function(opts)
+  for _, bufstr in ipairs(opts.fargs) do
+    local bufnr = tonumber(bufstr)
+    if bufnr and vim.api.nvim_buf_is_loaded(bufnr) then
+      vim.api.nvim_set_option_value('buflisted', false, { buf = bufnr })
+    end
+  end
+  if not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) then
+    vim.cmd('silent! bnext')
+  end
+end, { nargs = '*' })
 -- Return to basics: manage open buffers
 vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
 vim.keymap.set('n', 'gbn', '<cmd>bnext<CR>', { desc = '[N]ext Open Buffer' })
 vim.keymap.set('n', 'gbp', '<cmd>bprevious<CR>', { desc = '[P]revious Open Buffer' })
 vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
 -- not using :bdel as it removes the file from diagnostics
+vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
 vim.keymap.set('n', 'gbo', delete_all, { desc = 'Make [O]nly Buffer' })
 
 -- Remap Escape
