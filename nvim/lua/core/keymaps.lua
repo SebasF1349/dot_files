@@ -146,8 +146,31 @@ vim.keymap.set('c', '<space>', function()
 end, { expr = true })
 
 --------------------------------------------------
+-- Open Buffers
+--------------------------------------------------
+
+local edit_buffer = {
+  w = { cmd = ':edit ', desc = '[W]indow' },
+  s = { cmd = ':split ', desc = '[S]plit' },
+  v = { cmd = ':vsplit ', desc = '[V]ertical split' },
+}
+
+for key, opts in pairs(edit_buffer) do
+  vim.keymap.set('n', 'ge' .. key, opts.cmd .. '**/*', { desc = '[E]dit Buffer in ' .. opts.desc })
+  vim.keymap.set(
+    'n',
+    'gE' .. key,
+    opts.cmd .. vim.fn.expand('%:p:h') .. '/',
+    { desc = '[E]dit Buffer in Current Directory in ' .. opts.desc }
+  )
+end
+
+--------------------------------------------------
 -- Buffer Management
 --------------------------------------------------
+-- NOTE: maybe should use argslist instead of buflist?
+-- deleting a buf is an extra keymap
+-- every new buffer is added, even if it's just for a quick look
 
 local function delete_all_other_bufs()
   local current_bufnr = vim.api.nvim_win_get_buf(0)
@@ -170,7 +193,6 @@ vim.api.nvim_create_user_command('CleanBuflist', function(opts)
   end
 end, { nargs = '*' })
 
--- Return to basics: manage open buffers
 vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
 vim.keymap.set('n', 'gbn', '<cmd>bnext<CR>', { desc = '[N]ext Open Buffer' })
 vim.keymap.set('n', 'gbp', '<cmd>bprevious<CR>', { desc = '[P]revious Open Buffer' })
