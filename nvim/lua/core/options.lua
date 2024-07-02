@@ -42,7 +42,7 @@ vim.opt.shortmess = 'aoOstTWICF'
 vim.o.splitkeep = 'screen'
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = 'menu,menuone'
 
 -- Slight transparency - I like this ones but don't play with catppuccin
 -- vim.o.pumblend = 10 -- builtin completion
@@ -81,7 +81,11 @@ vim.opt.splitbelow = true
 vim.opt.fileencoding = 'utf-8'
 
 vim.opt.iskeyword:append('-')
+-- vim.opt.wildchar = 12 -- <C-l>
+vim.opt.wildmode = 'longest:full,full'
 vim.opt.wildignore:append({ '*/node_modules/*', '*/.git/*' })
+
+vim.opt.smoothscroll = true
 
 -- folds
 vim.opt.foldmethod = 'expr'
