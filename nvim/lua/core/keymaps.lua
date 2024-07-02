@@ -1,56 +1,12 @@
+--------------------------------------------------
+-- Basics
+--------------------------------------------------
+
 -- Keymaps for better default experience
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Execute q macro
 vim.keymap.set('n', 'Q', '@q')
-
-local function delete_all()
-  local current_bufnr = vim.api.nvim_win_get_buf(0)
-  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(bufnr) and bufnr ~= current_bufnr then
-      vim.api.nvim_set_option_value('buflisted', false, { buf = bufnr })
-    end
-  end
-end
-vim.api.nvim_create_user_command('CleanBuflist', function(opts)
-  for _, bufstr in ipairs(opts.fargs) do
-    local bufnr = tonumber(bufstr)
-    if bufnr and vim.api.nvim_buf_is_loaded(bufnr) then
-      vim.api.nvim_set_option_value('buflisted', false, { buf = bufnr })
-    end
-  end
-  if not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) then
-    vim.cmd('silent! bnext')
-  end
-end, { nargs = '*' })
--- Return to basics: manage open buffers
-vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
-vim.keymap.set('n', 'gbn', '<cmd>bnext<CR>', { desc = '[N]ext Open Buffer' })
-vim.keymap.set('n', 'gbp', '<cmd>bprevious<CR>', { desc = '[P]revious Open Buffer' })
-vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
--- not using :bdel as it removes the file from diagnostics
-vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
-vim.keymap.set('n', 'gbo', delete_all, { desc = 'Make [O]nly Buffer' })
-
--- Search using :global
-vim.keymap.set('n', 'g/', ':g//#<Left><Left>', { desc = 'Search with [G]lobal' })
-vim.keymap.set('c', '<CR>', function()
-  if vim.endswith(vim.fn.getcmdline(), '#') then
-    return '<CR>:'
-  else
-    return '<CR>'
-  end
-end, { desc = 'Search with [G]lobal', expr = true })
-
--- use <space> to 'fuzzy find' on search
-vim.keymap.set('c', '<space>', function()
-  local mode = vim.fn.getcmdtype()
-  if mode == '?' or mode == '/' or (mode == ':' and vim.startswith(vim.fn.getcmdline(), 'g/')) then
-    return '.*'
-  else
-    return ' '
-  end
-end, { expr = true })
 
 -- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
@@ -120,7 +76,10 @@ vim.keymap.set('x', 'gX', function()
   vim.api.nvim_input('<esc>')
 end, { desc = 'Search Selected Text' })
 
+--------------------------------------------------
 -- Terminal
+--------------------------------------------------
+
 ---@class term
 ---@field buf_num number
 ---@field win_id number
@@ -163,7 +122,69 @@ vim.keymap.set({ 'n', 't' }, 'tt', function()
 end, { desc = '[T]oggle [T]erminal 1' })
 vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
--- window management (NOTE: Check what to do with these keymaps)
+--------------------------------------------------
+-- Searching
+--------------------------------------------------
+
+-- Search using :global
+vim.keymap.set('n', 'g/', ':g//#<Left><Left>', { desc = 'Search with [G]lobal' })
+vim.keymap.set('c', '<CR>', function()
+  if vim.endswith(vim.fn.getcmdline(), '#') then
+    return '<CR>:'
+  else
+    return '<CR>'
+  end
+end, { desc = 'Search with [G]lobal', expr = true })
+
+-- use <space> to 'fuzzy find' on search
+vim.keymap.set('c', '<space>', function()
+  local mode = vim.fn.getcmdtype()
+  if mode == '?' or mode == '/' or (mode == ':' and vim.startswith(vim.fn.getcmdline(), 'g/')) then
+    return '.*'
+  else
+    return ' '
+  end
+end, { expr = true })
+
+--------------------------------------------------
+-- Buffer Management
+--------------------------------------------------
+
+local function delete_all_other_bufs()
+  local current_bufnr = vim.api.nvim_win_get_buf(0)
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and bufnr ~= current_bufnr then
+      vim.api.nvim_set_option_value('buflisted', false, { buf = bufnr })
+    end
+  end
+end
+
+vim.api.nvim_create_user_command('CleanBuflist', function(opts)
+  for _, bufstr in ipairs(opts.fargs) do
+    local bufnr = tonumber(bufstr)
+    if bufnr and vim.api.nvim_buf_is_loaded(bufnr) then
+      vim.api.nvim_set_option_value('buflisted', false, { buf = bufnr })
+    end
+  end
+  if not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) then
+    vim.cmd('silent! bnext')
+  end
+end, { nargs = '*' })
+
+-- Return to basics: manage open buffers
+vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
+vim.keymap.set('n', 'gbn', '<cmd>bnext<CR>', { desc = '[N]ext Open Buffer' })
+vim.keymap.set('n', 'gbp', '<cmd>bprevious<CR>', { desc = '[P]revious Open Buffer' })
+vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
+-- not using :bdel as it removes the file from diagnostics
+vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
+vim.keymap.set('n', 'gbo', delete_all_other_bufs, { desc = 'Make [O]nly Buffer' })
+
+--------------------------------------------------
+-- Window Management
+--------------------------------------------------
+
+-- Basics (NOTE: Check what to do with these keymaps)
 vim.keymap.set('n', '<C-\\>', '<C-w>v', { desc = 'Split Window [|]Vertically' })
 vim.keymap.set('n', '<CR>', '<C-w>s', { desc = 'Split Window [-]Horizontally' }) -- <C--> and <CR> map to the same key in the terminal
 vim.keymap.set('n', '<C-=>', '<C-w>=', { desc = 'Window [=]Equal Size' })
@@ -215,6 +236,10 @@ for key, _ in pairs(nav) do
   vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', navigate(key))
 end
 
+--------------------------------------------------
+-- Surround
+--------------------------------------------------
+
 local surround = {
   { '(', ')' },
   { '[', ']' },
@@ -256,7 +281,10 @@ for _, pair in ipairs(surround) do
   end
 end
 
--- notetaking
+--------------------------------------------------
+-- Notetaking
+--------------------------------------------------
+
 local notes_cache = {}
 local function open_notes()
   if not notes_cache.file_path then
@@ -291,6 +319,10 @@ local function open_notes()
 end
 vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
 
+--------------------------------------------------
+-- Spell
+--------------------------------------------------
+
 -- https://github.com/neovim/neovim/pull/25833/files
 -- Change default implementation of z= for spell checking
 local spell_on_choice = vim.schedule_wrap(function(_, idx)
@@ -308,5 +340,8 @@ local spell_select = function()
 end
 vim.keymap.set('n', 'z=', spell_select, { desc = 'Shows spelling suggestions' })
 
--- abbreviations
+--------------------------------------------------
+-- Abbreviations
+--------------------------------------------------
+
 vim.keymap.set('ca', 'Wa', 'wa')
