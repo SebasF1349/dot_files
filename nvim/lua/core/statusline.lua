@@ -130,8 +130,10 @@ git_modified()
 
 local function update_gstatus()
   local Job = require('plenary.job')
-  -- NOTE: this doesn't work as expected because it needs to fetch changes
-  -- and I can't make it fetch because it needs a password
+  Job:new({
+    command = 'git',
+    args = { 'fetch' },
+  }):start()
   Job:new({
     command = 'git',
     args = { 'rev-list', '--left-right', '--count', 'HEAD...@{upstream}' },
