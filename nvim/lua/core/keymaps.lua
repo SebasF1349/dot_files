@@ -127,19 +127,18 @@ vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 --------------------------------------------------
 
 -- Search using :global
-vim.keymap.set('n', 'g/', ':g//#<Left><Left>', { desc = 'Search with [G]lobal' })
-vim.keymap.set('c', '<CR>', function()
-  if vim.endswith(vim.fn.getcmdline(), '#') then
-    return '<CR>:'
-  else
-    return '<CR>'
-  end
+vim.keymap.set('n', 'g/', function()
+  vim.ui.input({ prompt = 'Search Pattern: ' }, function(input)
+    if input then
+      vim.api.nvim_input(':g/' .. input .. '/#<CR>:')
+    end
+  end)
 end, { desc = 'Search with [G]lobal', expr = true })
 
 -- use <space> to 'fuzzy find' on search
 vim.keymap.set('c', '<space>', function()
   local mode = vim.fn.getcmdtype()
-  if mode == '?' or mode == '/' or (mode == ':' and vim.startswith(vim.fn.getcmdline(), 'g/')) then
+  if mode == '?' or mode == '/' then
     return '.*'
   else
     return ' '
