@@ -92,7 +92,13 @@ return {
     local builtin = require('telescope.builtin')
 
     -- Browsing
-    vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
+    vim.keymap.set('n', '<leader>ff', function()
+      if vim.fs.root(0, '.git') then
+        builtin.git_files({ use_git_root = false, show_untracked = true })
+      else
+        builtin.find_files({ follow = true, hidden = true })
+      end
+    end, { desc = '[F]ind [F]iles' })
     vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = 'Find another [ ] opened buffers' })
 
     -- Searching
