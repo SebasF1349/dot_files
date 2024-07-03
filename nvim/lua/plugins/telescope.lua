@@ -1,7 +1,6 @@
 return {
   'nvim-telescope/telescope.nvim',
-  keys = { '<leader>f', '<leader><leader>', '<leader>/' },
-  -- branch = "0.1.x",
+  keys = { '<leader>f', '<leader>/' },
   dependencies = {
     'nvim-lua/plenary.nvim',
     {
@@ -38,27 +37,6 @@ return {
         selection_caret = ' ',
         dynamic_preview_title = true,
         path_display = { 'filename_first' },
-        layout_strategy = 'flex',
-        layout_config = {
-          horizontal = {
-            width = function(_, cols, _)
-              return cols
-            end,
-            height = function(_, _, rows)
-              return rows
-            end,
-            preview_cutoff = 0,
-          },
-          vertical = {
-            width = function(_, cols, _)
-              return cols
-            end,
-            height = function(_, _, rows)
-              return rows
-            end,
-            preview_cutoff = 0,
-          },
-        },
         file_ignore_patterns = {
           '%.jpg',
           '%.jpeg',
@@ -90,43 +68,28 @@ return {
     telescope.load_extension('ui-select')
 
     local builtin = require('telescope.builtin')
+    local themes = require('telescope.themes')
 
     -- Browsing
     vim.keymap.set('n', '<leader>ff', function()
       if vim.fs.root(0, '.git') then
-        builtin.git_files({ use_git_root = false, show_untracked = true })
+        builtin.git_files(themes.get_ivy({ use_git_root = false, show_untracked = true }))
       else
-        builtin.find_files({ follow = true, hidden = true })
+        builtin.find_files(themes.get_ivy({ follow = true, hidden = true }))
       end
     end, { desc = '[F]ind [F]iles' })
-    vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = 'Find another [ ] opened buffers' })
 
     -- Searching
     vim.keymap.set('n', '<leader>fg', function()
-      builtin.live_grep({ disable_coordinates = true })
+      builtin.live_grep(themes.get_ivy({ disable_coordinates = true }))
     end, { desc = '[F]ind by [G]rep' })
     vim.keymap.set('n', '<leader>/', function()
-      builtin.live_grep({
+      builtin.live_grep(themes.get_ivy({
         disable_coordinates = true,
         search_dirs = { vim.api.nvim_buf_get_name(0) },
         prompt_title = 'Live Grep in Current Buffer',
-      })
+      }))
     end, { desc = 'Find [/] in Current Buffer' })
-    vim.keymap.set('n', '<leader>f/', function()
-      builtin.live_grep({
-        disable_coordinates = true,
-        grep_open_files = true,
-        prompt_title = 'Live Grep in Open Buffers',
-      })
-    end, { desc = '[F]ind [/] in Open Buffers' })
-    vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
-    vim.keymap.set('v', '<leader>fs', function()
-      local visual_selection = vim.fn.getregion(vim.fn.getpos('.'), vim.fn.getpos('v'), { mode = vim.fn.mode() })
-      builtin.live_grep({
-        disable_coordinates = true,
-        default_text = vim.fn.escape(table.concat(visual_selection), '.(){}'),
-      })
-    end, { desc = '[F]ind [S]elected Text' })
 
     -- Miscelaneous
     vim.keymap.set('n', '<leader>fn', function()
@@ -136,10 +99,8 @@ return {
         use_regex = true,
       })
     end, { desc = '[F]ind [N]otes' })
-    vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = '[F]ind [D]iagnostics' })
     vim.keymap.set('n', '<leader>fb', builtin.git_branches, { desc = '[F]ind Git [B]ranch' })
     vim.keymap.set('n', '<leader>fs', builtin.git_status, { desc = '[F]ind Git [S]tatus' })
-    vim.keymap.set('n', '<leader>fp', builtin.registers, { desc = '[F]ind Register to [P]aste' })
     vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp' })
   end,
