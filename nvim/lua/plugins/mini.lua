@@ -70,5 +70,8 @@ return { -- Collection of various small independent plugins/modules
     -- NOTE: mini-surround for better surroundings?
 
     require('mini.splitjoin').setup({ mappings = { toggle = '<leader>j', split = '', join = '' } })
+
+    require('mini.icons').setup()
+    require('mini.icons').mock_nvim_web_devicons()
   end,
 }
