@@ -5,9 +5,6 @@
 -- Keymaps for better default experience
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
--- Execute q macro
-vim.keymap.set('n', 'Q', '@q')
-
 -- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
 
