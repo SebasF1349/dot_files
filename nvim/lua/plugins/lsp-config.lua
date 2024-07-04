@@ -77,6 +77,7 @@ return {
       'hrsh7th/cmp-nvim-lsp',
       'artemave/workspace-diagnostics.nvim',
       { 'dmmulroy/ts-error-translator.nvim', opts = {} },
+      'felpafel/inlay-hint.nvim', -- check nvim-lsp-endhints to show inlay hints only in current line
     },
     config = function()
       -- add border to the floating windows
@@ -93,6 +94,7 @@ return {
           local client = vim.lsp.get_client_by_id(event.data.client_id)
 
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+            require('inlay-hint').setup()
             vim.lsp.inlay_hint.enable(true)
             vim.keymap.set('n', '<leader>ti', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
