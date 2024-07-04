@@ -73,6 +73,12 @@ vim.keymap.set('x', 'gX', function()
   vim.api.nvim_input('<esc>')
 end, { desc = 'Search Selected Text' })
 
+-- registers
+vim.keymap.set('n', 'dd', function()
+  return vim.fn.getline('.') == '' and '"_dd' or 'dd'
+end, { desc = 'Send blank lines to black hole', expr = true })
+vim.keymap.set('n', 'dl', '0d$', { desc = '[D]elete [L]ine without newline' })
+
 --------------------------------------------------
 -- Terminal
 --------------------------------------------------
