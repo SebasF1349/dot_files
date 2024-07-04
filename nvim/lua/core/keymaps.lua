@@ -44,7 +44,6 @@ vim.keymap.set('n', 'G', 'Gzz')
 vim.keymap.set('n', 'gg', 'ggzz')
 vim.keymap.set('n', '<C-i>', '<C-i>zz')
 vim.keymap.set('n', '<C-o>', '<C-o>zz')
-vim.keymap.set('n', '%', '%zz')
 vim.keymap.set('n', '*', '*zz')
 vim.keymap.set('n', '#', '#zz')
 
