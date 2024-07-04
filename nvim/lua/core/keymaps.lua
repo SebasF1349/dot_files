@@ -228,7 +228,7 @@ vim.keymap.set('n', '<C->>', '5<C-w>>', { desc = 'Resize Window [>]Bigger Vertic
 vim.keymap.set('n', '<C-,>', '5<C-w>-', { desc = 'Resize Window [<]Smaller Horizontally' })
 vim.keymap.set('n', '<C-.>', '5<C-w>+', { desc = 'Resize Window [<]Bigger Horizontally' })
 -- Move (rotate) window on row
-vim.keymap.set('n', '<C-r>', '<C-w><C-r>', { desc = 'Window [R]otate' })
+vim.keymap.set('n', '<C-n>', '<C-w><C-w>', { desc = 'Move [N]ext Window' })
 -- Move split to main position
 vim.keymap.set('n', '<C-H>', '<C-w>H', { desc = 'Move Window [h]Left' })
 vim.keymap.set('n', '<C-K>', '<C-w>K', { desc = 'Move Window [k]Up' })
