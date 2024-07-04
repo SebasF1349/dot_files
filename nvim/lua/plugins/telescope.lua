@@ -71,8 +71,13 @@ return {
     local themes = require('telescope.themes')
 
     -- Browsing
+    local git_cwd = {}
     vim.keymap.set('n', '<leader>ff', function()
-      if vim.fs.root(0, '.git') then
+      local cwd = vim.uv.cwd() or ''
+      if git_cwd[cwd] == nil then
+        git_cwd[cwd] = vim.fs.root(0, '.git') ~= nil
+      end
+      if git_cwd[cwd] then
         builtin.git_files(themes.get_ivy({ use_git_root = false, show_untracked = true }))
       else
         builtin.find_files(themes.get_ivy({ follow = true, hidden = true }))
