@@ -1,6 +1,9 @@
 return {
   'nvim-treesitter/nvim-treesitter',
   event = { 'BufReadPost', 'BufNewFile' },
+  dependencies = {
+    'andymass/vim-matchup', --better %
+  },
   build = ':TSUpdate',
   config = function()
     require('nvim-treesitter.install').prefer_git = true
@@ -12,6 +15,9 @@ return {
         ['.*/waybar/config'] = 'jsonc',
       },
     })
+
+    vim.g.matchup_matchparen_offscreen = {}
+    vim.g.matchup_surround_enabled = 1 -- NOTE: is it better than just cs({ ?
 
     require('nvim-treesitter.configs').setup({
       ensure_installed = {
@@ -57,15 +63,7 @@ return {
       modules = {},
       highlight = { enable = true },
       -- indent = { enable = true }, -- doesn't work properly
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = 'gn',
-          node_incremental = 'gn',
-          scope_incremental = 'gs',
-          node_decremental = 'gr',
-        },
-      },
+      matchup = { enable = true },
     })
   end,
 }
