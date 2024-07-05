@@ -290,7 +290,8 @@ for _, pair in ipairs(surround) do
     local word = vim.fn.expand('<cword>') -- to avoid populating registers
     return '"_ciw' .. pair[1] .. word .. pair[2] .. '<ESC>'
   end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
-  vim.keymap.set('v', 'ys' .. pair[1], function()
+
+  vim.keymap.set('v', 'S' .. pair[1], function()
     if vim.fn.mode() == 'v' then
       return 'c' .. pair[1] .. '<C-r>"' .. pair[2] .. '<ESC>'
     elseif vim.fn.mode() == 'V' then
