@@ -1,7 +1,6 @@
 return {
   'hrsh7th/nvim-cmp',
-  event = { 'InsertEnter' },
-  keys = { ':', '/', '?' },
+  event = { 'InsertEnter', 'CmdlineEnter' },
   dependencies = {
     {
       'L3MON4D3/LuaSnip',
@@ -46,7 +45,7 @@ return {
           luasnip.lsp_expand(args.body)
         end,
       },
-      completion = { completeopt = 'menu,menuone,noinsert' },
+      completion = { completeopt = 'menu,menuone' },
       window = {
         completion = {
           border = 'rounded',
