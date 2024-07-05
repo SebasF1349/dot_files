@@ -62,6 +62,7 @@ local function mode()
 end
 
 ---- FILENAME ----
+-- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
 local function file()
   local buftype = vim.bo.buftype
   local ftype = vim.o.filetype
@@ -109,6 +110,14 @@ local function file()
       else
         vim.list_extend(buffers, { string.format('%%#NonText#%s', fname) })
       end
+    elseif bufnr == current_bufnr then
+      local bufname = vim.api.nvim_buf_get_name(bufnr)
+      local fname = vim.fn.fnamemodify(bufname, ':t')
+      if fname == '' then
+        fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
+      end
+      local fpath = vim.fn.fnamemodify(bufname, ':~:.:h')
+      vim.list_extend(buffers, { string.format('%%#NonText#%s/%%#Normal#%s[h]', fpath, fname) })
     end
   end
   if #buffers == 0 then
