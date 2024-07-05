@@ -180,9 +180,9 @@ end
 --------------------------------------------------
 -- Buffer Management
 --------------------------------------------------
--- NOTE: maybe should use argslist instead of buflist?
+-- NOTE: maybe use a custom list as arglist misses a good API and buflist is clunky
 -- deleting a buf is an extra keymap
--- every new buffer is added, even if it's just for a quick look
+-- change gb prefix for \ ?
 
 local function delete_all_other_bufs()
   local current_bufnr = vim.api.nvim_win_get_buf(0)
@@ -206,8 +206,9 @@ vim.api.nvim_create_user_command('CleanBuflist', function(opts)
 end, { nargs = '*' })
 
 vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
-vim.keymap.set('n', 'gbn', '<cmd>bnext<CR>', { desc = '[N]ext Open Buffer' })
-vim.keymap.set('n', 'gbp', '<cmd>bprevious<CR>', { desc = '[P]revious Open Buffer' })
+vim.keymap.set('n', ']b', '<cmd>bnext<CR>', { desc = 'Next Open Buffer' })
+vim.keymap.set('n', '[b', '<cmd>bprevious<CR>', { desc = 'Previous Open Buffer' })
+-- maybe add keymap for `:b#` that's easier than C-^
 vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
 -- not using :bdel as it removes the file from diagnostics
 vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
