@@ -58,6 +58,7 @@ vim.keymap.set('c', '/', function()
   for _, cmd in ipairs(cmds) do
     if
       (vim.startswith(cmd_line, cmd) and vim.fn.getcmdpos() == 2)
+      or (vim.startswith(cmd_line, '%' .. cmd) and vim.fn.getcmdpos() == 3)
       or (vim.startswith(cmd_line, "'<,'>" .. cmd) and vim.fn.getcmdpos() == 7)
       -- find better regex for various ranges (https://github.com/wincent/loupe/blob/9189e7fa2d9dd54f4f0211c5edfdd6260252fe4b/autoload/loupe/private.vim#L67)
     then
