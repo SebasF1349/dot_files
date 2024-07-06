@@ -47,33 +47,6 @@ vim.keymap.set('n', '<C-o>', '<C-o>zz')
 vim.keymap.set('n', '*', '*zz')
 vim.keymap.set('n', '#', '#zz')
 
-vim.keymap.set({ 'n', 'x' }, '/', '/\\v', { desc = 'Add Verymagic to Forward Seach' })
-vim.keymap.set({ 'n', 'x' }, '?', '/\\v', { desc = 'Add Verymagic to Backwards Search' })
-vim.keymap.set('c', '/', function()
-  if vim.fn.getcmdtype() ~= ':' then
-    return '/'
-  end
-  local cmd_line = vim.fn.getcmdline()
-  local cmds = { 's', 'g', 'v' }
-  for _, cmd in ipairs(cmds) do
-    if
-      (vim.startswith(cmd_line, cmd) and vim.fn.getcmdpos() == 2)
-      or (vim.startswith(cmd_line, '%' .. cmd) and vim.fn.getcmdpos() == 3)
-      or (vim.startswith(cmd_line, "'<,'>" .. cmd) and vim.fn.getcmdpos() == 7)
-      -- find better regex for various ranges (https://github.com/wincent/loupe/blob/9189e7fa2d9dd54f4f0211c5edfdd6260252fe4b/autoload/loupe/private.vim#L67)
-    then
-      return '/\\v'
-    end
-  end
-  return '/'
-end, { desc = 'Add Verymagic to Cmdline Patterns', expr = true })
-vim.keymap.set('c', '/', function()
-  if vim.fn.wildmenumode() ~= 0 then
-    return '<C-y>'
-  end
-  return '/'
-end, { desc = 'Select Wildmenu Option with /', expr = true })
-
 -- Stay in indent mode
 vim.keymap.set('v', '<', '<gv')
 vim.keymap.set('v', '>', '>gv')
@@ -155,37 +128,48 @@ vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 -- Searching
 --------------------------------------------------
 
--- Search using :global
 vim.keymap.set('n', 'g/', function()
   vim.ui.input({ prompt = 'Search Pattern: ' }, function(input)
     if input then
       vim.api.nvim_input(':g/' .. input .. '/#<CR>:')
     end
   end)
-end, { desc = 'Search with [G]lobal', expr = true })
+end, { desc = 'Search with [G]lobal' })
 
--- use <space> to 'fuzzy find' on search
+vim.keymap.set({ 'n', 'x' }, '/', '/\\v', { desc = 'Add Verymagic to Forward Seach' })
+vim.keymap.set({ 'n', 'x' }, '?', '?\\v', { desc = 'Add Verymagic to Backwards Search' })
+
+vim.keymap.set('c', '/', function()
+  if vim.fn.getcmdtype() ~= ':' then
+    return '/'
+  end
+  local cmd_line = vim.fn.getcmdline()
+  local cmds = { 's', 'g', 'v' }
+  for _, cmd in ipairs(cmds) do
+    -- find better regex for various ranges (https://github.com/wincent/loupe/blob/9189e7fa2d9dd54f4f0211c5edfdd6260252fe4b/autoload/loupe/private.vim#L67)
+    if cmd_line == cmd or cmd_line == '%' .. cmd or cmd_line == "'<,'>" .. cmd then
+      return '/\\v'
+    end
+  end
+  return '/'
+end, { desc = 'Add Verymagic to Cmdline Patterns', expr = true })
+
 vim.keymap.set('c', '<space>', function()
   local mode = vim.fn.getcmdtype()
-  if mode == '?' or mode == '/' then
-    return '.*'
-  else
-    return ' '
-  end
-end, { expr = true })
+  return (mode == '?' or mode == '/') and '.*' or ' '
+end, { desc = 'Use <space> to "fuzzy find"', expr = true })
 
--- maybe use these instead of ge and gE?
+-- NOTE: maybe use these two instead of ge and gE?
 vim.keymap.set('c', '*', function()
-  if vim.endswith(vim.fn.getcmdline(), '**') then
-    return '/*'
-  end
-  return '*'
+  local cmd_line = vim.fn.getcmdline()
+  return (vim.endswith(cmd_line, '**') and vim.fn.getcmdpos() == #cmd_line + 1) and '/*' or '*'
 end, { desc = 'Expand *** to **/*', expr = true })
+
 vim.keymap.set('c', '%', function()
-  if vim.endswith(vim.fn.getcmdline(), '%') then
-    return '<C-h>' .. vim.fn.expand('%:p:h') .. '/'
-  end
-  return '%'
+  local cmd_line = vim.fn.getcmdline()
+  return (vim.endswith(cmd_line, '%') and vim.fn.getcmdpos() == #cmd_line + 1)
+      and ('<C-h>' .. vim.fn.expand('%:p:h') .. '/')
+    or '%'
 end, { desc = 'Expand %% to File Directory', expr = true })
 
 --------------------------------------------------
