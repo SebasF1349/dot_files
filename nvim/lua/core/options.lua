@@ -81,7 +81,9 @@ vim.opt.splitbelow = true
 vim.opt.fileencoding = 'utf-8'
 
 vim.opt.iskeyword:append('-')
--- vim.opt.wildchar = 12 -- <C-l>
+
+-- cmdline autocomplete
+vim.opt.wildchar = 12 -- <C-l>
 vim.opt.wildmode = 'longest:full,full'
 vim.opt.wildignore:append({ '*/node_modules/*', '*/.git/*' })
 

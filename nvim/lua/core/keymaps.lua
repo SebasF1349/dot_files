@@ -67,6 +67,12 @@ vim.keymap.set('c', '/', function()
   end
   return '/'
 end, { desc = 'Add Verymagic to Cmdline Patterns', expr = true })
+vim.keymap.set('c', '/', function()
+  if vim.fn.wildmenumode() then
+    return '<C-y>'
+  end
+  return '/'
+end, { desc = 'Select Wildmenu Option with /', expr = true })
 
 -- Stay in indent mode
 vim.keymap.set('v', '<', '<gv')
@@ -168,6 +174,20 @@ vim.keymap.set('c', '<space>', function()
   end
 end, { expr = true })
 
+-- maybe use these instead of ge and gE?
+vim.keymap.set('c', '*', function()
+  if vim.endswith(vim.fn.getcmdline(), '**') then
+    return '/*'
+  end
+  return '*'
+end, { desc = 'Expand *** to **/*', expr = true })
+vim.keymap.set('c', '%', function()
+  if vim.endswith(vim.fn.getcmdline(), '%') then
+    return '<C-h>' .. vim.fn.expand('%:p:h') .. '/'
+  end
+  return '%'
+end, { desc = 'Expand %% to File Directory', expr = true })
+
 --------------------------------------------------
 -- Open Buffers
 --------------------------------------------------
@@ -194,8 +214,8 @@ for key, opts in pairs(edit_buffer) do
         vim.api.nvim_set_option_value('buflisted', false, { buf = 0 })
       end)
     end, { buffer = true })
-    vim.api.nvim_input(opts.cmd .. '**/*')
-  end, { desc = 'Open [S]cratch Buffer in ' .. opts.desc })
+    return opts.cmd .. '**/*'
+  end, { desc = 'Open [S]cratch Buffer in ' .. opts.desc, expr = true })
 end
 
 --------------------------------------------------
