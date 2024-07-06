@@ -333,11 +333,7 @@ for _, pair in ipairs(surround) do
   end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
 
   vim.keymap.set('v', 'S' .. pair[1], function()
-    if vim.fn.mode() == 'v' then
-      return 'c' .. pair[1] .. '<C-r>"' .. pair[2] .. '<ESC>'
-    elseif vim.fn.mode() == 'V' then
-      return '<ESC>I' .. pair[1] .. '<ESC>A' .. pair[2] .. '<ESC>'
-    end
+    return ':s/\\v%V(\\s*)(.*)%V/\\1' .. pair[1] .. '\\2' .. pair[2] .. '<CR>'
   end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
 
   vim.keymap.set(
