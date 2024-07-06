@@ -68,7 +68,7 @@ vim.keymap.set('c', '/', function()
   return '/'
 end, { desc = 'Add Verymagic to Cmdline Patterns', expr = true })
 vim.keymap.set('c', '/', function()
-  if vim.fn.wildmenumode() then
+  if vim.fn.wildmenumode() ~= 0 then
     return '<C-y>'
   end
   return '/'
