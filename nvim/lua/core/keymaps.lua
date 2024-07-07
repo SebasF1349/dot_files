@@ -78,6 +78,14 @@ vim.keymap.set('n', 'dd', function()
 end, { desc = 'Send blank lines to black hole', expr = true })
 vim.keymap.set('n', 'dl', '0d$', { desc = '[D]elete [L]ine without newline' })
 
+-- better cmdline history
+vim.keymap.set('c', '<C-n>', function()
+  return vim.fn.wildmenumode() == 1 and '<C-n>' or '<down>'
+end, { desc = 'Move Through Cmdline History', expr = true })
+vim.keymap.set('c', '<C-p>', function()
+  return vim.fn.wildmenumode() == 1 and '<C-p>' or '<up>'
+end, { desc = 'Move Through Cmdline History', expr = true })
+
 --------------------------------------------------
 -- Terminal
 --------------------------------------------------

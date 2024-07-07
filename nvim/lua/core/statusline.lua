@@ -63,6 +63,9 @@ end
 
 ---- FILENAME ----
 -- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
+-- TODO: reduce directory path when there are many open buffers
+-- TODO: maybe show only one buffer when there are many (using a ...)
+-- TODO: show always last directory with svelte files (or only with +page files)
 local function file()
   local buftype = vim.bo.buftype
   local ftype = vim.o.filetype
@@ -221,9 +224,6 @@ local function custom_diagnostics()
 
   return string.format(' %s%s', local_diagnostics, workspace_diagnostics)
 end
-
----- GRAPPLE ----
--- TODO: idk if I would still use grapple
 
 ---- STATUSLINE ----
 Statusline = {
