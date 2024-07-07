@@ -87,7 +87,7 @@ return {
           bib = { override = false },
         },
         mappings = {
-          MkdnEnter = { { 'n', 'v', 'i' }, '<CR>' },
+          MkdnEnter = { { 'n', 'x', 'i' }, '<CR>' },
           MkdnTab = { 'i', '>' },
           MkdnSTab = { 'i', '<' },
           MkdnNextLink = { 'n', '<Tab>' },
@@ -97,16 +97,16 @@ return {
           MkdnGoBack = false,
           MkdnGoForward = false,
           MkdnCreateLink = false,
-          MkdnCreateLinkFromClipboard = { { 'n', 'v' }, '<leader>mp' }, -- see MkdnEnter
+          MkdnCreateLinkFromClipboard = { { 'n', 'x' }, '<leader>mp' }, -- see MkdnEnter
           MkdnFollowLink = false,
           MkdnDestroyLink = { 'n', '<A-CR>' },
-          MkdnTagSpan = { 'v', '<A-CR>' },
+          MkdnTagSpan = { 'x', '<A-CR>' },
           MkdnMoveSource = { 'n', '<F2>' },
           MkdnYankAnchorLink = { 'n', 'yaa' },
           MkdnYankFileAnchorLink = { 'n', 'yfa' },
           MkdnIncreaseHeading = { 'n', '+' },
           MkdnDecreaseHeading = { 'n', '-' },
-          MkdnToggleToDo = { { 'n', 'v' }, '<leader>ml' },
+          MkdnToggleToDo = { { 'n', 'x' }, '<leader>ml' },
           MkdnNewListItem = false,
           MkdnNewListItemBelowInsert = false,
           MkdnNewListItemAboveInsert = false,

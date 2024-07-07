@@ -40,10 +40,10 @@ return {
       end, { desc = 'Jump to previous Hunk' })
 
       -- Visual mode
-      vim.keymap.set('v', '<leader>hs', function()
+      vim.keymap.set('x', '<leader>hs', function()
         gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { desc = '[H]unk [S]tage' })
-      vim.keymap.set('v', '<leader>hr', function()
+      vim.keymap.set('x', '<leader>hr', function()
         gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
       end, { desc = '[H]unk [R]eset' })
 

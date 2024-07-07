@@ -3,7 +3,7 @@
 --------------------------------------------------
 
 -- Keymaps for better default experience
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
@@ -13,8 +13,8 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 --Move things around when in visual mode
-vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
-vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
+vim.keymap.set('x', 'J', ":m '>+1<CR>gv=gv")
+vim.keymap.set('x', 'K', ":m '<-2<CR>gv=gv")
 
 -- Press 'U' for redo
 vim.keymap.set('n', 'U', '<C-r>')
@@ -48,8 +48,8 @@ vim.keymap.set('n', '*', '*zz')
 vim.keymap.set('n', '#', '#zz')
 
 -- Stay in indent mode
-vim.keymap.set('v', '<', '<gv')
-vim.keymap.set('v', '>', '>gv')
+vim.keymap.set('x', '<', '<gv')
+vim.keymap.set('x', '>', '>gv')
 
 -- Invert comments line by line
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments' })
@@ -324,7 +324,7 @@ for _, pair in ipairs(surround) do
     return '"_ciw' .. pair[1] .. word .. pair[2] .. '<ESC>'
   end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
 
-  vim.keymap.set('v', 'S' .. pair[1], function()
+  vim.keymap.set('x', 'S' .. pair[1], function()
     return ':s/\\v%V(\\s*)(.*)%V/\\1' .. pair[1] .. '\\2' .. pair[2] .. '<CR>'
   end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
 
