@@ -38,7 +38,7 @@ return { -- Collection of various small independent plugins/modules
         vim.keymap.set(mode, lhs, function()
           ---@diagnostic disable-next-line: undefined-global
           MiniAi.move_cursor(side, 'a', textobj_id, { search_method = 'prev' })
-        end, { desc = 'Move to Previous ' .. side .. ' ' .. textobj_id .. ' text object' })
+        end, { desc = 'Move to Previous ' .. side .. ' [' .. textobj_id .. '] Text Object' })
       end
     end
 
@@ -50,7 +50,7 @@ return { -- Collection of various small independent plugins/modules
         vim.keymap.set(mode, lhs, function()
           ---@diagnostic disable-next-line: undefined-global
           MiniAi.move_cursor(side, 'a', textobj_id, { search_method = 'next' })
-        end, { desc = 'Move to Next ' .. side .. ' ' .. textobj_id .. ' text object' })
+        end, { desc = 'Move to Next ' .. side .. ' [' .. textobj_id .. '] Text Object' })
       end
     end
 

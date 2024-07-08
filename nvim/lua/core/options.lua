@@ -69,8 +69,6 @@ vim.opt.incsearch = true
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
-vim.opt.termguicolors = true
-
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = 'yes'
 
