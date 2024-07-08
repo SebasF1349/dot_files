@@ -256,6 +256,7 @@ vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffe
 vim.keymap.set('n', ']b', '<cmd>bnext<CR>', { desc = 'Next Open Buffer' })
 vim.keymap.set('n', '[b', '<cmd>bprevious<CR>', { desc = 'Previous Open Buffer' })
 -- maybe add keymap for `:b#` that's easier than C-^
+vim.keymap.set('n', 'gba', '<cmd>set buflisted<CR>', { desc = '[A]dd Open Buffer' })
 vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
 -- not using :bdel as it removes the file from diagnostics
 vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
