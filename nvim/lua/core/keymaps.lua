@@ -241,16 +241,15 @@ local function delete_all_other_bufs()
 end
 
 vim.api.nvim_create_user_command('CleanBuflist', function(opts)
-  for _, bufstr in ipairs(opts.fargs) do
-    local bufnr = tonumber(bufstr)
-    if bufnr and vim.api.nvim_buf_is_loaded(bufnr) then
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.list_contains(opts.fargs, tostring(bufnr)) ~= opts.bang then
       vim.api.nvim_set_option_value('buflisted', false, { buf = bufnr })
     end
   end
   if not vim.api.nvim_get_option_value('buflisted', { buf = 0 }) then
     vim.cmd('silent! bnext')
   end
-end, { nargs = '*' })
+end, { nargs = '*', bang = true })
 
 vim.keymap.set('n', 'gbb', '<cmd>ls<CR>:b<space>', { desc = 'Change Open [B]uffer' })
 vim.keymap.set('n', ']b', '<cmd>bnext<CR>', { desc = 'Next Open Buffer' })
