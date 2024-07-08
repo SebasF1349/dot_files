@@ -153,13 +153,13 @@ vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 vim.keymap.set('n', 'g/', function()
   vim.ui.input({ prompt = 'Search Pattern: ' }, function(input)
     if input then
-      vim.api.nvim_input(':g/' .. input .. '/#<CR>:')
+      vim.api.nvim_input(':g<C-v>/\\V' .. input .. '/#<CR>:')
     end
   end)
 end, { desc = 'Search with [G]lobal' })
 
-vim.keymap.set({ 'n', 'x' }, '/', '/\\v', { desc = 'Add Verymagic to Forward Seach' })
-vim.keymap.set({ 'n', 'x' }, '?', '?\\v', { desc = 'Add Verymagic to Backwards Search' })
+vim.keymap.set({ 'n', 'x' }, '/', '/\\V', { desc = 'Add Very Nomagic to Forward Seach' })
+vim.keymap.set({ 'n', 'x' }, '?', '?\\V', { desc = 'Add Very Nomagic to Backwards Search' })
 
 vim.keymap.set('c', '/', function()
   if vim.fn.getcmdtype() ~= ':' then
@@ -174,12 +174,12 @@ vim.keymap.set('c', '/', function()
     end
   end
   return '/'
-end, { desc = 'Add Verymagic to Cmdline Patterns', expr = true })
+end, { desc = 'Add Very Magic to Cmdline Patterns', expr = true })
 
 vim.keymap.set('c', '<space>', function()
   local mode = vim.fn.getcmdtype()
   return (mode == '?' or mode == '/') and '.*' or ' '
-end, { desc = 'Use <space> to "fuzzy find"', expr = true })
+end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
 
 -- NOTE: maybe use these two instead of ge and gE?
 vim.keymap.set('c', '*', function()
