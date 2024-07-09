@@ -63,8 +63,6 @@ end
 
 ---- FILENAME ----
 -- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
--- TODO: reduce directory path when there are many open buffers
--- TODO: maybe show only one buffer when there are many (using a ...)
 -- TODO: show always last directory with svelte files (or only with +page files)
 local function file()
   local buftype = vim.bo.buftype
@@ -96,8 +94,10 @@ local function file()
   end
   local buffers = {}
   local current_bufnr = vim.api.nvim_get_current_buf()
+  local current_buf_shorten = { pos = -1, path = '' }
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value('buflisted', { buf = bufnr }) then
+    local is_listed = vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value('buflisted', { buf = bufnr })
+    if is_listed or bufnr == current_bufnr then
       local bufname = vim.api.nvim_buf_get_name(bufnr)
       local fname = vim.fn.fnamemodify(bufname, ':t')
       if fname == '' then
@@ -105,28 +105,42 @@ local function file()
       end
       if bufnr == current_bufnr then
         local fpath = vim.fn.fnamemodify(bufname, ':~:.:h')
+        current_buf_shorten.path = vim.fn.pathshorten(fpath)
+        local file_display = ''
         if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
-          vim.list_extend(buffers, { string.format('%%#Normal#%s', fname) })
+          file_display = string.format('%%#Normal#%s', fname)
+          current_buf_shorten.path = file_display
         else
-          vim.list_extend(buffers, { string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname) })
+          file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
+          current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', current_buf_shorten.path, fname)
         end
+        if not is_listed then
+          file_display = file_display .. '[h]'
+        end
+        vim.list_extend(buffers, { file_display })
+        current_buf_shorten.pos = #buffers
       else
         vim.list_extend(buffers, { string.format('%%#NonText#%s', fname) })
       end
-    elseif bufnr == current_bufnr then
-      local bufname = vim.api.nvim_buf_get_name(bufnr)
-      local fname = vim.fn.fnamemodify(bufname, ':t')
-      if fname == '' then
-        fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
-      end
-      local fpath = vim.fn.fnamemodify(bufname, ':~:.:h')
-      vim.list_extend(buffers, { string.format('%%#NonText#%s/%%#Normal#%s[h]', fpath, fname) })
     end
   end
   if #buffers == 0 then
     return ''
   end
-  return string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
+  local ret = string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
+  local max_columns = vim.o.columns - 10
+  local ret_length = #ret - 10 * #buffers
+  if ret_length - max_columns > 0 then
+    if #buffers[current_buf_shorten.pos] - #current_buf_shorten.path > ret_length - max_columns then
+      buffers[current_buf_shorten.pos] = current_buf_shorten.path
+      ret = string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
+    elseif #buffers[current_buf_shorten.pos] < max_columns then
+      ret = string.format(' %s […] ', buffers[current_buf_shorten.pos])
+    else
+      ret = string.format(' %s […] ', current_buf_shorten.path)
+    end
+  end
+  return ret
 end
 
 ---- GIT ----
