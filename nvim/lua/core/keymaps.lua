@@ -52,18 +52,13 @@ vim.keymap.set('x', '<', '<gv')
 vim.keymap.set('x', '>', '>gv')
 
 -- better default movements
--- https://www.reddit.com/r/neovim/comments/181bsu8/comment/kadbhj9/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-vim.keymap.set('n', 'b', "<cmd>call search('\\<', 'b')<CR>", { desc = 'Previous word' })
-vim.keymap.set('n', 'e', "l<cmd>call search('\\>')<CR>h", { desc = 'Next end of word' })
-vim.keymap.set('n', 'ge', "<cmd>call search('\\>', 'b')<CR>", { desc = 'Previous end of word' })
-vim.keymap.set('n', 'w', "<cmd>call search('\\<')<CR>", { desc = 'Next word' })
-vim.keymap.set(
-  'n',
-  '{',
-  "<cmd>call search('\\(\\n\\n\\|\\%^\\)\\s*\\zs\\S', 'b')<CR>",
-  { desc = 'Previous start of paragraph' }
-)
-vim.keymap.set('n', '}', "<cmd>call search('\\n\\n\\s*\\zs\\S')<CR>", { desc = 'Next start of paragraph' })
+-- based on https://www.reddit.com/r/neovim/comments/181bsu8/comment/kadbhj9
+vim.keymap.set('n', 'w', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]*\zs.\|\<')<CR>]], { desc = 'Next Word' })
+vim.keymap.set('n', 'b', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]\zs.\|\<', 'b')<CR>]], { desc = 'Previous Word' })
+vim.keymap.set('n', 'e', [[l<cmd>call search('[''",]\+$\|\>')<CR>h]], { desc = 'End Next word' })
+vim.keymap.set('n', 'ge', [[l<cmd>call search('[''",]\+$\|\>', 'b')<CR>h]], { desc = 'End Previous word' })
+vim.keymap.set('n', '{', [[<cmd>call search('\(\n\n\|\%^\)\s*\zs\S', 'b')<CR>]], { desc = 'Start Previous Paragraph' })
+vim.keymap.set('n', '}', [[<cmd>call search('\n\n\s*\zs\S')<CR>]], { desc = 'Start Next Paragraph' })
 
 -- Invert comments line by line
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments' })
