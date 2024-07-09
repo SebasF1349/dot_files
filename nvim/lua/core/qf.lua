@@ -150,22 +150,10 @@ vim.opt.grepformat = '%f:%l:%c:%m'
 
 vim.api.nvim_create_user_command('Rg', function(opts)
   vim.cmd('silent grep! "' .. opts.args .. '"')
-  local list = getList('c')
-  if list.size == 0 then
-    vim.notify('No results found', vim.log.levels.WARN)
-  else
-    vim.cmd('copen')
-  end
 end, { nargs = 1 })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
   vim.cmd('silent lgrep! "' .. opts.args .. '" %')
-  local list = getList('l')
-  if list.size == 0 then
-    vim.notify('No results found', vim.log.levels.WARN)
-  else
-    vim.cmd('lopen')
-  end
 end, { nargs = 1 })
 
 -- https://github.com/oncomouse/dotfiles/blob/5abf79588d28379aa071fc7767dda46b9d90fb74/conf/vim/init.lua#L190-L205
@@ -726,6 +714,20 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
 -- Extras
 --------------------------------------------------
 
+vim.api.nvim_create_autocmd('QuickFixCmdPost', {
+  group = qf_group,
+  callback = function(args)
+    local listType = vim.startswith(args.match, 'l') and 'l' or 'c'
+    local list = getList(listType)
+    if list.size == 0 then
+      vim.notify('No results found', vim.log.levels.WARN)
+    else
+      vim.cmd(listType .. 'window')
+    end
+  end,
+  desc = 'Open List Windows automatically',
+})
+
 -- NOTE: return early in an horizontal move maybe caching line and buffer
 vim.api.nvim_create_autocmd('CursorMoved', {
   group = qf_group,
@@ -815,13 +817,13 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- update qf list position on cursor move
 -- close neovim if qf is the last window (check what happens on bdel)
 -- close ll if parent window is closed
+-- maybe open the qf window automatically after :make, :grep, :lvimgrep
+--          and friends if there are valid locations/errors
 
 --------------------------------------------------
 -- Ideas to Implement
 --------------------------------------------------
 
--- maybe open the qf window automatically after :make, :grep, :lvimgrep
---          and friends if there are valid locations/errors (qf.vim) -- use QuickFixCmdPost event on autocmd
 -- shorten filepaths for better legibility (qf.vim) -- don't like it, but can use pathshorten
 -- have qf win ALWAYS on bottom, when opened in split or when creating new splits
 -- make possible to undo deleted qf items
