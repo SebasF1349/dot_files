@@ -150,13 +150,26 @@ vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 -- Searching
 --------------------------------------------------
 
-vim.keymap.set('n', 'g/', function()
-  vim.ui.input({ prompt = 'Search Pattern: ' }, function(input)
-    if input then
-      vim.api.nvim_input(':g<C-v>/\\V' .. input .. '/#<CR>:')
-    end
-  end)
-end, { desc = 'Search with [G]lobal' })
+vim.api.nvim_create_user_command('GSearch', function(opts)
+  vim.api.nvim_input(':g<C-v>/\\V' .. opts.args .. '/#<CR>:')
+end, {
+  nargs = '*',
+  complete = function(ArgLead, _, _)
+    -- https://vi.stackexchange.com/a/25005
+    local content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    content = vim.fn.join(content, ' ')
+    content = vim.fn.split(content, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
+    content = vim.tbl_filter(function(str)
+      return #str > 2
+        and vim.fn.match(str, '^[a-zA-Z_]\\+') > -1
+        and vim.fn.match(str, '^' .. ArgLead) > -1 -- so it starts with the word
+        and vim.fn.match(str, ArgLead) > -1 -- so it only cointains the word?
+    end, content)
+    content = vim.fn.sort(content)
+    return vim.fn.uniq(content)
+  end,
+})
+vim.keymap.set('n', 'g/', ':GSearch ', { desc = 'Search with [G]lobal' })
 
 vim.keymap.set({ 'n', 'x' }, '/', '/\\V', { desc = 'Add Very Nomagic to Forward Seach' })
 vim.keymap.set({ 'n', 'x' }, '?', '?\\V', { desc = 'Add Very Nomagic to Backwards Search' })
@@ -213,6 +226,8 @@ for key, opts in pairs(edit_buffer) do
     { desc = '[E]dit Buffer in Current Directory in ' .. opts.desc }
   )
   vim.keymap.set('n', 'gs' .. key, function()
+    -- this is very clunky, but a custom commands needs a recursive path
+    -- with a performance hit (and doesn't even seem to work ok)
     vim.keymap.set('c', '<CR>', function()
       vim.keymap.del('c', '<CR>', { buffer = vim.api.nvim_get_current_buf() })
       vim.api.nvim_input('<CR>')
