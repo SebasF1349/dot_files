@@ -213,7 +213,7 @@ local function custom_diagnostics()
     for i, data in ipairs(diagnostics_data) do
       local local_diag = local_count[i] or 0
       local works_diag = workspace_count[i] or 0
-      if #local_diagnostics == 0 and local_diag > 0 then
+      if #local_diagnostics == 0 and local_diag > 0 and vim.o.buftype == '' then
         local_diagnostics = string.format('%%#%s#%s', data.hi, data.icon)
       end
       if #workspace_diagnostics == 0 and works_diag > local_diag then
