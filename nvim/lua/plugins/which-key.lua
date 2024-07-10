@@ -24,11 +24,10 @@ return {
         ['b'] = { name = 'Git [B]uffer' },
         ['f'] = { name = '[F]ind' },
         ['t'] = { name = '[T]oggle' },
-        ['x'] = { name = '[X]Trouble' },
         ['q'] = { name = '[Q]uickfix List' },
         ['l'] = { name = '[L]ocation List' },
         ['m'] = { name = '[M]arkdown' },
-        ['r'] = { name = '[R]eplace current word' },
+        ['r'] = { name = '[R]efactoring' },
       },
     })
     which_key.register({
@@ -36,6 +35,7 @@ return {
         name = 'VISUAL <leader>', -- this is needed (looks like a which-key bug)
         ['h'] = { name = 'Git [H]unk' },
         ['f'] = { name = '[F]ind' },
+        ['r'] = { name = '[R]efactoring' },
       },
     }, { mode = 'v' })
   end,
