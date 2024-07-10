@@ -5,11 +5,22 @@ return {
 
   {
     'saecki/crates.nvim',
-    ft = { 'rust', 'toml' },
-    config = function(_, opts)
+    event = { 'BufRead Cargo.toml' },
+    config = function()
       local crates = require('crates')
-      crates.setup(opts)
+      crates.setup({
+        completion = {
+          cmp = { enabled = true },
+        },
+      })
       crates.show()
+      vim.keymap.set('n', 'K', function()
+        if vim.fn.expand('%:t') == 'Cargo.toml' and require('crates').popup_available() then
+          require('crates').show_popup()
+        else
+          vim.lsp.buf.hover()
+        end
+      end, { desc = 'Show Crate Documentation', buffer = true })
     end,
   },
 }
