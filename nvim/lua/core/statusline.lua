@@ -186,15 +186,25 @@ local function update_gstatus()
   }):start()
 end
 
-if _G.Gstatus_timer == nil then
-  _G.Gstatus_timer = vim.uv.new_timer()
-else
-  _G.Gstatus_timer:stop()
+local is_git
+local function git_setup()
+  is_git = vim.fs.root(0, '.git') ~= nil
+  if is_git then
+    if _G.Gstatus_timer == nil then
+      _G.Gstatus_timer = vim.uv.new_timer()
+    else
+      _G.Gstatus_timer:stop()
+    end
+    _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
+  end
 end
-_G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
+git_setup()
 
 local head = ''
 local function git()
+  if not is_git then
+    return ''
+  end
   local git_info = vim.b.gitsigns_status_dict
   if git_info then
     head = git_info.head
