@@ -168,41 +168,48 @@ vim.lsp.handlers['$/progress'] = function(_, progress, ctx)
   vim.notify(out, vim.log.levels.INFO)
 end
 
--- overwrite default _get_url() to add github repos on plugins and google search
 ---@diagnostic disable-next-line: duplicate-set-field
-vim.ui._get_url = function()
-  if vim.bo.filetype == 'markdown' then
-    local range = vim.api.nvim_win_get_cursor(0)
-    vim.treesitter.get_parser():parse(range)
-    -- marking the node as `markdown_inline` is required. Setting it to `markdown` does not
-    -- work.
-    local current_node = vim.treesitter.get_node({ lang = 'markdown_inline' })
-    while current_node do
-      local type = current_node:type()
-      if type == 'inline_link' or type == 'image' then
-        local child = assert(current_node:named_child(1))
-        return vim.treesitter.get_node_text(child, 0)
-      end
-      current_node = current_node:parent()
-    end
-  end
-
-  local url = vim._with({ go = { isfname = vim.o.isfname .. ',@-@' } }, function()
-    return vim.fn.expand('<cfile>')
-  end)
-
-  local is_uri = url:match('%w+:')
-  local is_repo = url:match('%w+/%w+') and vim.fn.count(url, '/') == 1
-  local is_dir = url:match('/%w+') or url:match('\\%w+')
+vim.ui.open = function(path)
+  vim.validate({
+    path = { path, 'string' },
+  })
+  local is_uri = path:match('%w+:')
+  local is_half_url = path:match('%.com$') or path:match('%.com%.')
+  local is_repo = vim.bo.filetype == 'lua' and path:match('%w/%w') and vim.fn.count(path, '/') == 1
+  local is_dir = path:match('/%w')
   if not is_uri then
-    if vim.bo.filetype == 'lua' and is_repo then
-      url = ('https://github.com/%s'):format(url)
+    if is_half_url then
+      path = ('https://%s'):format(path)
+    elseif is_repo then
+      path = ('https://github.com/%s'):format(path)
     elseif not is_dir then
-      url = ('https://google.com/search?q=%s'):format(vim.fn.expand('<cword>'))
+      path = ('https://google.com/search?q=%s'):format(vim.uri_encode(path))
+    else
+      path = vim.fs.normalize(path)
     end
   end
 
-  return url
+  local cmd --- @type string[]
+
+  if vim.fn.has('mac') == 1 then
+    cmd = { 'open', path }
+  elseif vim.fn.has('win32') == 1 then
+    if vim.fn.executable('rundll32') == 1 then
+      cmd = { 'rundll32', 'url.dll,FileProtocolHandler', path }
+    else
+      return nil, 'vim.ui.open: rundll32 not found'
+    end
+  elseif vim.fn.executable('wslview') == 1 then
+    cmd = { 'wslview', path }
+  elseif vim.fn.executable('explorer.exe') == 1 then
+    cmd = { 'explorer.exe', path }
+  elseif vim.fn.executable('xdg-open') == 1 then
+    cmd = { 'xdg-open', path }
+  else
+    return nil, 'vim.ui.open: no handler found (tried: wslview, explorer.exe, xdg-open)'
+  end
+
+  return vim.system(cmd, { text = true, detach = true }), nil
 end
 
 -- Disable health checks for these providers.

@@ -60,24 +60,6 @@ vim.keymap.set('n', '}', [[<cmd>call search('\n\n\s*\zs\S')<CR>]], { desc = 'Sta
 -- Invert comments line by line
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments' })
 
--- gX: Web search
-vim.keymap.set('n', 'gX', function()
-  local cfile = vim.fn.expand('<cfile>')
-  if vim.bo.filetype == 'lua' and cfile:match('.*/.*') then
-    vim.ui.open(('https://github.com/%s'):format(cfile))
-  else
-    vim.ui.open(('https://google.com/search?q=%s'):format(vim.fn.expand('<cword>')))
-  end
-end, { desc = 'Open Plugins Repo Or Search a Word' })
-vim.keymap.set('x', 'gX', function()
-  vim.ui.open(
-    ('https://google.com/search?q=%s'):format(
-      vim.trim(table.concat(vim.fn.getregion(vim.fn.getpos('.'), vim.fn.getpos('v'), { type = vim.fn.mode() }), ' '))
-    )
-  )
-  vim.api.nvim_input('<esc>')
-end, { desc = 'Search Selected Text' })
-
 -- registers
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
