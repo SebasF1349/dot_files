@@ -51,7 +51,7 @@ vim.keymap.set('x', '>', '>gv')
 -- better default movements
 -- based on https://www.reddit.com/r/neovim/comments/181bsu8/comment/kadbhj9
 vim.keymap.set('n', 'w', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]*\zs.\|\<')<CR>]], { desc = 'Next Word' })
-vim.keymap.set('n', 'b', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]\zs.\|\<', 'b')<CR>]], { desc = 'Previous Word' })
+vim.keymap.set('n', 'b', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]*\zs.\|\<', 'b')<CR>]], { desc = 'Previous Word' })
 vim.keymap.set('n', 'e', [[l<cmd>call search('[''",]\+$\|\>')<CR>h]], { desc = 'End Next word' })
 vim.keymap.set('n', 'ge', [[l<cmd>call search('[''",]\+$\|\>', 'b')<CR>h]], { desc = 'End Previous word' })
 vim.keymap.set('n', '{', [[<cmd>call search('\(\n\n\|\%^\)\s*\zs\S', 'b')<CR>]], { desc = 'Start Previous Paragraph' })
