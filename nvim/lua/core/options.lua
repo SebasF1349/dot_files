@@ -83,7 +83,9 @@ vim.opt.iskeyword:append('-')
 -- cmdline autocomplete
 vim.opt.wildchar = 12 -- <C-l>
 vim.opt.wildmode = 'longest:full,full'
-vim.opt.wildignore:append({ '*/node_modules/*', '*/.git/*' })
+vim.opt.wildignore:append({ '*/.git/*' }) -- git
+vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
+vim.opt.wildignore:append({ '*/target/*' }) -- java
 
 vim.opt.smoothscroll = true
 
