@@ -76,7 +76,17 @@ return { -- Collection of various small independent plugins/modules
     local jsx_table = { glyph = test_icon, hl = 'MiniIconsAzure' }
     local ts_table = { glyph = test_icon, hl = 'MiniIconsAzure' }
     local tsx_table = { glyph = test_icon, hl = 'MiniIconsBlue' }
+    local eslint = { glyph = '󰱺', hl = 'MiniIconsYellow' }
+    local prettier = { glyph = '', hl = 'MiniIconsPurple' } -- change to  when I can see it
     require('mini.icons').setup({
+      file = {
+        ['.eslintrc.js'] = eslint,
+        ['.eslintignore'] = eslint,
+        ['eslint.config.js'] = eslint,
+        ['.prettierrc'] = prettier,
+        ['.prettierignore'] = prettier,
+        ['.node-version'] = { glyph = '', hl = 'MiniIconsGreen' },
+      },
       extension = {
         ['test.js'] = js_table,
         ['test.jsx'] = jsx_table,
