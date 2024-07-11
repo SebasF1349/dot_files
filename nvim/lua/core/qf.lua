@@ -454,9 +454,9 @@ local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
 -- NOTE: extend to update location list too
 vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
   group = vim.api.nvim_create_augroup('user_diagnostic_qflist', {}),
-  callback = function(args)
-    local qf_info = getListByTitle('c', 'All Diagnostics')
-    if not qf_info then
+  callback = function()
+    local diag_qf = getListByTitle('c', 'All Diagnostics')
+    if not diag_qf then
       return
     end
     if vim.o.filetype == 'lazy' then
@@ -464,28 +464,14 @@ vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
     end
     local diagnostics = vim.diagnostic.get()
     if #diagnostics == 0 then
-      ---@diagnostic disable-next-line: param-type-mismatch
-      pcall(vim.cmd, 'cclose')
+      vim.cmd('cclose')
     end
-    local qf_items = vim.diagnostic.toqflist(
-      -- TODO: Can the event data have items not returned by vim.diagnostic.get?
-      -- If not, we don't need to extend the diagnostics variable here.
-      vim.tbl_deep_extend('force', diagnostics, args.data.diagnostics)
-    )
-
+    local qf_items = vim.diagnostic.toqflist(diagnostics)
     vim.schedule(function()
-      vim.fn.setqflist({}, qf_info.title == 'All Diagnostics' and 'r' or ' ', {
-        title = 'All Diagnostics',
+      vim.fn.setqflist({}, 'r', {
+        nr = diag_qf.nr,
         items = qf_items,
       })
-
-      -- Don't steal focus from other qflists. For example, when working through
-      -- vimgrep results, you likely want :cnext to take you to the next match,
-      -- rather than the next diagnostic. Use :cnew to switch to the diagnostic
-      -- qflist when you want it.
-      if qf_info.id ~= 0 and qf_info.title ~= 'All Diagnostics' then
-        vim.cmd.cold()
-      end
     end)
   end,
 })
