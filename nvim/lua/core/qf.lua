@@ -719,13 +719,15 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
 vim.api.nvim_create_autocmd('QuickFixCmdPost', {
   group = qf_group,
   callback = function(args)
-    local listType = vim.startswith(args.match, 'l') and 'l' or 'c'
-    local list = getList(listType)
-    if list.size == 0 then
-      vim.notify('No results found', vim.log.levels.WARN)
-    else
-      vim.cmd(listType .. 'window')
-    end
+    vim.schedule(function()
+      local listType = vim.startswith(args.match, 'l') and 'l' or 'c'
+      local list = getList(listType)
+      if list.size == 0 then
+        vim.notify('No results found', vim.log.levels.WARN)
+      else
+        vim.cmd(listType .. 'open')
+      end
+    end)
   end,
   desc = 'Open List Windows automatically',
 })
