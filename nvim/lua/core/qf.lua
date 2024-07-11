@@ -6,6 +6,35 @@
 ---| '"c"' # quickfix list
 ---| '"l"' # location list
 
+---@class qfitem
+---@field bufnr number
+---@field module string
+---@field lnum number
+---@field end_lnum number
+---@field col number
+---@field end_col number
+---@field vcol 0 | 1
+---@field nr number
+---@field pattern string
+---@field text string
+---@field type string
+---@field valid boolean
+---@field user_data any
+
+---@class qflist
+---@field changedtick number
+---@field context table | string
+---@field id number
+---@field idx number
+---@field items qfitem[]
+---@field nr number
+---@field qfbufnr number
+---@field quickfixtextfunc string
+---@field size number
+---@field title string
+---@field winid number
+---@field filewinid? number
+
 --------------------------------------------------
 -- "Global" variables in this file
 --------------------------------------------------
@@ -77,49 +106,52 @@ local function setList(listType, items, action, winid)
 end
 
 ---@param listType ListType
----@alias qfitem { id: number, bufnr: number, module: string, lnum: number, end_lnum: number, col: number, end_col: number, vcol: boolean, nr: number, pattern: string, text: string, type:string, valid: boolean, user_data: table }
----@return { items: qfitem[], size: number, winid: number, title: string, id: number, filewinid?: number }
-local function getList(listType)
+---@param nr? number | '$'
+---@return qflist
+local function getList(listType, nr)
+  nr = nr or 0
   if listType == 'c' then
-    return vim.fn.getqflist({ items = 0, size = 0, winid = 0, title = 0, id = 0 })
+    return vim.fn.getqflist({ nr = nr, all = 0 })
   else
-    return vim.fn.getloclist(0, { items = 0, size = 0, winid = 0, title = 0, id = 0, filewinid = 0 })
+    local ll = vim.fn.getloclist(0, { nr = nr, all = 0 })
+    if not ll.filewinid then
+      ll.filewinid = -1
+    end
+    return ll
   end
 end
 
 -- NOTE: This supposes only one list is opened, if there is more than one quickfix wins
----@return { qftype: string, items: qfitem[] , size: number, winid: number, title: string, id: number }
+---@return qflist
 local function getActiveList()
-  local loclist = getList('l')
   local qflist = getList('c')
+  local loclist = getList('l')
 
-  local lret = vim.tbl_extend('force', loclist, { qftype = 'l' })
-  local cret = vim.tbl_extend('force', qflist, { qftype = 'c' })
   local wintype = getListType()
   if wintype == 'c' then
-    return cret
+    return qflist
   elseif wintype == 'l' then
-    return lret
+    return loclist
   -- If loclist is empty, use quickfix
   elseif loclist.size == 0 then
-    return cret
+    return qflist
   -- If quickfix is empty, use loclist
   elseif qflist.size == 0 then
-    return lret
+    return loclist
   elseif qflist.winid ~= 0 then
     if loclist.winid == 0 then
-      return cret
+      return qflist
     end
   elseif loclist.winid ~= 0 then
-    return lret
+    return loclist
   end
   -- They're either both empty or both open
-  return cret
+  return qflist
 end
 
 ---@param listType ListType
 ---@param title string
----@return qfitem | nil
+---@return qflist | nil
 local function getListByTitle(listType, title)
   local size
   if listType == 'c' then
@@ -127,13 +159,8 @@ local function getListByTitle(listType, title)
   else
     size = vim.fn.getloclist(0, { nr = '$' }).nr
   end
-  local list
   for i = size, 1, -1 do
-    if listType == 'c' then
-      list = vim.fn.getqflist({ nr = i, all = 0 })
-    else
-      list = vim.fn.getloclist(0, { nr = i, all = 0 })
-    end
+    local list = getList(listType, i)
     if list.title == title then
       return list
     end
@@ -428,8 +455,8 @@ local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
 vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
   group = vim.api.nvim_create_augroup('user_diagnostic_qflist', {}),
   callback = function(args)
-    local qf_info = getList('c')
-    if qf_info.title ~= 'All Diagnostics' then
+    local qf_info = getListByTitle('c', 'All Diagnostics')
+    if not qf_info then
       return
     end
     if vim.o.filetype == 'lazy' then
@@ -538,7 +565,7 @@ local function delete()
     local visual_start = vim.fn.getpos('v')
     local visual_end = vim.fn.getpos('.')
     for i = visual_start[2], visual_end[2] do
-      qfitems[i] = {}
+      qfitems[i] = vim.empty_dict()
     end
     qfitems = vim.tbl_filter(function(item)
       return not vim.tbl_isempty(item)
@@ -678,8 +705,8 @@ local function selectItem(selectItemOpts)
   end
   vim.schedule(function()
     if opts.close then
-      local list = getActiveList()
-      vim.cmd(list.qftype .. 'close')
+      local listType = getActiveList().filewinid and 'l' or 'c'
+      vim.cmd(listType .. 'close')
     elseif opts.keep_cursor and not opts.split then
       vim.api.nvim_set_current_win(qflist.winid)
     end
