@@ -193,12 +193,9 @@ local edit_buffer = {
 
 for key, opts in pairs(edit_buffer) do
   vim.keymap.set('n', 'ge' .. key, opts.cmd .. '**/*', { desc = '[E]dit Buffer in ' .. opts.desc })
-  vim.keymap.set(
-    'n',
-    'gE' .. key,
-    opts.cmd .. vim.fn.expand('%:p:h') .. '/',
-    { desc = '[E]dit Buffer in Current Directory in ' .. opts.desc }
-  )
+  vim.keymap.set('n', 'gE' .. key, function()
+    return opts.cmd .. vim.fn.expand('%:p:h') .. '/'
+  end, { desc = '[E]dit Buffer in Current Directory in ' .. opts.desc, expr = true })
   vim.keymap.set('n', 'gs' .. key, function()
     -- this is very clunky, but a custom commands needs a recursive path
     -- with a performance hit (and doesn't even seem to work ok)
