@@ -557,8 +557,7 @@ end
 local function getPreview()
   local wins = vim.api.nvim_list_wins()
   for _, win in ipairs(wins) do
-    local preview = vim.api.nvim_get_option_value('previewwindow', { win = win })
-    if preview then
+    if vim.api.nvim_get_option_value('previewwindow', { win = win }) then
       return win
     end
   end
@@ -569,6 +568,7 @@ local function openPreview()
   local qfLinenr = vim.fn.line('.')
   local list = getActiveList().items
   if qfLinenr > #list then
+    vim.notify('Error retriving list items', vim.log.levels.WARN)
     return
   end
   local path = vim.fn.bufname(list[qfLinenr].bufnr)
@@ -576,8 +576,22 @@ local function openPreview()
   vim.cmd('pclose')
   vim.cmd('keepjumps aboveleft pedit +' .. line .. ' ' .. path)
   vim.api.nvim_win_set_cursor(0, { qfLinenr, 0 })
-  local preview_win = vim.api.nvim_win_get_buf(getPreview() or 0)
-  vim.api.nvim_set_option_value('buflisted', false, { buf = preview_win })
+  local preview_win = getPreview()
+  if not preview_win then
+    vim.notify('Error opening the preview window', vim.log.levels.WARN)
+    return
+  end
+  local preview_buf = vim.api.nvim_win_get_buf(preview_win)
+  local is_preview_dup = false
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if win ~= preview_win and preview_buf == vim.api.nvim_win_get_buf(win) then
+      is_preview_dup = true
+      break
+    end
+  end
+  if not is_preview_dup then
+    vim.api.nvim_set_option_value('buflisted', false, { buf = preview_buf })
+  end
 end
 
 -- NOTE: Should show lines or diagnostics in diagnostics qf?
