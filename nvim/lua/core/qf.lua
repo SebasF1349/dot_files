@@ -89,19 +89,15 @@ local function getListsWin()
 end
 
 ---@param listType ListType
----@param items any[]
+---@param what table
 ---@param action? " " | "a" | "r"
 ---@param winid? number
-local function setList(listType, items, action, winid)
+local function setList(listType, what, action, winid)
   action = action or ' '
   if listType == 'c' then
-    vim.fn.setqflist({}, action, {
-      items = items,
-    })
+    vim.fn.setqflist({}, action, what)
   else
-    vim.fn.setloclist(winid or 0, {}, action, {
-      items = items,
-    })
+    vim.fn.setloclist(winid or 0, {}, action, what)
   end
 end
 
@@ -446,7 +442,7 @@ local function addToQuickfix(listType)
       text = vim.fn.getline('.'),
     },
   }
-  setList(listType, new_qf_item, 'a')
+  setList(listType, { items = new_qf_item }, 'a')
   local list = getList(listType)
   if list.winid ~= 0 then
     vim.schedule(function()
@@ -573,12 +569,12 @@ local function delete()
     qfitems = vim.tbl_filter(function(item)
       return not vim.tbl_isempty(item)
     end, qfitems)
-    setList(listType, qfitems, 'r', list.filewinid)
+    setList(listType, { items = qfitems }, 'r', list.filewinid)
     vim.api.nvim_input('<Esc>')
   else
     local line = vim.api.nvim_win_get_cursor(0)
     table.remove(qfitems, line[1])
-    setList(listType, qfitems, 'r', list.filewinid)
+    setList(listType, { items = qfitems }, 'r', list.filewinid)
     local new_pos = line[1] > #qfitems and #qfitems or line[1]
     vim.api.nvim_win_set_cursor(0, { new_pos, 0 })
   end
