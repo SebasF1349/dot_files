@@ -107,13 +107,15 @@ end
 
 ---@param listType ListType
 ---@param nr? number | '$'
+---@param winid? number
 ---@return qflist
-local function getList(listType, nr)
+local function getList(listType, nr, winid)
   nr = nr or 0
+  winid = winid or 0
   if listType == 'c' then
     return vim.fn.getqflist({ nr = nr, all = 0 })
   else
-    local ll = vim.fn.getloclist(0, { nr = nr, all = 0 })
+    local ll = vim.fn.getloclist(winid, { nr = nr, all = 0 })
     if not ll.filewinid then
       ll.filewinid = -1
     end
