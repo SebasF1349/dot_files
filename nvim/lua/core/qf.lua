@@ -464,26 +464,40 @@ end, { desc = '[A]dd cursor position to [L]ocation List' })
 local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
 
 -- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941
--- NOTE: extend to update location list too
 vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
   group = vim.api.nvim_create_augroup('user_diagnostic_qflist', {}),
   callback = function()
-    local diag_qf = getListByTitle('c', 'All Diagnostics')
-    if not diag_qf then
-      return
-    end
     if vim.o.filetype == 'lazy' then
       return
     end
-    local diagnostics = vim.diagnostic.get()
-    if #diagnostics == 0 then
-      vim.cmd('cclose')
+    local diag_qf = getListByTitle('c', 'All Diagnostics')
+    if diag_qf then
+      local diagnostics = vim.diagnostic.get()
+      if #diagnostics == 0 and diag_qf.winid ~= 0 then
+        vim.cmd('cclose')
+      end
+      local qf_items = vim.diagnostic.toqflist(diagnostics)
+      vim.schedule(function()
+        vim.fn.setqflist({}, 'r', {
+          nr = diag_qf.nr,
+          items = qf_items,
+        })
+      end)
     end
-    local qf_items = vim.diagnostic.toqflist(diagnostics)
+
+    local diag_ll = getListByTitle('l', 'Local Diagnostics')
+    if not diag_ll then
+      return
+    end
+    local local_diagnostics = vim.diagnostic.get(0)
+    if #local_diagnostics == 0 and diag_ll.winid ~= 0 then
+      vim.cmd('lclose')
+    end
+    local ll_items = vim.diagnostic.toqflist(local_diagnostics)
     vim.schedule(function()
-      vim.fn.setqflist({}, 'r', {
-        nr = diag_qf.nr,
-        items = qf_items,
+      vim.fn.setloclist(0, {}, 'r', {
+        nr = diag_ll.nr,
+        items = ll_items,
       })
     end)
   end,
@@ -852,7 +866,7 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- toggle qf/ll and diagnostics and list symbols (functions)
 -- qf/ll next/prev item/file-item with wrapping
 -- add cursor position to qf/ll
--- update diagnostics in qf
+-- update diagnostics in qf and ll (for buffer errors)
 -- folding
 -- qf/ll options
 -- preview, preview on move, preview on hover
