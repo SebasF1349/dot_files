@@ -213,9 +213,9 @@ function _G.qftf(info)
   local list
   local ret = {}
   if info.quickfix == 1 then
-    list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1, winid = 1 })
+    list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1, winid = 1, lnum = 1 })
   else
-    list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1, winid = 1 })
+    list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1, winid = 1, lnum = 1 })
   end
   local qfwinid = list.winid
   vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
@@ -228,11 +228,15 @@ function _G.qftf(info)
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
   end
   local items = {}
+  local is_loc_diag = list[1].user_data and list[1].user_data.qfim and list[1].user_data.qfim.type == 'loc_diag'
   local limit = 0
   for i = info.start_idx, info.end_idx do
     local e = list[i]
     local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type }
-    if e.valid == 1 and e.bufnr > 0 then
+    if is_loc_diag then
+      item.name = tostring(e.lnum)
+      limit = #item.name > limit - 1 and #item.name - 1 or limit
+    elseif e.valid == 1 and e.bufnr > 0 then
       local fname = vim.fn.bufname(e.bufnr)
       if fname ~= '' then
         fname = vim.fn.fnamemodify(fname, ':p:~:.')
@@ -249,18 +253,18 @@ function _G.qftf(info)
     table.insert(items, item)
   end
   limit = math.floor(math.min(limit + 1, vim.o.columns / 2))
-  local formatLong, validFmt = '…%s', '%s %s%s │ %s%s'
+  local formatLong, pathFmt, validFmt = '…%s', '%s%s%s', '%s%s │ %s%s'
   local highlighting = {}
   for i, item in ipairs(items) do
     if #item.name > limit then
       item.name = formatLong:format(item.name:sub(1 - limit))
       item.path = ''
-    elseif #item.path + #item.name + 1 > limit then
+    elseif #item.path > 0 and #item.path + #item.name + 1 > limit then
       item.path = formatLong:format(item.path:sub(2 - limit + #item.name))
     end
     local type = item.type == '' and '' or (signs[item.type] and signs[item.type] or signs.I)
-    local str =
-      validFmt:format(item.name, item.path, (' '):rep(limit - #item.name - #item.path - 1), type, item.message)
+    local path = pathFmt:format(item.name, item.path == '' and '' or ' ', item.path)
+    local str = validFmt:format(path, (' '):rep(limit - #path), type, item.message)
     vim.list_extend(highlighting, {
       {
         group = 'Directory',
@@ -351,7 +355,14 @@ local function list_toggle(listType, diagnostics)
     else
       local llist = getListByTitle('l', 'Local Diagnostics')
       if not llist then
-        vim.diagnostic.setloclist({ title = 'Local Diagnostics' })
+        local local_diagnostics = vim.diagnostic.get(0)
+        local ll_items = vim.diagnostic.toqflist(local_diagnostics)
+        ll_items[1].user_data = { qfim = { type = 'loc_diag' } }
+        vim.fn.setloclist(0, {}, ' ', {
+          title = 'Local Diagnostics',
+          items = ll_items,
+        })
+        vim.cmd('lopen')
       else
         vim.cmd(llist.nr .. 'lhistory | lopen')
       end
