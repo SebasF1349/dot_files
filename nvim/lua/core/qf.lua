@@ -148,22 +148,15 @@ local function getActiveList()
 end
 
 ---@param listType ListType
----@param title string
 ---@return qflist | nil
-local function getListByTitle(listType, title)
-  local size
-  if listType == 'c' then
-    size = vim.fn.getqflist({ nr = '$' }).nr
-  else
-    size = vim.fn.getloclist(0, { nr = '$' }).nr
-  end
+local function getDiagList(listType)
+  local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
     local list = getList(listType, i)
-    if list.title == title then
+    if list.context ~= '' and list.context.qfim and list.context.qfim.type == listType .. 'diag' then
       return list
     end
   end
-  return nil
 end
 
 --------------------------------------------------
@@ -335,32 +328,22 @@ local function list_toggle(listType, diagnostics)
     or (listType == 'c' and diagnostics and #vim.diagnostic.get() == 0)
   then
     vim.notify('List is Empty', vim.log.levels.WARN)
+  elseif not diagnostics then
+    vim.cmd(listType .. 'open')
   else
-    if not diagnostics then
+    local qf_diag_list = getDiagList(listType)
+    if not qf_diag_list then
+      local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
+      local items = vim.diagnostic.toqflist(diag_list)
+      local title = listType == 'c' and 'All Diagnostics' or 'Local Diagnostics'
+      setList(listType, {
+        title = title,
+        items = items,
+        context = { qfim = { type = listType .. 'diag' } },
+      })
       vim.cmd(listType .. 'open')
-    elseif listType == 'c' then
-      local clist = getListByTitle('c', 'All Diagnostics')
-      if not clist then
-        vim.diagnostic.setqflist({
-          title = 'All Diagnostics',
-        })
-      else
-        vim.cmd(clist.nr .. 'chistory | copen')
-      end
     else
-      local llist = getListByTitle('l', 'Local Diagnostics')
-      if not llist then
-        local local_diagnostics = vim.diagnostic.get(0)
-        local ll_items = vim.diagnostic.toqflist(local_diagnostics)
-        vim.fn.setloclist(0, {}, ' ', {
-          title = 'Local Diagnostics',
-          items = ll_items,
-          context = { qfim = { type = 'ldiag' } },
-        })
-        vim.cmd('lopen')
-      else
-        vim.cmd(llist.nr .. 'lhistory | lopen')
-      end
+      vim.cmd(('%s%shistory | %sopen'):format(qf_diag_list.nr, listType, listType))
     end
   end
 end
@@ -456,43 +439,29 @@ end, { desc = '[A]dd cursor position to [L]ocation List' })
 
 local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
 
--- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941
+-- Based on https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941
 vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
   group = vim.api.nvim_create_augroup('user_diagnostic_qflist', {}),
   callback = function()
     if vim.o.filetype == 'lazy' then
       return
     end
-    local diag_qf = getListByTitle('c', 'All Diagnostics')
-    if diag_qf then
-      local diagnostics = vim.diagnostic.get()
-      if #diagnostics == 0 and diag_qf.winid ~= 0 then
-        vim.cmd('cclose')
+    for _, listType in ipairs({ 'c', 'l' }) do
+      local diag_qf = getDiagList(listType)
+      if diag_qf then
+        local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
+        if #diag_list == 0 and diag_qf.winid ~= 0 then
+          vim.cmd(listType .. 'close')
+        end
+        local qf_items = vim.diagnostic.toqflist(diag_list)
+        vim.schedule(function()
+          setList(listType, {
+            nr = diag_qf.nr,
+            items = qf_items,
+          }, 'r')
+        end)
       end
-      local qf_items = vim.diagnostic.toqflist(diagnostics)
-      vim.schedule(function()
-        vim.fn.setqflist({}, 'r', {
-          nr = diag_qf.nr,
-          items = qf_items,
-        })
-      end)
     end
-
-    local diag_ll = getListByTitle('l', 'Local Diagnostics')
-    if not diag_ll then
-      return
-    end
-    local local_diagnostics = vim.diagnostic.get(0)
-    if #local_diagnostics == 0 and diag_ll.winid ~= 0 then
-      vim.cmd('lclose')
-    end
-    local ll_items = vim.diagnostic.toqflist(local_diagnostics)
-    vim.schedule(function()
-      vim.fn.setloclist(0, {}, 'r', {
-        nr = diag_ll.nr,
-        items = ll_items,
-      })
-    end)
   end,
 })
 
