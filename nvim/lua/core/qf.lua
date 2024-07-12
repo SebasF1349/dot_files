@@ -230,9 +230,6 @@ function _G.qftf(info)
   local qfbufnr = list.qfbufnr
   local is_loc_diag = info.quickfix ~= 1 and local_diag.context ~= ''
   list = list.items
-  if info.start_idx == 1 then
-    vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
-  end
   local items = {}
   local limit = 0
   for i = info.start_idx, info.end_idx do
@@ -293,6 +290,8 @@ function _G.qftf(info)
     table.insert(ret, str)
   end
   vim.schedule(function()
+    -- NOTE: this is needed because somehow diagnostics toggle runs 3 times with incomplete data after a [L]Rg command
+    vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
     for _, hl in ipairs(highlighting) do
       vim.highlight.range(qfbufnr, qfim_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
     end
