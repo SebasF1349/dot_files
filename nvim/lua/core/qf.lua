@@ -166,33 +166,27 @@ end
 vim.opt.grepprg = 'rg --vimgrep --smart-case'
 vim.opt.grepformat = '%f:%l:%c:%m'
 
-vim.api.nvim_create_user_command('Rg', function(opts)
-  vim.cmd('silent grep! "' .. opts.args .. '"')
-end, { nargs = 1 })
-
-vim.api.nvim_create_user_command('LRg', function(opts)
-  vim.cmd('silent lgrep! "' .. opts.args .. '" %')
-end, { nargs = 1 })
-
 -- https://github.com/oncomouse/dotfiles/blob/5abf79588d28379aa071fc7767dda46b9d90fb74/conf/vim/init.lua#L190-L205
-local function grep_or_filter()
-  if vim.opt.buftype:get() == 'quickfix' then
+local function grep_or_filter(listType, input)
+  local trigger_win = vim.fn.getwininfo(vim.fn.win_getid())[1]
+  local prefix = trigger_win.loclist == 1 and 'l' or 'c'
+  if trigger_win.quickfix == 1 and prefix == listType then
     vim.cmd([[packadd cfilter]])
-    local input = vim.fn.input('QFGrep/')
-    if #input > 0 then
-      local prefix = vim.fn.getwininfo(vim.fn.win_getid())[1].loclist == 1 and 'L' or 'C'
-      vim.cmd(prefix .. 'filter /' .. input .. '/')
-    end
+    vim.cmd(listType:upper() .. 'filter /' .. input .. '/')
+  elseif listType == 'c' then
+    vim.cmd('silent! grep! "' .. input .. '"')
   else
-    local input = vim.fn.input('Grep/')
-    if #input > 0 then
-      vim.cmd('silent! grep! "' .. input .. '"')
-      vim.cmd('copen')
-    end
+    vim.cmd('silent lgrep! "' .. input .. '" %')
   end
 end
 
-vim.keymap.set('n', '<leader>rg', grep_or_filter, { desc = '[R]ip[G]rep' })
+vim.api.nvim_create_user_command('Rg', function(opts)
+  grep_or_filter('c', opts.args)
+end, { nargs = 1 })
+
+vim.api.nvim_create_user_command('LRg', function(opts)
+  grep_or_filter('l', opts.args)
+end, { nargs = 1 })
 
 --------------------------------------------------
 -- Better Quickfix Window Style
