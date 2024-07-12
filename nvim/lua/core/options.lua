@@ -42,7 +42,7 @@ vim.opt.shortmess = 'aoOstTWICF'
 vim.o.splitkeep = 'screen'
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menu,menuone'
+vim.o.completeopt = 'menu,menuone,fuzzy'
 
 -- Slight transparency - I like this ones but don't play with catppuccin
 -- vim.o.pumblend = 10 -- builtin completion
@@ -82,6 +82,7 @@ vim.opt.iskeyword:append('-')
 
 -- cmdline autocomplete
 vim.opt.wildchar = 12 -- <C-l>
+vim.opt.wildoptions = 'pum,tagfile,fuzzy'
 vim.opt.wildmode = 'longest:full,full'
 vim.opt.wildignore:append({ '*/.git/*' }) -- git
 vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
