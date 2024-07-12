@@ -212,10 +212,15 @@ local qfim_namespace = vim.api.nvim_create_namespace('qfim')
 function _G.qftf(info)
   local list
   local ret = {}
+  local local_diag = {}
   if info.quickfix == 1 then
     list = vim.fn.getqflist({ id = info.id, items = 1, qfbufnr = 1, winid = 1, lnum = 1 })
   else
     list = vim.fn.getloclist(info.winid, { id = info.id, items = 1, qfbufnr = 1, winid = 1, lnum = 1 })
+    -- local_diag = vim.fn.getloclist(
+    --   info.winid,
+    --   { context = { qfim = { type = 'loc_diag' } }, id = info.id, items = 1, qfbufnr = 1, winid = 1, lnum = 1 }
+    -- )
   end
   local qfwinid = list.winid
   vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
@@ -223,12 +228,12 @@ function _G.qftf(info)
   vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = qfwinid, scope = 'local' })
   vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = qfwinid, scope = 'local' })
   local qfbufnr = list.qfbufnr
+  local is_loc_diag = info.quickfix ~= 1 and local_diag.context ~= ''
   list = list.items
   if info.start_idx == 1 then
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
   end
   local items = {}
-  local is_loc_diag = list[1].user_data and list[1].user_data.qfim and list[1].user_data.qfim.type == 'loc_diag'
   local limit = 0
   for i = info.start_idx, info.end_idx do
     local e = list[i]
@@ -357,10 +362,10 @@ local function list_toggle(listType, diagnostics)
       if not llist then
         local local_diagnostics = vim.diagnostic.get(0)
         local ll_items = vim.diagnostic.toqflist(local_diagnostics)
-        ll_items[1].user_data = { qfim = { type = 'loc_diag' } }
         vim.fn.setloclist(0, {}, ' ', {
           title = 'Local Diagnostics',
           items = ll_items,
+          context = { qfim = { type = 'loc_diag' } },
         })
         vim.cmd('lopen')
       else
