@@ -41,6 +41,8 @@ return {
         which_key = true,
       },
       custom_highlights = function(colors)
+        local utils = require('catppuccin.utils.colors')
+
         return {
           FloatBorder = { fg = colors.blue, bg = colors.none },
           FloatTitle = { fg = colors.lavender, bg = colors.none },
@@ -75,7 +77,15 @@ return {
           },
           LazySpecial = { fg = colors.green },
 
+          Pmenu = {
+            bg = utils.darken(colors.surface0, 0.9, colors.lavender),
+            fg = colors.overlay2,
+          },
           PmenuSel = { bg = colors.green, fg = colors.base },
+          PmenuSbar = {
+            bg = utils.darken(colors.surface0, 0.9, colors.lavender),
+          },
+          PmenuThumb = { bg = colors.overlay2 },
 
           CmpItemAbbrMatch = { fg = colors.blue, style = { 'bold' } },
           CmpItemMenu = { fg = colors.subtext1 },
