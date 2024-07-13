@@ -1,3 +1,5 @@
+local nvim_version = require('utils.nvim-version')
+
 -- Set highlight on search
 vim.o.hlsearch = false
 
@@ -42,7 +44,11 @@ vim.opt.shortmess = 'aoOstTWICF'
 vim.o.splitkeep = 'screen'
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menu,menuone,fuzzy'
+if nvim_version.is_nightly() then
+  vim.o.completeopt = 'menu,menuone,fuzzy,popup'
+else
+  vim.o.completeopt = 'menu,menuone,popup'
+end
 
 -- Slight transparency - I like this ones but don't play with catppuccin
 -- vim.o.pumblend = 10 -- builtin completion
