@@ -37,6 +37,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight on yank',
 })
 
+-- This is needed as the formatoptions are set in ft files in neovim core
 vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   callback = function()
     vim.cmd('set formatoptions-=cro')
