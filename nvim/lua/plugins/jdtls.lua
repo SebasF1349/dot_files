@@ -21,11 +21,13 @@ return {
       end
     end
 
+    local root_dir = function()
+      return require('jdtls.setup').find_root({ 'pom.xml', 'mvnw', 'gradlew', '.git' })
+    end
+
     local cmd = function()
-      local fname = vim.api.nvim_buf_get_name(0)
-      local root_dir = require('lspconfig.server_configurations.jdtls').default_config.root_dir(fname)
       local cmd = { vim.fn.exepath('jdtls') }
-      local project_name = root_dir and vim.fs.basename(root_dir)
+      local project_name = root_dir and vim.fs.basename(root_dir())
       local jdtls_config_dir = vim.fn.stdpath('cache') .. '/jdtls/' .. project_name .. '/config'
       local jdtls_workspace_dir = vim.fn.stdpath('cache') .. '/jdtls/' .. project_name .. '/workspace'
       if project_name then
@@ -42,7 +44,7 @@ return {
     local config = function()
       return {
         cmd = cmd(),
-        root_dir = require('jdtls.setup').find_root({ 'pom.xml', 'mvnw', 'gradlew', '.git' }), -- update to vim.fs.root in nv0.10
+        root_dir = root_dir(),
         init_options = { bundles = bundles },
         filetypes = { 'java' },
         settings = {
