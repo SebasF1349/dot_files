@@ -122,11 +122,17 @@ return {
           vim.keymap.set('n', 'grt', vim.lsp.buf.type_definition, { desc = 'LSP: [G]oto [T]ype Definition' })
           vim.keymap.set('n', 'grs', vim.lsp.buf.signature_help, { desc = 'LSP: [S]ignature Documentation on Hover' })
 
-          vim.keymap.set('n', '<leader>oi', function()
+          vim.keymap.set('n', 'gro', function()
             if vim.fn.exists(':OrganizeImports') > 0 then
               vim.cmd('OrganizeImports')
+            else
+              vim.lsp.buf.code_action({
+                ---@diagnostic disable-next-line: missing-fields
+                context = { only = { 'source.organizeImports' } },
+                apply = true,
+              })
             end
-          end, { desc = 'LSP: [O]rganize [I]mports' })
+          end, { desc = 'LSP: [O]rganize Imports' })
 
           local ok_wd, wd = pcall(require, 'workspace-diagnostics')
           if ok_wd then
