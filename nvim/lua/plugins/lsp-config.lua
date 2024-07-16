@@ -70,13 +70,13 @@ return {
       })
     end,
   },
+  { 'dmmulroy/ts-error-translator.nvim', ft = { 'typescript', 'svelte' }, opts = {} },
   {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPost', 'BufNewFile' },
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
       'artemave/workspace-diagnostics.nvim',
-      { 'dmmulroy/ts-error-translator.nvim', opts = {} },
       'felpafel/inlay-hint.nvim', -- check nvim-lsp-endhints to show inlay hints only in current line
     },
     config = function()
