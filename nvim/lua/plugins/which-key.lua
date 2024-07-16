@@ -1,42 +1,41 @@
 return {
   'folke/which-key.nvim',
-  keys = { '<leader>', 'g', '[', ']', '"', 'y', 'd', 'c' },
-  ft = 'markdown',
+  event = 'VeryLazy',
   config = function()
     local which_key = require('which-key')
 
     which_key.setup({
-      window = { border = 'rounded' },
+      win = { border = 'rounded' },
+      icons = { rules = false },
     })
 
-    which_key.register({
-      ['g'] = { name = '[G]o to' },
-      ['gb'] = { name = '[B]ufferlist Management' },
-      [']'] = { name = 'Next' },
-      ['['] = { name = 'Prev' },
-      ['ys'] = { name = 'Surround' },
-      ['ds'] = { name = 'Delete Surround' },
-      ['cs'] = { name = 'Change Surround' },
-      ['<leader>'] = {
-        ['c'] = { name = '[C]ode' },
-        ['d'] = { name = '[D]ebugger' },
-        ['h'] = { name = 'Git [H]unk' },
-        ['b'] = { name = 'Git [B]uffer' },
-        ['f'] = { name = '[F]ind' },
-        ['t'] = { name = '[T]oggle' },
-        ['q'] = { name = '[Q]uickfix List' },
-        ['l'] = { name = '[L]ocation List' },
-        ['m'] = { name = '[M]arkdown' },
-        ['r'] = { name = '[R]efactoring' },
+    which_key.add({
+      { '<leader>b', group = 'Git [B]uffer' },
+      { '<leader>c', group = '[C]ode' },
+      { '<leader>d', group = '[D]ebugger' },
+      { '<leader>f', group = '[F]ind' },
+      { '<leader>h', group = 'Git [H]unk' },
+      { '<leader>l', group = '[L]ocation List' },
+      { '<leader>m', group = '[M]arkdown' },
+      { '<leader>q', group = '[Q]uickfix List' },
+      { '<leader>r', group = '[R]efactoring' },
+      { '<leader>t', group = '[T]oggle' },
+      { '[', group = 'Prev' },
+      { ']', group = 'Next' },
+      { 'cs', group = 'Change Surround' },
+      { 'ds', group = 'Delete Surround' },
+      { 'g', group = '[G]o to' },
+      { 'gb', group = '[B]ufferlist Management' },
+      { 'ys', group = 'Surround' },
+    })
+    which_key.add({
+      {
+        mode = { 'v' },
+        { '<leader>', group = 'VISUAL <leader>' },
+        { '<leader>f', group = '[F]ind' },
+        { '<leader>h', group = 'Git [H]unk' },
+        { '<leader>r', group = '[R]efactoring' },
       },
     })
-    which_key.register({
-      ['<leader>'] = {
-        name = 'VISUAL <leader>', -- this is needed (looks like a which-key bug)
-        ['h'] = { name = 'Git [H]unk' },
-        ['f'] = { name = '[F]ind' },
-        ['r'] = { name = '[R]efactoring' },
-      },
-    }, { mode = 'v' })
   end,
 }
