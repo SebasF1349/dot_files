@@ -177,8 +177,10 @@ vim.keymap.set('c', '<space>', function()
       return (vim.endswith(cmd_line, '**') and vim.fn.getcmdpos() == #cmd_line + 1) and '/*' or '*'
     elseif cmd_line:match('\\V') then
       return '\\.\\*'
-    else
+    elseif cmd_line:match('\\v') then
       return '.*'
+    else
+      return ' '
     end
   else
     return ' '
