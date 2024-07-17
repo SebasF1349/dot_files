@@ -165,7 +165,24 @@ end, { desc = 'Add Very Magic to Cmdline Patterns', expr = true })
 
 vim.keymap.set('c', '<space>', function()
   local mode = vim.fn.getcmdtype()
-  return (mode == '?' or mode == '/') and '.*' or ' '
+  local cmd_line = vim.fn.getcmdline()
+  if mode == '?' or mode == '/' then
+    if cmd_line:match('\\V') then
+      return '\\.\\*'
+    else
+      return '.*'
+    end
+  elseif mode == ':' then
+    if vim.startswith(cmd_line, 'edit') or vim.startswith(cmd_line, 'split') or vim.startswith(cmd_line, 'vsplit') then
+      return (vim.endswith(cmd_line, '**') and vim.fn.getcmdpos() == #cmd_line + 1) and '/*' or '*'
+    elseif cmd_line:match('\\V') then
+      return '\\.\\*'
+    else
+      return '.*'
+    end
+  else
+    return ' '
+  end
 end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
 
 -- NOTE: maybe use these two instead of ge and gE?
