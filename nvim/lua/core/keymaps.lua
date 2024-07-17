@@ -234,6 +234,17 @@ end
 -- deleting a buf is an extra keymap
 -- change gb prefix for \ ?
 
+local function delete_buf()
+  vim.api.nvim_set_option_value('buflisted', false, { buf = 0 })
+  local alternative_buffer = vim.fn.expand('#')
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_buf_get_name(bufnr) == alternative_buffer then
+      return '<cmd>edit #<CR>'
+    end
+  end
+  return '<cmd>silent! bnext<CR>'
+end
+
 local function delete_all_other_bufs()
   local current_bufnr = vim.api.nvim_win_get_buf(0)
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -259,7 +270,7 @@ vim.keymap.set('n', ']b', '<cmd>bnext<CR>', { desc = 'Next Open Buffer' })
 vim.keymap.set('n', '[b', '<cmd>bprevious<CR>', { desc = 'Previous Open Buffer' })
 -- maybe add keymap for `:b#` that's easier than C-^
 vim.keymap.set('n', 'gba', '<cmd>set buflisted<CR>', { desc = '[A]dd Open Buffer' })
-vim.keymap.set('n', 'gbd', '<cmd>set nobuflisted | silent! bnext<CR>', { desc = '[D]elete Open Buffer' })
+vim.keymap.set('n', 'gbd', delete_buf, { desc = '[D]elete Open Buffer', expr = true })
 -- not using :bdel as it removes the file from diagnostics
 vim.keymap.set('n', 'gbc', '<cmd>ls<CR>:CleanBuflist ', { desc = '[C]lean Open Buffer' })
 vim.keymap.set('n', 'gbo', delete_all_other_bufs, { desc = 'Make [O]nly Buffer' })
