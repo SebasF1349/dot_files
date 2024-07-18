@@ -174,7 +174,8 @@ vim.keymap.set('c', '<space>', function()
     end
   elseif mode == ':' then
     if vim.startswith(cmd_line, 'edit') or vim.startswith(cmd_line, 'split') or vim.startswith(cmd_line, 'vsplit') then
-      return (vim.endswith(cmd_line, '**') and vim.fn.getcmdpos() == #cmd_line + 1) and '/*' or '*'
+      local cmd_pos = vim.fn.getcmdpos()
+      return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
     elseif cmd_line:match('\\V') then
       return '\\.\\*'
     elseif cmd_line:match('\\v') then
@@ -190,14 +191,14 @@ end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
 -- NOTE: maybe use these two instead of ge and gE?
 vim.keymap.set('c', '*', function()
   local cmd_line = vim.fn.getcmdline()
-  return (vim.endswith(cmd_line, '**') and vim.fn.getcmdpos() == #cmd_line + 1) and '/*' or '*'
+  local cmd_pos = vim.fn.getcmdpos()
+  return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
 end, { desc = 'Expand *** to **/*', expr = true })
 
 vim.keymap.set('c', '%', function()
   local cmd_line = vim.fn.getcmdline()
-  return (vim.endswith(cmd_line, '%') and vim.fn.getcmdpos() == #cmd_line + 1)
-      and ('<C-h>' .. vim.fn.expand('%:p:h') .. '/')
-    or '%'
+  local cmd_pos = vim.fn.getcmdpos()
+  return cmd_line:sub(cmd_pos - 1, cmd_pos - 1) == '%' and ('<C-h>' .. vim.fn.expand('%:p:h') .. '/') or '%'
 end, { desc = 'Expand %% to File Directory', expr = true })
 
 --------------------------------------------------
