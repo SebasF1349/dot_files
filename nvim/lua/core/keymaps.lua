@@ -217,16 +217,7 @@ for key, opts in pairs(edit_buffer) do
     return opts.cmd .. vim.fn.expand('%:p:h') .. '/'
   end, { desc = '[E]dit Buffer in Current Directory in ' .. opts.desc, expr = true })
   vim.keymap.set('n', 'gs' .. key, function()
-    -- this is very clunky, but a custom commands needs a recursive path
-    -- with a performance hit (and doesn't even seem to work ok)
-    vim.keymap.set('c', '<CR>', function()
-      vim.keymap.del('c', '<CR>', { buffer = vim.api.nvim_get_current_buf() })
-      vim.api.nvim_input('<CR>')
-      vim.schedule(function()
-        vim.api.nvim_set_option_value('buflisted', false, { buf = 0 })
-      end)
-    end, { buffer = true })
-    return opts.cmd .. '**/*'
+    return opts.cmd .. '**/* | set nobuflisted' .. ('<left>'):rep(18)
   end, { desc = 'Open [S]cratch Buffer in ' .. opts.desc, expr = true })
 end
 
