@@ -132,12 +132,11 @@ return {
       },
     }
 
-    groups.typescript =
-      vim.tbl_extend('force', groups.default, { augend.constant.new({ elements = { 'let', 'const' } }) })
-    groups.lua = vim.tbl_extend('force', groups.default, {
+    groups.typescript = vim.list_extend({ augend.constant.new({ elements = { 'let', 'const' } }) }, groups.default)
+    groups.lua = vim.list_extend({
       augend.constant.new({ elements = { 'and', 'or' }, word = true, cyclic = true }),
       augend.constant.new({ elements = { '>', '<', '=', '~' }, word = false, cyclic = true }), --check this overwrittes order augend
-    })
+    }, groups.default)
 
     require('dial.config').augends:register_group(groups)
   end,
