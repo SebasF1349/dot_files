@@ -144,61 +144,52 @@ local function file()
 end
 
 ---- GIT ----
-local gstatus = { ahead = '0', behind = '0', modified = 0 }
+local gstatus = { head = '', ahead = '0', behind = '0', modified = false }
 
-local function git_modified()
-  local git_info = vim.b.gitsigns_status_dict
-  if git_info and (git_info.added ~= 0 or git_info.changed ~= 0 or git_info.removed ~= 0) then
-    gstatus.modified = 1
-  end
+-- improved my implementation stealing from https://github.com/pynappo/git-notify.nvim/blob/main/lua/git-notify/init.lua
+local function git_command(args)
+  return {
+    'git',
+    '--no-pager',
+    '--no-optional-locks',
+    '--literal-pathspecs',
+    '-c',
+    'gc.auto=0',
+    unpack(args),
+  }
 end
-git_modified()
 
-local function update_gstatus()
-  local Job = require('plenary.job')
-  Job:new({
-    command = 'git',
-    args = { 'fetch' },
-  }):start()
-  Job:new({
-    command = 'git',
-    args = { 'rev-list', '--left-right', '--count', 'HEAD...@{upstream}' },
-    on_exit = function(job, _)
-      local res = job:result()[1]
-      if type(res) ~= 'string' then
-        gstatus.ahead, gstatus.behind = '0', '0'
+local function update_git()
+  vim.system(git_command({ 'fetch' }), {}, function()
+    vim.system(git_command({ 'status', '--porcelain=v2', '--branch' }), {}, function(branch_status_output)
+      if branch_status_output.code ~= 0 then
         return
       end
-      local ok, ahead, behind = pcall(string.match, res, '(%d+)%s*(%d+)')
-      if not ok then
-        ahead, behind = '0', '0'
+      local lines = vim.split(branch_status_output.stdout, '\n', { plain = true })
+      local upstream_branch = lines[2]:sub(1 + #'# branch.head ')
+      gstatus.head = upstream_branch
+      local has_upstream = #lines > 3 and lines[3]:sub(1, 1) == '#'
+      if not has_upstream then
+        return
       end
-      gstatus.ahead, gstatus.behind = ahead, behind
-    end,
-  }):start()
-  Job:new({
-    command = 'git',
-    args = { 'status', '--porcelain' },
-    on_exit = function(job, _)
-      local res = job:result()[1]
-      gstatus.modified = res and #res or 0
-    end,
-  }):start()
+
+      local _, _, commits_ahead, commits_behind = lines[4]:find('%+(%d+) %-(%d+)')
+      gstatus.ahead = commits_ahead
+      gstatus.behind = commits_behind
+      gstatus.modified = not vim.startswith(lines[#lines - 1], '#')
+    end)
+  end)
 end
 
-local is_git
-local function git_setup()
-  is_git = vim.fs.root(0, '.git') ~= nil
-  if is_git then
-    if _G.Gstatus_timer == nil then
-      _G.Gstatus_timer = vim.uv.new_timer()
-    else
-      _G.Gstatus_timer:stop()
-    end
-    _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_gstatus))
+local is_git = vim.fs.root(0, '.git') ~= nil
+if is_git then
+  if _G.Gstatus_timer == nil then
+    _G.Gstatus_timer = vim.uv.new_timer()
+  else
+    _G.Gstatus_timer:stop()
   end
+  _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_git))
 end
-git_setup()
 
 local head = ''
 local function git()
@@ -211,7 +202,7 @@ local function git()
   end
   local ahead = gstatus.ahead ~= '0' and '' or ''
   local behind = gstatus.behind ~= '0' and '' or ''
-  local modified = gstatus.modified ~= 0 and '~' or ''
+  local modified = (gstatus.modified or vim.o.modified) and '~' or ''
   if ahead == '' and behind == '' and modified == '' then
     return string.format(' %%#Special#%s ', head)
   end
