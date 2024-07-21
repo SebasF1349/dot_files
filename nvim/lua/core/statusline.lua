@@ -166,9 +166,12 @@ local function update_git()
         return
       end
       local lines = vim.split(branch_status_output.stdout, '\n', { plain = true })
+      if #lines < 3 then
+        return
+      end
       local upstream_branch = lines[2]:sub(1 + #'# branch.head ')
       gstatus.head = upstream_branch
-      local has_upstream = #lines > 3 and lines[3]:sub(1, 1) == '#'
+      local has_upstream = lines[3]:sub(1, 1) == '#'
       if not has_upstream then
         return
       end
