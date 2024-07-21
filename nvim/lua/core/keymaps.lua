@@ -231,9 +231,13 @@ end
 
 local function delete_buf()
   vim.api.nvim_set_option_value('buflisted', false, { buf = 0 })
-  local alternative_buffer = vim.fn.expand('#')
+  local alternative_buffer = vim.fn.expand('#:p')
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_buf_get_name(bufnr) == alternative_buffer then
+    if
+      vim.api.nvim_buf_is_loaded(bufnr)
+      and vim.api.nvim_get_option_value('buflisted', { buf = bufnr })
+      and vim.api.nvim_buf_get_name(bufnr) == alternative_buffer
+    then
       return '<cmd>edit #<CR>'
     end
   end
