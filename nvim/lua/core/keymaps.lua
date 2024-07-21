@@ -89,10 +89,11 @@ local terms = {}
 local function toggle_term(num)
   local term = terms[num]
   if term.win_id ~= -1 and not vim.list_contains(vim.api.nvim_list_wins(), term.win_id) then
-    if vim.list_contains(vim.api.nvim_list_bufs(), term.buf_num) then
-      vim.api.nvim_buf_delete(term.buf_num, { force = true })
+    term.win_id = -1
+    term.is_hidden = 1
+    if not vim.list_contains(vim.api.nvim_list_bufs(), term.buf_num) then
+      term.buf_num = -1
     end
-    term = { buf_num = -1, win_id = -1, is_hidden = -1 }
   end
   if term.buf_num == -1 then
     vim.cmd('vsplit | vertical resize 50 | term')
