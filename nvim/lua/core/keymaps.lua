@@ -96,15 +96,16 @@ local function toggle_term(num)
   end
   if term.buf_num == -1 then
     vim.cmd('vsplit | vertical resize 50 | term')
-    term.buf_num = vim.fn.bufnr()
-    term.win_id = vim.fn.win_getid()
+    term.buf_num = vim.api.nvim_get_current_buf()
+    term.win_id = vim.api.nvim_get_current_win()
     term.is_hidden = 0
   elseif term.is_hidden == 1 then
     vim.cmd('vsplit | vertical resize 50 | b' .. term.buf_num)
-    term.win_id = vim.fn.win_getid()
+    term.win_id = vim.api.nvim_get_current_win()
     term.is_hidden = 0
   else
     vim.api.nvim_win_close(term.win_id, true)
+    term.win_id = -1
     term.is_hidden = 1
   end
   terms[num] = term
