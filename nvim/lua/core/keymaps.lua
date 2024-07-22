@@ -110,6 +110,7 @@ local function toggle_term(num)
     term.win_id = -1
   end
 end
+
 for pos = 1, 2 do
   terms[pos] = { buf_num = -1, win_id = -1, is_hidden = -1 }
   vim.keymap.set({ 'n', 't' }, 't' .. pos, function()
@@ -119,7 +120,39 @@ end
 vim.keymap.set({ 'n', 't' }, 'tt', function()
   toggle_term(1)
 end, { desc = '[T]oggle [T]erminal 1' })
+
 vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
+
+---@param cmd string
+local function run_term_command(cmd)
+  local term = terms[1]
+  check_term_data(term)
+  if term.win_id == -1 then
+    toggle_term(1)
+  end
+  local bufnr = vim.api.nvim_win_get_buf(term.win_id)
+  local terminal_job_id = (vim.api.nvim_buf_get_var(bufnr, 'terminal_job_id'))
+  local cr = string.char(13)
+  vim.api.nvim_chan_send(terminal_job_id, cmd .. cr)
+end
+
+vim.keymap.set('n', 'crb', function()
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    if client.name == 'jdtls' then
+      run_term_command('mvn spring-boot:run')
+      return
+    end
+  end
+end, { desc = '[C]ode [R]unner [B]uild' })
+
+vim.keymap.set('n', 'crt', function()
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    if client.name == 'jdtls' then
+      run_term_command('mvn test')
+      return
+    end
+  end
+end, { desc = '[C]ode [R]unner [T]est' })
 
 --------------------------------------------------
 -- Searching
