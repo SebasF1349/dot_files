@@ -81,7 +81,6 @@ end, { desc = 'Move Through Cmdline History', expr = true })
 ---@class term
 ---@field buf_num number
 ---@field win_id number
----@field is_hidden number
 
 ---@type term[]
 local terms = {}
@@ -99,17 +98,13 @@ local function toggle_term(num)
     vim.cmd('vsplit | vertical resize 50 | term')
     term.buf_num = vim.api.nvim_get_current_buf()
     term.win_id = vim.api.nvim_get_current_win()
-    term.is_hidden = 0
-  elseif term.is_hidden == 1 then
+  elseif term.win_id == -1 then
     vim.cmd('vsplit | vertical resize 50 | b' .. term.buf_num)
     term.win_id = vim.api.nvim_get_current_win()
-    term.is_hidden = 0
   else
     vim.api.nvim_win_close(term.win_id, true)
     term.win_id = -1
-    term.is_hidden = 1
   end
-  terms[num] = term
 end
 for pos = 1, 2 do
   terms[pos] = { buf_num = -1, win_id = -1, is_hidden = -1 }
