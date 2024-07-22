@@ -82,18 +82,22 @@ end, { desc = 'Move Through Cmdline History', expr = true })
 ---@field buf_num number
 ---@field win_id number
 
+---@param term term
+local function check_term_data(term)
+  if term.win_id ~= -1 and not vim.list_contains(vim.api.nvim_list_wins(), term.win_id) then
+    term.win_id = -1
+    if not vim.list_contains(vim.api.nvim_list_bufs(), term.buf_num) then
+      term.buf_num = -1
+    end
+  end
+end
+
 ---@type term[]
 local terms = {}
 ---@param num 1|2
 local function toggle_term(num)
   local term = terms[num]
-  if term.win_id ~= -1 and not vim.list_contains(vim.api.nvim_list_wins(), term.win_id) then
-    term.win_id = -1
-    term.is_hidden = 1
-    if not vim.list_contains(vim.api.nvim_list_bufs(), term.buf_num) then
-      term.buf_num = -1
-    end
-  end
+  check_term_data(term)
   if term.buf_num == -1 then
     vim.cmd('vsplit | vertical resize 50 | term')
     term.buf_num = vim.api.nvim_get_current_buf()
