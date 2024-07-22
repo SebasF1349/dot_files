@@ -47,11 +47,12 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
 })
 
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
-  callback = function()
+  callback = function(event)
     vim.cmd('startinsert')
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
     vim.opt.statuscolumn = ''
+    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
   end,
   group = general,
   desc = 'Remove line numbers from terminal and start on insert',
