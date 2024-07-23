@@ -207,7 +207,13 @@ vim.keymap.set('c', '<space>', function()
       return '.*'
     end
   elseif mode == ':' then
-    if vim.startswith(cmd_line, 'edit') or vim.startswith(cmd_line, 'split') or vim.startswith(cmd_line, 'vsplit') then
+    if
+      vim.startswith(cmd_line, 'edit')
+      or vim.startswith(cmd_line, 'split')
+      or vim.startswith(cmd_line, 'vsplit')
+      or vim.startswith(cmd_line, 'find')
+      or vim.startswith(cmd_line, 'sfind')
+    then
       local cmd_pos = vim.fn.getcmdpos()
       return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
     elseif cmd_line:match('\\V') then
@@ -246,12 +252,25 @@ local edit_buffer = {
 }
 
 for key, opts in pairs(edit_buffer) do
-  vim.keymap.set('n', 'ge' .. key, opts.cmd .. '**/*', { desc = '[E]dit Buffer in ' .. opts.desc })
+  -- vim.keymap.set('n', 'ge' .. key, opts.cmd .. '**/*', { desc = '[E]dit Buffer in ' .. opts.desc })
   vim.keymap.set('n', 'gE' .. key, function()
     return opts.cmd .. vim.fn.expand('%:p:h') .. '/'
   end, { desc = '[E]dit Buffer in Current Directory in ' .. opts.desc, expr = true })
+  -- vim.keymap.set('n', 'gs' .. key, function()
+  --   return opts.cmd .. '**/* | set nobuflisted' .. ('<left>'):rep(18)
+  -- end, { desc = 'Open [S]cratch Buffer in ' .. opts.desc, expr = true })
+end
+
+local find_buffer = {
+  w = { cmd = ':find ', desc = '[W]indow' },
+  s = { cmd = ':sfind ', desc = '[S]plit' },
+  v = { cmd = ':vsplit | find ', desc = '[V]ertical split' },
+}
+
+for key, opts in pairs(find_buffer) do
+  vim.keymap.set('n', 'ge' .. key, opts.cmd, { desc = '[E]dit Buffer in ' .. opts.desc })
   vim.keymap.set('n', 'gs' .. key, function()
-    return opts.cmd .. '**/* | set nobuflisted' .. ('<left>'):rep(18)
+    return opts.cmd .. ' | set nobuflisted' .. ('<left>'):rep(18)
   end, { desc = 'Open [S]cratch Buffer in ' .. opts.desc, expr = true })
 end
 

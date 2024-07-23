@@ -90,9 +90,29 @@ vim.opt.iskeyword:append('-')
 vim.opt.wildchar = 12 -- <C-l>
 vim.opt.wildoptions = 'pum,tagfile,fuzzy'
 vim.opt.wildmode = 'longest:full,full'
-vim.opt.wildignore:append({ '*/.git/*' }) -- git
-vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
-vim.opt.wildignore:append({ '*/target/*' }) -- java
+-- vim.opt.wildignore:append({ '*/.git/*' }) -- git
+-- vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
+-- vim.opt.wildignore:append({ '*/target/*' }) -- java
+
+local is_git = vim.fs.root(vim.env.PWD, '.git') ~= nil
+local function set_path()
+  if not is_git then
+    return '.,'
+      .. table
+        .concat(
+          vim.fn.systemlist(
+            'fd . --type d --hidden --exclude .git --exclude node_modules --exclude target --absolute-path'
+          ),
+          ','
+        )
+        :gsub('%./', '')
+      .. ','
+      .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
+  else
+    return table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
+  end
+end
+vim.o.path = set_path()
 
 vim.opt.smoothscroll = true
 
