@@ -259,6 +259,18 @@ for key, opts in pairs(edit_buffer) do
   -- vim.keymap.set('n', 'gs' .. key, function()
   --   return opts.cmd .. '**/* | set nobuflisted' .. ('<left>'):rep(18)
   -- end, { desc = 'Open [S]cratch Buffer in ' .. opts.desc, expr = true })
+  vim.keymap.set('n', 'ga' .. key, function()
+    local current_path = vim.fn.expand('%:p')
+    local alternative_path
+    if vim.o.filetype == 'java' then
+      if current_path:find('test') then
+        alternative_path = current_path:gsub('/test/', '/main/'):gsub('Test', '')
+      else
+        alternative_path = current_path:gsub('/main/', '/test/'):gsub('%.java', 'Test.java')
+      end
+    end
+    return opts.cmd .. alternative_path .. '<CR>'
+  end, { desc = 'Edit [A]lternative File in ' .. opts.desc, expr = true })
 end
 
 local find_buffer = {
