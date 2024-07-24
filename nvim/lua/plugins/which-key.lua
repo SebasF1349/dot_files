@@ -72,6 +72,10 @@ return {
       { 'ds', group = 'Delete Surround' },
       { 'g', group = '[G]o to' },
       { 'gb', group = '[B]ufferlist Management' },
+      { 'ge', group = '[E]dit Buffer' },
+      { 'gE', group = '[E]dit Buffer in Current Directory' },
+      { 'gs', group = 'Open [S]cratch Buffer' },
+      { 'ga', group = 'Edit [A]lternative File' },
       { 'ys', group = 'Surround' },
     })
     which_key.add({
