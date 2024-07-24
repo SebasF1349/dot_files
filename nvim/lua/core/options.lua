@@ -239,6 +239,57 @@ vim.ui.open = function(path)
   return vim.system(cmd, { text = true, detach = true }), nil
 end
 
+local ca_namespace = vim.api.nvim_create_namespace('code_actions')
+local select_opts = { 'a', 's', 'd', 'f', 'g', 'w', 'e', 'r', 't', 'z', 'x', 'c', 'v', '1', '2', '3', '4', '5' }
+---@diagnostic disable-next-line: duplicate-set-field
+vim.ui.select = function(items, opts, on_choice)
+  vim.validate({
+    items = { items, 'table', false },
+    on_choice = { on_choice, 'function', false },
+  })
+  opts = opts or {}
+  local choices = { opts.prompt or 'Select one of:' }
+  local format_item = opts.format_item or tostring
+
+  local cursor_pos = vim.api.nvim_win_get_cursor(0) -- to remove float
+  vim.api.nvim_win_set_cursor(0, { cursor_pos[1], cursor_pos[2] + 1 })
+
+  local bufnr = vim.api.nvim_create_buf(false, true)
+  local win = vim.api.nvim_open_win(bufnr, true, { win = 0, split = 'below', height = #items + 1 })
+  vim.api.nvim_set_option_value('filetype', 'uiselect', { buf = bufnr })
+  local highlighting = { { group = 'Title', line = 0, col = 0, end_col = #choices[1] } }
+
+  for i, item in ipairs(items) do
+    table.insert(choices, string.format('%s: %s', select_opts[i] or '-', format_item(item)))
+    vim.keymap.set('n', select_opts[i], function()
+      on_choice(items[i], i)
+      vim.api.nvim_win_hide(win)
+    end, { buffer = bufnr })
+    vim.list_extend(highlighting, { { group = 'CursorLineNr', line = i, col = 0, end_col = 2 } })
+  end
+  vim.api.nvim_buf_set_lines(bufnr, 0, #choices, false, choices)
+  for _, hl in ipairs(highlighting) do
+    vim.highlight.range(bufnr, ca_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
+  end
+
+  vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = bufnr })
+  vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })
+  vim.api.nvim_set_option_value('signcolumn', 'no', { win = win })
+  vim.api.nvim_set_option_value('statuscolumn', ' ', { win = win })
+
+  vim.keymap.set('n', '<CR>', function()
+    local choice = vim.api.nvim_win_get_cursor(0)[1] - 1
+    if choice > 0 and choice <= #items then
+      on_choice(items[choice], choice)
+      vim.api.nvim_win_hide(win)
+    end
+  end, { buffer = bufnr })
+  vim.keymap.set('n', 'q', function()
+    on_choice(nil, nil)
+    vim.api.nvim_win_hide(win)
+  end, { buffer = bufnr })
+end
+
 -- Disable health checks for these providers.
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
