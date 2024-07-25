@@ -64,11 +64,10 @@ end
 ---- FILENAME ----
 -- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
 local function file()
-  local buftype = vim.bo.buftype
   local ftype = vim.o.filetype
   local label, title
   -- TODO: Change filename in special buffers (dap)
-  if buftype == 'help' then
+  if ftype == 'help' then
     title, label = vim.fn.expand('%:t:r:r'), 'Help'
   elseif ftype == 'netrw' then
     label = 'Netrw'
