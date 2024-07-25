@@ -94,7 +94,7 @@ local function file()
   end
   local buffers = {}
   local current_bufnr = vim.api.nvim_get_current_buf()
-  local current_buf_shorten = { pos = -1, path = '' }
+  local current_buf_shorten = { pos = -1, path = '', fname = '' }
   for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
     local is_listed = vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value('buflisted', { buf = bufnr })
     if is_listed or bufnr == current_bufnr then
@@ -105,14 +105,14 @@ local function file()
       end
       if bufnr == current_bufnr then
         local fpath = vim.fn.fnamemodify(bufname, ':~:.:h')
-        current_buf_shorten.path = vim.fn.pathshorten(fpath)
+        current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
         local file_display = ''
         if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
-          file_display = string.format('%%#Normal#%s', fname)
+          file_display = current_buf_shorten.fname
           current_buf_shorten.path = file_display
         else
           file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
-          current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', current_buf_shorten.path, fname)
+          current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
         end
         if not is_listed then
           file_display = file_display .. '[h]'
@@ -128,19 +128,23 @@ local function file()
     return ''
   end
   local ret = string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
-  local max_columns = vim.o.columns - 10
-  local ret_length = #ret - 10 * #buffers
-  if ret_length - max_columns > 0 then
-    if #buffers[current_buf_shorten.pos] - #current_buf_shorten.path > ret_length - max_columns then
-      buffers[current_buf_shorten.pos] = current_buf_shorten.path
-      ret = string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
-    elseif #buffers[current_buf_shorten.pos] < max_columns then
-      ret = string.format(' %s […] ', buffers[current_buf_shorten.pos])
-    else
-      ret = string.format(' %s […] ', current_buf_shorten.path)
-    end
+  local max_columns = vim.o.columns
+  local ret_length = #ret - 18 * #buffers
+  if ret_length < max_columns then
+    return ret
+  elseif ret_length - #buffers[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
+    buffers[current_buf_shorten.pos] = current_buf_shorten.path
+    return string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
+  elseif ret_length - #buffers[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
+    buffers[current_buf_shorten.pos] = current_buf_shorten.fname
+    return string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
+  elseif #buffers[current_buf_shorten.pos] < max_columns then
+    return string.format(' %s […] ', buffers[current_buf_shorten.pos])
+  elseif #current_buf_shorten.path < max_columns then
+    return string.format(' %s […] ', current_buf_shorten.path)
+  else
+    return string.format(' %s […] ', current_buf_shorten.fname)
   end
-  return ret
 end
 
 ---- GIT ----
