@@ -4,7 +4,7 @@ vim.g.netrw_banner = 0
 vim.g.netrw_sort_options = 'i'
 vim.g.netrw_winsize = 25
 vim.g.netrw_preview = 1
-vim.g.netrw_altfile = 1
+-- vim.g.netrw_altfile = 1
 
 vim.keymap.set('n', '<leader>n', function()
   local function getPath(str)
@@ -19,8 +19,12 @@ vim.api.nvim_create_autocmd('FileType', {
   group = netrw,
   pattern = 'netrw',
   callback = function()
-    vim.o.nu = true
-    vim.o.rnu = true
+    -- FIX: if I open nv in netrw it gets listed anyway until I move to the buffer again
+    vim.bo.buflisted = false
+    vim.bo.bufhidden = 'wipe'
+    vim.opt.signcolumn = 'yes'
+    vim.opt.number = true
+    vim.opt.relativenumber = true
     vim.keymap.set(
       'n',
       'w',
