@@ -73,6 +73,7 @@ vim.opt.incsearch = true
 vim.opt.inccommand = 'split'
 
 vim.opt.scrolloff = 8
+vim.opt.sidescrolloff = 20
 vim.opt.signcolumn = 'yes'
 
 -- split windows
