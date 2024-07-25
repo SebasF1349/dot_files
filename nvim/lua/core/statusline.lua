@@ -63,7 +63,6 @@ end
 
 ---- FILENAME ----
 -- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
--- TODO: show always last directory with svelte files (or only with +page files)
 local function file()
   local buftype = vim.bo.buftype
   local ftype = vim.o.filetype
@@ -100,11 +99,15 @@ local function file()
     if is_listed or bufnr == current_bufnr then
       local bufname = vim.api.nvim_buf_get_name(bufnr)
       local fname = vim.fn.fnamemodify(bufname, ':t')
+      local is_svelte = vim.startswith(fname, '+')
+      if is_svelte then
+        fname = vim.fn.fnamemodify(bufname, ':h:t') .. '/' .. fname
+      end
       if fname == '' then
         fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
       end
       if bufnr == current_bufnr then
-        local fpath = vim.fn.fnamemodify(bufname, ':~:.:h')
+        local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
         current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
         local file_display = ''
         if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
