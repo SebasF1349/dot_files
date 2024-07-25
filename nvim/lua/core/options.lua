@@ -40,9 +40,6 @@ vim.o.fillchars = 'eob: '
 -- Reduce command line messages
 vim.opt.shortmess = 'aoOstTWICF'
 
--- Reduce scroll during window split
-vim.o.splitkeep = 'screen'
-
 -- Set completeopt to have a better completion experience
 if nvim_version.is_nightly() then
   vim.o.completeopt = 'menu,menuone,fuzzy,popup'
