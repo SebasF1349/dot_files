@@ -144,21 +144,25 @@ local function run_term_command(cmd)
 end
 
 vim.keymap.set('n', 'crb', function()
+  local build = { jdtls = 'mvn spring-boot:run' }
   for _, client in ipairs(vim.lsp.get_clients()) do
-    if client.name == 'jdtls' then
-      run_term_command('mvn spring-boot:run')
+    if build[client.name] then
+      run_term_command(build[client.name])
       return
     end
   end
+  vim.notify('No Build command for attached lsps', vim.log.levels.INFO)
 end, { desc = '[C]ode [R]unner [B]uild' })
 
 vim.keymap.set('n', 'crt', function()
+  local test = { jdtls = 'mvn test' }
   for _, client in ipairs(vim.lsp.get_clients()) do
-    if client.name == 'jdtls' then
-      run_term_command('mvn test')
+    if test[client.name] then
+      run_term_command(test[client.name])
       return
     end
   end
+  vim.notify('No Test command for attached lsps', vim.log.levels.INFO)
 end, { desc = '[C]ode [R]unner [T]est' })
 
 --------------------------------------------------
