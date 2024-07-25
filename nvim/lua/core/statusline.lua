@@ -191,7 +191,7 @@ local function update_git()
   end)
 end
 
-local is_git = vim.fs.root(0, '.git') ~= nil
+local is_git = require('utils.is-git')()
 if is_git then
   if _G.Gstatus_timer == nil then
     _G.Gstatus_timer = vim.uv.new_timer()

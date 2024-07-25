@@ -94,8 +94,8 @@ vim.opt.wildmode = 'longest:full,full'
 -- vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
 -- vim.opt.wildignore:append({ '*/target/*' }) -- java
 
-local is_git = vim.fs.root(vim.env.PWD, '.git') ~= nil
 local function set_path()
+  local is_git = require('utils.is-git')()
   if not is_git then
     return '.,'
       .. table
