@@ -123,6 +123,13 @@ end, { desc = '[T]oggle [T]erminal 1' })
 
 vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
+local function scroll_to_end(bufnr, winid)
+  vim.api.nvim_buf_call(bufnr, function()
+    local target_line = vim.tbl_count(vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
+    vim.api.nvim_win_set_cursor(winid, { target_line, 0 })
+  end)
+end
+
 ---@param cmd string
 local function run_term_command(cmd)
   local term = terms[1]
@@ -130,8 +137,8 @@ local function run_term_command(cmd)
   if term.win_id == -1 then
     toggle_term(1)
   end
-  local bufnr = vim.api.nvim_win_get_buf(term.win_id)
-  local terminal_job_id = (vim.api.nvim_buf_get_var(bufnr, 'terminal_job_id'))
+  scroll_to_end(term.buf_num, term.win_id)
+  local terminal_job_id = (vim.api.nvim_buf_get_var(term.buf_num, 'terminal_job_id'))
   local cr = string.char(13)
   vim.api.nvim_chan_send(terminal_job_id, cmd .. cr)
 end
