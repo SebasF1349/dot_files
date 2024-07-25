@@ -86,7 +86,7 @@ local function file()
     local isLoclist = vim.fn.getloclist(0, { filewinid = 1 }).filewinid ~= 0
     label = isLoclist and 'Location List' or 'Quickfix List'
     title = isLoclist and vim.fn.getloclist(0, { title = 0 }).title or vim.fn.getqflist({ title = 0 }).title
-  elseif vim.list_contains({ 'lazy', 'mason', 'TelescopePrompt' }, ftype) then
+  elseif vim.list_contains({ 'lazy', 'mason', 'TelescopePrompt', 'uiselect' }, ftype) then
     return ''
   end
   if label then
