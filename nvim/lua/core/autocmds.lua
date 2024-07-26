@@ -48,6 +48,7 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
 
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
   callback = function(event)
+    vim.opt_local.filetype = 'terminal'
     vim.cmd('startinsert')
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
@@ -56,6 +57,16 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
   end,
   group = general,
   desc = 'Remove line numbers from terminal and start on insert',
+})
+
+vim.api.nvim_create_autocmd('WinEnter', {
+  callback = function()
+    if vim.bo.filetype == 'terminal' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+      vim.cmd('quit')
+    end
+  end,
+  group = general,
+  desc = 'Close Neovim if the last window is a terminal window',
 })
 
 vim.api.nvim_create_autocmd({ 'FileType' }, {
