@@ -240,10 +240,12 @@ vim.ui.select = function(items, opts, on_choice)
 
   for i, item in ipairs(items) do
     table.insert(choices, string.format('%s: %s', select_opts[i] or '-', format_item(item)))
-    vim.keymap.set('n', select_opts[i], function()
-      on_choice(items[i], i)
-      vim.api.nvim_win_hide(win)
-    end, { buffer = bufnr })
+    if select_opts[i] then
+      vim.keymap.set('n', select_opts[i], function()
+        on_choice(items[i], i)
+        vim.api.nvim_win_hide(win)
+      end, { buffer = bufnr })
+    end
     vim.list_extend(highlighting, { { group = 'CursorLineNr', line = i, col = 0, end_col = 2 } })
   end
   vim.api.nvim_buf_set_lines(bufnr, 0, #choices, false, choices)
