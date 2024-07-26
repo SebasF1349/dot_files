@@ -121,3 +121,30 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
   end,
   desc = 'Markdown defaults',
 })
+
+local function set_path()
+  local is_git = require('utils.is-git')()
+  if not is_git then
+    return '.,'
+      .. table
+        .concat(
+          vim.fn.systemlist(
+            'fd . --type d --hidden --exclude .git --exclude node_modules --exclude target --absolute-path'
+          ),
+          ','
+        )
+        :gsub('%./', '')
+      .. ','
+      .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
+  else
+    return table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
+  end
+end
+vim.api.nvim_create_autocmd('CmdlineEnter', {
+  callback = function()
+    vim.o.path = set_path()
+  end,
+  once = true,
+  group = general,
+  desc = 'Lazyload setting path until I want to use :find',
+})

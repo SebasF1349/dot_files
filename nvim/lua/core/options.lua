@@ -92,25 +92,6 @@ vim.opt.wildmode = 'longest:full,full'
 -- vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
 -- vim.opt.wildignore:append({ '*/target/*' }) -- java
 
-local function set_path()
-  local is_git = require('utils.is-git')()
-  if not is_git then
-    return '.,'
-      .. table
-        .concat(
-          vim.fn.systemlist(
-            'fd . --type d --hidden --exclude .git --exclude node_modules --exclude target --absolute-path'
-          ),
-          ','
-        )
-        :gsub('%./', '')
-      .. ','
-      .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
-  else
-    return table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
-  end
-end
-vim.o.path = set_path()
 
 vim.opt.smoothscroll = true
 
