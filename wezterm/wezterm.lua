@@ -1,12 +1,9 @@
--- Pull in the wezterm API
 local wezterm = require("wezterm")
 
 local utils = require("utils")
--- This table will hold the configuration.
+
 local config = {}
 
--- In newer versions of wezterm, use the config_builder which will
--- help provide clearer error messages
 if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
@@ -37,6 +34,15 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 			opacity = 0.7,
 		},
 	}
+	wezterm.on("gui-startup", function(cmd)
+		local screen = wezterm.gui.screens().main
+		local width, height = screen.width * 0.99, screen.height * 0.93
+		local _, _, window = wezterm.mux.spawn_window(cmd or {
+			position = { x = (screen.width - width) / 2 - 10, y = (screen.height - height) / 2 - 35 },
+		})
+		window:gui_window():set_inner_size(width, height)
+		-- window:gui_window():maximize()
+	end)
 elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
 	config.window_background_opacity = 0.9
 end
