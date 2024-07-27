@@ -190,8 +190,10 @@ end, {
 })
 vim.keymap.set('n', 'g/', ':GSearch ', { desc = 'Search with [G]lobal' })
 
-vim.keymap.set({ 'n', 'x' }, '/', '/\\V', { desc = 'Add Very Nomagic to Forward Seach' })
-vim.keymap.set({ 'n', 'x' }, '?', '?\\V', { desc = 'Add Very Nomagic to Backwards Search' })
+-- stylua: ignore
+vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark for easier return' })
+-- stylua: ignore
+vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark for easier return' })
 
 vim.keymap.set('c', '/', function()
   if vim.fn.getcmdtype() ~= ':' then
