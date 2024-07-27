@@ -22,10 +22,23 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
 	config.default_prog = { "wsl.exe", "--cd", "~/repos" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland -- wait for wayland wez rewrite
+	local background_image = "\\\\wsl$\\Ubuntu\\home\\sebasf\\dot_files\\wallpaper\\wallpaper_clean.jpg"
+	local scheme = wezterm.get_builtin_color_schemes()["Catppuccin Mocha"]
+	config.background = {
+		{
+			source = { File = background_image },
+			horizontal_align = "Center",
+			vertical_align = "Middle",
+		},
+		{
+			source = { Color = scheme.background },
+			height = "100%",
+			width = "100%",
+			opacity = 0.7,
+		},
+	}
 elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
-	--Let open in home or in current directory, it works on linux, not in wsl
-	--config.default_prog = { '/bin/bash', '-l' }
-	--config.default_cwd = './~'
+	config.window_background_opacity = 0.9
 end
 
 --config.adjust_window_size_when_changing_font_size = false
@@ -37,8 +50,6 @@ config.inactive_pane_hsb = {
 }
 
 config.enable_scroll_bar = false
-
-config.window_background_opacity = 0.9
 
 config.window_close_confirmation = "NeverPrompt"
 
