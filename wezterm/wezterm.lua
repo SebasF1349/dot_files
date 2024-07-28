@@ -62,25 +62,7 @@ config.cursor_blink_ease_out = "Constant"
 
 config.check_for_updates = false
 
-config.window_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = "0.5cell" }
-
-local function recompute_padding(window, is_nvim)
-	local overrides = window:get_config_overrides() or {}
-	local new_padding = {}
-	if is_nvim then
-		new_padding = { left = 0, right = 0, top = 0, bottom = 0 }
-	else
-		new_padding = { left = "1cell", right = "1cell", top = "0.5cell", bottom = "0.5cell" }
-	end
-	if not overrides.window_padding or overrides.window_padding.left ~= new_padding.left then
-		overrides.window_padding = new_padding
-		window:set_config_overrides(overrides)
-	end
-end
-
-wezterm.on("update-status", function(window, pane)
-	recompute_padding(window, utils.is_nvim(pane))
-end)
+config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0.5cell", bottom = "0.5cell" }
 
 config.enable_wayland = false
 
