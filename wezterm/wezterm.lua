@@ -49,6 +49,7 @@ config.inactive_pane_hsb = {
 	saturation = 1,
 	brightness = 0.5,
 }
+config.use_resize_increments = true
 
 config.enable_scroll_bar = false
 
