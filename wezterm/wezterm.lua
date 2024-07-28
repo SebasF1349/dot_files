@@ -19,7 +19,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
 	config.default_prog = { "wsl.exe", "--cd", "~/repos" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland -- wait for wayland wez rewrite
-	local background_image = "\\\\wsl$\\Ubuntu\\home\\sebasf\\dot_files\\wallpaper\\wallpaper_clean.jpg"
+	local background_image = "\\\\wsl$\\Ubuntu\\home\\sebasf\\dot_files\\wallpaper\\wallpaper_clean_mini.jpeg"
 	local scheme = wezterm.get_builtin_color_schemes()["Catppuccin Mocha"]
 	config.background = {
 		{
