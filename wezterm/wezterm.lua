@@ -35,13 +35,8 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 		},
 	}
 	wezterm.on("gui-startup", function(cmd)
-		local screen = wezterm.gui.screens().main
-		local width, height = screen.width * 0.99, screen.height * 0.93
-		local _, _, window = wezterm.mux.spawn_window(cmd or {
-			position = { x = (screen.width - width) / 2 - 10, y = (screen.height - height) / 2 - 35 },
-		})
-		window:gui_window():set_inner_size(width, height)
-		-- window:gui_window():maximize()
+		local _, _, window = wezterm.mux.spawn_window(cmd or {})
+		window:gui_window():maximize()
 	end)
 elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
 	config.window_background_opacity = 0.9
