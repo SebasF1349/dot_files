@@ -57,8 +57,10 @@ vim.keymap.set('n', 'ge', [[l<cmd>call search('[''",]\+$\|\>', 'b')<CR>h]], { de
 vim.keymap.set('n', '{', [[<cmd>call search('\(\n\n\|\%^\)\s*\zs\S', 'b')<CR>]], { desc = 'Start Previous Paragraph' })
 vim.keymap.set('n', '}', [[<cmd>call search('\n\n\s*\zs\S')<CR>]], { desc = 'Start Next Paragraph' })
 
--- Invert comments line by line
-vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments' })
+vim.keymap.set('n', "'", '`', { desc = "Swap ` with ' because is a better way to jump to marks" })
+vim.keymap.set('n', '`', "'", { desc = "Swap ` with ' because is a better way to jump to marks" })
+
+vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments line by line' })
 
 -- registers
 vim.keymap.set('n', 'dd', function()
