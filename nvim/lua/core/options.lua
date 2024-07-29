@@ -230,48 +230,60 @@ vim.ui.select = function(items, opts, on_choice)
     on_choice = { on_choice, 'function', false },
   })
   opts = opts or {}
-  local choices = { opts.prompt or 'Select one of:' }
   local format_item = opts.format_item or tostring
 
-  local cursor_pos = vim.api.nvim_win_get_cursor(0) -- to remove float
-  vim.api.nvim_win_set_cursor(0, { cursor_pos[1], cursor_pos[2] + 1 })
+  local current_win = vim.api.nvim_get_current_win()
+  local height = math.min(vim.o.lines - vim.fn.screenrow() - 2, #items)
 
-  local bufnr = vim.api.nvim_create_buf(false, true)
-  local win = vim.api.nvim_open_win(bufnr, true, { win = 0, split = 'below', height = #items + 1 })
-  vim.api.nvim_set_option_value('filetype', 'uiselect', { buf = bufnr })
-  local highlighting = { { group = 'Title', line = 0, col = 0, end_col = #choices[1] } }
+  local select_bufnr = vim.api.nvim_create_buf(false, true)
+  local select_win = vim.api.nvim_open_win(select_bufnr, true, {
+    relative = 'editor',
+    width = vim.o.columns,
+    height = height,
+    row = vim.o.lines,
+    col = 0,
+    zindex = 1000,
+    style = 'minimal',
+    border = 'single',
+    title = opts.prompt or 'Select one of:',
+    footer = string.format('(%s, %s)', select_opts[1], select_opts[#items] or '-'),
+    noautocmd = true,
+  })
 
+  local function select_and_close(i)
+    local item = i and items[i] or nil
+    on_choice(item, i)
+    vim.api.nvim_win_close(select_win, true)
+    vim.api.nvim_set_current_win(current_win)
+  end
+
+  local choices = {}
   for i, item in ipairs(items) do
     table.insert(choices, string.format('%s: %s', select_opts[i] or '-', format_item(item)))
     if select_opts[i] then
       vim.keymap.set('n', select_opts[i], function()
-        on_choice(items[i], i)
-        vim.api.nvim_win_hide(win)
-      end, { buffer = bufnr })
+        select_and_close(i)
+      end, { buffer = select_bufnr })
     end
-    vim.list_extend(highlighting, { { group = 'CursorLineNr', line = i, col = 0, end_col = 2 } })
   end
-  vim.api.nvim_buf_set_lines(bufnr, 0, #choices, false, choices)
-  for _, hl in ipairs(highlighting) do
-    vim.highlight.range(bufnr, ca_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
+  vim.api.nvim_buf_set_lines(select_bufnr, 0, #choices, false, choices)
+  for i, _ in ipairs(items) do
+    vim.highlight.range(select_bufnr, ca_namespace, 'CursorLineNr', { i, 0 }, { i, 2 })
   end
 
-  vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = bufnr })
-  vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })
-  vim.api.nvim_set_option_value('signcolumn', 'no', { win = win })
-  vim.api.nvim_set_option_value('statuscolumn', ' ', { win = win })
+  vim.api.nvim_set_option_value('filetype', 'uiselect', { buf = select_bufnr })
+  vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = select_bufnr })
+  vim.api.nvim_set_option_value('modifiable', false, { buf = select_bufnr })
 
   vim.keymap.set('n', '<CR>', function()
     local choice = vim.api.nvim_win_get_cursor(0)[1] - 1
     if choice > 0 and choice <= #items then
-      on_choice(items[choice], choice)
-      vim.api.nvim_win_hide(win)
+      select_and_close(choice)
     end
-  end, { buffer = bufnr })
+  end, { buffer = select_bufnr })
   vim.keymap.set('n', 'q', function()
-    on_choice(nil, nil)
-    vim.api.nvim_win_hide(win)
-  end, { buffer = bufnr })
+    select_and_close(nil)
+  end, { buffer = select_bufnr })
 end
 
 -- Disable health checks for these providers.
