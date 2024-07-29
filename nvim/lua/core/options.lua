@@ -219,7 +219,10 @@ vim.ui.open = function(path)
 end
 
 local ca_namespace = vim.api.nvim_create_namespace('code_actions')
-local select_opts = { 'a', 's', 'd', 'f', 'g', 'w', 'e', 'r', 't', 'z', 'x', 'c', 'v', '1', '2', '3', '4', '5' }
+-- stylua: ignore
+local select_opts = { 'a', 's', 'd', 'f', 'g', 'w', 'e', 'r', 't', 'z', 'x', 'c', 'v',
+                      'A', 'S', 'D', 'F', 'G', 'W', 'E', 'R', 'T', 'Z', 'X', 'C', 'V',
+                      '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' }
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.ui.select = function(items, opts, on_choice)
   vim.validate({
