@@ -299,6 +299,65 @@ vim.ui.select = function(items, opts, on_choice)
     desc = 'Close select',
   })
 end
+
+---@diagnostic disable-next-line: duplicate-set-field
+vim.ui.input = function(opts, on_confirm)
+  vim.validate({
+    opts = { opts, 'table', true },
+    on_confirm = { on_confirm, 'function', false },
+  })
+
+  opts = (opts and not vim.tbl_isempty(opts)) and opts or vim.empty_dict()
+
+  local current_win = vim.api.nvim_get_current_win()
+
+  local input_bufnr = vim.api.nvim_create_buf(false, true)
+  local input_win = vim.api.nvim_open_win(input_bufnr, true, {
+    relative = 'editor',
+    width = vim.o.columns,
+    height = 1,
+    row = vim.o.lines,
+    col = 0,
+    zindex = 1000,
+    style = 'minimal',
+    border = 'single',
+    noautocmd = true,
+    title = opts.prompt,
+  })
+  vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
+  vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
+  vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
+  vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
+
+  local function select_and_close(input)
+    on_confirm(input)
+    vim.api.nvim_win_close(input_win, true)
+    vim.api.nvim_set_current_win(current_win)
+  end
+
+  vim.keymap.set({ 'n', 'i', 'x' }, '<CR>', function()
+    vim.api.nvim_input('<ESC>')
+    local line = vim.api.nvim_buf_get_lines(input_bufnr, 0, 1, false)[1]
+    select_and_close(line)
+  end, { buffer = input_bufnr })
+  vim.keymap.set('n', 'q', function()
+    select_and_close(nil)
+  end, { buffer = input_bufnr })
+  vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
+    vim.api.nvim_input('<ESC>')
+    select_and_close(nil)
+  end, { buffer = input_bufnr })
+
+  local input_augroup = vim.api.nvim_create_augroup('ui.input', { clear = true })
+  vim.api.nvim_create_autocmd('BufLeave', {
+    callback = function()
+      select_and_close(nil)
+    end,
+    buffer = input_bufnr,
+    once = true,
+    group = input_augroup,
+    desc = 'Close input',
+  })
 end
 
 -- Disable health checks for these providers.
