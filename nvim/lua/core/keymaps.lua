@@ -357,18 +357,8 @@ vim.keymap.set('n', 'gbo', delete_all_other_bufs, { desc = 'Make [O]nly Buffer' 
 -- Window Management
 --------------------------------------------------
 
--- Basics (NOTE: Check what to do with these keymaps)
-vim.keymap.set('n', '<C-\\>', '<C-w>v', { desc = 'Split Window [|]Vertically' })
-vim.keymap.set('n', '<CR>', '<C-w>s', { desc = 'Split Window [-]Horizontally' }) -- <C--> and <CR> map to the same key in the terminal
-vim.keymap.set('n', '<C-=>', '<C-w>=', { desc = 'Window [=]Equal Size' })
 vim.keymap.set('n', '<C-q>', '<cmd>close<CR>', { desc = 'Window [Q]uit' })
--- Move (rotate) window on row
 vim.keymap.set('n', '<C-r>', '<C-w><C-w>', { desc = 'Move A[R]ound Windows' })
--- Move split to main position
-vim.keymap.set('n', '<C-H>', '<C-w>H', { desc = 'Move Window [h]Left' })
-vim.keymap.set('n', '<C-K>', '<C-w>K', { desc = 'Move Window [k]Up' })
-vim.keymap.set('n', '<C-J>', '<C-w>J', { desc = 'Move Window [j]Down' })
-vim.keymap.set('n', '<C-L>', '<C-w>L', { desc = 'Move Window [l]right' })
 
 local nav = {
   h = 'Left',
@@ -399,9 +389,9 @@ local function navigate(dir)
   end
 end
 
--- Move to window using the movement keys
-for key, _ in pairs(nav) do
-  vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', navigate(key))
+for key, direction in pairs(nav) do
+  vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', navigate(key), { desc = 'Move to Window ' .. direction })
+end
 
 local resize_dir = {
   ['<'] = { dir = 'Left', key = '<', desc = 'Resize Window [<]Smaller Horizontally' },
