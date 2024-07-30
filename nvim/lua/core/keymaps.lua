@@ -362,11 +362,6 @@ vim.keymap.set('n', '<C-\\>', '<C-w>v', { desc = 'Split Window [|]Vertically' })
 vim.keymap.set('n', '<CR>', '<C-w>s', { desc = 'Split Window [-]Horizontally' }) -- <C--> and <CR> map to the same key in the terminal
 vim.keymap.set('n', '<C-=>', '<C-w>=', { desc = 'Window [=]Equal Size' })
 vim.keymap.set('n', '<C-q>', '<cmd>close<CR>', { desc = 'Window [Q]uit' })
--- Resize window
-vim.keymap.set('n', '<C-<>', '5<C-w><', { desc = 'Resize Window [<]Smaller Vertically' })
-vim.keymap.set('n', '<C->>', '5<C-w>>', { desc = 'Resize Window [>]Bigger Vertically' })
-vim.keymap.set('n', '<C-,>', '5<C-w>-', { desc = 'Resize Window [<]Smaller Horizontally' })
-vim.keymap.set('n', '<C-.>', '5<C-w>+', { desc = 'Resize Window [<]Bigger Horizontally' })
 -- Move (rotate) window on row
 vim.keymap.set('n', '<C-r>', '<C-w><C-w>', { desc = 'Move A[R]ound Windows' })
 -- Move split to main position
@@ -407,6 +402,39 @@ end
 -- Move to window using the movement keys
 for key, _ in pairs(nav) do
   vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', navigate(key))
+
+local resize_dir = {
+  ['<'] = { dir = 'Left', key = '<', desc = 'Resize Window [<]Smaller Horizontally' },
+  ['>'] = { dir = 'Right', key = '>', desc = 'Resize Window [>]Bigger Horizontally' },
+  [','] = { dir = 'Up', key = '-', desc = 'Resize Window [<]Smaller Vertically' },
+  ['.'] = { dir = 'Down', key = '+', desc = 'Resize Window [<]Bigger Vertically' },
+}
+
+---@param dir "<"|">"|","|"."
+---@return function
+local function resize(dir)
+  return function()
+    local win = vim.api.nvim_get_current_win()
+    local height, width = vim.api.nvim_win_get_height(win), vim.api.nvim_win_get_width(win)
+    vim.api.nvim_input('5<C-w>' .. resize_dir[dir].key)
+    local new_height, new_width = vim.api.nvim_win_get_height(win), vim.api.nvim_win_get_width(win)
+    if height == new_height and width == new_width then
+      local cmd = vim.uv.os_uname().release:find('WSL') and 'wezterm.exe' or 'wezterm'
+      vim.system({ cmd, 'cli', 'adjust-pane-size', resize_dir[dir].dir }, { text = true }, function(p)
+        if p.code ~= 0 then
+          vim.notify(
+            'Failed resize move to pane ' .. resize_dir[dir].dir .. '\n' .. p.stderr,
+            vim.log.levels.ERROR,
+            { title = 'Wezterm' }
+          )
+        end
+      end)
+    end
+  end
+end
+
+for key, content in pairs(resize_dir) do
+  vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', resize(key), { desc = content.desc })
 end
 
 --------------------------------------------------
