@@ -284,7 +284,7 @@ vim.ui.select = function(items, opts, on_choice)
   vim.keymap.set('n', 'q', function()
     select_and_close(nil)
   end, { buffer = select_bufnr })
-  vim.keymap.set('n', '<C-c>', function()
+  vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
     select_and_close(nil)
   end, { buffer = select_bufnr })
 
