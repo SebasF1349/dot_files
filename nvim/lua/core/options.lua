@@ -276,7 +276,7 @@ vim.ui.select = function(items, opts, on_choice)
   vim.api.nvim_set_option_value('modifiable', false, { buf = select_bufnr })
 
   vim.keymap.set('n', '<CR>', function()
-    local choice = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local choice = vim.api.nvim_win_get_cursor(0)[1]
     if choice > 0 and choice <= #items then
       select_and_close(choice)
     end
@@ -284,6 +284,21 @@ vim.ui.select = function(items, opts, on_choice)
   vim.keymap.set('n', 'q', function()
     select_and_close(nil)
   end, { buffer = select_bufnr })
+  vim.keymap.set('n', '<C-c>', function()
+    select_and_close(nil)
+  end, { buffer = select_bufnr })
+
+  local select_augroup = vim.api.nvim_create_augroup('ui.select', { clear = true })
+  vim.api.nvim_create_autocmd('BufLeave', {
+    callback = function()
+      select_and_close(nil)
+    end,
+    buffer = select_bufnr,
+    once = true,
+    group = select_augroup,
+    desc = 'Close select',
+  })
+end
 end
 
 -- Disable health checks for these providers.
