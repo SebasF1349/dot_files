@@ -77,6 +77,7 @@ return {
       { 'gs', group = 'Open [S]cratch Buffer' },
       { 'ga', group = 'Edit [A]lternative File' },
       { 'ys', group = 'Surround' },
+      { 'cr', group = '[C]ode [R]unner' },
     })
     which_key.add({
       {
