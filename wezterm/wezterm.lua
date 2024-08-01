@@ -1,7 +1,5 @@
 local wezterm = require("wezterm")
 
-local utils = require("utils")
-
 local config = {}
 
 if wezterm.config_builder then
@@ -16,12 +14,12 @@ config.color_scheme = "Catppuccin Mocha"
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 	--This next line should be the only thing that's needed, but it doesn't work for new panes
 	--config.default_domain = 'WSL:Ubuntu'
-	config.default_cwd = "\\\\wsl$\\Ubuntu\\home\\sebasf\\repos"
+	config.default_cwd = wezterm.home_dir .. "\\repos"
 	config.default_prog = { "wsl.exe", "--cd", "~/repos" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland -- wait for wayland wez rewrite
 	-- local background_image = "\\\\wsl$\\Ubuntu\\home\\sebasf\\dot_files\\wallpaper\\wallpaper_clean_mini.jpeg"
 	local background_image = ".\\wallpaper_clean_mini.jpeg"
-	local scheme = wezterm.get_builtin_color_schemes()["Catppuccin Mocha"]
+	local scheme = wezterm.color.get_builtin_schemes()["Catppuccin Mocha"]
 	config.background = {
 		{
 			source = { File = background_image },
