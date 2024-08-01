@@ -236,6 +236,18 @@ vim.ui.select = function(items, opts, on_choice)
   local current_win = vim.api.nvim_get_current_win()
   local height = math.min(vim.o.lines - vim.fn.screenrow() - 2, #items)
 
+  local current_cursor = vim.o.guicursor
+  local cursor_hl = 'HiddenCursor'
+  local function hide_cursor()
+    if vim.fn.hlexists(cursor_hl) == 0 then
+      vim.cmd(string.format('highlight %s gui=reverse blend=100', cursor_hl))
+    end
+    vim.o.guicursor = string.format('a:%s/lCursor', cursor_hl)
+  end
+  local function restore_cursor()
+    vim.o.guicursor = current_cursor
+  end
+
   local select_bufnr = vim.api.nvim_create_buf(false, true)
   local select_win = vim.api.nvim_open_win(select_bufnr, true, {
     relative = 'editor',
@@ -250,12 +262,14 @@ vim.ui.select = function(items, opts, on_choice)
     footer = string.format('(%s, %s)', select_opts[1], select_opts[#items] or '-'),
     noautocmd = true,
   })
+  hide_cursor()
 
   local function select_and_close(i)
     local item = i and items[i] or nil
     on_choice(item, i)
     vim.api.nvim_win_close(select_win, true)
     vim.api.nvim_set_current_win(current_win)
+    restore_cursor()
   end
 
   local choices = {}
