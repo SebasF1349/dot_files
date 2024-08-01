@@ -231,6 +231,8 @@ vim.ui.select = function(items, opts, on_choice)
   opts = opts or {}
   local format_item = opts.format_item or tostring
 
+  local two_letter_mode = #items > #select_opts
+
   local current_win = vim.api.nvim_get_current_win()
   local height = math.min(vim.o.lines - vim.fn.screenrow() - 2, #items)
 
@@ -259,12 +261,20 @@ vim.ui.select = function(items, opts, on_choice)
   local choices = {}
   local max_length = -1
   for i, item in ipairs(items) do
-    table.insert(choices, string.format('%s: %s', select_opts[i] or '-', format_item(item)))
-    if select_opts[i] then
-      vim.keymap.set('n', select_opts[i], function()
+    local option
+    if two_letter_mode then
+      local first_letter = math.floor((i - 1) / #select_opts) + 1
+      local second_letter = ((i - 1) % #select_opts) + 1
+      option = select_opts[first_letter] .. select_opts[second_letter]
+    else
+      option = select_opts[i]
+    end
+    table.insert(choices, string.format(' %s: %s ', option or '-', format_item(item)))
     if #choices[i] > max_length then
       max_length = #choices[i]
     end
+    if option then
+      vim.keymap.set('n', option, function()
         select_and_close(i)
       end, { buffer = select_bufnr })
     end
