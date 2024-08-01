@@ -257,13 +257,36 @@ vim.ui.select = function(items, opts, on_choice)
   end
 
   local choices = {}
+  local max_length = -1
   for i, item in ipairs(items) do
     table.insert(choices, string.format('%s: %s', select_opts[i] or '-', format_item(item)))
     if select_opts[i] then
       vim.keymap.set('n', select_opts[i], function()
+    if #choices[i] > max_length then
+      max_length = #choices[i]
+    end
         select_and_close(i)
       end, { buffer = select_bufnr })
     end
+  end
+  local number_columns = math.floor(vim.o.columns / (max_length + 1))
+  local number_lines = math.ceil(#choices / number_columns)
+  number_columns = math.ceil(#choices / number_lines)
+  if number_columns > 1 then
+    local whitespace = math.floor((vim.o.columns - (max_length + 1) * number_columns) / (number_columns + 1))
+    local text = {}
+    for i = 1, number_columns do
+      for j = 1, number_lines do
+        local pos = j + (i - 1) * number_lines
+        if pos > #choices then
+          break
+        end
+        local item_whitespace = (whitespace + max_length) * (i - 1) - #(text[j] or '') + whitespace
+        text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
+      end
+    end
+    choices = text
+    vim.api.nvim_win_set_height(select_win, #text)
   end
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #choices, false, choices)
   for i, _ in ipairs(items) do
