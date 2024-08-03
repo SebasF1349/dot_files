@@ -116,6 +116,26 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
   desc = 'Create dir when saving a file when an intermediate directory is missing.',
 })
 
+-- based in https://new.reddit.com/r/neovim/comments/szjysg/switching_back_to_last_accessed_window_on_closing/
+vim.t.winid_rec = { prev = vim.fn.win_getid(), current = vim.fn.win_getid() }
+vim.api.nvim_create_autocmd({ 'WinEnter' }, {
+  callback = function()
+    if vim.api.nvim_win_get_config(0).relative ~= '' then
+      return
+    end
+
+    vim.t.winid_rec = { prev = vim.t.winid_rec.current, current = vim.fn.win_getid() }
+
+    if vim.api.nvim_win_is_valid(vim.t.winid_rec.prev) then
+      return -- previous window wasn't closed
+    end
+
+    vim.cmd('wincmd p')
+  end,
+  group = general,
+  desc = 'Return to previous window when closing another one',
+})
+
 vim.api.nvim_create_autocmd({ 'FileType' }, {
   pattern = 'markdown',
   callback = function()
