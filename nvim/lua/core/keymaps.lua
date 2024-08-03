@@ -394,7 +394,7 @@ for key, direction in pairs(nav) do
 end
 
 local resize_dir = {
-  ['<'] = { dir = 'Left', key = '<', desc = 'Resize Window [<]Smaller Horizontally' },
+  ['<'] = { dir = 'Left', key = '<LT>', desc = 'Resize Window [<]Smaller Horizontally' }, -- can't use < with nvim_input
   ['>'] = { dir = 'Right', key = '>', desc = 'Resize Window [>]Bigger Horizontally' },
   [','] = { dir = 'Up', key = '-', desc = 'Resize Window [<]Smaller Vertically' },
   ['.'] = { dir = 'Down', key = '+', desc = 'Resize Window [<]Bigger Vertically' },
