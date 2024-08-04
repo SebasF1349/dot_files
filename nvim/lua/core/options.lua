@@ -234,7 +234,7 @@ vim.ui.select = function(items, opts, on_choice)
   local two_letter_mode = #items > #select_opts
 
   local current_win = vim.api.nvim_get_current_win()
-  local height = math.min(vim.o.lines - vim.fn.screenrow() - 2, #items)
+  local height = math.max(math.min(vim.o.lines - vim.fn.screenrow() - 2, #items), 1)
 
   local current_cursor = vim.o.guicursor
   local cursor_hl = 'HiddenCursor'
