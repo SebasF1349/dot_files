@@ -134,6 +134,7 @@ end
 
 ---@param cmd string
 local function run_term_command(cmd)
+  vim.cmd('wa')
   local term = terms[1]
   check_term_data(term)
   if term.win_id == -1 then
