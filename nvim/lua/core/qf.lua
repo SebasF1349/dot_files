@@ -768,14 +768,21 @@ vim.api.nvim_create_autocmd('QuickFixCmdPost', {
 })
 
 -- NOTE: return early in an horizontal move maybe caching line and buffer
+local cursor_moved_cache = { bufnr = -1, line = -1 }
 vim.api.nvim_create_autocmd('CursorMoved', {
   group = qf_group,
   callback = function()
     local list = getActiveList()
-    if list.winid == 0 or vim.bo.buftype ~= '' then
+    local bufnr = vim.api.nvim_get_current_buf()
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    if
+      list.winid == 0
+      or vim.bo.buftype ~= ''
+      or (cursor_moved_cache.bufnr == bufnr and cursor_moved_cache.line == cursor[1])
+    then
       return
     end
-    local bufnr = vim.api.nvim_get_current_buf()
+    cursor_moved_cache = { bufnr = bufnr, line = cursor[1] }
     local qf_pos = 0
     local buf_list = vim.tbl_filter(
       function(item)
@@ -789,7 +796,6 @@ vim.api.nvim_create_autocmd('CursorMoved', {
     if vim.tbl_isempty(buf_list) then
       return
     end
-    local cursor = vim.api.nvim_win_get_cursor(0)
     local prev_lnum = -1
     local prev_col = -1
     local pos = buf_list[1].qf_pos
@@ -809,9 +815,15 @@ vim.api.nvim_create_autocmd('CursorMoved', {
       prev_lnum = entry.lnum
       prev_col = entry.col
     end
+    local change_qf_pos = true
     if list.winid then
-      vim.api.nvim_win_set_cursor(list.winid, { pos, 0 })
-      vim.api.nvim_set_option_value('cursorline', true, { scope = 'local', win = list.winid })
+      if change_qf_pos then
+        vim.cmd('cc ' .. pos)
+        vim.api.nvim_win_set_cursor(0, cursor)
+      else
+        vim.api.nvim_win_set_cursor(list.winid, { pos, 0 })
+        vim.api.nvim_set_option_value('cursorline', true, { scope = 'local', win = list.winid })
+      end
     end
   end,
   desc = 'Update location in quickfix window',
