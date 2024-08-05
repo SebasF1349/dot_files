@@ -690,6 +690,25 @@ local function closeList()
   vim.cmd.close()
 end
 
+---@param direction 'older'|'newer'
+local function listHistory(direction)
+  local listType = getListType()
+  if not listType then
+    return
+  end
+  local listCount = getList(listType, '$').nr
+  if listCount == 1 then
+    vim.notify('There is only one list in the history', vim.log.levels.WARN)
+  end
+  local listNr = getList(listType).nr
+  if listNr == 1 and direction == 'older' then
+    direction = 'newer ' .. (listCount - 1)
+  elseif listNr >= listCount and direction == 'newer' then
+    direction = 'older ' .. (listCount - 1)
+  end
+  vim.cmd(listType .. direction)
+end
+
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
@@ -717,6 +736,12 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
     vim.keymap.set('n', 'K', previewHover, { buffer = 0, desc = 'Show Message on Hover' })
     vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
+    vim.keymap.set('n', '<C-o>', function()
+      listHistory('older')
+    end, { buffer = 0, desc = 'Open Older List' })
+    vim.keymap.set('n', '<C-i>', function()
+      listHistory('newer')
+    end, { buffer = 0, desc = 'Open Newer List' })
     vim.keymap.set({ 'x' }, 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
   end,
   desc = 'Keymaps inside quickfix window',
