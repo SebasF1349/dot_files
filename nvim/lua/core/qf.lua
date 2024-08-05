@@ -362,7 +362,7 @@ vim.keymap.set('n', '<leader>ls', function()
 end, { desc = '[L]ocation List [S]ymbols' })
 
 ---@param listType ListType
----@param direction "next" | "prev"
+---@param direction "n" | "p"
 ---@param file boolean
 local function move(listType, direction, file)
   ---@diagnostic disable-next-line: param-type-mismatch
@@ -373,31 +373,31 @@ local function move(listType, direction, file)
 end
 
 vim.keymap.set('n', ']q', function()
-  move('c', 'next', false)
+  move('c', 'n', false)
 end, { desc = 'Next [Q]uickfix Item Wrapping' })
 vim.keymap.set('n', '[q', function()
-  move('c', 'prev', false)
+  move('c', 'p', false)
 end, { desc = 'Previous [Q]uickfix Item Wrapping' })
 
 vim.keymap.set('n', ']Q', function()
-  move('c', 'next', true)
+  move('c', 'n', true)
 end, { desc = 'Next [Q]uickfix File Wrapping' })
 vim.keymap.set('n', '[Q', function()
-  move('c', 'prev', true)
+  move('c', 'p', true)
 end, { desc = 'Previous [Q]uickfix File Wrapping' })
 
 vim.keymap.set('n', ']l', function()
-  move('l', 'next', false)
+  move('l', 'n', false)
 end, { desc = 'Next [L]ocation List Item Wrapping' })
 vim.keymap.set('n', '[l', function()
-  move('l', 'prev', false)
+  move('l', 'p', false)
 end, { desc = 'Previous [L]ocation List Item Wrapping' })
 
 vim.keymap.set('n', ']L', function()
-  move('l', 'next', true)
+  move('l', 'n', true)
 end, { desc = 'Next [L]ocation List File Wrapping' })
 vim.keymap.set('n', '[L', function()
-  move('l', 'prev', true)
+  move('l', 'p', true)
 end, { desc = 'Previous [L]ocation List File Wrapping' })
 
 ---@param listType? ListType
