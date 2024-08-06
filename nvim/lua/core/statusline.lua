@@ -105,7 +105,6 @@ local function file()
   end
   local current_bufnr = vim.api.nvim_get_current_buf()
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
-  local active_pinbuf = pinbufs.get_active_pinbuf()
   local buffer_names = {}
   for i, bufnr in ipairs(buffers) do
     local bufname = vim.api.nvim_buf_get_name(bufnr)
@@ -133,7 +132,9 @@ local function file()
       current_buf_shorten.pos = #buffer_names
     end
     if i > #pinbufs.get_pinbufs() then
-      file_display = file_display .. '[t]'
+      file_display = string.format('%s[t]', file_display)
+    elseif i == pinbufs.get_active_pinbuf() and buffers[i] ~= current_bufnr then
+      file_display = string.format('%s[a]', file_display)
     end
     vim.list_extend(buffer_names, { file_display })
   end
