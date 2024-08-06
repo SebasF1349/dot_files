@@ -1,5 +1,6 @@
 -- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
 local mocha = require('catppuccin.palettes').get_palette('mocha')
+local pinbufs = require('core.buffers')
 
 ---- MODE ----
 local modes = {
@@ -93,38 +94,73 @@ local function file()
   local buffers = {}
   local current_bufnr = vim.api.nvim_get_current_buf()
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
-  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-    local is_listed = vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value('buflisted', { buf = bufnr })
-    if is_listed or bufnr == current_bufnr then
-      local bufname = vim.api.nvim_buf_get_name(bufnr)
-      local fname = vim.fn.fnamemodify(bufname, ':t')
-      local is_svelte = vim.startswith(fname, '+')
-      if is_svelte then
-        fname = vim.fn.fnamemodify(bufname, ':h:t') .. '/' .. fname
-      end
-      if fname == '' then
-        fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
-      end
-      if bufnr == current_bufnr then
-        local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
-        current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
-        local file_display = ''
-        if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
-          file_display = current_buf_shorten.fname
-          current_buf_shorten.path = file_display
-        else
-          file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
-          current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
-        end
-        if not is_listed then
-          file_display = file_display .. '[h]'
-        end
-        vim.list_extend(buffers, { file_display })
-        current_buf_shorten.pos = #buffers
+  local active_pinbuf = pinbufs.get_active_pinbuf()
+  -- FIX: lots of duplicated code below
+  for i, pinbuf in ipairs(pinbufs.get_pinbufs()) do
+    local bufname = vim.api.nvim_buf_get_name(pinbuf)
+    local fname = vim.fn.fnamemodify(bufname, ':t')
+    local is_svelte = vim.startswith(fname, '+')
+    if is_svelte then
+      fname = vim.fn.fnamemodify(bufname, ':h:t') .. '/' .. fname
+    end
+    if fname == '' then
+      fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
+    end
+    if active_pinbuf == i then
+      local file_display = string.format('%%#NonText#%s', fname)
+      vim.list_extend(buffers, { file_display })
+    elseif pinbuf ~= current_bufnr then
+      vim.list_extend(buffers, { string.format('%%#NonText#%s', fname) })
+    else
+      local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
+      current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
+      local file_display = ''
+      if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
+        file_display = current_buf_shorten.fname
+        current_buf_shorten.path = file_display
       else
-        vim.list_extend(buffers, { string.format('%%#NonText#%s', fname) })
+        file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
+        current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
+      end
+      vim.list_extend(buffers, { file_display })
+      current_buf_shorten.pos = #buffers
+    end
+  end
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    -- FIX: shows buffer duplicated if it's in two windows
+    -- FIX: it shows floating windows like which-key
+    local bufnr = vim.api.nvim_win_get_buf(win)
+    for _, pinbuf in ipairs(pinbufs.get_pinbufs()) do
+      if pinbuf == bufnr then
+        goto continue
       end
     end
+    local bufname = vim.api.nvim_buf_get_name(bufnr)
+    local fname = vim.fn.fnamemodify(bufname, ':t')
+    local is_svelte = vim.startswith(fname, '+')
+    if is_svelte then
+      fname = vim.fn.fnamemodify(bufname, ':h:t') .. '/' .. fname
+    end
+    if fname == '' then
+      fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
+    end
+    if bufnr ~= current_bufnr then
+      vim.list_extend(buffers, { string.format('%%#NonText#%s[t]', fname) })
+    else
+      local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
+      current_buf_shorten.fname = string.format('%%#Normal#%s[t]', fname)
+      local file_display = ''
+      if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
+        file_display = current_buf_shorten.fname
+        current_buf_shorten.path = file_display
+      else
+        file_display = string.format('%%#NonText#%s/%%#Normal#%s[t]', fpath, fname)
+        current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s[t]', vim.fn.pathshorten(fpath), fname)
+      end
+      vim.list_extend(buffers, { file_display })
+      current_buf_shorten.pos = #buffers
+    end
+    ::continue::
   end
   if #buffers == 0 then
     return ''
