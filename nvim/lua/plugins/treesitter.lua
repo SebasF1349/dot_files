@@ -56,6 +56,8 @@ return {
         'sql',
         'regex',
         'diff',
+        -- work
+        'php',
       },
       auto_install = true,
       sync_install = false,

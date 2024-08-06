@@ -14,6 +14,8 @@ return {
       sh = { 'shellcheck' },
       json = { 'jsonlint' },
       text = { 'vale' },
+      -- work
+      php = { 'phpcs' },
       -- ['yaml.ansible'] = { 'ansible-lint', },
     }
 

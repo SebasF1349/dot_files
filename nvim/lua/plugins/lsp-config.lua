@@ -36,6 +36,9 @@ return {
         'vale', -- linter
         -- sql
         -- "sqlfluff", -- linter
+        -- work
+        'phpcs',
+        'php-cs-fixer',
       })
 
       vim.api.nvim_create_user_command('MasonInstallAll', function()

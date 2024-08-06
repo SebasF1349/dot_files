@@ -183,6 +183,9 @@ M = {
   jdtls = {},
 
   marksman = {},
+
+  --work
+  phpactor = {},
 }
 
 return M
