@@ -36,24 +36,34 @@ local function add_pinbuf()
   end
 end
 
----@param pos? number
+---@param pos number
 local function remove_pinbuf(pos)
-  if not pos then
-    local bufnr = vim.api.nvim_get_current_buf()
-    pos = bufpin_pos(bufnr)
-    if not pos then
-      return
-    end
-  end
-  table.remove(pinbufs, pos)
-  if #pinbufs == 0 then
-    active_pinbuf = 0
-  elseif active_pinbuf == pos then
-    if active_pinbuf >= #pinbufs then
+  if active_pinbuf == pos then
+    if #pinbufs == 0 then
+      active_pinbuf = 0
+    elseif active_pinbuf >= #pinbufs then
       active_pinbuf = 1
     else
       active_pinbuf = active_pinbuf + 1
     end
+  end
+  table.remove(pinbufs, pos)
+end
+
+local function remove_curr_pinbuf()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local pos = bufpin_pos(bufnr)
+  if not pos then
+    return
+  end
+  remove_pinbuf(pos)
+  if #vim.api.nvim_list_wins() > 1 then
+    vim.api.nvim_win_close(0, false)
+  elseif active_pinbuf ~= 0 then
+    vim.api.nvim_set_current_buf(pinbufs[active_pinbuf])
+  else
+    -- TODO: return to alternate file or old file?
+    -- check gh chrisgrieser/.config /lua/funcs/alt-alt
   end
 end
 
@@ -113,7 +123,7 @@ end
 
 ---@param direction -1|1
 local function cycle_bufpin(direction)
-  if active_pinbuf == 0 then
+  if active_pinbuf == 0 or #pinbufs <= 1 then
     return
   end
   local next_pos = active_pinbuf + direction
