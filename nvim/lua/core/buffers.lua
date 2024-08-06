@@ -152,25 +152,25 @@ local function move_through_buf_history(direction)
   end
 end
 
-vim.keymap.set('n', 'gbb', select_bufpin, { desc = 'Change Open [B]uffer' })
+vim.keymap.set('n', 'gbb', select_bufpin, { desc = 'Change Pinned [B]uffer' })
 vim.keymap.set('n', ']p', function()
   cycle_bufpin(1)
-end, { desc = 'Next Open Buffer' })
+end, { desc = 'Next [P]in Buffer' })
 vim.keymap.set('n', '[p', function()
   cycle_bufpin(-1)
-end, { desc = 'Previous Open Buffer' })
+end, { desc = 'Previous [P]in Buffer' })
 vim.keymap.set('n', ']b', function()
   move_through_buf_history(1)
-end, { desc = 'Next Open Buffer' })
+end, { desc = 'Next [B]uffer in History' })
 vim.keymap.set('n', '[b', function()
   move_through_buf_history(-1)
-end, { desc = 'Previous Open Buffer' })
+end, { desc = 'Previous [B]uffer in History' })
 -- maybe add keymap for `:b#` that's easier than C-^
-vim.keymap.set('n', 'gba', add_pinbuf, { desc = '[A]dd Open Buffer' })
-vim.keymap.set('n', 'gbd', remove_pinbuf, { desc = '[D]elete Open Buffer', expr = true })
+vim.keymap.set('n', 'gba', add_pinbuf, { desc = '[A]dd Pin Buffer' })
+vim.keymap.set('n', 'gbd', remove_pinbuf, { desc = '[D]elete Pin Buffer', expr = true })
 -- not using :bdel as it removes the file from diagnostics
-vim.keymap.set('n', 'gbc', select_remove_pinbuf, { desc = '[C]lean Open Buffer' })
-vim.keymap.set('n', 'gbo', remove_other_bufpin, { desc = 'Make [O]nly Buffer' })
+vim.keymap.set('n', 'gbc', select_remove_pinbuf, { desc = '[C]lean Pin Buffer' })
+vim.keymap.set('n', 'gbo', remove_other_bufpin, { desc = 'Make [O]nly Pin Buffer' })
 
 --------------------------------------------------
 -- Opening Buffers
