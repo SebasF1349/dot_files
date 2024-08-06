@@ -1,5 +1,5 @@
 local nvim_version = require('utils.nvim-version')
-local lsp_mappings = require('plugins.lsp.lsp-packages')
+local lsp_mappings = require('plugins.lsp.lsp-packages').lspconfig_to_package
 local servers = require('plugins.lsp.servers')
 
 return {
