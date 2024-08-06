@@ -92,7 +92,6 @@ vim.opt.wildmode = 'longest:full,full'
 -- vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
 -- vim.opt.wildignore:append({ '*/target/*' }) -- java
 
-
 vim.opt.smoothscroll = true
 
 -- folds
@@ -293,27 +292,25 @@ vim.ui.select = function(items, opts, on_choice)
       end, { buffer = select_bufnr })
     end
   end
-  local number_columns = math.floor(vim.o.columns / (max_length + 1))
+  local whitespace = 3
+  local number_columns = math.floor(vim.o.columns / (max_length + whitespace))
   local number_lines = math.ceil(#choices / number_columns)
   number_columns = math.ceil(#choices / number_lines)
   local col_start = {}
-  if number_columns > 1 then
-    local whitespace = math.floor((vim.o.columns - (max_length + 1) * number_columns) / (number_columns + 1))
-    local text = {}
-    for i = 1, number_columns do
-      table.insert(col_start, (whitespace + max_length) * (i - 1) + whitespace)
-      for j = 1, number_lines do
-        local pos = j + (i - 1) * number_lines
-        if pos > #choices then
-          break
-        end
-        local item_whitespace = col_start[i] - #(text[j] or '')
-        text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
+  local text = {}
+  for i = 1, number_columns do
+    table.insert(col_start, (whitespace + max_length) * (i - 1) + whitespace)
+    for j = 1, number_lines do
+      local pos = j + (i - 1) * number_lines
+      if pos > #choices then
+        break
       end
+      local item_whitespace = col_start[i] - #(text[j] or '')
+      text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
     end
-    choices = text
-    vim.api.nvim_win_set_height(select_win, #text)
   end
+  choices = text
+  vim.api.nvim_win_set_height(select_win, #text)
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #choices, false, choices)
   for i, _ in ipairs(choices) do
     for _, pos in ipairs(col_start) do
