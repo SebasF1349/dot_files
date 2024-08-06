@@ -84,7 +84,7 @@ local function select_bufpin()
   end)
 end
 
-local function remove_bufpin()
+local function select_remove_pinbuf()
   if #pinbufs == 0 then
     vim.notify('No pinned bufs', vim.log.levels.WARN)
   end
@@ -169,7 +169,7 @@ end, { desc = 'Previous Open Buffer' })
 vim.keymap.set('n', 'gba', add_pinbuf, { desc = '[A]dd Open Buffer' })
 vim.keymap.set('n', 'gbd', remove_pinbuf, { desc = '[D]elete Open Buffer', expr = true })
 -- not using :bdel as it removes the file from diagnostics
-vim.keymap.set('n', 'gbc', remove_bufpin, { desc = '[C]lean Open Buffer' })
+vim.keymap.set('n', 'gbc', select_remove_pinbuf, { desc = '[C]lean Open Buffer' })
 vim.keymap.set('n', 'gbo', remove_other_bufpin, { desc = 'Make [O]nly Buffer' })
 
 --------------------------------------------------
