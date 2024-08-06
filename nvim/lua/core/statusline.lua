@@ -106,7 +106,7 @@ local function file()
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
     end
-    if active_pinbuf == i then
+    if active_pinbuf ~= i then
       local file_display = string.format('%%#NonText#%s', fname)
       vim.list_extend(buffers, { file_display })
     elseif pinbuf ~= current_bufnr then
