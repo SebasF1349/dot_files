@@ -92,49 +92,22 @@ local function file()
     return string.format('%%#NonText# [%s] %%#Normal#%s ', label, title)
   end
   local buffers = {}
+  for _, pinbuf in ipairs(pinbufs.get_pinbufs()) do
+    table.insert(buffers, pinbuf)
+  end
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative == '' then
+      local bufnr = vim.api.nvim_win_get_buf(win)
+      if not vim.list_contains(buffers, bufnr) then
+        table.insert(buffers, bufnr)
+      end
+    end
+  end
   local current_bufnr = vim.api.nvim_get_current_buf()
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
   local active_pinbuf = pinbufs.get_active_pinbuf()
-  -- FIX: lots of duplicated code below
-  for i, pinbuf in ipairs(pinbufs.get_pinbufs()) do
-    local bufname = vim.api.nvim_buf_get_name(pinbuf)
-    local fname = vim.fn.fnamemodify(bufname, ':t')
-    local is_svelte = vim.startswith(fname, '+')
-    if is_svelte then
-      fname = vim.fn.fnamemodify(bufname, ':h:t') .. '/' .. fname
-    end
-    if fname == '' then
-      fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
-    end
-    if active_pinbuf ~= i then
-      local file_display = string.format('%%#NonText#%s', fname)
-      vim.list_extend(buffers, { file_display })
-    elseif pinbuf ~= current_bufnr then
-      vim.list_extend(buffers, { string.format('%%#NonText#%s', fname) })
-    else
-      local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
-      current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
-      local file_display = ''
-      if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
-        file_display = current_buf_shorten.fname
-        current_buf_shorten.path = file_display
-      else
-        file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
-        current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
-      end
-      vim.list_extend(buffers, { file_display })
-      current_buf_shorten.pos = #buffers
-    end
-  end
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    -- FIX: shows buffer duplicated if it's in two windows
-    -- FIX: it shows floating windows like which-key
-    local bufnr = vim.api.nvim_win_get_buf(win)
-    for _, pinbuf in ipairs(pinbufs.get_pinbufs()) do
-      if pinbuf == bufnr then
-        goto continue
-      end
-    end
+  local buffer_names = {}
+  for i, bufnr in ipairs(buffers) do
     local bufname = vim.api.nvim_buf_get_name(bufnr)
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
@@ -144,40 +117,42 @@ local function file()
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
     end
+    local file_display
     if bufnr ~= current_bufnr then
-      vim.list_extend(buffers, { string.format('%%#NonText#%s[t]', fname) })
+      file_display = string.format('%%#NonText#%s', fname)
     else
       local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
-      current_buf_shorten.fname = string.format('%%#Normal#%s[t]', fname)
-      local file_display = ''
+      current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
       else
-        file_display = string.format('%%#NonText#%s/%%#Normal#%s[t]', fpath, fname)
-        current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s[t]', vim.fn.pathshorten(fpath), fname)
+        file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
+        current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
       end
-      vim.list_extend(buffers, { file_display })
-      current_buf_shorten.pos = #buffers
+      current_buf_shorten.pos = #buffer_names
     end
-    ::continue::
+    if i > #pinbufs.get_pinbufs() then
+      file_display = file_display .. '[t]'
+    end
+    vim.list_extend(buffer_names, { file_display })
   end
-  if #buffers == 0 then
+  if #buffer_names == 0 then
     return ''
   end
-  local ret = string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
+  local ret = string.format(' %s ', table.concat(buffer_names, ' %#FloatBorder#| '))
   local max_columns = vim.o.columns
-  local ret_length = #ret - 18 * #buffers
+  local ret_length = #ret - 18 * #buffer_names
   if ret_length < max_columns then
     return ret
-  elseif ret_length - #buffers[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
-    buffers[current_buf_shorten.pos] = current_buf_shorten.path
-    return string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
-  elseif ret_length - #buffers[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
-    buffers[current_buf_shorten.pos] = current_buf_shorten.fname
-    return string.format(' %s ', table.concat(buffers, ' %#FloatBorder#| '))
-  elseif #buffers[current_buf_shorten.pos] < max_columns then
-    return string.format(' %s […] ', buffers[current_buf_shorten.pos])
+  elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
+    buffer_names[current_buf_shorten.pos] = current_buf_shorten.path
+    return string.format(' %s ', table.concat(buffer_names, ' %#FloatBorder#| '))
+  elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
+    buffer_names[current_buf_shorten.pos] = current_buf_shorten.fname
+    return string.format(' %s ', table.concat(buffer_names, ' %#FloatBorder#| '))
+  elseif #buffer_names[current_buf_shorten.pos] < max_columns then
+    return string.format(' %s […] ', buffer_names[current_buf_shorten.pos])
   elseif #current_buf_shorten.path < max_columns then
     return string.format(' %s […] ', current_buf_shorten.path)
   else
