@@ -38,21 +38,21 @@ end
 
 ---@param pos? number
 local function remove_pinbuf(pos)
-  if pos then
-    table.remove(pinbufs, pos)
-  else
+  if not pos then
     local bufnr = vim.api.nvim_get_current_buf()
     pos = bufpin_pos(bufnr)
-    if pos then
-      table.remove(pinbufs, pos)
+    if not pos then
+      return
     end
   end
+  table.remove(pinbufs, pos)
   if #pinbufs == 0 then
     active_pinbuf = 0
   elseif active_pinbuf == pos then
-    active_pinbuf = active_pinbuf + 1
-    if active_pinbuf > #pinbufs then
+    if active_pinbuf >= #pinbufs then
       active_pinbuf = 1
+    else
+      active_pinbuf = active_pinbuf + 1
     end
   end
 end
