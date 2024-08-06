@@ -266,10 +266,10 @@ vim.ui.select = function(items, opts, on_choice)
 
   local function select_and_close(i)
     local item = i and items[i] or nil
-    on_choice(item, i)
     vim.api.nvim_win_close(select_win, true)
     vim.api.nvim_set_current_win(current_win)
     restore_cursor()
+    on_choice(item, i)
   end
 
   local choices = {}
