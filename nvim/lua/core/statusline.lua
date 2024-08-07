@@ -107,6 +107,9 @@ local function file()
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
   local buffer_names = {}
   for i, bufnr in ipairs(buffers) do
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+      goto continue
+    end
     local bufname = vim.api.nvim_buf_get_name(bufnr)
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
@@ -137,6 +140,7 @@ local function file()
       file_display = string.format('%s[a]', file_display)
     end
     vim.list_extend(buffer_names, { file_display })
+    ::continue::
   end
   if #buffer_names == 0 then
     return ''
