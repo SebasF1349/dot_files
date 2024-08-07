@@ -858,9 +858,9 @@ vim.api.nvim_create_autocmd('CursorMoved', {
     if list.winid then
       if change_qf_pos then
         if list.filewinid then
-          vim.cmd('ll ' .. pos)
+          vim.cmd('keepjumps ll ' .. pos)
         else
-          vim.cmd('cc ' .. pos)
+          vim.cmd('keepjumps cc ' .. pos)
         end
         vim.api.nvim_win_set_cursor(0, cursor)
       else
