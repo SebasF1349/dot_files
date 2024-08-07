@@ -67,8 +67,9 @@ local function remove_curr_pinbuf()
   end
 end
 
----@param pos number
+---@param pos? number
 local function move_to_bufpin(pos)
+  pos = pos or active_pinbuf
   vim.api.nvim_set_current_buf(pinbufs[pos])
   active_pinbuf = pos
 end
@@ -175,6 +176,7 @@ end, { desc = 'Next [B]uffer in History' })
 vim.keymap.set('n', '[b', function()
   move_through_buf_history(-1)
 end, { desc = 'Previous [B]uffer in History' })
+vim.keymap.set('n', 'gbp', move_to_bufpin, { desc = 'Move to [P]inned Buffer' })
 -- maybe add keymap for `:b#` that's easier than C-^
 vim.keymap.set('n', 'gba', add_pinbuf, { desc = '[A]dd Pin Buffer' })
 vim.keymap.set('n', 'gbd', remove_curr_pinbuf, { desc = '[D]elete Pin Buffer', expr = true })
