@@ -365,6 +365,11 @@ end, { desc = '[L]ocation List [S]ymbols' })
 ---@param direction "n" | "p"
 ---@param file boolean
 local function move(listType, direction, file)
+  local list = getList(listType)
+  if #list.items == 0 then
+    vim.notify('List is Empty', vim.log.levels.WARN)
+    return
+  end
   ---@diagnostic disable-next-line: param-type-mismatch
   local ok, _ = pcall(vim.cmd, file and listType .. direction .. 'f' or listType .. direction)
   if not ok then
