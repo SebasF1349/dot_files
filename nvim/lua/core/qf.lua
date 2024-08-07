@@ -687,6 +687,39 @@ local function selectItem(selectItemOpts)
   end)
 end
 
+---@param selectItemOpts SelectItemOpts
+local function openSelectedWin(selectItemOpts)
+  vim.print('hey')
+  local wins = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative == '' and vim.o.filetype ~= 'qf' then
+      local position = vim.api.nvim_win_get_position(win)
+      local bufnr = vim.api.nvim_win_get_buf(win)
+      local name = vim.api.nvim_buf_get_name(bufnr)
+      local opt = string.format('[%s,%s] %s', position[1], position[2], name ~= '' and name or vim.o.filetype)
+      table.insert(wins, { opt = opt, win = win })
+    end
+  end
+  if #wins == 1 then
+    selectItem(selectItemOpts)
+    return
+  end
+  vim.ui.select(wins, {
+    prompt = 'Replace buffer:',
+    format_item = function(item)
+      return item.opt
+    end,
+  }, function(item, idx)
+    if not idx then
+      return
+    end
+    local curr_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_set_current_win(item.win)
+    vim.api.nvim_set_current_win(curr_win)
+    selectItem(selectItemOpts)
+  end)
+end
+
 local function closeList()
   local preview = getPreview()
   if preview then
@@ -720,6 +753,7 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   callback = function()
     vim.keymap.set('n', 'q', closeList, { buffer = 0, desc = 'Close QF list' })
     vim.keymap.set('n', '<CR>', selectItem, { buffer = 0, desc = 'Open QF item' })
+    vim.keymap.set('n', '<A-CR>', openSelectedWin, { buffer = 0, desc = 'Open QF item in selected window' })
     vim.keymap.set('n', '<C-s>', function()
       selectItem({ split = 'h' })
     end, { buffer = 0, desc = 'Open QF Item in Horizontal [S]plit' })
@@ -875,6 +909,7 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- close ll if parent window is closed
 -- maybe open the qf window automatically after :make, :grep, :lvimgrep
 --          and friends if there are valid locations/errors
+-- decide in which window to open an item
 
 --------------------------------------------------
 -- Ideas to Implement
