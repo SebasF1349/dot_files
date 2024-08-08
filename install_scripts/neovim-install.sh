@@ -8,6 +8,16 @@ fi
 
 if [ ! -d "$neovim_dir" ]; then
     cd "$HOME/apps" && git clone https://github.com/neovim/neovim
+
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        DISTRO=$ID_LIKE
+    fi
+    if [ "$DISTRO" = "debian" ]; then
+        sudo apt-get install ninja-build gettext cmake unzip curl build-essential
+    elif [ "$DISTRO" = "arch" ]; then
+        sudo pacman -Syu base-devel cmake unzip ninja curl
+    fi
 else
     cd "$neovim_dir" && git fetch origin
 
