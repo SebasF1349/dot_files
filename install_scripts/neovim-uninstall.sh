@@ -1,8 +1,21 @@
 #!/usr/bin/bash
 
+force=false
+
+while getopts 'f' flag; do
+    case "${flag}" in
+    f) force=true ;;
+    *) ;;
+    esac
+done
+
 if ! command -v "nvim" &>/dev/null; then
     echo "nvim could not be found"
-    exit 1
+    if [ "$force" = false ]; then
+        exit 1
+    else
+        echo "Removing orphan files"
+    fi
 fi
 
 sudo rm /usr/local/share/man/man1/nvim.1

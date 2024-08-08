@@ -1,5 +1,14 @@
 #!/usr/bin/bash
 
+force=false
+
+while getopts 'f' flag; do
+    case "${flag}" in
+    f) force=true ;;
+    *) ;;
+    esac
+done
+
 neovim_dir="$HOME/apps/neovim"
 
 if [ ! -d "$HOME/apps" ]; then
@@ -21,13 +30,15 @@ if [ ! -d "$neovim_dir" ]; then
 else
     cd "$neovim_dir" && git fetch origin
 
-    # https://stackoverflow.com/a/3278427
-    UPSTREAM="master"
-    LOG=$(cd "$neovim_dir" && git log HEAD..origin/$UPSTREAM --oneline)
+    if [ "$force" = false ]; then
+        # https://stackoverflow.com/a/3278427
+        UPSTREAM="master"
+        LOG=$(cd "$neovim_dir" && git log HEAD..origin/$UPSTREAM --oneline)
 
-    if [[ -z "$LOG" ]]; then
-        echo "up-to-date"
-        exit 1
+        if [[ -z "$LOG" ]]; then
+            echo "up-to-date"
+            exit 1
+        fi
     fi
 fi
 
