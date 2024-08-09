@@ -157,7 +157,7 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
 local function set_path()
   local is_git = require('utils.is-git')()
   if not is_git then
-    return '.,'
+    return '.,,'
       .. table
         .concat(
           vim.fn.systemlist(
@@ -169,7 +169,7 @@ local function set_path()
       .. ','
       .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
   else
-    return table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
+    return ',,' .. table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
   end
 end
 vim.api.nvim_create_autocmd('CmdlineEnter', {
