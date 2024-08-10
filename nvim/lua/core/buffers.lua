@@ -38,6 +38,7 @@ end
 
 ---@param pos number
 local function remove_pinbuf(pos)
+  table.remove(pinbufs, pos)
   if active_pinbuf == pos then
     if #pinbufs == 0 then
       active_pinbuf = 0
@@ -47,7 +48,6 @@ local function remove_pinbuf(pos)
       active_pinbuf = active_pinbuf + 1
     end
   end
-  table.remove(pinbufs, pos)
 end
 
 local function remove_curr_pinbuf()
