@@ -58,9 +58,13 @@ local function remove_curr_pinbuf()
   end
   remove_pinbuf(pos)
   if #vim.api.nvim_list_wins() > 1 then
-    vim.api.nvim_win_close(0, false)
+    vim.schedule(function()
+      vim.api.nvim_win_close(0, false)
+    end)
   elseif active_pinbuf ~= 0 then
-    vim.api.nvim_set_current_buf(pinbufs[active_pinbuf])
+    vim.schedule(function()
+      vim.api.nvim_set_current_buf(pinbufs[active_pinbuf])
+    end)
   else
     -- TODO: return to alternate file or old file?
     -- check gh chrisgrieser/.config /lua/funcs/alt-alt
