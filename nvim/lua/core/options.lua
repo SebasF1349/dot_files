@@ -145,6 +145,7 @@ vim.diagnostic.config({
 })
 
 -- LSP progress messages on cmdline
+---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.handlers['$/progress'] = function(_, progress, ctx)
   local msg = progress.value
 
