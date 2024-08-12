@@ -38,7 +38,7 @@ vim.o.smartcase = true
 vim.o.fillchars = 'eob: '
 
 -- Reduce command line messages
-vim.opt.shortmess = 'aoOstTWICF'
+vim.opt.shortmess = 'aoOstTWIcCF'
 
 -- Set completeopt to have a better completion experience
 if nvim_version.is_nightly() then
