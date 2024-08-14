@@ -6,8 +6,6 @@ return {
   },
   build = ':TSUpdate',
   config = function()
-    require('nvim-treesitter.install').prefer_git = true
-
     vim.filetype.add({
       extension = { rasi = 'rasi' },
       pattern = {
