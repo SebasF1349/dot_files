@@ -85,7 +85,7 @@ vim.opt.fileencoding = 'utf-8'
 vim.opt.iskeyword:append('-')
 
 -- cmdline autocomplete
-vim.opt.wildchar = 12 -- <C-l>
+vim.opt.wildchar = (''):byte()
 vim.opt.wildoptions = 'pum,tagfile,fuzzy'
 vim.opt.wildmode = 'longest:full,full'
 -- vim.opt.wildignore:append({ '*/.git/*' }) -- git
