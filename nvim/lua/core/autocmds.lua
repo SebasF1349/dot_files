@@ -180,3 +180,30 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
   group = general,
   desc = 'Lazyload setting path until I want to use :find',
 })
+
+local function open_external_file()
+  local prev_buf = vim.fn.bufnr('%')
+  local fn = vim.fn.expand('%:p')
+  -- Open the file using xdg-open
+  -- vim.fn.jobstart('xdg-open "' .. fn .. '"')
+  vim.ui.open(fn)
+
+  vim.notify(string.format('Opening file: %s', fn))
+
+  if vim.fn.buflisted(prev_buf) == 1 then
+    vim.api.nvim_set_current_buf(prev_buf)
+  end
+
+  vim.api.nvim_buf_delete(0, { force = true })
+end
+
+local file_types = { 'pdf', 'jpg', 'jpeg', 'webp', 'png', 'mp3', 'mp4', 'xls', 'xlsx', 'xopp', 'gif', 'doc', 'docx' }
+
+local bin_files = vim.api.nvim_create_augroup('binFiles', { clear = true })
+for _, ext in ipairs(file_types) do
+  vim.api.nvim_create_autocmd({ 'BufReadCmd' }, {
+    pattern = '*.' .. ext,
+    group = bin_files,
+    callback = open_external_file,
+  })
+end
