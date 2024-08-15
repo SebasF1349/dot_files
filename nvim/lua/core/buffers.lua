@@ -240,6 +240,7 @@ end
 
 local pinbufs_augroup = vim.api.nvim_create_augroup('Pinbufs', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  group = pinbufs_augroup,
   callback = function()
     local bufnr = vim.api.nvim_win_get_buf(0)
     local pos = bufpin_pos(bufnr)
@@ -247,17 +248,28 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
       move_to_bufpin(pos)
     end
   end,
-  group = pinbufs_augroup,
   desc = 'Update pinbufs when changing buffers',
 })
+
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
+  group = pinbufs_augroup,
   callback = function()
-    if vim.o.buftype == '' then
-      add_pinbuf()
+    if vim.fn.argc() == 0 then
+      return
+    end
+    local args = vim.fn.argv()
+    if type(args) == 'string' then
+      args = { args }
+    end
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+      local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':p:.')
+      if vim.list_contains(args, fname) then
+        add_pinbuf(bufnr)
+      end
     end
   end,
-  group = pinbufs_augroup,
-  desc = 'Pin first buffer',
+  once = true,
+  desc = 'Pin arglist buffers',
 })
 
 return M
