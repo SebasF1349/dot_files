@@ -28,10 +28,11 @@ local function bufpin_pos(bufnr)
   end
 end
 
-local function add_pinbuf()
-  local cur_buf = vim.api.nvim_get_current_buf()
-  if not bufpin_pos(cur_buf) then
-    table.insert(pinbufs, cur_buf)
+---@param bufnr? number
+local function add_pinbuf(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  if not bufpin_pos(bufnr) then
+    table.insert(pinbufs, bufnr)
     active_pinbuf = #pinbufs
   end
 end
