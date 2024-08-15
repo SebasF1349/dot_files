@@ -76,8 +76,8 @@ vim.ui.select = function(items, opts, on_choice)
 
   local choices = {}
   local max_length = -1
+  local option
   for i, item in ipairs(items) do
-    local option
     if two_letter_mode then
       local first_letter = math.floor((i - 1) / #select_opts) + 1
       local second_letter = ((i - 1) % #select_opts) + 1
@@ -94,6 +94,9 @@ vim.ui.select = function(items, opts, on_choice)
         select_and_close(i)
       end, { buffer = select_bufnr })
     end
+  end
+  if two_letter_mode then
+    vim.api.nvim_win_set_config(select_win, { footer = string.format('(%s, %s)', select_opts[1]:rep(2), option) })
   end
   local whitespace = 3
   local number_columns = math.floor(vim.o.columns / (max_length + whitespace))
