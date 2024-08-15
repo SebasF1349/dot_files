@@ -43,7 +43,7 @@ local function remove_pinbuf(pos)
   if active_pinbuf == pos then
     if #pinbufs == 0 then
       active_pinbuf = 0
-    elseif active_pinbuf >= #pinbufs then
+    elseif active_pinbuf > #pinbufs then
       active_pinbuf = 1
     else
       active_pinbuf = active_pinbuf + 1
@@ -120,8 +120,8 @@ local function remove_other_bufpin()
     vim.notify('No pinned bufs', vim.log.levels.WARN)
   end
   local current_bufnr = vim.api.nvim_win_get_buf(0)
-  for i, pinbuf in ipairs(pinbufs) do
-    if current_bufnr ~= pinbuf then
+  for i = #pinbufs, 1, -1 do
+    if current_bufnr ~= pinbufs[i] then
       remove_pinbuf(i)
     end
   end
