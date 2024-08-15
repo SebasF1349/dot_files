@@ -132,12 +132,12 @@ local function file()
         file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
         current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
       end
-      current_buf_shorten.pos = #buffer_names
+      current_buf_shorten.pos = #buffer_names + 1
     end
     if i > #pinbufs.get_pinbufs() then
       file_display = string.format('%s[t]', file_display)
     elseif i == pinbufs.get_active_pinbuf() and buffers[i] ~= current_bufnr then
-      file_display = string.format('%s[a]', file_display)
+      file_display = string.format('%s[*]', file_display)
     end
     vim.list_extend(buffer_names, { file_display })
     ::continue::
