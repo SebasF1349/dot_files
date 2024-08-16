@@ -2,6 +2,8 @@
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local pinbufs = require('core.buffers')
 
+vim.api.nvim_set_hl(0, 'StatusLineSeparator', { bg = mocha.none, fg = mocha.blue })
+
 ---- MODE ----
 local modes = {
   ['n'] = 'Normal',
@@ -145,17 +147,17 @@ local function file()
   if #buffer_names == 0 then
     return ''
   end
-  local ret = string.format(' %s ', table.concat(buffer_names, ' %#FloatBorder#| '))
+  local ret = string.format(' %s ', table.concat(buffer_names, ' %#StatusLineSeparator#| '))
   local max_columns = vim.o.columns
   local ret_length = #ret - 18 * #buffer_names
   if ret_length < max_columns then
     return ret
   elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.path
-    return string.format(' %s ', table.concat(buffer_names, ' %#FloatBorder#| '))
+    return string.format(' %s ', table.concat(buffer_names, ' %#StatusLineSeparator#| '))
   elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.fname
-    return string.format(' %s ', table.concat(buffer_names, ' %#FloatBorder#| '))
+    return string.format(' %s ', table.concat(buffer_names, ' %#StatusLineSeparator#| '))
   elseif #buffer_names[current_buf_shorten.pos] < max_columns then
     return string.format(' %s […] ', buffer_names[current_buf_shorten.pos])
   elseif #current_buf_shorten.path < max_columns then
@@ -271,10 +273,10 @@ Statusline = {
     return table.concat({
       mode(),
       custom_diagnostics(),
-      '%#FloatBorder#%=',
-      -- "%#FloatBorder#├%=┤",
+      '%#StatusLineSeparator#%=',
+      -- "%#StatusLineSeparator#├%=┤",
       file(),
-      '%#FloatBorder#%=',
+      '%#StatusLineSeparator#%=',
       git(),
     })
   end,
