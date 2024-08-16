@@ -137,14 +137,6 @@ return {
       vim.keymap.set('n', '<leader>mt', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[M]arkdown Preview [T]oggle' })
     end,
   },
-  -- NOTE: nice plugin to try once is finished
-  -- {
-  --   'OXY2DEV/markview.nvim',
-  --   ft = { 'markdown' },
-  --   dependencies = {
-  --     'nvim-treesitter/nvim-treesitter',
-  --   },
-  -- },
   {
     'HakonHarnes/img-clip.nvim',
     opts = {
