@@ -181,9 +181,9 @@ vim.ui.input = function(opts, on_confirm)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
 
   local function select_and_close(input)
-    on_confirm(input)
     vim.api.nvim_win_close(input_win, true)
     vim.api.nvim_set_current_win(current_win)
+    on_confirm(input)
   end
 
   vim.keymap.set({ 'n', 'i', 'x' }, '<CR>', function()
