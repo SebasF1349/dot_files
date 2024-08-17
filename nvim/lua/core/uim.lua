@@ -42,6 +42,29 @@ local function create_win(bufnr, height, title, footer)
   return winnr
 end
 
+---@param bufnr number
+---@param on_close function
+local function close_mappings(bufnr, on_close)
+  vim.keymap.set('n', 'q', function()
+    on_close(nil)
+  end, { buffer = bufnr })
+  vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
+    vim.api.nvim_input('<ESC>')
+    on_close(nil)
+  end, { buffer = bufnr })
+
+  local augroup = vim.api.nvim_create_augroup('ui', { clear = true })
+  vim.api.nvim_create_autocmd('BufLeave', {
+    callback = function()
+      on_close(nil)
+    end,
+    buffer = bufnr,
+    once = true,
+    group = augroup,
+    desc = 'Close select',
+  })
+end
+
 local select_ns = vim.api.nvim_create_namespace('select_ui')
 -- stylua: ignore
 local select_opts = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
@@ -147,23 +170,7 @@ vim.ui.select = function(items, opts, on_choice)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = select_bufnr })
   vim.api.nvim_set_option_value('modifiable', false, { buf = select_bufnr })
 
-  vim.keymap.set('n', 'q', function()
-    select_and_close(nil)
-  end, { buffer = select_bufnr })
-  vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
-    select_and_close(nil)
-  end, { buffer = select_bufnr })
-
-  local select_augroup = vim.api.nvim_create_augroup('ui.select', { clear = true })
-  vim.api.nvim_create_autocmd('BufLeave', {
-    callback = function()
-      select_and_close(nil)
-    end,
-    buffer = select_bufnr,
-    once = true,
-    group = select_augroup,
-    desc = 'Close select',
-  })
+  close_mappings(select_bufnr, select_and_close)
 end
 
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -195,22 +202,6 @@ vim.ui.input = function(opts, on_confirm)
     local line = vim.api.nvim_buf_get_lines(input_bufnr, 0, 1, false)[1]
     select_and_close(line)
   end, { buffer = input_bufnr })
-  vim.keymap.set('n', 'q', function()
-    select_and_close(nil)
-  end, { buffer = input_bufnr })
-  vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
-    vim.api.nvim_input('<ESC>')
-    select_and_close(nil)
-  end, { buffer = input_bufnr })
 
-  local input_augroup = vim.api.nvim_create_augroup('ui.input', { clear = true })
-  vim.api.nvim_create_autocmd('BufLeave', {
-    callback = function()
-      select_and_close(nil)
-    end,
-    buffer = input_bufnr,
-    once = true,
-    group = input_augroup,
-    desc = 'Close input',
-  })
+  close_mappings(input_bufnr, select_and_close)
 end
