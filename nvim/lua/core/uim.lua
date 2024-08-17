@@ -86,8 +86,9 @@ vim.ui.select = function(items, opts, on_choice)
       option = select_opts[i]
     end
     table.insert(choices, string.format(' %s: %s ', option or '-', format_item(item)))
-    if #choices[i] > max_length then
-      max_length = #choices[i]
+    local charnr = vim.fn.strchars(choices[i])
+    if charnr > max_length then
+      max_length = charnr
     end
     if option then
       vim.keymap.set('n', option, function()
@@ -111,7 +112,7 @@ vim.ui.select = function(items, opts, on_choice)
       if pos > #choices then
         break
       end
-      local item_whitespace = col_start[i] - #(text[j] or '')
+      local item_whitespace = col_start[i] - vim.fn.strchars(text[j] or '')
       text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
     end
   end
