@@ -20,6 +20,28 @@ vim.ui.open = (function(overridden)
   end
 end)(vim.ui.open)
 
+---@param bufnr number
+---@param height number
+---@param title string
+---@param footer? string
+---@return integer
+local function create_win(bufnr, height, title, footer)
+  local winnr = vim.api.nvim_open_win(bufnr, true, {
+    relative = 'editor',
+    width = vim.o.columns,
+    height = height,
+    row = vim.o.lines - height - 4, -- 4 counts for cmdline, statusline and 2 for the borders
+    col = 0,
+    zindex = 1000,
+    style = 'minimal',
+    border = 'single',
+    title = title,
+    footer = footer,
+    noautocmd = true,
+  })
+  return winnr
+end
+
 local select_ns = vim.api.nvim_create_namespace('select_ui')
 -- stylua: ignore
 local select_opts = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
@@ -51,19 +73,12 @@ vim.ui.select = function(items, opts, on_choice)
   end
 
   local select_bufnr = vim.api.nvim_create_buf(false, true)
-  local select_win = vim.api.nvim_open_win(select_bufnr, true, {
-    relative = 'editor',
-    width = vim.o.columns,
-    height = height,
-    row = vim.o.lines - height - 4, -- 4 counts for cmdline, statusline and 2 for the borders
-    col = 0,
-    zindex = 1000,
-    style = 'minimal',
-    border = 'single',
-    title = opts.prompt or 'Select one of:',
-    footer = string.format('(%s, %s)', select_opts[1], select_opts[#items] or '-'),
-    noautocmd = true,
-  })
+  local select_win = create_win(
+    select_bufnr,
+    height,
+    opts.prompt or 'Select one of:',
+    string.format('(%s, %s)', select_opts[1], select_opts[#items] or '-')
+  )
   hide_cursor()
 
   local function select_and_close(i)
@@ -163,18 +178,7 @@ vim.ui.input = function(opts, on_confirm)
   local current_win = vim.api.nvim_get_current_win()
 
   local input_bufnr = vim.api.nvim_create_buf(false, true)
-  local input_win = vim.api.nvim_open_win(input_bufnr, true, {
-    relative = 'editor',
-    width = vim.o.columns,
-    height = 1,
-    row = vim.o.lines,
-    col = 0,
-    zindex = 1000,
-    style = 'minimal',
-    border = 'single',
-    noautocmd = true,
-    title = opts.prompt,
-  })
+  local input_win = create_win(input_bufnr, 1, opts.prompt)
   vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
   vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
   vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
