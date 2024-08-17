@@ -102,7 +102,6 @@ vim.ui.select = function(items, opts, on_choice)
   local whitespace = 3
   local number_columns = math.floor(vim.o.columns / (max_length + whitespace))
   local number_lines = math.ceil(#choices / number_columns)
-  number_columns = math.ceil(#choices / number_lines)
   local col_start = {}
   local text = {}
   for i = 1, number_columns do
