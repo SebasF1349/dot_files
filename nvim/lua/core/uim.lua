@@ -115,13 +115,12 @@ vim.ui.select = function(items, opts, on_choice)
       text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
     end
   end
-  choices = text
   vim.api.nvim_win_set_config(
     select_win,
     { height = #text, relative = 'editor', row = vim.o.lines - #text - 4, col = 0 } -- 4 counts for cmdline, statusline and 2 for the borders
   )
-  vim.api.nvim_buf_set_lines(select_bufnr, 0, #choices, false, choices)
-  for i, _ in ipairs(choices) do
+  vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
+  for i, _ in ipairs(text) do
     for _, pos in ipairs(col_start) do
       vim.highlight.range(select_bufnr, select_ns, 'CursorLineNr', { i - 1, pos }, { i - 1, pos + 3 })
     end
