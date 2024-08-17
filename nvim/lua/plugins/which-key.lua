@@ -7,6 +7,7 @@ return {
     which_key.setup({
       win = { border = 'rounded' },
       icons = { rules = false },
+      plugins = { spelling = { enabled = false } },
     })
 
     which_key.add({
