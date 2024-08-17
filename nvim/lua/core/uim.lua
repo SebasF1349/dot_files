@@ -55,7 +55,7 @@ vim.ui.select = function(items, opts, on_choice)
     relative = 'editor',
     width = vim.o.columns,
     height = height,
-    row = vim.o.lines,
+    row = vim.o.lines - height - 4, -- 4 counts for cmdline, statusline and 2 for the borders
     col = 0,
     zindex = 1000,
     style = 'minimal',
@@ -117,7 +117,10 @@ vim.ui.select = function(items, opts, on_choice)
     end
   end
   choices = text
-  vim.api.nvim_win_set_height(select_win, #text)
+  vim.api.nvim_win_set_config(
+    select_win,
+    { height = #text, relative = 'editor', row = vim.o.lines - #text - 4, col = 0 } -- 4 counts for cmdline, statusline and 2 for the borders
+  )
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #choices, false, choices)
   for i, _ in ipairs(choices) do
     for _, pos in ipairs(col_start) do
