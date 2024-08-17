@@ -4,55 +4,9 @@ return {
   config = function()
     local which_key = require('which-key')
 
-    local function create_goto_keymap(number)
-      return {
-        'gb' .. number,
-        function()
-          local count = 0
-          for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value('buflisted', { buf = bufnr }) then
-              count = count + 1
-              if count == number then
-                vim.cmd('buffer ' .. bufnr)
-              end
-            end
-          end
-        end,
-        desc = function()
-          local count = 0
-          for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-            if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value('buflisted', { buf = bufnr }) then
-              count = count + 1
-              if count == number then
-                local filepath = vim.api.nvim_buf_get_name(bufnr)
-                return 'Go to ' .. filepath:gsub(vim.uv.cwd() or '', '')
-              end
-            end
-          end
-          return 'null'
-        end,
-      }
-    end
-
     which_key.setup({
       win = { border = 'rounded' },
       icons = { rules = false },
-      filter = function(mapping)
-        return mapping.desc ~= 'null'
-      end,
-      spec = {
-        {
-          create_goto_keymap(1),
-          create_goto_keymap(2),
-          create_goto_keymap(3),
-          create_goto_keymap(4),
-          create_goto_keymap(5),
-          create_goto_keymap(6),
-          create_goto_keymap(7),
-          create_goto_keymap(8),
-          create_goto_keymap(9),
-        },
-      },
     })
 
     which_key.add({
