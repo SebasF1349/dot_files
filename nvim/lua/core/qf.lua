@@ -324,7 +324,11 @@ local function list_toggle(listType, diagnostics)
     vim.notify('List is Empty', vim.log.levels.WARN)
   elseif not diagnostics then
     vim.cmd(listType .. 'open')
-  else
+  end
+  if
+    diagnostics
+    and (list.winid == 0 or list.context == '' or not list.context.qfim or list.context.qfim.type ~= listType .. 'diag')
+  then
     local qf_diag_list = getDiagList(listType)
     if not qf_diag_list then
       local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
