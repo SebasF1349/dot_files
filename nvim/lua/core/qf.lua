@@ -232,8 +232,7 @@ function _G.qftf(info)
   end
   limit = math.floor(math.min(limit + 1, vim.o.columns / 2))
   local formatLong, pathFmt, validFmt = '…%s', '%s%s%s', '%s%s │ %s%s'
-  local highlighting = {}
-  for i, item in ipairs(items) do
+  for _, item in ipairs(items) do
     if #item.name > limit then
       item.name = formatLong:format(item.name:sub(1 - limit))
       item.path = ''
@@ -243,33 +242,32 @@ function _G.qftf(info)
     local type = item.type == '' and '' or (signs[item.type] and signs[item.type] or signs.I)
     local path = pathFmt:format(item.name, item.path == '' and '' or ' ', item.path)
     local str = validFmt:format(path, (' '):rep(limit - #path), type, item.message)
-    vim.list_extend(highlighting, {
-      {
-        group = 'Directory',
-        line = i - 1,
-        col = 0,
-        end_col = #item.name,
-      },
-      {
-        group = 'Comment',
-        line = i - 1,
-        col = #item.name + 1,
-        end_col = limit + 4,
-      },
-      {
-        group = highlights[item.type] or 'FloatTitle',
-        line = i - 1,
-        col = limit + 4,
-        end_col = vim.o.columns,
-      },
-    })
     table.insert(ret, str)
   end
   vim.schedule(function()
-    -- NOTE: this is needed because somehow diagnostics toggle runs 3 times with incomplete data after a [L]Rg command
+    -- NOTE: this is needed because somehow diagnostics toggle runs 3 times with incomplete data after a [L]Rg command (?)
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
-    for _, hl in ipairs(highlighting) do
-      vim.highlight.range(qfbufnr, qfim_namespace, hl.group, { hl.line, hl.col }, { hl.line, hl.end_col })
+    -- NOTE: check if this regex based highlight is slower
+    local lines = vim.api.nvim_buf_get_lines(qfbufnr, 0, -1, true)
+    for line, content in ipairs(lines) do
+      line = line - 1
+      local space = content:find('%s')
+      vim.highlight.range(qfbufnr, qfim_namespace, 'Directory', { line, 1 }, { line, space })
+      local _, sep_end = content:find('│')
+      if not sep_end then
+        goto continue
+      end
+      vim.highlight.range(qfbufnr, qfim_namespace, 'Comment', { line, space }, { line, sep_end })
+      local message = content:sub(sep_end + ('│'):len() - 1)
+      local msg_hl = 'Title'
+      for key, value in pairs(signs) do
+        if vim.startswith(message, value) then
+          msg_hl = highlights[key]
+          break
+        end
+      end
+      vim.highlight.range(qfbufnr, qfim_namespace, msg_hl, { line, sep_end }, { line, vim.o.columns })
+      ::continue::
     end
   end)
   return ret
