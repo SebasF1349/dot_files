@@ -117,11 +117,16 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
 })
 
 -- based in https://new.reddit.com/r/neovim/comments/szjysg/switching_back_to_last_accessed_window_on_closing/
-vim.t.winid_rec = { prev = vim.fn.win_getid(), current = vim.fn.win_getid() }
 vim.api.nvim_create_autocmd({ 'WinEnter' }, {
   callback = function()
     if vim.api.nvim_win_get_config(0).relative ~= '' then
       return
+    end
+
+    if nil == vim.t.winid_rec then
+      vim.t.winid_rec = { prev = vim.fn.win_getid(), current = vim.fn.win_getid() }
+    else
+      vim.t.winid_rec = { prev = vim.t.winid_rec.current, current = vim.fn.win_getid() }
     end
 
     vim.t.winid_rec = { prev = vim.t.winid_rec.current, current = vim.fn.win_getid() }
