@@ -34,8 +34,15 @@ return {
           },
         },
         prompt_prefix = ' ',
-        selection_caret = ' ',
-        dynamic_preview_title = true,
+        selection_caret = ' ',
+        border = false,
+        -- borderchars = { '', '', '', '', '', '', '', '' },
+        layout_strategy = 'bottom_pane',
+        layout_config = {
+          prompt_position = 'bottom',
+          height = 0.25,
+        },
+        -- dynamic_preview_title = true,
         path_display = { 'filename_first' },
         file_ignore_patterns = {
           '%.jpg',
@@ -68,28 +75,27 @@ return {
     -- telescope.load_extension('ui-select')
 
     local builtin = require('telescope.builtin')
-    local themes = require('telescope.themes')
 
     -- Browsing
     local is_git = require('utils.is-git')()
     vim.keymap.set('n', '<leader>ff', function()
       if is_git then
-        builtin.git_files(themes.get_ivy({ use_git_root = false, show_untracked = true }))
+        builtin.git_files({ use_git_root = false, show_untracked = true })
       else
-        builtin.find_files(themes.get_ivy({ follow = true, hidden = true }))
+        builtin.find_files({ follow = true, hidden = true })
       end
     end, { desc = '[F]ind [F]iles' })
 
     -- Searching
     vim.keymap.set('n', '<leader>fg', function()
-      builtin.live_grep(themes.get_ivy({ disable_coordinates = true }))
+      builtin.live_grep({ disable_coordinates = true })
     end, { desc = '[F]ind by [G]rep' })
     vim.keymap.set('n', '<leader>/', function()
-      builtin.live_grep(themes.get_ivy({
+      builtin.live_grep({
         disable_coordinates = true,
         search_dirs = { vim.api.nvim_buf_get_name(0) },
         prompt_title = 'Live Grep in Current Buffer',
-      }))
+      })
     end, { desc = 'Find [/] in Current Buffer' })
 
     -- Miscelaneous
