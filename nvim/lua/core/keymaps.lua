@@ -154,8 +154,8 @@ local function run_term_command(cmd)
   end
   scroll_to_end(term.buf_num, term.win_id)
   local terminal_job_id = (vim.api.nvim_buf_get_var(term.buf_num, 'terminal_job_id'))
-  local cr = string.char(13)
-  vim.api.nvim_chan_send(terminal_job_id, cmd .. cr)
+  vim.api.nvim_chan_send(terminal_job_id, '\n')
+  vim.api.nvim_chan_send(terminal_job_id, cmd .. '\n')
 end
 
 vim.keymap.set('n', 'crb', function()
