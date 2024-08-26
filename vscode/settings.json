@@ -9,7 +9,6 @@
         "editor.defaultFormatter": "rust-lang.rust-analyzer",
         "editor.formatOnSave": true
     },
-    "breadcrumbs.enabled": false,
     "cmake.configureOnOpen": true,
     "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
     "editor.acceptSuggestionOnEnter": "off",
@@ -52,6 +51,7 @@
     "extensions.autoUpdate": "onlyEnabledExtensions",
     "extensions.ignoreRecommendations": true,
     "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
     "files.associations": {
         "header.ejs": "ejs"
     },
