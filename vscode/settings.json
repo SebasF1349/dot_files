@@ -11,6 +11,7 @@
     },
     "cmake.configureOnOpen": true,
     "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
+    "diffEditor.ignoreTrimWhitespace": false,
     "editor.acceptSuggestionOnEnter": "off",
     "editor.bracketPairColorization.enabled": true,
     "editor.codeActionsOnSave": {
