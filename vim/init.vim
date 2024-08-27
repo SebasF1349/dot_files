@@ -240,6 +240,35 @@ endfunction
 command! MapQ noremap q <cmd>call RecordOrStop()<cr>
 noremap Q <cmd>execute 'normal! @'.g:qreg<cr>
 
+function! Toggle()
+    let toggles = {
+        \'true': 'false', 'false': 'true', 'True': 'False', 'False': 'True', 'TRUE': 'FALSE', 'FALSE': 'TRUE',
+        \'yes': 'no', 'no': 'yes', 'Yes': 'No', 'No': 'Yes', 'YES': 'NO', 'NO': 'YES',
+        \'on': 'off', 'off': 'on', 'On': 'Off', 'Off': 'On', 'ON': 'OFF', 'OFF': 'ON',
+        \'open': 'close', 'close': 'open', 'Open': 'Close', 'Close': 'Open',
+        \'dark': 'light', 'light': 'dark',
+        \'width': 'height', 'height': 'width',
+        \'first': 'last', 'last': 'first',
+        \'top': 'right', 'right': 'bottom', 'bottom': 'left', 'left': 'center', 'center': 'top',
+        \'and': 'or', 'or': 'and',
+        \'=': '!', '!': '>', '>': '<', '<': '=',
+        \'"': "'", "'": '`', '`': '"',
+        \'&&': '||', '||': '&&',
+    \}
+    " && and || doesn't work as <cword> doesn't get symbols if there is text
+    " after
+    let word = getline('.')->slice(charcol('.') - 1, charcol('.'))
+    if toggles->has_key(word)
+        execute 'normal! "_s' .. toggles[word]
+    else
+        let word = expand("<cword>")
+        if toggles->has_key(word)
+            execute 'normal! "_ciw' .. toggles[word]
+        endif
+    endif
+endfunction
+
+nnoremap <silent> <BS> <cmd>call Toggle()<CR>
 " DEFAULT PLUGINS
 
 if has('syntax') && !exists('g:syntax_on')
