@@ -29,6 +29,41 @@
         "args": "<C-d>"
     },
     {
+        "key": "ctrl+h",
+        "command": "workbench.action.navigateLeft",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "workbench.action.navigateDown",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "workbench.action.navigateUp",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.navigateRight",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
+        "key": "ctrl+q",
+        "command": "workbench.action.closeActiveEditor",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
+        "key": "ctrl+\\",
+        "command": "workbench.action.splitEditorRight",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
+        "key": "ctrl+-",
+        "command": "workbench.action.splitEditorDown",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    {
         "key": "ctrl+\\",
         "command": "workbench.action.terminal.split",
         "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
