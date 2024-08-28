@@ -189,8 +189,11 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-nnoremap j gj
-nnoremap k gk
+nmap <expr> k v:count == 0 ? 'gk' : 'k'
+nmap <expr> j v:count == 0 ? 'gj' : 'j'
+nmap <expr> $ v:count == 0 ? 'g$' : '$'
+nmap 0 g0
+nmap ^ g^
 nnoremap Y y$
 nnoremap U <C-r>
 nnoremap ' `
