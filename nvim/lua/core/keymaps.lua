@@ -5,9 +5,12 @@
 -- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
 
--- Remap for dealing with word wrap
+-- Remaps for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+vim.keymap.set('n', '$', "v:count == 0 ? 'g$' : '$'", { expr = true, silent = true })
+vim.keymap.set('n', '0', 'g0', { silent = true })
+vim.keymap.set('n', '^', 'g^', { silent = true })
 
 --Move things around when in visual mode
 vim.keymap.set('x', 'J', ":m '>+1<CR>gv=gv")
