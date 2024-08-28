@@ -128,7 +128,6 @@
     "typescript.updateImportsOnFileMove.enabled": "always",
     "window.commandCenter": false,
     "window.menuBarVisibility": "toggle",
-    "window.restoreWindows": "none",
     "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
     "workbench.activityBar.location": "hidden",
     "workbench.colorTheme": "Catppuccin Mocha",
