@@ -150,18 +150,18 @@ local function move_through_buf_history(direction)
   end
   local jumplistPos = direction == -1 and jumplist[2] or jumplist[2] + 1
   while true do
+    if direction == -1 and jumplistPos == 0 then
+      vim.notify('First jump position', vim.log.levels.WARN)
+      return
+    elseif direction == 1 and jumplistPos > #jumplist[1] then
+      vim.notify('Last jump position', vim.log.levels.WARN)
+      return
+    end
     local new_buf = jumplist[1][jumplistPos].bufnr
     if new_buf ~= current_bufnr then
       local jumps_count = (jumplistPos - jumplist[2] - 1) * direction
       local dir = direction == 1 and '<C-i>' or '<C-o>'
       vim.api.nvim_input(jumps_count .. dir)
-      return
-    end
-    if direction == -1 and jumplistPos == 1 then
-      vim.notify('Last jump position', vim.log.levels.WARN)
-      return
-    elseif direction == 1 and jumplistPos == #jumplist[1] then
-      vim.notify('First jump position', vim.log.levels.WARN)
       return
     end
     jumplistPos = jumplistPos + direction
