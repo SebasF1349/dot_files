@@ -434,18 +434,35 @@ vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
 -- Change default implementation of z= for spell checking
 local spell_on_choice = vim.schedule_wrap(function(_, idx)
   if type(idx) == 'number' then
-    vim.cmd.normal({ idx .. 'z=', bang = true })
+    vim.cmd.normal({ idx .. ']sz=', bang = true })
   end
 end)
-local spell_select = function()
+
+---@param move? 1 | -1
+local spell_select = function(move)
+  if move == 1 then
+    vim.cmd.normal({ ']s', bang = true })
+  elseif move == -1 then
+    vim.cmd.normal({ '[s', bang = true })
+  end
   if vim.v.count > 0 then
     spell_on_choice(nil, vim.v.count)
     return
   end
   local cword = vim.fn.expand('<cword>')
-  vim.ui.select(vim.fn.spellsuggest(cword, vim.o.lines), { prompt = 'Change ' .. cword .. ' to:' }, spell_on_choice)
+  vim.fn.matchadd('LspReferenceRead', cword)
+  vim.ui.select(vim.fn.spellsuggest(cword, vim.o.lines), { prompt = 'Change ' .. cword .. ' to:' }, function(opt)
+    vim.fn.clearmatches()
+    spell_on_choice(opt)
+  end)
 end
 vim.keymap.set('n', 'z=', spell_select, { desc = 'Shows spelling suggestions' })
+vim.keymap.set('n', ']s', function()
+  spell_select(1)
+end, { desc = 'Shows next spelling suggestions' })
+vim.keymap.set('n', '[s', function()
+  spell_select(-1)
+end, { desc = 'Shows previous spelling suggestions' })
 
 --------------------------------------------------
 -- Abbreviations
