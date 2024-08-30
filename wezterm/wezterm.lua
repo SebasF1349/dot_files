@@ -62,7 +62,7 @@ config.cursor_blink_ease_out = "Constant"
 
 config.check_for_updates = false
 
-config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0.5cell", bottom = "0.5cell" }
+config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0cell", bottom = "0cell" }
 
 config.enable_wayland = false
 
