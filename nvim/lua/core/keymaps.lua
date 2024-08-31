@@ -438,6 +438,7 @@ local spell_on_choice = vim.schedule_wrap(function(_, idx)
   end
 end)
 
+local spell_ns = vim.api.nvim_create_namespace('spell_namespace')
 ---@param move? 1 | -1
 local spell_select = function(move)
   if move == 1 then
@@ -450,9 +451,11 @@ local spell_select = function(move)
     return
   end
   local cword = vim.fn.expand('<cword>')
-  vim.fn.matchadd('LspReferenceRead', cword)
+  local curr_pos = vim.api.nvim_win_get_cursor(0)
+  -- This doesn't work correctly if using z= in the middle of the word
+  vim.api.nvim_buf_add_highlight(0, spell_ns, 'LspReferenceRead', curr_pos[1] - 1, curr_pos[2], curr_pos[2] + #cword)
   vim.ui.select(vim.fn.spellsuggest(cword, vim.o.lines), { prompt = 'Change ' .. cword .. ' to:' }, function(item, i)
-    vim.fn.clearmatches()
+    vim.api.nvim_buf_clear_namespace(0, spell_ns, 0, -1)
     spell_on_choice(item, i)
   end)
 end
