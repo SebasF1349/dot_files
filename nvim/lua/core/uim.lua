@@ -53,6 +53,7 @@ local function create_win(winOpts)
   return winnr
 end
 
+local autocmd_id
 ---@param bufnr number
 ---@param on_close function
 local function close_mappings(bufnr, on_close)
@@ -65,7 +66,7 @@ local function close_mappings(bufnr, on_close)
   end, { buffer = bufnr })
 
   local augroup = vim.api.nvim_create_augroup('ui', { clear = true })
-  vim.api.nvim_create_autocmd('BufLeave', {
+  autocmd_id = vim.api.nvim_create_autocmd('BufLeave', {
     callback = function()
       on_close(nil)
     end,
@@ -117,8 +118,11 @@ vim.ui.select = function(items, opts, on_choice)
   hide_cursor()
 
   local function select_and_close(i)
+    vim.api.nvim_del_autocmd(autocmd_id)
     local item = i and items[i] or nil
-    vim.api.nvim_win_close(select_win, true)
+    if select_win and vim.api.nvim_win_is_valid(select_win) then
+      vim.api.nvim_win_close(select_win, true)
+    end
     vim.api.nvim_set_current_win(current_win)
     restore_cursor()
     on_choice(item, i)
@@ -205,7 +209,11 @@ vim.ui.input = function(opts, on_confirm)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
 
   local function select_and_close(input)
+    vim.api.nvim_del_autocmd(autocmd_id)
     vim.api.nvim_win_close(input_win, true)
+    if title_win and vim.api.nvim_win_is_valid(title_win) then
+      vim.api.nvim_win_close(title_win, true)
+    end
     vim.api.nvim_set_current_win(current_win)
     on_confirm(input)
   end
