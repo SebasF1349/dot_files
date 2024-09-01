@@ -25,10 +25,12 @@ local border = 'none'
 ---@class WinOpts
 ---@field bufnr number
 ---@field height number
+---@field width? number
 ---@field border string
 ---@field title? string
 ---@field footer? string
 ---@field row? number
+---@field column? number
 
 ---@param winOpts WinOpts
 ---@return integer
@@ -41,10 +43,10 @@ local function create_win(winOpts)
       - (winOpts.border ~= 'none' and 2 or 0)
   local winnr = vim.api.nvim_open_win(winOpts.bufnr, true, {
     relative = 'editor',
-    width = vim.o.columns,
+    width = winOpts.width or vim.o.columns,
     height = winOpts.height,
     row = row,
-    col = 0,
+    col = winOpts.column or 0,
     zindex = 1000,
     style = 'minimal',
     border = winOpts.border,
