@@ -20,6 +20,8 @@ vim.ui.open = (function(overridden)
   end
 end)(vim.ui.open)
 
+local border = 'none'
+
 ---@class WinOpts
 ---@field bufnr number
 ---@field height number
@@ -197,7 +199,6 @@ vim.ui.input = function(opts, on_confirm)
   })
 
   opts = (opts and not vim.tbl_isempty(opts)) and opts or vim.empty_dict()
-  local border = 'none' -- 'single'
 
   local current_win = vim.api.nvim_get_current_win()
 
