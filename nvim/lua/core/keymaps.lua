@@ -435,7 +435,6 @@ local spell_on_choice = vim.schedule_wrap(function(_, idx)
   end
 end)
 
-local spell_ns = vim.api.nvim_create_namespace('spell_namespace')
 ---@param move? 1 | -1
 local spell_select = function(move)
   if move == 1 then
@@ -443,16 +442,19 @@ local spell_select = function(move)
   elseif move == -1 then
     vim.cmd.normal({ '[s', bang = true })
   end
+
   if vim.v.count > 0 then
     spell_on_choice(nil, vim.v.count)
     return
   end
+
+  -- stealed from https://github.com/echasnovski/mini.cursorword/blob/7a9f1ec73c52124abc39f0309d332ababefc68b2/lua/mini/cursorword.lua#L246
+  local current_word_pattern = [[\k*\%#\k*]]
+  local match_id_current = vim.fn.matchadd('Underlined', current_word_pattern, -1)
+
   local cword = vim.fn.expand('<cword>')
-  local curr_pos = vim.api.nvim_win_get_cursor(0)
-  -- This doesn't work correctly if using z= in the middle of the word
-  vim.api.nvim_buf_add_highlight(0, spell_ns, 'LspReferenceRead', curr_pos[1] - 1, curr_pos[2], curr_pos[2] + #cword)
   vim.ui.select(vim.fn.spellsuggest(cword, vim.o.lines), { prompt = 'Change ' .. cword .. ' to:' }, function(item, i)
-    vim.api.nvim_buf_clear_namespace(0, spell_ns, 0, -1)
+    vim.fn.matchdelete(match_id_current)
     spell_on_choice(item, i)
   end)
 end
