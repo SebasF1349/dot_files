@@ -113,11 +113,11 @@ local function toggle_term(num)
   local term = terms[num]
   check_term_data(term)
   if term.buf_num == -1 then
-    vim.cmd('vsplit | vertical resize 50 | term')
+    vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | term')
     term.buf_num = vim.api.nvim_get_current_buf()
     term.win_id = vim.api.nvim_get_current_win()
   elseif term.win_id == -1 then
-    vim.cmd('vsplit | vertical resize 50 | b' .. term.buf_num)
+    vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | b' .. term.buf_num)
     term.win_id = vim.api.nvim_get_current_win()
   else
     vim.api.nvim_win_close(term.win_id, true)
