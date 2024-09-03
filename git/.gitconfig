@@ -1,22 +1,6 @@
 [user]
     name = SebasF1349
     email = ratablanca711@gmail.com
-[alias]
-	s = status
-    d = diff
-    c = commit -m
-    ac = commir -am
-    cl = clone
-    a = add
-    ad = add .
-    aa = add --all
-    b = branch
-    ch = checkout
-    cb = checkout -b
-    P = push
-    p = pull
-    l = log
-    st = stash
 [init]
     defaultBranch = main
 [help]
