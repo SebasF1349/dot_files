@@ -156,20 +156,18 @@ alias ..="cd .."
 alias ...="cd ../.."
 
 # git
-function_exists() {
-    declare -f -F "$1" >/dev/null
-    return $?
-}
-
-aliases=$(git --list-cmds=alias)
-for al in $aliases; do
-    alias g"$al"="git $al"
-
-    complete_func=_git_$(__git_aliased_command "$al")
-    function_exists "$complete_fnc" && __git_complete g"$al" "$complete_func"
-done
-
 alias g="git"
+alias gs="git status"
+alias gd="git diff"
+alias gc="git commit -m"
+alias gac="git commit -am"
+alias gcl="git clone"
+alias ga="git add"
+alias ga.="git add ."
+alias gaa="git add --all"
+alias gb="git branch"
+alias gch="git checkout"
+alias gcb="git checkout -b"
 function git_checkout_fzf() {
     branch=$(git branch --all |
         fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" |
@@ -179,6 +177,12 @@ function git_checkout_fzf() {
     fi
 }
 alias gcf="git_checkout_fzf"
+alias gP="git push"
+alias gpush="git push"
+alias gp="git pull"
+alias gpull="git pull"
+alias gl="git log"
+alias gst="git stash"
 
 alias nv='${EDITOR}'
 alias nv.='${EDITOR} .'
