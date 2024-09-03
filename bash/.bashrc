@@ -156,10 +156,25 @@ alias ..="cd .."
 alias ...="cd ../.."
 
 # git
+
+function current_branch() {
+    branch_name=$(git symbolic-ref --short -q HEAD)
+    echo "$branch_name"
+}
+
+function git_checkout_fzf() {
+    branch=$(git branch --all |
+        fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" |
+        sed "s/remotes\/origin\///" | xargs)
+    if [ -n "$branch" ]; then
+        git checkout "$branch"
+    fi
+}
+
 alias g="git"
 alias gs="git status"
 alias gd="git diff"
-alias gdn="git diff --name-only ..origin/main"
+alias gdn='git diff --name-only ..origin/$(current_branch)'
 alias gc="git commit -m"
 alias gac="git commit -am"
 alias gcl="git clone"
@@ -170,18 +185,10 @@ alias gb="git branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:re
 alias gde="git branch -D"
 alias gch="git checkout"
 alias gcb="git checkout -b"
-function git_checkout_fzf() {
-    branch=$(git branch --all |
-        fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" |
-        sed "s/remotes\/origin\///" | xargs)
-    if [ -n "$branch" ]; then
-        git checkout "$branch"
-    fi
-}
 alias gcf="git_checkout_fzf"
 alias gP="git push"
 alias gpush="git push"
-alias gf="git fetch && git diff --name-only ..origin/main"
+alias gf='git fetch && git diff --name-only ..origin/$(current_branch)'
 alias gp="git pull"
 alias gpull="git pull"
 alias gl="git log"
