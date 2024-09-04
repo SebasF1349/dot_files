@@ -110,8 +110,8 @@ vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.s
 })
 
 -- Nicer and less noicy signcolumn
-vim.wo.signcolumn = 'yes'
-vim.opt.statuscolumn = '%s%=%{%v:relnum ? v:relnum : v:lnum %} '
+vim.opt.signcolumn = 'yes'
+vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
 
 -- Change color to current line number
 vim.opt.cursorline = true
