@@ -46,7 +46,8 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   desc = "Don't auto comment after pressing enter in comment",
 })
 
-vim.api.nvim_create_autocmd({ 'TermOpen' }, {
+vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
+  pattern = 'term://*',
   callback = function(event)
     vim.opt_local.filetype = 'terminal'
     vim.cmd('startinsert')
