@@ -204,12 +204,45 @@ vim.ui.input = function(opts, on_confirm)
 
   local current_win = vim.api.nvim_get_current_win()
 
+  local column = 0
+  local row
+  local title_win
+  if border == 'none' then
+    local title_bufnr = vim.api.nvim_create_buf(false, true)
+    title_win = create_win({
+      bufnr = title_bufnr,
+      height = 1,
+      width = #opts.prompt,
+      border = 'none',
+      row = vim.o.lines,
+      column = 0,
+    })
+    vim.api.nvim_buf_set_lines(title_bufnr, 0, 1, false, { opts.prompt .. ' ' })
+    vim.api.nvim_set_option_value('filetype', 'uiinputtitle', { buf = title_bufnr })
+    vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = title_bufnr })
+    vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = title_win })
+    vim.api.nvim_set_option_value('winblend', 0, { win = title_win })
+    column = column + #opts.prompt
+    row = vim.o.lines
+  end
   local input_bufnr = vim.api.nvim_create_buf(false, true)
-  local input_win = create_win({ bufnr = input_bufnr, height = 1, border = border, title = opts.prompt })
+  local input_win = create_win({
+    bufnr = input_bufnr,
+    height = 1,
+    width = vim.o.columns - column,
+    border = border,
+    title = opts.prompt,
+    row = row,
+    column = column,
+  })
   vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
   vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
   vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
+  if border == 'none' then
+    vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = input_win })
+    vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
+  end
 
   local function select_and_close(input)
     vim.api.nvim_del_autocmd(autocmd_id)
