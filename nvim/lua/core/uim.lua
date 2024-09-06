@@ -97,7 +97,6 @@ vim.ui.select = function(items, opts, on_choice)
   local two_letter_mode = #items > #select_opts
 
   local current_win = vim.api.nvim_get_current_win()
-  local height = math.max(math.min(vim.o.lines - vim.fn.screenrow() - 2, #items), 1)
   local title = opts.prompt or 'Select one of:'
 
   local current_cursor = vim.o.guicursor
@@ -113,14 +112,43 @@ vim.ui.select = function(items, opts, on_choice)
   end
 
   local select_bufnr = vim.api.nvim_create_buf(false, true)
+  hide_cursor()
+
+  ---@class Choice
+  ---@field option string
+  ---@field item string
+
+  ---@type Choice[]
+  local choices = {}
+  local max_length = -1
+  for i, item in ipairs(items) do
+    local option
+    if two_letter_mode then
+      local first_letter = math.floor((i - 1) / #select_opts) + 1
+      local second_letter = ((i - 1) % #select_opts) + 1
+      option = select_opts[first_letter] .. select_opts[second_letter]
+    else
+      option = select_opts[i]
+    end
+    option = option or '-'
+    item = format_item(item)
+    table.insert(choices, { option = option, item = item })
+    local charnr = vim.fn.strchars(option) + vim.fn.strchars(item) + 4 -- 4 because of the spaces I will add later
+    if charnr > max_length then
+      max_length = charnr
+    end
+  end
+  local whitespace = 3
+  local number_columns = math.floor(vim.o.columns / (max_length + whitespace))
+  local number_lines = math.ceil(#choices / number_columns)
+
   local select_win = create_win({
     bufnr = select_bufnr,
-    height = height,
+    height = border == 'none' and number_lines + 1 or number_lines,
     border = border,
     title = title,
-    footer = string.format('(%s, %s)', select_opts[1], select_opts[#items] or '-'),
+    footer = string.format('(%s, %s)', choices[1].option, choices[#choices].option),
   })
-  hide_cursor()
 
   local function select_and_close(i)
     vim.api.nvim_del_autocmd(autocmd_id)
@@ -133,34 +161,6 @@ vim.ui.select = function(items, opts, on_choice)
     on_choice(item, i)
   end
 
-  local choices = {}
-  local max_length = -1
-  local option
-  for i, item in ipairs(items) do
-    if two_letter_mode then
-      local first_letter = math.floor((i - 1) / #select_opts) + 1
-      local second_letter = ((i - 1) % #select_opts) + 1
-      option = select_opts[first_letter] .. select_opts[second_letter]
-    else
-      option = select_opts[i]
-    end
-    table.insert(choices, string.format(' %s: %s ', option or '-', format_item(item)))
-    local charnr = vim.fn.strchars(choices[i])
-    if charnr > max_length then
-      max_length = charnr
-    end
-    if option then
-      vim.keymap.set('n', option, function()
-        select_and_close(i)
-      end, { buffer = select_bufnr })
-    end
-  end
-  if two_letter_mode then
-    vim.api.nvim_win_set_config(select_win, { footer = string.format('(%s, %s)', select_opts[1]:rep(2), option) })
-  end
-  local whitespace = 3
-  local number_columns = math.floor(vim.o.columns / (max_length + whitespace))
-  local number_lines = math.ceil(#choices / number_columns)
   local col_start = {}
   local text = {}
   for i = 1, number_columns do
@@ -171,18 +171,18 @@ vim.ui.select = function(items, opts, on_choice)
         break
       end
       local item_whitespace = col_start[i] - vim.fn.strchars(text[j] or '')
-      text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
+      text[j] =
+        string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choices[pos].option, choices[pos].item)
+      if choices[pos].option ~= '-' then
+        vim.keymap.set('n', choices[pos].option, function()
+          select_and_close(i)
+        end, { buffer = select_bufnr })
+      end
     end
   end
   if border == 'none' then
     text = vim.list_extend({ title }, text)
   end
-  local win_config = vim.api.nvim_win_get_config(select_win)
-  local row = vim.o.lines - #text - vim.o.cmdheight - (vim.o.laststatus ~= 0 and 1 or 0) - (border ~= 'none' and 2 or 0)
-  vim.api.nvim_win_set_config(
-    select_win,
-    { height = #text, relative = 'editor', row = row, col = win_config.col } -- 4 counts for cmdline, statusline and 2 for the borders
-  )
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
   for i, _ in ipairs(text) do
     for _, pos in ipairs(col_start) do
