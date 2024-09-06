@@ -98,6 +98,7 @@ vim.ui.select = function(items, opts, on_choice)
 
   local current_win = vim.api.nvim_get_current_win()
   local height = math.max(math.min(vim.o.lines - vim.fn.screenrow() - 2, #items), 1)
+  local title = opts.prompt or 'Select one of:'
 
   local current_cursor = vim.o.guicursor
   local cursor_hl = 'HiddenCursor'
@@ -115,8 +116,8 @@ vim.ui.select = function(items, opts, on_choice)
   local select_win = create_win({
     bufnr = select_bufnr,
     height = height,
-    border = 'single',
-    title = opts.prompt or 'Select one of:',
+    border = border,
+    title = title,
     footer = string.format('(%s, %s)', select_opts[1], select_opts[#items] or '-'),
   })
   hide_cursor()
@@ -173,12 +174,15 @@ vim.ui.select = function(items, opts, on_choice)
       text[j] = (text[j] or '') .. (' '):rep(item_whitespace) .. choices[pos]
     end
   end
-  if #text ~= #choices then
-    vim.api.nvim_win_set_config(
-      select_win,
-      { height = #text, relative = 'editor', row = vim.o.lines - #text - 4, col = 0 } -- 4 counts for cmdline, statusline and 2 for the borders
-    )
+  if border == 'none' then
+    text = vim.list_extend({ title }, text)
   end
+  local win_config = vim.api.nvim_win_get_config(select_win)
+  local row = vim.o.lines - #text - vim.o.cmdheight - (vim.o.laststatus ~= 0 and 1 or 0) - (border ~= 'none' and 2 or 0)
+  vim.api.nvim_win_set_config(
+    select_win,
+    { height = #text, relative = 'editor', row = row, col = win_config.col } -- 4 counts for cmdline, statusline and 2 for the borders
+  )
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
   for i, _ in ipairs(text) do
     for _, pos in ipairs(col_start) do
