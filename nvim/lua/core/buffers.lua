@@ -164,7 +164,7 @@ local function move_through_buf_history(direction)
       return
     end
     local new_buf = jumplist[1][jumplistPos].bufnr
-    if new_buf ~= current_bufnr then
+    if new_buf ~= current_bufnr and vim.api.nvim_get_option_value('buftype', { buf = new_buf }) == '' then
       local jumps_count = (jumplistPos - jumplist[2] - 1) * direction
       local dir = direction == 1 and '<C-i>' or '<C-o>'
       vim.api.nvim_input(jumps_count .. dir)
