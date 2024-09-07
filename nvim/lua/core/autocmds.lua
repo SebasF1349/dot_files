@@ -46,19 +46,27 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   desc = "Don't auto comment after pressing enter in comment",
 })
 
-vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
-  pattern = 'term://*',
+vim.api.nvim_create_autocmd({ 'TermOpen' }, {
   callback = function(event)
-    vim.opt_local.filetype = 'terminal'
+    vim.opt.filetype = 'terminal'
     vim.cmd('startinsert')
-    vim.opt_local.number = false
-    vim.opt_local.relativenumber = false
+    vim.opt.number = false
+    vim.opt.relativenumber = false
     vim.opt.statuscolumn = ''
     vim.opt.wrap = true
     vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
   end,
   group = general,
   desc = 'Remove line numbers from terminal and start on insert',
+})
+
+vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  pattern = 'term://*',
+  callback = function()
+    vim.cmd('startinsert')
+  end,
+  group = general,
+  desc = 'Move to terminal on insert mode',
 })
 
 vim.api.nvim_create_autocmd('WinEnter', {
