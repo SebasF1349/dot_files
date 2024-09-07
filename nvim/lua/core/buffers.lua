@@ -135,14 +135,19 @@ end
 
 ---@param direction -1|1
 local function cycle_bufpin(direction)
-  if active_pinbuf == 0 or #pinbufs <= 1 then
+  if active_pinbuf == 0 or #pinbufs == 0 then
     return
   end
-  local next_pos = active_pinbuf + direction
-  if next_pos < 1 then
-    next_pos = #pinbufs
-  elseif next_pos > #pinbufs then
-    next_pos = 1
+  local next_pos
+  if direction == -1 and vim.api.nvim_get_current_buf() ~= pinbufs[active_pinbuf] then
+    next_pos = active_pinbuf
+  else
+    next_pos = active_pinbuf + direction
+    if next_pos < 1 then
+      next_pos = #pinbufs
+    elseif next_pos > #pinbufs then
+      next_pos = 1
+    end
   end
   move_to_bufpin(next_pos)
 end
