@@ -125,6 +125,12 @@ local function remove_other_bufpin()
       remove_pinbuf(i)
     end
   end
+  local curr_win = vim.api.nvim_get_current_win()
+  for _, winid in ipairs(vim.api.nvim_list_wins()) do
+    if winid ~= curr_win then
+      vim.api.nvim_win_close(winid, true)
+    end
+  end
 end
 
 ---@param direction -1|1
