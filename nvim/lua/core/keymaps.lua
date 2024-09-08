@@ -243,6 +243,9 @@ vim.keymap.set('c', '<space>', function()
       or vim.startswith(cmd_line, 'find')
       or vim.startswith(cmd_line, 'sfind')
     then
+      if not cmd_line:find(' ') then
+        return ' '
+      end
       local cmd_pos = vim.fn.getcmdpos()
       return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
     elseif cmd_line:match('\\V') then
