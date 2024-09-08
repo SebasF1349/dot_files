@@ -11,6 +11,11 @@ return {
 
     local slow_format_filetypes = {}
     local opts = {
+      formatters = {
+        ['markdown-toc'] = {
+          prepend_args = { '--bullets', '-' },
+        },
+      },
       formatters_by_ft = {
         lua = { 'stylua' },
         svelte = { 'prettierd', 'prettier', stop_after_first = true },
@@ -20,7 +25,7 @@ return {
         typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         css = { 'prettierd', 'prettier', stop_after_first = true },
         json = { 'prettierd', 'prettier', stop_after_first = true },
-        markdown = { 'prettierd', 'prettier', 'markdownlint', 'markdown-toc', stop_after_first = true },
+        markdown = { 'prettierd', 'prettier', 'markdownlint', 'markdown-toc' },
         html = { 'prettierd', 'prettier', stop_after_first = true },
         sh = { 'shfmt' },
         rust = { 'rustfmt' },
