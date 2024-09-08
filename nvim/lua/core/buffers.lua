@@ -179,7 +179,14 @@ local function move_through_buf_history(direction)
   end
 end
 
-vim.keymap.set('n', 'gbb', select_bufpin, { desc = 'Change Pinned [B]uffer' })
+vim.keymap.set('n', 'gbb', function()
+  local count = vim.v.count
+  if count ~= 0 and count <= #pinbufs then
+    move_to_bufpin(count)
+  else
+    select_bufpin()
+  end
+end, { desc = 'Change Pinned [B]uffer' })
 vim.keymap.set('n', ']p', function()
   cycle_bufpin(1)
 end, { desc = 'Next [P]in Buffer' })
