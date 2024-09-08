@@ -53,7 +53,8 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
     vim.opt.number = false
     vim.opt.relativenumber = false
     vim.opt.statuscolumn = ''
-    vim.opt.wrap = true
+    vim.wo.signcolumn = 'no'
+    vim.opt.buflisted = false
     vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
   end,
   group = general,
