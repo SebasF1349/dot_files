@@ -314,19 +314,50 @@ for key, direction in pairs(nav) do
 end
 
 local resize_dir = {
-  ['<'] = { dir = 'Left', key = '<LT>', desc = 'Resize Window [<]Smaller Horizontally' }, -- can't use < with nvim_input
-  ['>'] = { dir = 'Right', key = '>', desc = 'Resize Window [>]Bigger Horizontally' },
-  [','] = { dir = 'Up', key = '-', desc = 'Resize Window [<]Smaller Vertically' },
-  ['.'] = { dir = 'Down', key = '+', desc = 'Resize Window [<]Bigger Vertically' },
+  h = { key = '<', dir = 'Left', nv_key = '<LT>', inverted = 'l', desc = 'Resize Window [<]Smaller Horizontally' }, -- can't use < with nvim_input
+  l = { key = '>', dir = 'Right', nv_key = '>', inverted = 'h', desc = 'Resize Window [>]Bigger Horizontally' },
+  k = { key = ',', dir = 'Up', nv_key = '-', inverted = 'j', desc = 'Resize Window [<]Smaller Vertically' },
+  j = { key = '.', dir = 'Down', nv_key = '+', inverted = 'k', desc = 'Resize Window [<]Bigger Vertically' },
 }
 
----@param dir "<"|">"|","|"."
+-- copied from https://github.com/pogyomo/winresize.nvim/blob/main/lua/winresize.lua#L24
+---@param dir 'h' | 'j' | 'k' | 'l'
+---@return boolean # True if the window have neighbor to 'dir'.
+local function have_neighbor_to(dir)
+  local neighbor = vim.api.nvim_win_call(0, function()
+    vim.cmd.wincmd(dir)
+    return vim.api.nvim_get_current_win()
+  end)
+  return vim.api.nvim_get_current_win() ~= neighbor
+end
+
+---@param dir 'h' | 'j' | 'k' | 'l'
+local function resize_window(dir)
+  local amount = 5
+  local postfix = (dir == 'h' or dir == 'l') and 'width' or 'height'
+  local setter = vim.api['nvim_win_set_' .. postfix]
+  local getter = vim.api['nvim_win_get_' .. postfix]
+
+  -- Prevent statusline moves.
+  if postfix == 'height' and not have_neighbor_to('j') and not have_neighbor_to('k') then
+    return
+  end
+
+  if dir == 'h' or dir == 'k' then
+    dir = resize_dir[dir].inverted
+  end
+
+  local diff = have_neighbor_to(dir) and amount or -amount
+  setter(0, getter(0) + diff)
+end
+
+---@param dir 'h' | 'j' | 'k' | 'l'
 ---@return function
 local function resize(dir)
   return function()
     local win = vim.api.nvim_get_current_win()
     local height, width = vim.api.nvim_win_get_height(win), vim.api.nvim_win_get_width(win)
-    vim.api.nvim_input('5<C-w>' .. resize_dir[dir].key)
+    resize_window(dir)
     local new_height, new_width = vim.api.nvim_win_get_height(win), vim.api.nvim_win_get_width(win)
     if height == new_height and width == new_width then
       local cmd = vim.uv.os_uname().release:find('WSL') and 'wezterm.exe' or 'wezterm'
@@ -343,8 +374,8 @@ local function resize(dir)
   end
 end
 
-for key, content in pairs(resize_dir) do
-  vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', resize(key), { desc = content.desc })
+for dir, content in pairs(resize_dir) do
+  vim.keymap.set({ 'n', 't' }, '<C-' .. content.key .. '>', resize(dir), { desc = content.desc })
 end
 
 --------------------------------------------------
