@@ -3,6 +3,13 @@ return {
     'jakewvincent/mkdnflow.nvim',
     ft = { 'markdown' },
     config = function()
+      vim.keymap.set(
+        'n',
+        '<leader>mt',
+        'i<!-- toc --><ESC><cmd>w<CR>',
+        { desc = 'Add [M]arkdown [T]OC using markdown-toc' }
+      )
+
       require('mkdnflow').setup({
         modules = {
           bib = false,
@@ -97,7 +104,7 @@ return {
           MkdnGoBack = false,
           MkdnGoForward = false,
           MkdnCreateLink = false,
-          MkdnCreateLinkFromClipboard = { { 'n', 'x' }, '<leader>mp' }, -- see MkdnEnter
+          MkdnCreateLinkFromClipboard = false, -- { { 'n', 'x' }, '<leader>mp' }, -- see MkdnEnter
           MkdnFollowLink = false,
           MkdnDestroyLink = { 'n', '<A-CR>' },
           MkdnTagSpan = { 'x', '<A-CR>' },
@@ -134,7 +141,7 @@ return {
       vim.fn['mkdp#util#install']()
     end,
     config = function()
-      vim.keymap.set('n', '<leader>mt', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[M]arkdown Preview [T]oggle' })
+      vim.keymap.set('n', '<leader>mp', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[M]arkdown [P]review Toggle' })
     end,
   },
   {
