@@ -116,6 +116,7 @@ local function toggle_term(num)
     vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | term')
     term.buf_num = vim.api.nvim_get_current_buf()
     term.win_id = vim.api.nvim_get_current_win()
+    vim.api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = term.win_id, scope = 'local' })
   elseif term.win_id == -1 then
     vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | b' .. term.buf_num)
     term.win_id = vim.api.nvim_get_current_win()
