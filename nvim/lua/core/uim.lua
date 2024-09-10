@@ -173,7 +173,7 @@ vim.ui.select = function(items, opts, on_choice)
       if pos > #choices then
         break
       end
-      local item_whitespace = col_start[i] - vim.fn.strchars(text[j] or '')
+      local item_whitespace = col_start - vim.fn.strchars(text[j] or '')
       table.insert(hl[j], #(text[j] or '') + item_whitespace + 1)
       text[j] =
         string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choices[pos].option, choices[pos].item)
