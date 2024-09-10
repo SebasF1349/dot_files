@@ -133,7 +133,7 @@ vim.ui.select = function(items, opts, on_choice)
     option = option or '-'
     item = format_item(item)
     table.insert(choices, { option = option, item = item })
-    local charnr = vim.fn.strchars(option) + vim.fn.strchars(item) + 4 -- 4 because of the spaces I will add later
+    local charnr = vim.fn.strchars(option) + vim.fn.strchars(item) + 5 -- 5 because of the spaces I will add later
     if charnr > max_length then
       max_length = charnr
     end
@@ -161,16 +161,20 @@ vim.ui.select = function(items, opts, on_choice)
     on_choice(item, i)
   end
 
-  local col_start = {}
+  local hl = {}
   local text = {}
   for i = 1, number_columns do
-    table.insert(col_start, (whitespace + max_length) * (i - 1) + whitespace)
+    local col_start = (whitespace + max_length) * (i - 1) + whitespace
     for j = 1, number_lines do
+      if not hl[j] then
+        table.insert(hl, {})
+      end
       local pos = j + (i - 1) * number_lines
       if pos > #choices then
         break
       end
       local item_whitespace = col_start[i] - vim.fn.strchars(text[j] or '')
+      table.insert(hl[j], #(text[j] or '') + item_whitespace + 1)
       text[j] =
         string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choices[pos].option, choices[pos].item)
       if choices[pos].option ~= '-' then
@@ -184,9 +188,11 @@ vim.ui.select = function(items, opts, on_choice)
     text = vim.list_extend({ title }, text)
   end
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
-  for i, _ in ipairs(text) do
-    for _, pos in ipairs(col_start) do
-      vim.highlight.range(select_bufnr, select_ns, 'CursorLineNr', { i - 1, pos }, { i - 1, pos + 3 })
+  for i, line_hl in ipairs(hl) do
+    for _, col in ipairs(line_hl) do
+      local line = border == 'none' and i or i - 1
+      local col_end = two_letter_mode and col + 3 or col + 2
+      vim.highlight.range(select_bufnr, select_ns, 'DiagnosticInfo', { line, col }, { line, col_end })
     end
   end
 
