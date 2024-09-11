@@ -175,6 +175,13 @@ vim.ui.select = function(items, opts, on_choice)
       - (vim.o.laststatus ~= 0 and 1 or 0)
       - (win_opts.border ~= 'none' and 2 or 0)
     win_opts.col = vim.o.columns - win_opts.width
+  elseif position == 'center' then
+    number_columns = math.floor((vim.o.columns / 2) / (max_length + whitespace))
+    number_lines = math.ceil(#choices / number_columns)
+    win_opts.height = math.min(border == 'none' and #choices + 1 or #choices, vim.o.columns / 2)
+    win_opts.width = max_length * number_columns + whitespace
+    win_opts.row = vim.o.lines / 4
+    win_opts.col = (vim.o.columns - win_opts.width) / 2
   end
 
   local select_win = create_win(win_opts)
