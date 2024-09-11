@@ -174,7 +174,8 @@ vim.ui.select = function(items, opts, on_choice)
         break
       end
       local item_whitespace = col_start - vim.fn.strchars(text[j] or '')
-      table.insert(hl[j], #(text[j] or '') + item_whitespace + 1)
+      local col = #(text[j] or '') + item_whitespace + 1
+      table.insert(hl[j], { col, col + 1 + #choices[pos].option })
       text[j] =
         string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choices[pos].option, choices[pos].item)
       if choices[pos].option ~= '-' then
@@ -185,14 +186,13 @@ vim.ui.select = function(items, opts, on_choice)
     end
   end
   if border == 'none' then
-    text = vim.list_extend({ title }, text)
+    text = vim.list_extend({ title .. ' ' .. footer }, text)
+    hl = vim.list_extend({ { { #title + 1, #title + 1 + #footer } } }, hl)
   end
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
-  for i, line_hl in ipairs(hl) do
-    for _, col in ipairs(line_hl) do
-      local line = border == 'none' and i or i - 1
-      local col_end = two_letter_mode and col + 3 or col + 2
-      vim.highlight.range(select_bufnr, select_ns, 'DiagnosticInfo', { line, col }, { line, col_end })
+  for line, cols in ipairs(hl) do
+    for _, col in ipairs(cols) do
+      vim.highlight.range(select_bufnr, select_ns, 'DiagnosticInfo', { line - 1, col[1] }, { line - 1, col[2] })
     end
   end
 
