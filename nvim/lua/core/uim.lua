@@ -25,12 +25,12 @@ local border = 'none'
 ---@class WinOpts
 ---@field bufnr number
 ---@field height number
----@field width? number
+---@field width number
 ---@field border string
+---@field row number
+---@field col number
 ---@field title? string
 ---@field footer? string
----@field row? number
----@field column? number
 
 ---@param winOpts WinOpts
 ---@return integer
@@ -43,10 +43,10 @@ local function create_win(winOpts)
       - (winOpts.border ~= 'none' and 2 or 0)
   local winnr = vim.api.nvim_open_win(winOpts.bufnr, true, {
     relative = 'editor',
-    width = winOpts.width or vim.o.columns,
+    width = winOpts.width,
     height = winOpts.height,
     row = row,
-    col = winOpts.column or 0,
+    col = winOpts.col,
     zindex = 1000,
     style = 'minimal',
     border = winOpts.border,
@@ -225,7 +225,7 @@ vim.ui.input = function(opts, on_confirm)
       width = #opts.prompt,
       border = 'none',
       row = vim.o.lines,
-      column = 0,
+      col = 0,
     })
     vim.api.nvim_buf_set_lines(title_bufnr, 0, 1, false, { opts.prompt .. ' ' })
     vim.api.nvim_set_option_value('filetype', 'uiinputtitle', { buf = title_bufnr })
@@ -243,7 +243,7 @@ vim.ui.input = function(opts, on_confirm)
     border = border,
     title = opts.prompt,
     row = row,
-    column = column,
+    col = column,
   })
   vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
   vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
