@@ -20,6 +20,8 @@ vim.ui.open = (function(overridden)
   end
 end)(vim.ui.open)
 
+---@type 'bottom' | 'right' | 'center' | 'cursor'
+local position = 'right'
 local border = 'none'
 
 ---@class WinOpts
@@ -138,17 +140,44 @@ vim.ui.select = function(items, opts, on_choice)
       max_length = charnr
     end
   end
-  local whitespace = 3
-  local number_columns = math.floor(vim.o.columns / (max_length + whitespace))
-  local number_lines = math.ceil(#choices / number_columns)
 
-  local select_win = create_win({
+  local whitespace = 3
+  local footer = string.format('(%s, %s)', choices[1].option, choices[#choices].option)
+  local win_opts = {
     bufnr = select_bufnr,
-    height = border == 'none' and number_lines + 1 or number_lines,
     border = border,
     title = title,
-    footer = string.format('(%s, %s)', choices[1].option, choices[#choices].option),
-  })
+    footer = footer,
+  }
+  local number_columns = 0
+  local number_lines = 0
+
+  if position == 'bottom' then
+    number_columns = math.floor(vim.o.columns / (max_length + whitespace))
+    number_lines = math.ceil(#choices / number_columns)
+    win_opts.height =
+      math.max(math.min(vim.o.lines - vim.fn.screenrow() - 2, border == 'none' and number_lines + 1 or number_lines), 1)
+    win_opts.width = vim.o.columns
+    win_opts.row = vim.o.lines
+      - win_opts.height
+      - vim.o.cmdheight
+      - (vim.o.laststatus ~= 0 and 1 or 0)
+      - (win_opts.border ~= 'none' and 2 or 0)
+    win_opts.col = 0
+  elseif position == 'right' then
+    number_columns = 1
+    number_lines = #choices
+    win_opts.height = border == 'none' and #choices + 1 or #choices
+    win_opts.width = max_length
+    win_opts.row = vim.o.lines
+      - win_opts.height
+      - vim.o.cmdheight
+      - (vim.o.laststatus ~= 0 and 1 or 0)
+      - (win_opts.border ~= 'none' and 2 or 0)
+    win_opts.col = vim.o.columns - win_opts.width
+  end
+
+  local select_win = create_win(win_opts)
 
   local function select_and_close(i)
     vim.api.nvim_del_autocmd(autocmd_id)
