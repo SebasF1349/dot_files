@@ -168,7 +168,7 @@ vim.ui.select = function(items, opts, on_choice)
     number_columns = 1
     number_lines = #choices
     win_opts.height = border == 'none' and #choices + 1 or #choices
-    win_opts.width = max_length
+    win_opts.width = max_length + whitespace
     win_opts.row = vim.o.lines
       - win_opts.height
       - vim.o.cmdheight
