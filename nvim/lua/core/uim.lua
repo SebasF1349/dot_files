@@ -286,9 +286,33 @@ vim.ui.input = function(opts, on_confirm)
     vim.api.nvim_set_option_value('winblend', 0, { win = title_win })
     win_opts.col = #opts.prompt
     win_opts.row = vim.o.lines
-    win_opts.height = 1
     win_opts.width = vim.o.columns - win_opts.col
     win_opts.border = 'none'
+  elseif input_position == 'bottom' then
+    win_opts.width = vim.o.columns
+    win_opts.row = vim.o.lines
+      - win_opts.height
+      - vim.o.cmdheight
+      - (vim.o.laststatus ~= 0 and 1 or 0)
+      - (win_opts.border ~= 'none' and 2 or 0)
+    win_opts.col = 0
+  elseif input_position == 'right' then
+    win_opts.width = math.floor(vim.o.columns / 3)
+    win_opts.row = vim.o.lines
+      - win_opts.height
+      - vim.o.cmdheight
+      - (vim.o.laststatus ~= 0 and 1 or 0)
+      - (win_opts.border ~= 'none' and 2 or 0)
+    win_opts.col = vim.o.columns - win_opts.width
+  elseif input_position == 'center' then
+    win_opts.width = math.floor(vim.o.columns / 3)
+    win_opts.row = vim.o.lines / 4
+    win_opts.col = (vim.o.columns - win_opts.width) / 2
+  elseif input_position == 'cursor' then
+    win_opts.relative = 'cursor'
+    win_opts.width = math.floor(vim.o.columns / 4)
+    win_opts.row = 1
+    win_opts.col = 0
   end
 
   local input_win = create_win(win_opts)
