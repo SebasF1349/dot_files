@@ -21,8 +21,9 @@ vim.ui.open = (function(overridden)
 end)(vim.ui.open)
 
 ---@type 'bottom' | 'right' | 'center' | 'cursor'
-local position = 'right'
 local select_position = 'center'
+---@type 'cmdline' | 'bottom' | 'right' | 'center' | 'cursor'
+local input_position = 'cmdline'
 local border = 'none'
 
 ---@class WinOpts
@@ -256,7 +257,19 @@ vim.ui.input = function(opts, on_confirm)
   local column = 0
   local row = vim.o.lines - 1 - vim.o.cmdheight - (vim.o.laststatus ~= 0 and 1 or 0)
   local title_win
-  if border == 'none' then
+
+  local input_bufnr = vim.api.nvim_create_buf(false, true)
+  ---@type WinOpts
+  local win_opts = {
+    bufnr = input_bufnr,
+    height = 1,
+    width = vim.o.columns - column,
+    border = border,
+    title = opts.prompt,
+    row = row,
+    col = column,
+  }
+  if input_position == 'cmdline' then
     local title_bufnr = vim.api.nvim_create_buf(false, true)
     title_win = create_win({
       bufnr = title_bufnr,
@@ -271,19 +284,15 @@ vim.ui.input = function(opts, on_confirm)
     vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = title_bufnr })
     vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = title_win })
     vim.api.nvim_set_option_value('winblend', 0, { win = title_win })
-    column = column + #opts.prompt
-    row = vim.o.lines
+    win_opts.col = #opts.prompt
+    win_opts.row = vim.o.lines
+    win_opts.height = 1
+    win_opts.width = vim.o.columns - win_opts.col
+    win_opts.border = 'none'
   end
-  local input_bufnr = vim.api.nvim_create_buf(false, true)
-  local input_win = create_win({
-    bufnr = input_bufnr,
-    height = 1,
-    width = vim.o.columns - column,
-    border = border,
-    title = opts.prompt,
-    row = row,
-    col = column,
-  })
+
+  local input_win = create_win(win_opts)
+
   vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
   vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
   vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
