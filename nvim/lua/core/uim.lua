@@ -253,7 +253,7 @@ vim.ui.input = function(opts, on_confirm)
   local current_win = vim.api.nvim_get_current_win()
 
   local column = 0
-  local row
+  local row = vim.o.lines - 1 - vim.o.cmdheight - (vim.o.laststatus ~= 0 and 1 or 0)
   local title_win
   if border == 'none' then
     local title_bufnr = vim.api.nvim_create_buf(false, true)
