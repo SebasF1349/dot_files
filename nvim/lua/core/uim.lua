@@ -38,18 +38,11 @@ local border = 'none'
 ---@param winOpts WinOpts
 ---@return integer
 local function create_win(winOpts)
-  local row = winOpts.row
-    or vim.o.lines
-      - winOpts.height
-      - vim.o.cmdheight
-      - (vim.o.laststatus ~= 0 and 1 or 0)
-      - (winOpts.border ~= 'none' and 2 or 0)
-  local winnr = vim.api.nvim_open_win(winOpts.bufnr, true, {
-    relative = 'editor',
+  return vim.api.nvim_open_win(winOpts.bufnr, true, {
     relative = winOpts.relative or 'editor',
     width = winOpts.width,
     height = winOpts.height,
-    row = row,
+    row = winOpts.row,
     col = winOpts.col,
     zindex = 1000,
     style = 'minimal',
@@ -58,7 +51,6 @@ local function create_win(winOpts)
     footer = winOpts.footer,
     noautocmd = true,
   })
-  return winnr
 end
 
 local autocmd_id
