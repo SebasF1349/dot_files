@@ -22,6 +22,7 @@ end)(vim.ui.open)
 
 ---@type 'bottom' | 'right' | 'center' | 'cursor'
 local position = 'right'
+local select_position = 'center'
 local border = 'none'
 
 ---@class WinOpts
@@ -146,7 +147,7 @@ vim.ui.select = function(items, opts, on_choice)
   local number_columns = 0
   local number_lines = 0
 
-  if position == 'bottom' then
+  if select_position == 'bottom' then
     number_columns = math.floor(vim.o.columns / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
     win_opts.height =
@@ -158,7 +159,7 @@ vim.ui.select = function(items, opts, on_choice)
       - (vim.o.laststatus ~= 0 and 1 or 0)
       - (win_opts.border ~= 'none' and 2 or 0)
     win_opts.col = 0
-  elseif position == 'right' then
+  elseif select_position == 'right' then
     number_columns = 1
     number_lines = #choices
     win_opts.height = border == 'none' and #choices + 1 or #choices
@@ -169,14 +170,14 @@ vim.ui.select = function(items, opts, on_choice)
       - (vim.o.laststatus ~= 0 and 1 or 0)
       - (win_opts.border ~= 'none' and 2 or 0)
     win_opts.col = vim.o.columns - win_opts.width
-  elseif position == 'center' then
+  elseif select_position == 'center' then
     number_columns = math.floor((vim.o.columns / 2) / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
     win_opts.height = math.min(border == 'none' and #choices + 1 or #choices, vim.o.columns / 2)
     win_opts.width = max_length * number_columns + whitespace
     win_opts.row = vim.o.lines / 4
     win_opts.col = (vim.o.columns - win_opts.width) / 2
-  elseif position == 'cursor' then
+  elseif select_position == 'cursor' then
     number_columns = math.floor((vim.o.columns / 2) / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
     win_opts.relative = 'cursor'
