@@ -33,6 +33,7 @@ local border = 'none'
 ---@field col number
 ---@field title? string
 ---@field footer? string
+---@field relative? string
 
 ---@param winOpts WinOpts
 ---@return integer
@@ -45,6 +46,7 @@ local function create_win(winOpts)
       - (winOpts.border ~= 'none' and 2 or 0)
   local winnr = vim.api.nvim_open_win(winOpts.bufnr, true, {
     relative = 'editor',
+    relative = winOpts.relative or 'editor',
     width = winOpts.width,
     height = winOpts.height,
     row = row,
@@ -182,6 +184,14 @@ vim.ui.select = function(items, opts, on_choice)
     win_opts.width = max_length * number_columns + whitespace
     win_opts.row = vim.o.lines / 4
     win_opts.col = (vim.o.columns - win_opts.width) / 2
+  elseif position == 'cursor' then
+    number_columns = math.floor((vim.o.columns / 2) / (max_length + whitespace))
+    number_lines = math.ceil(#choices / number_columns)
+    win_opts.relative = 'cursor'
+    win_opts.height = math.min(border == 'none' and #choices + 1 or #choices, vim.o.columns / 2)
+    win_opts.width = max_length * number_columns + whitespace
+    win_opts.row = 1
+    win_opts.col = 0
   end
 
   local select_win = create_win(win_opts)
