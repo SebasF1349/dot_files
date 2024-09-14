@@ -327,7 +327,7 @@ vim.ui.input = function(opts, on_confirm)
   vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
   vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
-  if border == 'none' then
+  if input_position == 'cmdline' then
     vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = input_win })
     vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
   end
