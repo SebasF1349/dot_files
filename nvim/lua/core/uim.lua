@@ -140,11 +140,16 @@ vim.ui.select = function(items, opts, on_choice)
 
   local whitespace = 3
   local footer = string.format('(%s, %s)', choices[1].option, choices[#choices].option)
+  ---@type WinOpts
   local win_opts = {
     bufnr = select_bufnr,
     border = border,
     title = title,
     footer = footer,
+    height = -1,
+    width = -1,
+    row = -1,
+    col = -1,
   }
   local number_columns = 0
   local number_lines = 0
