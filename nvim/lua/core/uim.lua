@@ -24,6 +24,7 @@ end)(vim.ui.open)
 local select_position = 'center'
 ---@type 'cmdline' | 'bottom' | 'right' | 'center' | 'cursor'
 local input_position = 'cmdline'
+---@type 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
 local border = 'none'
 
 ---@class WinOpts
