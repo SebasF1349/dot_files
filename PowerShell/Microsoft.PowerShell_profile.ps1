@@ -70,11 +70,13 @@ function gch {
 function gcb {
 	git git checkout -b $args
 }
-function gP {
-	git push $args
-}
 function gp {
-	git pull $args
+    $alias = $MyInvocation.InvocationName
+    if ($alias -ceq "gp") {
+        git pull $args
+    } elseif ($alias -ceq "gP"){
+        git push $args
+    }
 }
 function gf {
 	$CurrentBranch = Get-Git-CurrentBranch
@@ -99,3 +101,4 @@ function gdlc {
 
 # Prompt
 Invoke-Expression (&starship init powershell)
+
