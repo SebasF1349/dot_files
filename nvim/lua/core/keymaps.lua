@@ -504,11 +504,8 @@ end, { desc = 'Shows previous spelling suggestions' })
 local replace_chars =
   { a = 'á', e = 'é', i = 'í', o = 'ó', u = 'ú', A = 'Á', E = 'É', I = 'Í', O = 'Ó', U = 'Ú' }
 vim.keymap.set('n', "g'", function()
-  local col = vim.api.nvim_win_get_cursor(0)[2]
-  local line = vim.api.nvim_get_current_line()
-  local char_start = vim.str_utfindex(line, col + 1) -- needed to get multibyte chars like é
-  local char_end = vim.str_byteindex(line, col + 1)
-  local char = line:sub(char_start, char_end)
+  local line, col = vim.api.nvim_get_current_line(), vim.fn.col('.')
+  local char = line:sub(col, col + vim.str_utf_end(line, col))
   for k1, k2 in pairs(replace_chars) do
     if char == k1 then
       return 'r' .. k2
