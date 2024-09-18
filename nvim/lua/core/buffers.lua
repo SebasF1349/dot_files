@@ -89,11 +89,10 @@ local function select_bufpin()
   if #pinbufs == 0 then
     vim.notify('No pinned bufs', vim.log.levels.WARN)
   end
-  local bufpins = {}
-  for _, pinbuf in ipairs(pinbufs) do
-    table.insert(bufpins, vim.fn.fnamemodify(vim.api.nvim_buf_get_name(pinbuf), ':.'))
-  end
-  vim.ui.select(bufpins, { prompt = 'Select buffer:' }, function(_, selected)
+  local bufpins = vim.iter(pinbufs):map(function(item)
+    return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(item), ':.')
+  end)
+  vim.ui.select(bufpins:totable(), { prompt = 'Select buffer:' }, function(_, selected)
     if selected then
       move_to_bufpin(selected)
     end
