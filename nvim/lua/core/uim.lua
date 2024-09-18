@@ -226,7 +226,7 @@ vim.ui.select = function(items, opts, on_choice)
         string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choices[pos].option, choices[pos].item)
       if choices[pos].option ~= '-' then
         vim.keymap.set('n', choices[pos].option, function()
-          select_and_close(i)
+          select_and_close(pos)
         end, { buffer = select_bufnr })
       end
     end
