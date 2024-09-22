@@ -472,6 +472,10 @@ end)
 
 ---@param move? 1 | -1
 local spell_select = function(move)
+  if not vim.o.spell then
+    vim.notify('Spelling is OFF', vim.lsp.log_levels.WARN)
+    return
+  end
   if move == 1 then
     vim.cmd.normal({ ']s', bang = true })
   elseif move == -1 then
