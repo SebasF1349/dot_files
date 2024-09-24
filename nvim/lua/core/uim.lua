@@ -24,6 +24,8 @@ end)(vim.ui.open)
 local select_position = 'center'
 ---@type 'cmdline' | 'bottom' | 'right' | 'center' | 'cursor'
 local input_position = 'cmdline'
+---@type 'list' | 'intelligent'
+local key_opts = 'intelligent'
 ---@type 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
 local border = 'none'
 
@@ -82,6 +84,9 @@ end
 
 local select_ns = vim.api.nvim_create_namespace('select_ui')
 -- stylua: ignore
+local posible_chars = { 'z', 'y', 'x', 'w', 'v', 'u', 't', 's', 'r', 'q', 'p', 'o', 'n',
+                        'm', 'l', 'k', 'j', 'i', 'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a' }
+-- stylua: ignore
 local select_opts = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
                       'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
 ---@diagnostic disable-next-line: duplicate-set-field
@@ -120,9 +125,62 @@ vim.ui.select = function(items, opts, on_choice)
   ---@type Choice[]
   local choices = {}
   local max_length = -1
+  local selected = {}
+
+  local function get_number_chars(n)
+    if #items <= #posible_chars * n then
+      return n
+    end
+    return get_number_chars(n + 1)
+  end
+  local number_chars = get_number_chars(1)
+  local function get_opts(permutations)
+    local perm = {}
+    for _, p in ipairs(permutations) do
+      for _, c in ipairs(posible_chars) do
+        table.insert(perm, p .. c)
+      end
+    end
+    if #perm[1] == number_chars then
+      return perm
+    end
+    return get_opts(perm)
+  end
+  local permutations = get_opts({ '' })
+  local function choose_key(item, key)
+    if #key == number_chars then
+      if vim.list_contains(permutations, key) and not vim.list_contains(selected, key) then
+        table.insert(selected, key)
+        return key
+      end
+      return
+    end
+    for char in item:lower():gmatch('.') do
+      if not key:find(char) then
+        local returned = choose_key(item, key .. char)
+        if returned then
+          return returned
+        end
+      end
+    end
+  end
+
   for i, item in ipairs(items) do
+    item = format_item(item)
     local option
-    if two_letter_mode then
+    if key_opts == 'intelligent' then
+      option = choose_key(item, '')
+      table.insert(selected, option)
+      if not option then
+        for _, char in ipairs(permutations) do
+          if not vim.list_contains(selected, char) then
+            option = char
+            table.insert(selected, char)
+            break
+          end
+        end
+      end
+    elseif two_letter_mode then
       local first_letter = math.floor((i - 1) / #select_opts) + 1
       local second_letter = ((i - 1) % #select_opts) + 1
       option = select_opts[first_letter] .. select_opts[second_letter]
@@ -130,7 +188,6 @@ vim.ui.select = function(items, opts, on_choice)
       option = select_opts[i]
     end
     option = option or '-'
-    item = format_item(item)
     table.insert(choices, { option = option, item = item })
     local charnr = vim.fn.strchars(option) + vim.fn.strchars(item) + 5 -- 5 because of the spaces I will add later
     if charnr > max_length then
