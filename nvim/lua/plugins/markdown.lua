@@ -17,6 +17,7 @@ return {
           conceal = false,
           cursor = true,
           folds = true,
+          foldtext = true,
           links = true,
           lists = true,
           maps = true,
@@ -78,6 +79,27 @@ return {
           in_progress = '-',
           complete = 'X',
         },
+        foldtext = { -- adding this table breaks the foldetext - I don't like the default but don't know how to change it
+          object_count = true,
+          object_count_icon_set = 'emoji',
+          object_count_opts = function()
+            return require('mkdnflow').foldtext.default_count_opts()
+          end,
+          line_count = true,
+          line_percentage = true,
+          word_count = true,
+          title_transformer = function()
+            require('mkdnflow').foldtext.default_title_transformer()
+          end,
+          separator = ' · ',
+          fill_chars = {
+            left_edge = '─',
+            right_edge = '─',
+            left_inside = ' ─',
+            right_inside = '─ ',
+            middle = '─',
+          },
+        },
         tables = {
           trim_whitespace = true,
           format_on_move = true,
@@ -127,8 +149,8 @@ return {
           MkdnTableNewRowAbove = { 'n', '<leader>mR' },
           MkdnTableNewColAfter = { 'n', '<leader>mc' },
           MkdnTableNewColBefore = { 'n', '<leader>mC' },
-          MkdnFoldSection = false,
-          MkdnUnfoldSection = false,
+          MkdnFoldSection = { 'n', '<leader>mf' },
+          MkdnUnfoldSection = { 'n', '<leader>mF' },
         },
       })
     end,
