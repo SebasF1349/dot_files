@@ -32,7 +32,6 @@ set cdpath=,.,~/src,~/
 set clipboard=unnamed,unnamedplus
 set cmdheight=1
 set complete=.,w,b,u,t
-set cscopeverbose
 set diffopt=internal,filler
 set display=lastline
 set formatoptions=tcqj
@@ -69,94 +68,6 @@ set viewoptions-=options
 let &viminfo='!,'.&viminfo
 let g:vimsyn_embed='l'
 set cursorline
-
-" DIRECTORIES
-
-" These don't always necessarily exist in Neovim,
-" but are convenient to have for Stdpath()
-
-if ! exists('$XDG_CACHE_HOME')
-  if has('win32')
-    let $XDG_CACHE_HOME=$TEMP
-  else
-    let $XDG_CACHE_HOME=$HOME . '/.cache'
-  endif
-endif
-
-if ! exists('$XDG_CONFIG_HOME')
-  if has('win32')
-    let $XDG_CONFIG_HOME=$LOCALAPPDATA
-  else
-    let $XDG_CONFIG_HOME=$HOME . '/.config'
-  endif
-endif
-
-if ! exists('$XDG_DATA_HOME')
-  if has('win32')
-    let $XDG_DATA_HOME=$LOCALAPPDATA
-  else
-    let $XDG_DATA_HOME=$HOME . '/.local/share'
-  endif
-endif
-
-" Similar to nvim's stdpath(id)
-" Unfortunately, user functions can't use lowercase
-function! Stdpath(id)
-  if a:id == 'data'
-    if has('win32')
-      return $XDG_DATA_HOME . '/nvim-data'
-    else
-      return $XDG_DATA_HOME . '/nvim'
-    endif
-  elseif a:id == 'data_dirs'
-    return []
-  elseif a:id == 'config'
-    return $XDG_CONFIG_HOME . '/nvim'
-  elseif a:id == 'config_dirs' return []
-  elseif a:id == 'cache'
-    return $XDG_CACHE_HOME . '/nvim'
-  else
-    throw '"' . a:id . '" is not a valid stdpath'
-  endif
-endfunction
-
-let s:datadir   = Stdpath('data')
-let s:configdir = Stdpath('config')
-
-" backupdir isn't set exactly like Neovim, because it's odd.
-let &backupdir = s:datadir . '/backup//'
-let &viewdir   = s:datadir . '/view//'
-if ! executable('nvim')
-  let &directory = s:datadir . '/swap//'
-  let &undodir   = s:datadir . '/undo//'
-else
-  " Vim/Neovim have different file formats
-  let &directory = s:datadir . '/vimswap//'
-  let &undodir   = s:datadir . '/vimundo//'
-endif
-
-let s:shadadir   = s:datadir  . '/shada'
-let &viminfofile.= s:shadadir . '/viminfo'
-
-" Neovim creates directories if they don't exist
-function! s:MakeDirs()
-  for dir in [&backupdir, &directory, &undodir, &viewdir, s:shadadir]
-    call mkdir(dir, "p")
-  endfor
-endfunction
-autocmd VimEnter * call s:MakeDirs()
-
-" Add user config dirs to search paths
-function! s:fixpath(path)
-  let l:pathprefix  = s:configdir . ',' . s:datadir . '/site,'
-  let l:pathpostfix = ',' . s:datadir . '/site/after,' . s:configdir . '/after'
-  let l:fullpath = l:pathprefix . a:path . l:pathpostfix
-  " Remove .vim
-  return substitute(l:fullpath, ','.$HOME.'\/\.vim\(/after\)\?', '', 'g')
-endfunction
-
-let &packpath     = s:fixpath(&packpath)
-let &runtimepath  = s:fixpath(&runtimepath)
 
 " AUTOCMD
 
@@ -399,14 +310,6 @@ if executable('rg') == 1
 endif
 
 " LOAD init.vim
-
-" If this is the .vimrc, not a plugin, then load init.vim
-if $MYVIMRC == expand('<sfile>:p')
-  let $MYVIMRC = s:configdir . '/init.vim'
-  if filereadable($MYVIMRC)
-    source $MYVIMRC
-  endif
-endif
 
 if &exrc && filereadable('.nvimrc')
   source .nvimrc
