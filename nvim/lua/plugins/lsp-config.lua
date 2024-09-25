@@ -74,14 +74,11 @@ return {
     end,
   },
   { 'dmmulroy/ts-error-translator.nvim', ft = { 'typescript', 'svelte' }, opts = {} },
+  { 'artemave/workspace-diagnostics.nvim' },
+  { 'felpafel/inlay-hint.nvim' }, -- check nvim-lsp-endhints to show inlay hints only in current line
   {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPost', 'BufNewFile' },
-    dependencies = {
-      'hrsh7th/cmp-nvim-lsp',
-      'artemave/workspace-diagnostics.nvim',
-      'felpafel/inlay-hint.nvim', -- check nvim-lsp-endhints to show inlay hints only in current line
-    },
     config = function()
       -- add border to the floating windows
       require('lspconfig.ui.windows').default_options = {
@@ -95,6 +92,85 @@ return {
         group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
         callback = function(event)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if not client then
+            return
+          end
+
+          vim.api.nvim_create_autocmd({ 'InsertEnter' }, {
+            callback = function()
+              vim.lsp.completion.trigger()
+            end,
+          })
+          -- based on https://github.com/neovim/neovim/issues/29225#issuecomment-2159428607 (autocmd breaks snippets)
+          vim.api.nvim_create_autocmd('CompleteChanged', {
+            buffer = event.buf,
+            callback = function()
+              local info = vim.fn.complete_info({ 'selected' })
+              local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
+              if not completionItem then
+                return
+              end
+
+              local resolvedItem = vim.lsp.buf_request_sync(
+                event.buf,
+                vim.lsp.protocol.Methods.completionItem_resolve,
+                completionItem,
+                500
+              ) or {}
+
+              local docs = vim.tbl_get(resolvedItem[event.data.client_id], 'result', 'documentation', 'value') or ''
+
+              local winData = vim.api.nvim__complete_set(info['selected'], { info = docs })
+              if not winData.winid or not vim.api.nvim_win_is_valid(winData.winid) then
+                return
+              end
+
+              if docs == '' then
+                vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Float', { win = winData.winid })
+                return
+              end
+
+              vim.api.nvim_set_option_value('winhighlight', 'Normal:NormalFloat', { win = winData.winid })
+              vim.treesitter.start(winData.bufnr, 'markdown')
+              vim.wo[winData.winid].conceallevel = 3
+            end,
+          })
+          vim.lsp.completion.enable(true, event.data.client_id, event.buf, { autotrigger = true })
+          vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert', 'fuzzy', 'popup' }
+          vim.keymap.set({ 'i', 's' }, '<C-l>', function()
+            if vim.fn.pumvisible() ~= 0 then
+              return '<C-y>'
+            elseif vim.snippet.active({ direction = 1 }) then
+              return '<cmd>lua vim.snippet.jump(1)<cr>'
+            else
+              vim.lsp.completion.trigger()
+            end
+          end, { desc = 'Select, Expand and Jump Snippet', expr = true })
+          vim.keymap.set({ 'i', 's' }, '<C-h>', function()
+            if vim.snippet.active({ direction = -1 }) then
+              return '<cmd>lua vim.snippet.jump(-1)<cr>'
+            else
+              return '<C-h>'
+            end
+          end, { desc = 'Jump Snippet Backwards', expr = true })
+          vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text' })
+          vim.keymap.set('i', '<BS>', function()
+            return vim.fn.pumvisible() ~= 0 and '<BS><cmd>lua vim.lsp.completion.trigger()<CR>' or '<BS>'
+          end, { desc = 'Retrigger completion when deleting', expr = true })
+          vim.keymap.set(
+            'i',
+            '<C-Space>',
+            vim.lsp.completion.trigger,
+            { silent = true, desc = 'Trigger LSP Completion' }
+          )
+          vim.keymap.set('i', '<CR>', function()
+            if vim.fn.pumvisible() ~= 0 then
+              return '<C-e><CR>'
+            else
+              return '<CR>'
+            end
+          end, { desc = 'Accept selected or new line', expr = true })
+          -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
             require('inlay-hint').setup()
@@ -170,9 +246,8 @@ return {
         end,
       })
 
-      -- used to enable autocompletion (assign to every lsp server config)
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities()) or {}
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
 
       for server_name, server in pairs(servers) do
         -- to avoid double lsp server, as java lsp is launched by the jdtls extension

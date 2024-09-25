@@ -5,7 +5,6 @@ return {
     'mfussenegger/nvim-dap',
     'williamboman/mason.nvim',
     'neovim/nvim-lspconfig',
-    'hrsh7th/cmp-nvim-lsp',
   },
   ft = 'java',
   config = function()
@@ -40,6 +39,9 @@ return {
       end
       return cmd
     end
+
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
 
     local config = function()
       return {
@@ -93,7 +95,7 @@ return {
             },
           },
         },
-        capabilities = require('cmp_nvim_lsp').default_capabilities(),
+        capabilities = capabilities,
         dap = { hotcodereplace = 'auto', config_overrides = {} },
         dap_main = {},
       }

@@ -42,9 +42,9 @@ vim.opt.shortmess = 'aoOstTWIcCF'
 
 -- Set completeopt to have a better completion experience
 if nvim_version.is_nightly() then
-  vim.o.completeopt = 'menu,menuone,fuzzy,popup'
+  vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy,popup'
 else
-  vim.o.completeopt = 'menu,menuone,popup'
+  vim.o.completeopt = 'menu,menuone,noinsert,noselect'
 end
 
 -- Slight transparency - I like this ones but don't play with catppuccin
