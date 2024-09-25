@@ -18,10 +18,6 @@ require('lazy').setup({ { import = 'plugins' } }, {
   change_detection = {
     notify = false,
   },
-  ui = {
-    border = 'rounded',
-    backdrop = 100,
-  },
   defaults = {
     lazy = true,
     version = false,

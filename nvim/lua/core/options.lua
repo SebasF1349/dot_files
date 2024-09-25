@@ -100,15 +100,6 @@ vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldtext = ''
 vim.opt.foldlevelstart = 99
 
--- add borders to floating windows
-local _border = 'rounded'
-vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-  border = _border,
-})
-vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-  border = _border,
-})
-
 -- Nicer and less noicy signcolumn
 vim.opt.signcolumn = 'yes'
 vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
@@ -121,7 +112,6 @@ vim.opt.cursorlineopt = 'number'
 vim.diagnostic.config({
   underline = false,
   float = {
-    border = _border,
     scope = 'cursor',
     severity_sort = true,
     source = true,

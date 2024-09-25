@@ -67,7 +67,6 @@ return {
             package_pending = '➜',
             package_uninstalled = '✗',
           },
-          border = 'rounded',
           height = 0.8,
         },
       })
@@ -80,11 +79,6 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPost', 'BufNewFile' },
     config = function()
-      -- add border to the floating windows
-      require('lspconfig.ui.windows').default_options = {
-        border = 'single',
-      }
-
       local is_windows = vim.fn.has('win32') ~= 0
       vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (is_windows and ';' or ':') .. vim.env.PATH
 

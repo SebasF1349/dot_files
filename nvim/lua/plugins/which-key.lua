@@ -5,8 +5,7 @@ return {
     local which_key = require('which-key')
 
     which_key.setup({
-      win = { border = 'rounded' },
-      icons = { rules = false },
+      icons = { rules = false, mappings = false },
       plugins = { spelling = { enabled = false } },
     })
 
