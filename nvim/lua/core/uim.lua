@@ -1,5 +1,5 @@
 vim.ui.open = (function(overridden)
-  return function(path)
+  return function(path, opt)
     vim.validate({
       path = { path, 'string' },
     })
@@ -16,7 +16,7 @@ vim.ui.open = (function(overridden)
         path = ('https://google.com/search?q=%s'):format(path)
       end
     end
-    overridden(path)
+    overridden(path, opt)
   end
 end)(vim.ui.open)
 
