@@ -174,18 +174,14 @@ return {
             end, { desc = 'LSP: [T]oggle [I]nlay Hints' })
           end
 
-          -- Diagnostic keymaps
-          if not nvim_version.is_nightly() then
-            vim.keymap.set('n', '[d', function()
-              ---@diagnostic disable-next-line: deprecated
-              vim.diagnostic.goto_prev()
-              vim.api.nvim_feedkeys('zz', 'n', false)
-            end, { desc = 'LSP: Go to previous [D]iagnostic message' })
-            vim.keymap.set('n', ']d', function()
-              ---@diagnostic disable-next-line: deprecated
-              vim.diagnostic.goto_next()
-              vim.api.nvim_feedkeys('zz', 'n', false)
-            end, { desc = 'LSP: Go to next [D]iagnostic message' })
+          local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
+          local next_diag, prev_diag = ts_repeat_move.make_repeatable_move_pair(function()
+            vim.diagnostic.jump({ count = 1 })
+          end, function()
+            vim.diagnostic.jump({ count = -1 })
+          end)
+          vim.keymap.set('n', ']d', next_diag, { desc = 'LSP: Go to next [D]iagnostic message' })
+          vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message' })
           end
 
           vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings' })
