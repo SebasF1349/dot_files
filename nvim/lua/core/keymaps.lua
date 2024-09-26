@@ -517,10 +517,19 @@ local spell_select = function(move)
     vim.notify('Spelling is OFF', vim.lsp.log_levels.WARN)
     return
   end
+
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+
   if move == 1 then
     vim.cmd.normal({ ']s', bang = true })
   elseif move == -1 then
     vim.cmd.normal({ '[s', bang = true })
+  end
+
+  local new_cursor_pos = vim.api.nvim_win_get_cursor(0)
+  if move and cursor_pos[1] == new_cursor_pos[1] and cursor_pos[2] == new_cursor_pos[2] then
+    vim.notify('No more words to fix', vim.lsp.log_levels.WARN)
+    return
   end
 
   if vim.v.count > 0 then
