@@ -427,6 +427,41 @@ for _, pair in ipairs(surround) do
 end
 
 --------------------------------------------------
+-- Substitute
+--------------------------------------------------
+
+local function opfunc(func_name)
+  return function()
+    vim.o.operatorfunc = 'v:lua.' .. func_name
+    return 'g@'
+  end
+end
+
+-- based on https://www.reddit.com/r/neovim/comments/xrwo05/comment/ja7oyqy/
+---@param mode "char"|"line"|"block"
+function _G.Substitute(mode)
+  local reg = vim.fn.getreg('"')
+  local starting = vim.api.nvim_buf_get_mark(0, '[')
+  local ending = vim.api.nvim_buf_get_mark(0, ']')
+  if mode == 'char' then
+    vim.api.nvim_buf_set_text(0, starting[1] - 1, starting[2], ending[1] - 1, ending[2] + 1, { reg })
+  elseif mode == 'line' then
+    vim.api.nvim_buf_set_lines(0, starting[1] - 1, ending[1], true, { reg })
+  elseif mode == 'block' then
+    for i = starting[1] - 1, ending[1] - 1 do
+      vim.api.nvim_buf_set_text(0, i, starting[2], i, ending[2] + 1, { reg })
+    end
+  end
+end
+
+vim.keymap.set(
+  { 'n', 'v' },
+  'S',
+  opfunc('_G.Substitute'),
+  { desc = '[S]ubstitute Operator', silent = true, expr = true }
+)
+
+--------------------------------------------------
 -- Notetaking
 --------------------------------------------------
 
