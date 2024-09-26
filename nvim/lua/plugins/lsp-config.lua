@@ -203,6 +203,32 @@ return {
             end
           end, { desc = 'LSP: [O]rganize Imports' })
 
+          -- based on https://github.com/mfussenegger/nvim-qwahl/blob/main/lua/qwahl.lua#L446C1-L468C4
+          ---@param bufnr? integer 0 for current buffer; nil for all diagnostic
+          ---@param opts? {lnum?: integer, severity?: vim.diagnostic.Severity} See vim.diagnostic.get
+          local function select_diagnostic(bufnr, opts)
+            local diagnostics = vim.diagnostic.get(bufnr, opts)
+            local ui_opts = {
+              prompt = 'Diagnostic: ',
+              format_item = function(d)
+                local signs = { ' ', ' ', '', ' ' }
+                local bufname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
+                return string.format('%s%s (%s)', signs[d.severity], d.message, bufname)
+              end,
+            }
+            local win = vim.api.nvim_get_current_win()
+            vim.ui.select(diagnostics, ui_opts, function(d)
+              if d then
+                vim.api.nvim_set_current_buf(d.bufnr)
+                vim.api.nvim_win_set_cursor(win, { d.lnum + 1, d.col })
+                vim.api.nvim_win_call(win, function()
+                  vim.cmd('normal! zvzz')
+                end)
+              end
+            end)
+          end
+          vim.keymap.set('n', 'grl', select_diagnostic)
+
           local ok_wd, wd = pcall(require, 'workspace-diagnostics')
           if ok_wd then
             wd.populate_workspace_diagnostics(client, event.buf)
