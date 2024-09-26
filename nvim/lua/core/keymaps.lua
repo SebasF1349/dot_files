@@ -394,19 +394,25 @@ local surround = {
   { '_', '_' },
 }
 for _, pair in ipairs(surround) do
-  vim.keymap.set('n', 'ys' .. pair[1], function()
-    local word = vim.fn.expand('<cword>') -- to avoid populating registers
-    return '"_ciw' .. pair[1] .. word .. pair[2] .. '<ESC>'
-  end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
+  vim.keymap.set(
+    'n',
+    'ys' .. pair[1],
+    '"sciw' .. pair[1] .. '<C-r>s' .. pair[2] .. '<ESC>',
+    { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']' }
+  )
 
-  vim.keymap.set('x', 'S' .. pair[1], function()
-    return ':s/\\v%V(\\s*)(.*)%V/\\1' .. pair[1] .. '\\2' .. pair[2] .. '<CR>'
-  end, { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']', expr = true })
+  vim.keymap.set('x', 's', '<NOP>', { desc = 'Disable v_s to be able to use surround' })
+  vim.keymap.set(
+    'x',
+    's' .. pair[1],
+    '"sc' .. pair[1] .. '<C-r>s' .. pair[2] .. '<ESC>',
+    { desc = '[S]urround with [' .. pair[1] .. ']' }
+  )
 
   vim.keymap.set(
     'n',
     'ds' .. pair[1],
-    'di' .. pair[1] .. 'vhP',
+    '"sci' .. pair[1] .. '<BS><Del><C-r>s',
     { desc = '[D]elete [S]urrounding [' .. pair[1] .. ']' }
   )
 
@@ -414,7 +420,7 @@ for _, pair in ipairs(surround) do
     vim.keymap.set(
       'n',
       'cs' .. pair[1] .. replace[1],
-      'di' .. pair[1] .. 'vh"_c' .. replace[1] .. '<C-r>"' .. replace[2],
+      '"sci' .. pair[1] .. '<BS><Del>' .. replace[1] .. '<C-r>s' .. replace[2],
       { desc = '[C]hange [S]urround [' .. pair[1] .. '] with [' .. replace[1] .. ']' }
     )
   end
