@@ -1,4 +1,3 @@
-local nvim_version = require('utils.nvim-version')
 local lsp_mappings = require('plugins.lsp.lsp-packages').lspconfig_to_package
 local servers = require('plugins.lsp.servers')
 
@@ -182,7 +181,56 @@ return {
           end)
           vim.keymap.set('n', ']d', next_diag, { desc = 'LSP: Go to next [D]iagnostic message' })
           vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message' })
+
+          -- Move to next/prev reference IN THE BUFFER
+          ---@param direction 1 | -1
+          local function move_reference(direction)
+            vim.lsp.buf.references(nil, {
+              on_list = function(options)
+                local current_buffer = vim.api.nvim_buf_get_name(0)
+                local current_position = vim.api.nvim_win_get_cursor(0)
+                current_position[2] = current_position[2] + 1
+                local items = vim
+                  .iter(options.items)
+                  :filter(function(item)
+                    return item.filename == current_buffer
+                  end)
+                  :totable()
+                if #items == 0 then
+                  vim.notify('No references in the buffer', vim.lof.levels.INFO)
+                  return
+                end
+                local next_reference
+                if direction == 1 then
+                  next_reference = vim.iter(items):find(function(item)
+                    return (item.lnum == current_position[1] and item.col > current_position[2])
+                      or (item.lnum > current_position[1])
+                  end)
+                  if not next_reference then
+                    next_reference = items[1]
+                  end
+                else
+                  next_reference = vim.iter(options.items):rfind(function(item)
+                    return (item.lnum == current_position[1] and item.col < current_position[2])
+                      or (item.lnum < current_position[1])
+                  end)
+                  if not next_reference then
+                    next_reference = items[#items]
+                  end
+                end
+                vim.api.nvim_win_set_cursor(0, {
+                  next_reference.lnum,
+                  next_reference.col - 1,
+                })
+              end,
+            })
           end
+          vim.keymap.set('n', ']r', function()
+            move_reference(1)
+          end, { desc = 'LSP: Go to next [R]eference' })
+          vim.keymap.set('n', '[r', function()
+            move_reference(-1)
+          end, { desc = 'LSP: Go to previous [R]eference' })
 
           vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings' })
           vim.keymap.set('n', 'gre', vim.diagnostic.open_float, { desc = 'LSP: Open Floating [E]rror Message' })
