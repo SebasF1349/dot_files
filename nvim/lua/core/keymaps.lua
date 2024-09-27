@@ -218,6 +218,7 @@ vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forwar
 -- stylua: ignore
 vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark for easier return' })
 
+-- maybe replace with https://github.com/yujinyuz/vms.nvim if needed (range aware)
 vim.keymap.set('c', '/', function()
   if vim.fn.getcmdtype() ~= ':' then
     return '/'
@@ -225,7 +226,6 @@ vim.keymap.set('c', '/', function()
   local cmd_line = vim.fn.getcmdline()
   local cmds = { 's', 'g', 'v' }
   for _, cmd in ipairs(cmds) do
-    -- find better regex for various ranges (https://github.com/wincent/loupe/blob/9189e7fa2d9dd54f4f0211c5edfdd6260252fe4b/autoload/loupe/private.vim#L67)
     if cmd_line == cmd or cmd_line == '%' .. cmd or cmd_line == "'<,'>" .. cmd then
       return '/\\v'
     end
