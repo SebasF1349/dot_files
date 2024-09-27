@@ -692,7 +692,6 @@ end
 
 ---@param selectItemOpts SelectItemOpts
 local function openSelectedWin(selectItemOpts)
-  vim.print('hey')
   local wins = {}
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == '' and vim.o.filetype ~= 'qf' then
@@ -934,6 +933,7 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- use qf to list buffers and/or open buffers
 -- use more the api and less cmd/vim.fn
 -- use more keepjumps in cmd (https://github.com/ronakg/quickr-preview.vim/blob/master/after/ftplugin/qf.vim#L190)
+-- https://yutkat.github.io/my-neovim-pluginlist/quickfix_location.html
 
 -- location list
 -- make every qf feature available for location windows too (qf.vim)
