@@ -136,6 +136,13 @@ vim.keymap.set({ 'n', 't' }, 'tt', function()
   toggle_term(1)
 end, { desc = '[T]oggle [T]erminal 1' })
 
+vim.keymap.set({ 'n', 't' }, 'tb', function()
+  local win = (terms[1].win_id and terms[1].win_id ~= -1) and terms[1].win_id or terms[2].win_id
+  if win and win ~= -1 and vim.api.nvim_win_is_valid(win) then
+    vim.api.nvim_set_current_win(win)
+  end
+end, { desc = 'Move to [T]erminal [B]uffer ' })
+
 vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
 local function scroll_to_end(bufnr, winid)
