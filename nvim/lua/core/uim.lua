@@ -28,6 +28,8 @@ local input_position = 'cmdline'
 local key_opts = 'intelligent'
 ---@type 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
 local border = 'none'
+---@type 'left' | 'center' | 'right'.
+local title_pos = 'center'
 
 ---@class WinOpts
 ---@field bufnr number
@@ -37,6 +39,7 @@ local border = 'none'
 ---@field row number
 ---@field col number
 ---@field title? string
+---@field title_pos? string
 ---@field footer? string
 ---@field relative? string
 
@@ -53,6 +56,7 @@ local function create_win(winOpts)
     style = 'minimal',
     border = winOpts.border,
     title = winOpts.title,
+    title_pos = winOpts.title_pos,
     footer = winOpts.footer,
     noautocmd = true,
   })
@@ -203,6 +207,7 @@ vim.ui.select = function(items, opts, on_choice)
     bufnr = select_bufnr,
     border = border,
     title = title,
+    title_pos = title_pos,
     footer = footer,
     height = -1,
     width = -1,
@@ -330,6 +335,7 @@ vim.ui.input = function(opts, on_confirm)
     width = vim.o.columns - column,
     border = border,
     title = opts.prompt,
+    title_pos = title_pos,
     row = row,
     col = column,
   }
