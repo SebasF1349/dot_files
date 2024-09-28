@@ -196,7 +196,8 @@ vim.ui.select = function(items, opts, on_choice)
   end
 
   local whitespace = 3
-  local footer = string.format('(%s, %s)', choices[1].option, choices[#choices].option)
+  local footer = key_opts ~= 'intelligent' and string.format('(%s, %s)', choices[1].option, choices[#choices].option)
+    or ''
   ---@type WinOpts
   local win_opts = {
     bufnr = select_bufnr,
