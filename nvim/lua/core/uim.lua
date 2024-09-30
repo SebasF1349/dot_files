@@ -21,34 +21,42 @@ vim.ui.open = (function(overridden)
 end)(vim.ui.open)
 
 ---@class uim.OptsSelect
----@field position 'bottom' | 'right' | 'center' | 'cursor'
----@field border 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
----@field title_pos 'left' | 'center' | 'right'
----@field keys_method 'list' | 'intelligent'
+---@field position? 'bottom' | 'right' | 'center' | 'cursor'
+---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
+---@field title_pos? 'left' | 'center' | 'right'
+---@field keys_method? 'list' | 'intelligent'
 
 ---@class uim.OptsInput
----@field position 'bottom' | 'right' | 'center' | 'cursor' | 'cmdline'
----@field border 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
----@field title_pos 'left' | 'center' | 'right'
+---@field position? 'bottom' | 'right' | 'center' | 'cursor' | 'cmdline'
+---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
+---@field title_pos? 'left' | 'center' | 'right'
 
 ---@class uim.Opts
 ---@field select uim.OptsSelect
 ---@field input uim.OptsInput
+---@field kind? table<string, uim.OptsSelect>
 local defaults = {
   select = {
     position = 'bottom',
-    border = 'single',
+    border = 'none',
     title_pos = 'center',
-    keys_method = 'intelligent',
+    keys_method = 'list',
   },
   input = {
-    position = 'bottom',
-    border = 'single',
+    position = 'cmdline',
+    border = 'none',
     title_pos = 'center',
   },
 }
 
-local config = {}
+---@class uim.Opts
+local config = {
+  kind = {
+    codeaction = {
+      keys_method = 'intelligent',
+    },
+  },
+}
 
 ---@type uim.Opts
 config = vim.tbl_deep_extend('force', {}, defaults, config or {})
@@ -124,6 +132,11 @@ vim.ui.select = function(items, opts, on_choice)
   opts = opts or {}
   local format_item = opts.format_item or tostring
 
+  local curr_conf = vim.deepcopy(config.select)
+  if config.kind and config.kind[opts.kind] then
+    curr_conf = vim.tbl_deep_extend('force', {}, curr_conf, config.kind[opts.kind])
+  end
+
   local two_letter_mode = #items > #select_opts
 
   local current_win = vim.api.nvim_get_current_win()
@@ -194,7 +207,7 @@ vim.ui.select = function(items, opts, on_choice)
   for i, item in ipairs(items) do
     item = format_item(item)
     local option
-    if config.select.keys_method == 'intelligent' then
+    if curr_conf.keys_method == 'intelligent' then
       option = choose_key(item, '')
       table.insert(selected, option)
       if not option then
@@ -222,15 +235,15 @@ vim.ui.select = function(items, opts, on_choice)
   end
 
   local whitespace = 3
-  local footer = config.select.keys_method ~= 'intelligent'
+  local footer = curr_conf.keys_method ~= 'intelligent'
       and string.format('(%s, %s)', choices[1].option, choices[#choices].option)
     or ''
   ---@type WinOpts
   local win_opts = {
     bufnr = select_bufnr,
-    border = config.select.border,
+    border = curr_conf.border,
     title = title,
-    title_pos = config.select.title_pos,
+    title_pos = curr_conf.title_pos,
     footer = footer,
     height = -1,
     width = -1,
@@ -240,14 +253,11 @@ vim.ui.select = function(items, opts, on_choice)
   local number_columns = 0
   local number_lines = 0
 
-  if config.select.position == 'bottom' then
+  if curr_conf.position == 'bottom' then
     number_columns = math.floor(vim.o.columns / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
     win_opts.height = math.max(
-      math.min(
-        vim.o.lines - vim.fn.screenrow() - 2,
-        config.select.border == 'none' and number_lines + 1 or number_lines
-      ),
+      math.min(vim.o.lines - vim.fn.screenrow() - 2, curr_conf.border == 'none' and number_lines + 1 or number_lines),
       1
     )
     win_opts.width = vim.o.columns
@@ -257,10 +267,10 @@ vim.ui.select = function(items, opts, on_choice)
       - (vim.o.laststatus ~= 0 and 1 or 0)
       - (win_opts.border ~= 'none' and 2 or 0)
     win_opts.col = 0
-  elseif config.select.position == 'right' then
+  elseif curr_conf.position == 'right' then
     number_columns = 1
     number_lines = #choices
-    win_opts.height = config.select.border == 'none' and #choices + 1 or #choices
+    win_opts.height = curr_conf.border == 'none' and #choices + 1 or #choices
     win_opts.width = max_length + whitespace
     win_opts.row = vim.o.lines
       - win_opts.height
@@ -268,18 +278,18 @@ vim.ui.select = function(items, opts, on_choice)
       - (vim.o.laststatus ~= 0 and 1 or 0)
       - (win_opts.border ~= 'none' and 2 or 0)
     win_opts.col = vim.o.columns - win_opts.width
-  elseif config.select.position == 'center' then
+  elseif curr_conf.position == 'center' then
     number_columns = math.floor((vim.o.columns / 2) / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
-    win_opts.height = math.min(config.select.border == 'none' and number_lines + 1 or number_lines, vim.o.columns / 2)
+    win_opts.height = math.min(curr_conf.border == 'none' and number_lines + 1 or number_lines, vim.o.columns / 2)
     win_opts.width = max_length * number_columns + whitespace
     win_opts.row = vim.o.lines / 4
     win_opts.col = (vim.o.columns - win_opts.width) / 2
-  elseif config.select.position == 'cursor' then
+  elseif curr_conf.position == 'cursor' then
     number_columns = math.floor((vim.o.columns / 2) / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
     win_opts.relative = 'cursor'
-    win_opts.height = math.min(config.select.border == 'none' and number_lines + 1 or number_lines, vim.o.columns / 2)
+    win_opts.height = math.min(curr_conf.border == 'none' and number_lines + 1 or number_lines, vim.o.columns / 2)
     win_opts.width = max_length * number_columns + whitespace
     win_opts.row = 1
     win_opts.col = 0
@@ -322,7 +332,7 @@ vim.ui.select = function(items, opts, on_choice)
       end
     end
   end
-  if config.select.border == 'none' then
+  if curr_conf.border == 'none' then
     text = vim.list_extend({ title .. ' ' .. footer }, text)
     hl = vim.list_extend({ { { #title + 1, #title + 1 + #footer } } }, hl)
   end
