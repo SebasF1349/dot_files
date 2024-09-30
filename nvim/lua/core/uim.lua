@@ -32,8 +32,8 @@ end)(vim.ui.open)
 ---@field title_pos? 'left' | 'center' | 'right'
 
 ---@class uim.Opts
----@field select uim.OptsSelect
----@field input uim.OptsInput
+---@field select? uim.OptsSelect
+---@field input? uim.OptsInput
 ---@field kind? table<string, uim.OptsSelect>
 local defaults = {
   select = {
@@ -49,7 +49,7 @@ local defaults = {
   },
 }
 
----@class uim.Opts
+---@type uim.Opts
 local config = {
   kind = {
     codeaction = {
@@ -132,7 +132,7 @@ vim.ui.select = function(items, opts, on_choice)
   opts = opts or {}
   local format_item = opts.format_item or tostring
 
-  local curr_conf = vim.deepcopy(config.select)
+  local curr_conf = vim.deepcopy(config.select) or {}
   if config.kind and config.kind[opts.kind] then
     curr_conf = vim.tbl_deep_extend('force', {}, curr_conf, config.kind[opts.kind])
   end
