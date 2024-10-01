@@ -74,11 +74,11 @@ vim.keymap.set('c', '<M-f>', '<S-Right>', { desc = 'Move one word to the right i
 vim.keymap.set('i', '<C-a>', '<C-o>^', { desc = 'Move to start of line in insert mode' })
 vim.keymap.set('i', '<C-e>', '<C-o>$', { desc = 'Move to end of line in insert mode' })
 
--- registers
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
 vim.keymap.set('n', 'dl', '0d$', { desc = '[D]elete [L]ine without newline' })
+vim.keymap.set('n', 'yl', '0y$', { desc = '[Y]ank [L]ine without newline' })
 
 -- better cmdline history
 vim.keymap.set('c', '<C-n>', function()
