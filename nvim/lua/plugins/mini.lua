@@ -34,20 +34,19 @@ return {
       local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
 
       for textobj_id, _ in pairs(custom_textobjects) do
-        for _, mode in ipairs({ 'n', 'x', 'o' }) do
-          for side, key in pairs({ left = textobj_id, right = textobj_id:upper() }) do
-            local next_text_object, prev_text_object = ts_repeat_move.make_repeatable_move_pair(function()
-              ---@diagnostic disable-next-line: undefined-global
-              MiniAi.move_cursor(side, 'a', textobj_id, { search_method = 'next' })
-            end, function()
-              ---@diagnostic disable-next-line: undefined-global
-              MiniAi.move_cursor(side, 'a', textobj_id, { search_method = 'prev' })
-            end)
-            -- stylua: ignore
-            vim.keymap.set(mode, ']' .. key, next_text_object, { desc = 'Move to Next ' .. side .. ' [' .. textobj_id .. '] Text Object' })
-            -- stylua: ignore
-            vim.keymap.set(mode, '[' .. key, prev_text_object, { desc = 'Move to Previous ' .. side .. ' [' .. textobj_id .. '] Text Object' })
+        for side, key in pairs({ left = textobj_id, right = textobj_id:upper() }) do
+          local next_text_object, prev_text_object = ts_repeat_move.make_repeatable_move_pair(function()
+            ---@diagnostic disable-next-line: undefined-global
+            MiniAi.move_cursor(side, 'a', textobj_id, { search_method = 'next' })
+          end, function()
+            ---@diagnostic disable-next-line: undefined-global
+            MiniAi.move_cursor(side, 'a', textobj_id, { search_method = 'prev' })
+          end)
+          local function desc(dir)
+            return ('Move to %s %s [%s] Text Object'):format(dir, side, textobj_id)
           end
+          vim.keymap.set({ 'n', 'x', 'o' }, ']' .. key, next_text_object, { desc = desc('Next') })
+          vim.keymap.set({ 'n', 'x', 'o' }, '[' .. key, prev_text_object, { desc = desc('Previous') })
         end
       end
     end,
