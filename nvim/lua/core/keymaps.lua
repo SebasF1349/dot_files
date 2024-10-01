@@ -386,6 +386,28 @@ for dir, content in pairs(resize_dir) do
 end
 
 --------------------------------------------------
+-- Zoom Window
+--------------------------------------------------
+
+-- lua translation from https://github.com/justinmk/config/blob/master/.config/nvim/plugin/winning.lua#L61C1-L80C56
+local zoom_restore
+local function zoom_toggle()
+  if vim.fn.winnr('$') == 1 then
+    return
+  end
+  if zoom_restore then
+    vim.cmd(zoom_restore)
+    zoom_restore = nil
+  else
+    zoom_restore = vim.fn.winrestcmd()
+    vim.cmd.wincmd('|')
+    vim.cmd.wincmd('_')
+  end
+end
+
+vim.keymap.set('n', '+', zoom_toggle, { desc = 'Toggle Window Zoom' })
+
+--------------------------------------------------
 -- Surround
 --------------------------------------------------
 
