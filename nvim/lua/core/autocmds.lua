@@ -151,6 +151,21 @@ vim.api.nvim_create_autocmd({ 'WinEnter' }, {
   desc = 'Return to previous window when closing another one',
 })
 
+-- https://www.reddit.com/r/neovim/comments/1fbxxuo/comment/lm4scjx/
+vim.api.nvim_create_autocmd('FocusGained', {
+  pattern = '*',
+  callback = function()
+    vim.o.cursorlineopt = 'both'
+    vim.cmd('redraw')
+    vim.defer_fn(function()
+      vim.o.cursorlineopt = 'number'
+      vim.cmd('redraw')
+    end, 300)
+  end,
+  group = general,
+  desc = 'Show where the cursor is',
+})
+
 local function show_toc()
   local bufname = vim.api.nvim_buf_get_name(0)
   local info = vim.fn.getloclist(0, { winid = 1 })
