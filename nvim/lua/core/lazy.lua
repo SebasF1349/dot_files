@@ -38,6 +38,7 @@ require('lazy').setup({ { import = 'plugins' } }, {
         'logipat',
         'matchit',
         'matchparen',
+        'netrwPlugin',
         'optwin',
         'rplugin',
         'rrhelper',
