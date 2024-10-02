@@ -2,6 +2,7 @@ return {
   'nvim-treesitter/nvim-treesitter',
   event = { 'BufReadPost', 'BufNewFile' },
   dependencies = {
+    -- how to lazy load matchup, I only really need it when pressing %
     'andymass/vim-matchup', --better %
   },
   build = ':TSUpdate',
@@ -15,9 +16,9 @@ return {
     })
 
     vim.g.matchup_matchparen_offscreen = {}
-    vim.g.matchup_surround_enabled = 1 -- NOTE: is it better than just cs({ ?
 
     require('nvim-treesitter.configs').setup({
+      -- NOTE: maybe replace with a custom function to reduce startup time
       ensure_installed = {
         -- langs
         'c',

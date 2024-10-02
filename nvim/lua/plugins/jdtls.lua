@@ -5,6 +5,7 @@ return {
     'mfussenegger/nvim-dap',
     'williamboman/mason.nvim',
     'neovim/nvim-lspconfig',
+    -- check JavaHello/spring-boot.nvim
   },
   ft = 'java',
   config = function()
@@ -107,15 +108,15 @@ return {
       require('jdtls').start_or_attach(config())
 
       -- codelens
-      pcall(vim.lsp.codelens.refresh)
-      vim.api.nvim_create_autocmd('BufWritePost', {
-        group = java_autocmd,
-        buffer = 0,
-        callback = function()
-          pcall(vim.lsp.codelens.refresh)
-        end,
-        desc = 'Refresh Codelens',
-      })
+      -- pcall(vim.lsp.codelens.refresh)
+      -- vim.api.nvim_create_autocmd('BufWritePost', {
+      --   group = java_autocmd,
+      --   buffer = 0,
+      --   callback = function()
+      --     pcall(vim.lsp.codelens.refresh)
+      --   end,
+      --   desc = 'Refresh Codelens',
+      -- })
     end
 
     vim.api.nvim_create_autocmd('FileType', {
