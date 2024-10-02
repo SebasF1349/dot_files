@@ -60,6 +60,8 @@ vim.keymap.set('n', '}', [[<cmd>call search('\n\n\s*\zs\S')<CR>]], { desc = 'Sta
 vim.keymap.set('n', "'", '`', { desc = "Swap ` with ' because is a better way to jump to marks" })
 vim.keymap.set('n', '`', "'", { desc = "Swap ` with ' because is a better way to jump to marks" })
 
+vim.keymap.set('x', '.', ':normal .<CR>', { desc = 'Use . to repeat last change in selection' })
+
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments line by line' })
 
 -- Add bash shortcuts for command line
