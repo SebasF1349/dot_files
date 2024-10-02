@@ -2,7 +2,6 @@
 -- Basics
 --------------------------------------------------
 
--- Remap Escape
 vim.keymap.set('i', 'jk', '<Esc>')
 
 -- Remaps for dealing with word wrap
@@ -170,6 +169,7 @@ local function run_term_command(cmd)
   vim.api.nvim_chan_send(terminal_job_id, cmd .. '\n')
 end
 
+-- NOTE: improve keymaps checking this plugin code: https://github.com/samharju/yeet.nvim/blob/master/lua/yeet/buffer.lua
 vim.keymap.set('n', 'crb', function()
   local build = { jdtls = 'mvn spring-boot:run' }
   for _, client in ipairs(vim.lsp.get_clients()) do
