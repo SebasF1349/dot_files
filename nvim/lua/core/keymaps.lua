@@ -76,6 +76,8 @@ vim.keymap.set('c', '<M-f>', '<S-Right>', { desc = 'Move one word to the right i
 vim.keymap.set('i', '<C-a>', '<C-o>^', { desc = 'Move to start of line in insert mode' })
 vim.keymap.set('i', '<C-e>', '<C-o>$', { desc = 'Move to end of line in insert mode' })
 
+vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
+
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
