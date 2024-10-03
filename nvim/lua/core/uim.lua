@@ -25,6 +25,8 @@ end)(vim.ui.open)
 ---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
 ---@field title_pos? 'left' | 'center' | 'right'
 ---@field keys_method? 'list' | 'intelligent'
+---@field possible_chars? string[]
+---@field ignore_chars? string[]
 
 ---@class uim.OptsInput
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor' | 'cmdline'
@@ -41,6 +43,10 @@ local defaults = {
     border = 'none',
     title_pos = 'center',
     keys_method = 'list',
+    -- stylua: ignore
+    possible_chars = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
+                      'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' },
+    ignore_chars = {},
   },
   input = {
     position = 'cmdline',
@@ -54,6 +60,9 @@ local config = {
   kind = {
     codeaction = {
       keys_method = 'intelligent',
+      -- stylua: ignore
+      possible_chars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' },
     },
   },
 }
@@ -117,12 +126,6 @@ local function close_mappings(bufnr, on_close)
 end
 
 local select_ns = vim.api.nvim_create_namespace('select_ui')
--- stylua: ignore
-local posible_chars = { 'z', 'y', 'x', 'w', 'v', 'u', 't', 's', 'r', 'q', 'p', 'o', 'n',
-                        'm', 'l', 'k', 'j', 'i', 'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a' }
--- stylua: ignore
-local select_opts = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
-                      'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.ui.select = function(items, opts, on_choice)
   vim.validate({
@@ -136,8 +139,6 @@ vim.ui.select = function(items, opts, on_choice)
   if config.kind and config.kind[opts.kind] then
     curr_conf = vim.tbl_deep_extend('force', {}, curr_conf, config.kind[opts.kind])
   end
-
-  local two_letter_mode = #items > #select_opts
 
   local current_win = vim.api.nvim_get_current_win()
   local title = opts.prompt or 'Select one of:'
@@ -165,6 +166,13 @@ vim.ui.select = function(items, opts, on_choice)
   local choices = {}
   local max_length = -1
   local selected = {}
+
+  local posible_chars = vim
+    .iter(curr_conf.possible_chars)
+    :filter(function(item)
+      return not vim.list_contains(curr_conf.ignore_chars, item)
+    end)
+    :totable()
 
   local function get_number_chars(n)
     if #items <= #posible_chars * n then
@@ -211,20 +219,16 @@ vim.ui.select = function(items, opts, on_choice)
       option = choose_key(item, '')
       table.insert(selected, option)
       if not option then
-        for _, char in ipairs(permutations) do
-          if not vim.list_contains(selected, char) then
-            option = char
-            table.insert(selected, char)
+        for j = #permutations, 1, -1 do
+          if not vim.list_contains(selected, permutations[j]) then
+            option = permutations[j]
+            table.insert(selected, permutations[j])
             break
           end
         end
       end
-    elseif two_letter_mode then
-      local first_letter = math.floor((i - 1) / #select_opts) + 1
-      local second_letter = ((i - 1) % #select_opts) + 1
-      option = select_opts[first_letter] .. select_opts[second_letter]
     else
-      option = select_opts[i]
+      option = permutations[i]
     end
     option = option or '-'
     table.insert(choices, { option = option, item = item })
