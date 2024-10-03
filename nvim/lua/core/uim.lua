@@ -174,6 +174,7 @@ vim.ui.select = function(items, opts, on_choice)
     end)
     :totable()
 
+  ---@param n number
   local function get_number_chars(n)
     if #items <= #posible_chars * n then
       return n
@@ -181,6 +182,8 @@ vim.ui.select = function(items, opts, on_choice)
     return get_number_chars(n + 1)
   end
   local number_chars = get_number_chars(1)
+  ---@param permutations string[]
+  ---@return string[]
   local function get_opts(permutations)
     local perm = {}
     for _, p in ipairs(permutations) do
@@ -194,10 +197,11 @@ vim.ui.select = function(items, opts, on_choice)
     return get_opts(perm)
   end
   local permutations = get_opts({ '' })
+  ---@param item string
+  ---@param key string
   local function choose_key(item, key)
     if #key == number_chars then
       if vim.list_contains(permutations, key) and not vim.list_contains(selected, key) then
-        table.insert(selected, key)
         return key
       end
       return
@@ -239,9 +243,8 @@ vim.ui.select = function(items, opts, on_choice)
   end
 
   local whitespace = 3
-  local footer = curr_conf.keys_method ~= 'intelligent'
-      and string.format('(%s, %s)', choices[1].option, choices[#choices].option)
-    or ''
+  local footer = curr_conf.keys_method == 'intelligent' and ''
+    or string.format('(%s, %s)', choices[1].option, choices[#choices].option)
   ---@type WinOpts
   local win_opts = {
     bufnr = select_bufnr,
