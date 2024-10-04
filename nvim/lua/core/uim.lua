@@ -105,7 +105,7 @@ local autocmd_id
 ---@param bufnr number
 ---@param on_close function
 local function close_mappings(bufnr, on_close)
-  vim.keymap.set('n', 'q', function()
+  vim.keymap.set('n', '<ESC>', function()
     on_close(nil)
   end, { buffer = bufnr })
   vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
