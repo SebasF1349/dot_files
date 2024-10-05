@@ -176,7 +176,7 @@ vim.ui.select = function(items, opts, on_choice)
 
   ---@param n number
   local function get_number_chars(n)
-    if #items <= #posible_chars * n then
+    if #items <= math.pow(#posible_chars, n) then
       return n
     end
     return get_number_chars(n + 1)
