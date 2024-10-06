@@ -1,0 +1,13 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+body {
+	height: 30px;
+	font-size: small;
+}
+
+:root [data-theme='catppuccin'] {
+	--base-font-family: JetBrainsMono Nerd Font;
+	--heading-font-family: JetBrainsMono Nerd Font;
+}
