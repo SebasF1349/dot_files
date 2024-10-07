@@ -4,7 +4,7 @@
 		BatteryOutput,
 		DateOutput,
 		GlazeWmOutput,
-		// NetworkOutput,
+		NetworkOutput,
 		WeatherOutput
 	} from 'zebar';
 	import * as zebar from 'zebar';
@@ -12,7 +12,7 @@
 	let battery = $state<BatteryOutput | null>();
 	let date = $state<DateOutput | null>();
 	let glazewm = $state<GlazeWmOutput | null>();
-	// let network = $state<NetworkOutput | null>();
+	let network = $state<NetworkOutput | null>();
 	let weather = $state<WeatherOutput | null>();
 
 	onMount(() => {
@@ -20,7 +20,7 @@
 			battery: { type: 'battery' },
 			date: { type: 'date', formatting: 'dd LLL HH:mm' },
 			glazewm: { type: 'glazewm' },
-			// network: { type: 'network' },
+			network: { type: 'network' },
 			weather: { type: 'weather', latitude: -39, longitude: -62 }
 		});
 
@@ -28,7 +28,7 @@
 			battery = providers.outputMap.battery;
 			date = providers.outputMap.date;
 			glazewm = providers.outputMap.glazewm;
-			// network = providers.outputMap.network;
+			network = providers.outputMap.network;
 			weather = providers.outputMap.weather;
 		});
 	});
@@ -60,14 +60,17 @@
 			{glazewm?.tilingDirection[0].toUpperCase()}
 		</button>
 		{#if glazewm}
-			{#each glazewm.currentWorkspaces as workspace, i}
-				<button
-					type="button"
-					class="chip h-fit py-0 {workspace.hasFocus
-						? 'preset-filled-primary-500'
-						: 'preset-outlined-primary-500'}"
-					onclick={() => glazewm?.runCommand('focus --workspace ' + (i + 1))}>{i + 1}</button
-				>
+			{#each glazewm.currentWorkspaces as workspace}
+				{#if workspace.children.length !== 0 || workspace.hasFocus}
+					<button
+						type="button"
+						class="chip h-fit py-0 {workspace.hasFocus
+							? 'preset-filled-primary-500'
+							: 'preset-outlined-primary-500'}"
+						onclick={() => glazewm?.runCommand('focus --workspace ' + workspace.name)}
+						>{workspace.name}</button
+					>
+				{/if}
 			{/each}
 		{/if}
 	</div>
@@ -78,7 +81,7 @@
 				{Math.round(weather.celsiusTemp)}°
 			</div>
 		{/if}
-		<!-- {#if network}
+		{#if network}
 			<div
 				class="badge-icon preset-filled {network.defaultInterface?.type == 'wifi'
 					? 'pr-1'
@@ -105,7 +108,7 @@
 					{network.defaultGateway?.signalStrength}
 				</div>
 			{/if}
-		{/if} -->
+		{/if}
 		{#if battery}
 			<div class="badge py-0 preset-filled">
 				{battery.chargePercent}
