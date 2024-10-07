@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { SplitContainer, Window } from 'glazewm';
 	import { onMount } from 'svelte';
 	import type {
 		BatteryOutput,
@@ -47,6 +48,34 @@
 		thunder_day: '',
 		thunder_night: ' '
 	};
+
+	const apps_icons = {
+		vivaldi: '󰖟 ',
+		windowsterminal: ' ',
+		wezterm: ' ',
+		webview: '󰜏 ',
+		code: ' ',
+		explorer: ' '
+	};
+
+	function getWorkspaceIcons(children: (SplitContainer | Window)[]) {
+		const icons = [];
+		for (const child of children) {
+			if (child.type !== 'window') {
+				continue;
+			}
+			const app = (Object.keys(apps_icons) as Array<keyof typeof apps_icons>).find((win) =>
+				child.processName.toLowerCase().includes(win)
+			);
+			if (app) {
+				icons.push(apps_icons[app]);
+			}
+		}
+		if (icons.length > 0) {
+			return ': ' + icons.join(' ');
+		}
+		return '';
+	}
 </script>
 
 <div class="flex h-full items-center justify-between px-4">
@@ -60,15 +89,16 @@
 			{glazewm?.tilingDirection[0].toUpperCase()}
 		</button>
 		{#if glazewm}
+			{console.log(glazewm.currentWorkspaces)}
 			{#each glazewm.currentWorkspaces as workspace}
 				{#if workspace.children.length !== 0 || workspace.hasFocus}
 					<button
 						type="button"
 						class="chip h-fit py-0 {workspace.hasFocus
 							? 'preset-filled-primary-500'
-							: 'preset-outlined-primary-500'}"
+							: 'preset-outlined-primary-500'} {workspace.children.length !== 0 ? 'pr-5' : ''}"
 						onclick={() => glazewm?.runCommand('focus --workspace ' + workspace.name)}
-						>{workspace.name}</button
+						>{workspace.name + getWorkspaceIcons(workspace.children)}</button
 					>
 				{/if}
 			{/each}
