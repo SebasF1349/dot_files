@@ -106,14 +106,14 @@
 	</div>
 	<div class="flex gap-4 justify-self-end">
 		{#if weather}
-			<div class="badge py-0 preset-filled">
+			<div class="badge h-fit py-0 preset-filled">
 				{weather_icons[weather.status]}&nbsp;
 				{Math.round(weather.celsiusTemp)}°
 			</div>
 		{/if}
 		{#if network}
 			<div
-				class="badge-icon preset-filled {network.defaultInterface?.type == 'wifi'
+				class="badge-icon h-fit preset-filled {network.defaultInterface?.type == 'wifi'
 					? 'pr-1'
 					: 'pr-1'}"
 			>
@@ -140,12 +140,12 @@
 			{/if}
 		{/if}
 		{#if battery}
-			<div class="badge py-0 preset-filled">
+			<div class="badge h-fit py-0 preset-filled">
 				{battery.chargePercent}
 			</div>
 		{/if}
 		{#if date}
-			<div class="badge py-0 preset-filled">
+			<div class="badge h-fit py-0 preset-filled">
 				{date.formatted}
 			</div>
 		{/if}
