@@ -264,7 +264,10 @@ vim.ui.select = function(items, opts, on_choice)
     number_columns = math.floor(vim.o.columns / (max_length + whitespace))
     number_lines = math.ceil(#choices / number_columns)
     win_opts.height = math.max(
-      math.min(vim.o.lines - vim.fn.screenrow() - 2, curr_conf.border == 'none' and number_lines + 1 or number_lines),
+      math.min(
+        vim.o.lines - vim.fn.screenrow() - 1 - vim.o.cmdheight,
+        curr_conf.border == 'none' and number_lines + 1 or number_lines
+      ),
       1
     )
     win_opts.width = vim.o.columns
