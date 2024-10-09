@@ -320,6 +320,9 @@ return {
           require('lspconfig')[server_name].setup(server)
         end
       end
+      require('lspconfig').dartls.setup({
+        cmd = { 'dart', 'language-server', '--protocol=lsp' },
+      })
     end,
   },
 }
