@@ -74,19 +74,28 @@
 		powerpnt: ''
 	};
 
-	function getWorkspaceIcons(children: (SplitContainer | Window)[]) {
-		const icons = [];
+	function getIcons(children: (SplitContainer | Window)[]): string[] {
+		let icons: string[] = [];
 		for (const child of children) {
-			if (child.type !== 'window') {
-				continue;
-			}
-			const app = (Object.keys(apps_icons) as Array<keyof typeof apps_icons>).find((win) =>
-				child.processName.toLowerCase().includes(win)
-			);
-			if (app) {
-				icons.push(apps_icons[app]);
+			if (child.type === 'split') {
+				const i = getIcons(child.children);
+				icons = icons.concat(i);
+			} else {
+				const app = (Object.keys(apps_icons) as Array<keyof typeof apps_icons>).find((win) =>
+					child.processName.toLowerCase().includes(win)
+				);
+				if (app) {
+					icons.push(apps_icons[app]);
+				} else {
+					icons.push(apps_icons['default']);
+				}
 			}
 		}
+		return icons;
+	}
+
+	function getWorkspaceIcons(children: (SplitContainer | Window)[]): string {
+		const icons = getIcons(children);
 		if (icons.length > 0) {
 			return ': ' + icons.join(' ');
 		}
