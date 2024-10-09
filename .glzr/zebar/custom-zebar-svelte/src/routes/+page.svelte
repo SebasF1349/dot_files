@@ -50,12 +50,28 @@
 	};
 
 	const apps_icons = {
+		default: '󰘔',
 		vivaldi: '󰖟 ',
+		firefox: '󰖟 ',
+		chrome: '󰖟 ',
 		windowsterminal: ' ',
 		wezterm: ' ',
 		webview: '󰜏 ',
 		code: ' ',
-		explorer: ' '
+		explorer: ' ',
+		sumatra: '',
+		discord: '󰙯',
+		spotify: '',
+		cbase: '󰡗',
+		scid: '󰡗',
+		chess: '󰡗',
+		zoom: '',
+		thunderbird: '󰇮',
+		taskmgr: '',
+		soffice: '', // TODO: use different icons for writer, calc, etc.
+		winword: '',
+		excel: '',
+		powerpnt: ''
 	};
 
 	function getWorkspaceIcons(children: (SplitContainer | Window)[]) {
@@ -131,6 +147,8 @@
 					{:else}
 						󰤨
 					{/if}
+				{:else}
+					󰛵
 				{/if}
 			</div>
 			{#if network.defaultInterface?.type == 'wifi'}
