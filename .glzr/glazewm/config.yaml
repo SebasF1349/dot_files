@@ -121,6 +121,31 @@ binding_modes:
           - commands: ["wm-disable-binding-mode --name pause"]
             bindings: ["alt+shift+p"]
 keybindings:
+    # Open apps
+    - commands: ['shell-exec C:\ProgramData\Microsoft\Windows\Start Menu\Programs\WezTerm.lnk']
+      bindings: ["lwin+enter"]
+    - commands:
+          [
+              'shell-exec C:\Users\ratab\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Discord Inc\Discord.lnk',
+          ]
+      bindings: ["lwin+d Discord"]
+    - commands: ['shell-exec C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Thunderbird.lnk']
+      bindings: ["lwin+e"]
+    - commands:
+          [
+              'shell-exec C:\Users\ratab\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Vivaldi.lnk',
+          ]
+      bindings: ["lwin+w"]
+    - commands:
+          [
+              'shell-exec C:\Users\ratab\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ChessBase 17.lnk',
+          ]
+      bindings: ["lwin+c"]
+    - commands:
+          [
+              'shell-exec C:\Users\ratab\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Spotify.lnk',
+          ]
+      bindings: ["lwin+s"]
     # Shift focus in a given direction.
     - commands: ["focus --direction left"]
       bindings: ["lwin+shift+h", "alt+left"]
@@ -194,20 +219,14 @@ keybindings:
     # - commands: ["wm-redraw"]
     #   bindings: ["alt+shift+w"]
 
-    # Launch CMD terminal. Alternatively, use `shell-exec wt` or
-    # `shell-exec %ProgramFiles%/Git/git-bash.exe` to start Windows
-    # Terminal and Git Bash respectively.
-    # - commands: ["shell-exec %ProgramFiles%/WezTerm/wezterm-gui.exe"]
-    - commands: ['shell-exec C:\ProgramData\Microsoft\Windows\Start Menu\Programs\WezTerm.lnk']
-      bindings: ["lwin+enter"]
     # Focus the next/previous workspace defined in `workspaces` config.
     - commands: ["focus --next-workspace"]
       bindings: ["lwin+n"]
     - commands: ["focus --prev-workspace"]
       bindings: ["lwin+p"]
     # Focus the workspace that last had focus.
-    - commands: ["focus --recent-workspace"]
-      bindings: ["lwin+d"]
+    # - commands: ["focus --recent-workspace"]
+    #   bindings: ["lwin+d"]
     # Change focus to a workspace defined in `workspaces` config.
     - commands: ["focus --workspace 1"]
       bindings: ["lwin+1"]
