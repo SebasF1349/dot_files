@@ -172,7 +172,7 @@ M = {
     end,
   },
 
-  emmet_ls = {
+  emmet_language_server = {
     settings = {
       filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'sass', 'scss', 'less', 'svelte' },
     },
