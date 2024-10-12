@@ -191,23 +191,14 @@ vim.lsp.handlers['$/progress'] = function(_, progress, ctx)
     return
   end
 
-  local out = ''
-
   local client = vim.lsp.get_client_by_id(ctx.client_id)
-  if client and client.name then
-    out = out .. '[' .. client.name .. ']'
-  end
+  local client_name = client and client.name and '[' .. client.name .. ']' or ''
 
-  local title = msg.title or ''
-  if title ~= '' then
-    out = out .. ' ' .. title
-  end
+  local title = msg.title and ' ' .. msg.title or ''
 
-  if msg.kind == 'end' then
-    out = out .. ' done'
-  elseif msg.kind == 'begin' then
-    out = out .. ' starting...'
-  end
+  local kind = msg.kind == 'end' and 'done' or 'starting...'
+
+  local out = string.format('%s%s %s', client_name, title, kind)
 
   vim.notify(out, vim.log.levels.INFO)
 end
