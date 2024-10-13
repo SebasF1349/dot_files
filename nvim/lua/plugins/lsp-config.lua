@@ -90,6 +90,7 @@ return {
           end
 
           vim.api.nvim_create_autocmd({ 'InsertEnter' }, {
+            buffer = event.buf,
             callback = function()
               vim.lsp.completion.trigger()
             end,
@@ -138,23 +139,23 @@ return {
             else
               vim.lsp.completion.trigger()
             end
-          end, { desc = 'Select, Expand and Jump Snippet', expr = true })
+          end, { desc = 'Select, Expand and Jump Snippet', expr = true, buffer = event.buf })
           vim.keymap.set({ 'i', 's' }, '<C-h>', function()
             if vim.snippet.active({ direction = -1 }) then
               return '<cmd>lua vim.snippet.jump(-1)<cr>'
             else
               return '<C-h>'
             end
-          end, { desc = 'Jump Snippet Backwards', expr = true })
-          vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text' })
+          end, { desc = 'Jump Snippet Backwards', expr = true, buffer = event.buf })
+          vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = event.buf })
           vim.keymap.set('i', '<BS>', function()
             return vim.fn.pumvisible() ~= 0 and '<BS><cmd>lua vim.lsp.completion.trigger()<CR>' or '<BS>'
-          end, { desc = 'Retrigger completion when deleting', expr = true })
+          end, { desc = 'Retrigger completion when deleting', expr = true, buffer = event.buf })
           vim.keymap.set(
             'i',
             '<C-Space>',
             vim.lsp.completion.trigger,
-            { silent = true, desc = 'Trigger LSP Completion' }
+            { silent = true, desc = 'Trigger LSP Completion', buffer = event.buf }
           )
           vim.keymap.set('i', '<CR>', function()
             if vim.fn.pumvisible() ~= 0 then
@@ -162,7 +163,7 @@ return {
             else
               return '<CR>'
             end
-          end, { desc = 'Accept selected or new line', expr = true })
+          end, { desc = 'Accept selected or new line', expr = true, buffer = event.buf })
           -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
@@ -170,7 +171,7 @@ return {
             vim.lsp.inlay_hint.enable(true)
             vim.keymap.set('n', '<leader>ti', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
-            end, { desc = 'LSP: [T]oggle [I]nlay Hints' })
+            end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
           end
 
           local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
@@ -179,8 +180,8 @@ return {
           end, function()
             vim.diagnostic.jump({ count = -1 })
           end)
-          vim.keymap.set('n', ']d', next_diag, { desc = 'LSP: Go to next [D]iagnostic message' })
-          vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message' })
+          vim.keymap.set('n', ']d', next_diag, { desc = 'LSP: Go to next [D]iagnostic message', buffer = event.buf })
+          vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
 
           -- Move to next/prev reference IN THE BUFFER
           ---@param direction 1 | -1
@@ -227,17 +228,37 @@ return {
           end
           vim.keymap.set('n', ']r', function()
             move_reference(1)
-          end, { desc = 'LSP: Go to next [R]eference' })
+          end, { desc = 'LSP: Go to next [R]eference', buffer = event.buf })
           vim.keymap.set('n', '[r', function()
             move_reference(-1)
-          end, { desc = 'LSP: Go to previous [R]eference' })
+          end, { desc = 'LSP: Go to previous [R]eference', buffer = event.buf })
 
-          vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings' })
-          vim.keymap.set('n', 'gre', vim.diagnostic.open_float, { desc = 'LSP: Open Floating [E]rror Message' })
-          vim.keymap.set('n', 'grd', '<C-]>', { desc = 'LSP: [G]oto [D]efinition' })
-          vim.keymap.set('n', 'gri', vim.lsp.buf.implementation, { desc = 'LSP: [G]oto [I]mplementation' })
-          vim.keymap.set('n', 'grt', vim.lsp.buf.type_definition, { desc = 'LSP: [G]oto [T]ype Definition' })
-          vim.keymap.set('n', 'grs', vim.lsp.buf.signature_help, { desc = 'LSP: [S]ignature Documentation on Hover' })
+          vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buffer = event.buf })
+          vim.keymap.set(
+            'n',
+            'gre',
+            vim.diagnostic.open_float,
+            { desc = 'LSP: Open Floating [E]rror Message', buffer = event.buf }
+          )
+          vim.keymap.set('n', 'grd', '<C-]>', { desc = 'LSP: [G]oto [D]efinition', buffer = event.buf })
+          vim.keymap.set(
+            'n',
+            'gri',
+            vim.lsp.buf.implementation,
+            { desc = 'LSP: [G]oto [I]mplementation', buffer = event.buf }
+          )
+          vim.keymap.set(
+            'n',
+            'grt',
+            vim.lsp.buf.type_definition,
+            { desc = 'LSP: [G]oto [T]ype Definition', buffer = event.buf }
+          )
+          vim.keymap.set(
+            'n',
+            'grs',
+            vim.lsp.buf.signature_help,
+            { desc = 'LSP: [S]ignature Documentation on Hover', buffer = event.buf }
+          )
 
           vim.keymap.set('n', 'gro', function()
             if vim.fn.exists(':OrganizeImports') > 0 then
@@ -249,7 +270,7 @@ return {
                 apply = true,
               })
             end
-          end, { desc = 'LSP: [O]rganize Imports' })
+          end, { desc = 'LSP: [O]rganize Imports', buffer = event.buf })
 
           -- based on https://github.com/mfussenegger/nvim-qwahl/blob/main/lua/qwahl.lua#L446C1-L468C4
           ---@param bufnr? integer 0 for current buffer; nil for all diagnostic
@@ -275,7 +296,7 @@ return {
               end
             end)
           end
-          vim.keymap.set('n', 'grl', select_diagnostic)
+          vim.keymap.set('n', 'grl', select_diagnostic, { desc = '[L]ist Diagnostics', buffer = event.buf })
 
           local ok_wd, wd = pcall(require, 'workspace-diagnostics')
           if ok_wd then
@@ -301,6 +322,7 @@ return {
             -- Clear highlight when detaching lsp (fix some lsp errors)
             vim.api.nvim_create_autocmd('LspDetach', {
               group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+              buffer = event.buf,
               callback = function(local_event)
                 vim.lsp.buf.clear_references()
                 vim.api.nvim_clear_autocmds({ group = 'lsp-highlight', buffer = local_event.buf })
