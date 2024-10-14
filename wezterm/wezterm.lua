@@ -33,10 +33,6 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 			opacity = 0.7,
 		},
 	}
-	wezterm.on("gui-startup", function(cmd)
-		local _, _, window = wezterm.mux.spawn_window(cmd or {})
-		window:gui_window():maximize()
-	end)
 elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
 	config.window_background_opacity = 0.9
 end
