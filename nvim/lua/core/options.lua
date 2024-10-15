@@ -1,16 +1,11 @@
 local nvim_version = require('utils.nvim-version')
 
--- Set highlight on search
 vim.o.hlsearch = false
 
--- Make line numbers default
 vim.opt.number = true
 vim.opt.relativenumber = true
 
--- Don't show the mode, since it's already in status line
 vim.opt.showmode = false
-
--- Don't show number of lines of characters selected
 vim.opt.showcmd = false
 
 -- Disable mouse mode
@@ -20,41 +15,31 @@ vim.keymap.set('', '<down>', '<nop>', { noremap = true })
 vim.keymap.set('i', '<up>', '<nop>', { noremap = true })
 vim.keymap.set('i', '<down>', '<nop>', { noremap = true })
 
--- Enable break indent
 vim.o.breakindent = true
 
--- Save undo history
 vim.o.undofile = true
-
--- Don't store backup while overwriting the file
 vim.o.backup = false
 vim.o.writebackup = false
 
--- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
--- Don't show `~` outside of buffer
 vim.o.fillchars = 'eob: '
 
--- Reduce command line messages
 vim.opt.shortmess = 'aoOstTWIcCF'
+vim.o.formatoptions = 'qjl1'
 
--- Set completeopt to have a better completion experience
 if nvim_version.is_nightly() then
   vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy,popup'
 else
   vim.o.completeopt = 'menu,menuone,noinsert,noselect'
 end
 
--- Slight transparency - I like this ones but don't play with catppuccin
--- vim.o.pumblend = 10 -- builtin completion
--- vim.o.winblend = 10 -- floating windows
-vim.o.pumheight = 10 -- popup
+vim.o.pumblend = 10
+vim.o.winblend = 10
+vim.o.pumheight = 10
 
--- Decreate update time
 vim.opt.updatetime = 250
--- Decrease mapped sequence wait time - Displays which-key popup sooner
 vim.opt.timeoutlen = 300
 
 vim.opt.tabstop = 4
@@ -69,14 +54,12 @@ vim.opt.linebreak = true
 vim.opt.textwidth = 0
 
 vim.opt.incsearch = true
--- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
 
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 20
 vim.opt.signcolumn = 'yes'
 
--- split windows
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
@@ -84,7 +67,6 @@ vim.opt.fileencoding = 'utf-8'
 
 vim.opt.iskeyword:append('-')
 
--- cmdline autocomplete
 vim.opt.wildchar = (''):byte()
 vim.opt.wildoptions = 'pum,tagfile,fuzzy'
 vim.opt.wildmode = 'longest:full,full'
@@ -94,7 +76,6 @@ vim.opt.wildmode = 'longest:full,full'
 
 vim.opt.smoothscroll = true
 
--- folds
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldlevelstart = 99
@@ -148,11 +129,9 @@ vim.opt.fillchars:append({
   foldsep = ' ',
 })
 
--- Nicer and less noicy signcolumn
 vim.opt.signcolumn = 'yes'
 vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
 
--- Change color to current line number
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = 'number'
 

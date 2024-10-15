@@ -291,4 +291,5 @@ vim.opt.fillchars:append({
   stl = '─',
   stlnc = '─',
 })
+vim.opt.ruler = false
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
