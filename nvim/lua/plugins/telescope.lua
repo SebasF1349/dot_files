@@ -4,9 +4,40 @@ return {
   },
   {
     'nvim-telescope/telescope-fzf-native.nvim',
-    build = 'make',
+    build = function(plugin)
+      if vim.fn.has('win32') == 0 then
+        local obj = vim.system({ 'cmake', '-S.', '-Bbuild', '-DCMAKE_BUILD_TYPE=Release' }, { cwd = plugin.dir }):wait()
+        if obj.code ~= 0 then
+          error(obj.stderr)
+        end
+        obj = vim.system({ 'cmake', '--build', 'build', '--config', 'Release' }, { cwd = plugin.dir }):wait()
+        if obj.code ~= 0 then
+          error(obj.stderr)
+        end
+        obj = vim.system({ 'cmake', '--install', 'build', '--prefix', 'build' }, { cwd = plugin.dir }):wait()
+        if obj.code ~= 0 then
+          error(obj.stderr)
+        end
+      else
+        vim.uv.fs_mkdir(plugin.dir .. '/build', 666, function()
+          vim.system({
+            'zig',
+            'cc',
+            '-O3',
+            '-Wall',
+            '-Werror',
+            '-fpic',
+            '-std=gnu99',
+            '-shared',
+            'src/fzf.c',
+            '-o',
+            'build/libfzf.dll',
+          }, { cwd = plugin.dir })
+        end)
+      end
+    end,
     cond = function()
-      return vim.fn.executable('make') == 1
+      return vim.fn.executable('cmake') == 1 or vim.fn.executable('zig') == 1
     end,
   },
   {
