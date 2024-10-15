@@ -354,11 +354,13 @@ local function resize_window(dir)
     return
   end
 
+  local diff
   if dir == 'h' or dir == 'k' then
-    dir = resize_dir[dir].inverted
+    diff = have_neighbor_to(resize_dir[dir].inverted) and -amount or amount
+  else
+    diff = have_neighbor_to(dir) and amount or -amount
   end
 
-  local diff = have_neighbor_to(dir) and amount or -amount
   setter(0, getter(0) + diff)
 end
 
