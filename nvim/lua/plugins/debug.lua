@@ -45,7 +45,13 @@ return {
     },
     {
       'microsoft/vscode-js-debug',
-      build = 'npm i && npm run compile vsDebugServerBundle && rm -rf out && mv -f dist out',
+      build = function()
+        if vim.fn.has('win32') == 0 then
+          return 'npm clean-install --legacy-peer-deps && npx gulp vsDebugServerBundle && move dist out'
+        else
+          return 'npm clean-install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out'
+        end
+      end,
     },
 
     -- Lua adapter.
