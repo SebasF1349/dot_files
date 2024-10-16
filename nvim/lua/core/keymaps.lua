@@ -254,23 +254,31 @@ local function get_fuzzy(cmd_line)
   end
 end
 
+local function fuzzy_find(cmd_line, cmd_pos)
+  local cmd_parsed = vim.api.nvim_parse_cmd(cmd_line, {})
+  if #cmd_parsed.args == 0 and cmd_parsed.nextcmd == '' then
+    return ' '
+  end
+  local next_cmd_pos = cmd_line:find('|')
+  if next_cmd_pos and cmd_pos > next_cmd_pos then
+    return fuzzy_find(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
+  end
+  local cmds = { 'edit', 'split', 'vsplit', 'find', 'sfind' }
+  if vim.list_contains(cmds, cmd_parsed.cmd) then
+    return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
+  else
+    return get_fuzzy(cmd_line)
+  end
+end
+
 vim.keymap.set('c', '<space>', function()
   local mode = vim.fn.getcmdtype()
   local cmd_line = vim.fn.getcmdline()
   if mode == '?' or mode == '/' then
     return get_fuzzy(cmd_line)
   elseif mode == ':' then
-    local cmd_parsed = vim.api.nvim_parse_cmd(cmd_line, {})
-    local cmds = { 'edit', 'split', 'vsplit', 'find', 'sfind' }
-    if vim.list_contains(cmds, cmd_parsed.cmd) then
-      if #cmd_parsed.args == 0 then
-        return ' '
-      end
-      local cmd_pos = vim.fn.getcmdpos()
-      return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
-    else
-      return get_fuzzy(cmd_line)
-    end
+    local cmd_pos = vim.fn.getcmdpos()
+    return fuzzy_find(cmd_line, cmd_pos)
   else
     return ' '
   end
