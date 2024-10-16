@@ -255,7 +255,10 @@ local function get_fuzzy(cmd_line)
 end
 
 local function fuzzy_find(cmd_line, cmd_pos)
-  local cmd_parsed = vim.api.nvim_parse_cmd(cmd_line, {})
+  local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
+  if not ok then
+    return ' '
+  end
   if #cmd_parsed.args == 0 and cmd_parsed.nextcmd == '' then
     return ' '
   end
