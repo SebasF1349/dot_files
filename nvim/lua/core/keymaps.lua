@@ -227,7 +227,10 @@ vim.keymap.set('c', '/', function()
     return '/'
   end
   local cmd_line = vim.fn.getcmdline()
-  local cmd_parsed = vim.api.nvim_parse_cmd(cmd_line, {})
+  local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
+  if not ok then
+    return ' '
+  end
   local cmds = { 'substitute', 'global', 'vglobal' }
   if vim.list_contains(cmds, cmd_parsed.cmd) and #cmd_parsed.args == 0 then
     return '/\\v'
