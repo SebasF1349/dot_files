@@ -222,20 +222,29 @@ vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forwar
 -- stylua: ignore
 vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark for easier return' })
 
-vim.keymap.set('c', '/', function()
-  if vim.fn.getcmdtype() ~= ':' then
-    return '/'
-  end
-  local cmd_line = vim.fn.getcmdline()
+local function add_magic(cmd_line, cmd_pos)
   local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
   if not ok then
-    return ' '
+    return '/'
+  end
+  local next_cmd_pos = cmd_line:find('|')
+  if next_cmd_pos and cmd_pos > next_cmd_pos then
+    return add_magic(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
   end
   local cmds = { 'substitute', 'global', 'vglobal' }
   if vim.list_contains(cmds, cmd_parsed.cmd) and #cmd_parsed.args == 0 then
     return '/\\v'
   end
   return '/'
+end
+
+vim.keymap.set('c', '/', function()
+  if vim.fn.getcmdtype() ~= ':' then
+    return '/'
+  end
+  local cmd_line = vim.fn.getcmdline()
+  local cmd_pos = vim.fn.getcmdpos()
+  return add_magic(cmd_line, cmd_pos)
 end, { desc = 'Add Very Magic to Cmdline Patterns', expr = true })
 
 local function get_fuzzy(cmd_line)
