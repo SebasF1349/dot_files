@@ -222,49 +222,54 @@ vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forwar
 -- stylua: ignore
 vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark for easier return' })
 
--- maybe replace with https://github.com/yujinyuz/vms.nvim if needed (range aware)
 vim.keymap.set('c', '/', function()
   if vim.fn.getcmdtype() ~= ':' then
     return '/'
   end
   local cmd_line = vim.fn.getcmdline()
-  local cmds = { 's', 'g', 'v' }
-  for _, cmd in ipairs(cmds) do
-    if cmd_line == cmd or cmd_line == '%' .. cmd or cmd_line == "'<,'>" .. cmd then
-      return '/\\v'
-    end
+  local cmd_parsed = vim.api.nvim_parse_cmd(cmd_line, {})
+  local cmds = { 'substitute', 'global', 'vglobal' }
+  if vim.list_contains(cmds, cmd_parsed.cmd) and #cmd_parsed.args == 0 then
+    return '/\\v'
   end
   return '/'
 end, { desc = 'Add Very Magic to Cmdline Patterns', expr = true })
+
+local function get_fuzzy(cmd_line)
+  local closed_fuzzy_block
+  local very_nomagic_pos = cmd_line:find('\\V')
+  local very_magic_pos = cmd_line:find('\\v')
+  local is_magic = very_nomagic_pos or very_magic_pos
+  if is_magic and is_magic ~= 1 then -- is_magic == 1 means I'm searching with / or ?
+    local divider = cmd_line:sub(is_magic - 1, is_magic - 1)
+    closed_fuzzy_block = cmd_line:find(divider, is_magic)
+  end
+  vim.print(very_magic_pos, very_nomagic_pos, closed_fuzzy_block)
+  if closed_fuzzy_block or not is_magic then
+    return ' '
+  elseif very_nomagic_pos then
+    return '\\.\\*' -- maybe change with non-greedy regex `\{-}`
+  elseif very_magic_pos then
+    return '.*'
+  end
+end
 
 vim.keymap.set('c', '<space>', function()
   local mode = vim.fn.getcmdtype()
   local cmd_line = vim.fn.getcmdline()
   if mode == '?' or mode == '/' then
-    if cmd_line:match('\\V') then
-      return '\\.\\*'
-    else
-      return '.*'
-    end
+    return get_fuzzy(cmd_line)
   elseif mode == ':' then
-    if
-      vim.startswith(cmd_line, 'edit')
-      or vim.startswith(cmd_line, 'split')
-      or vim.startswith(cmd_line, 'vsplit')
-      or vim.startswith(cmd_line, 'find')
-      or vim.startswith(cmd_line, 'sfind')
-    then
-      if not cmd_line:find(' ') then
+    local cmd_parsed = vim.api.nvim_parse_cmd(cmd_line, {})
+    local cmds = { 'edit', 'split', 'vsplit', 'find', 'sfind' }
+    if vim.list_contains(cmds, cmd_parsed.cmd) then
+      if #cmd_parsed.args == 0 then
         return ' '
       end
       local cmd_pos = vim.fn.getcmdpos()
       return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
-    elseif cmd_line:match('\\V') then
-      return '\\.\\*'
-    elseif cmd_line:match('\\v') then
-      return '.*'
     else
-      return ' '
+      return get_fuzzy(cmd_line)
     end
   else
     return ' '
