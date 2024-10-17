@@ -8,7 +8,9 @@ vim.opt.relativenumber = true
 vim.opt.showmode = false
 vim.opt.showcmd = false
 
--- Disable mouse mode
+vim.o.equalalways = true
+vim.o.eadirection = 'hor'
+
 vim.o.mouse = ''
 vim.keymap.set('', '<up>', '<nop>', { noremap = true })
 vim.keymap.set('', '<down>', '<nop>', { noremap = true })
