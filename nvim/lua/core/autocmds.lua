@@ -260,3 +260,14 @@ for _, ext in ipairs(file_types) do
     callback = open_external_file,
   })
 end
+
+vim.api.nvim_create_autocmd({ 'VimEnter' }, {
+  group = general,
+  callback = function()
+    if vim.fn.argc() == 0 then
+      vim.schedule(vim.cmd.Oil)
+    end
+  end,
+  once = true,
+  desc = 'Pin arglist buffers',
+})
