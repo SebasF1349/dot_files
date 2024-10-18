@@ -266,8 +266,11 @@ end
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   group = general,
   callback = function()
-    if vim.fn.argc() == 0 then
-      vim.schedule(vim.cmd.Oil)
+    if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
+      vim.schedule(function()
+        local cwd = vim.uv.cwd()
+        vim.cmd.Oil(cwd)
+      end)
     end
   end,
   once = true,
