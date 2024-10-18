@@ -269,7 +269,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   group = pinbufs_augroup,
   callback = function()
-    if vim.fn.argc() == 0 then
+    if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
       return
     end
     local args = vim.fn.argv()
