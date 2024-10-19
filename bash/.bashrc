@@ -130,6 +130,10 @@ _fzf_compgen_dir() {
     fd --type d --hidden --follow --exclude ".git" . "$1"
 }
 
+export ANDROID_HOME=$HOME/android-sdk
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export CHROME_EXECUTABLE=/usr/bin/chromium
+
 # if [[ $iatest > 0 ]]; then bind "set completion-ignore-case on"; fi
 
 eval "$(starship init bash)"
