@@ -198,7 +198,7 @@ return {
                   end)
                   :totable()
                 if #items == 0 then
-                  vim.notify('No references in the buffer', vim.lof.levels.INFO)
+                  vim.notify('No references in the buffer', vim.log.levels.INFO)
                   return
                 end
                 local next_reference
@@ -308,7 +308,7 @@ return {
             wd.populate_workspace_diagnostics(client, event.buf)
           end
 
-          if client and client.server_capabilities.documentHighlightProvider then
+          if client.server_capabilities.documentHighlightProvider then
             local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
             -- Highlight references of the word under your cursor
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
