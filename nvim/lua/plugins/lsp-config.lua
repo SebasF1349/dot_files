@@ -280,9 +280,14 @@ return {
             local ui_opts = {
               prompt = 'Diagnostic: ',
               format_item = function(d)
+                local new_line = d.message:find('\n')
+                if new_line then
+                  d.message = d.message:sub(1, new_line - 1)
+                end
                 local signs = { ' ', ' ', '', ' ' }
                 local bufname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
-                return string.format('%s%s (%s)', signs[d.severity], d.message, bufname)
+                local lnum = d.lnum or d.end_lnum
+                return string.format('%s%s (%s:%s)', signs[d.severity], d.message, bufname, lnum + 1)
               end,
             }
             local win = vim.api.nvim_get_current_win()
