@@ -96,6 +96,11 @@ function M.select(items, opts, on_choice)
 
   for i, item in ipairs(items) do
     item = format_item(item)
+    -- TODO: find best way to handle new lines, now I'm just keeping the first one
+    local new_line = item:find('\n')
+    if new_line then
+      item = item:sub(1, new_line - 1)
+    end
     local option
     if curr_conf.keys_method == 'intelligent' then
       option = choose_key(item, '')
