@@ -21,8 +21,23 @@ end)
 function M.setup(config)
 	config.disable_default_key_bindings = true
 	config.keys = {
-		-- New Tab --
+		-- New Tab
 		{ mods = M.modTab, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
+		-- New Tab on Windows
+		{
+			mods = M.modTab,
+			key = "w",
+			action = wezterm.action.SpawnCommandInNewTab({
+				args = { "pwsh.exe" },
+				-- this is normally the default, but I'd recommend making it explicit
+				-- when working on windows with WSL and other mux domains.
+				-- This ensures that the command will be run on the wezterm GUI host
+				-- and not in some other domain
+				domain = { DomainName = "local" },
+				cwd = "D:\\Trabajos\\Proyectos - Dev",
+			}),
+			-- action = act.SpawnTab("CurrentPaneDomain")
+		},
 		-- Move Tabs
 		{ mods = M.modTab .. "|CTRL", key = "l", action = act.MoveTabRelative(1) },
 		{ mods = M.modTab .. "|CTRL", key = "h", action = act.MoveTabRelative(-1) },
