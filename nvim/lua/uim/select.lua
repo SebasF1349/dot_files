@@ -45,6 +45,16 @@ function M.select(items, opts, on_choice)
   local max_length = -1
   local selected = {}
 
+  if curr_conf.closing_keys then
+    for _, key in ipairs(curr_conf.closing_keys) do
+      if type(key) == 'string' then
+        table.insert(curr_conf.ignore_chars, key)
+      elseif type(key) == 'table' then
+        table.insert(curr_conf.ignore_chars, key[1])
+      end
+    end
+  end
+
   local posible_chars = vim
     .iter(curr_conf.possible_chars)
     :filter(function(item)
@@ -240,7 +250,7 @@ function M.select(items, opts, on_choice)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = select_bufnr })
   vim.api.nvim_set_option_value('modifiable', false, { buf = select_bufnr })
 
-  shared.close_mappings(select_bufnr, select_and_close)
+  shared.close_mappings(select_bufnr, select_and_close, curr_conf.closing_keys)
 end
 
 return M

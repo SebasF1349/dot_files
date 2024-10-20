@@ -33,17 +33,22 @@ end
 
 M.autocmd_id = nil
 
--- TODO: remove other keymaps?
 ---@param bufnr number
 ---@param on_close function
-function M.close_mappings(bufnr, on_close)
-  vim.keymap.set('n', '<ESC>', function()
-    on_close(nil)
-  end, { buffer = bufnr })
-  vim.keymap.set({ 'n', 'i' }, '<C-c>', function()
-    vim.api.nvim_input('<ESC>')
-    on_close(nil)
-  end, { buffer = bufnr })
+---@param closing_keys (string | uim.OptsClosingKeys)[]
+function M.close_mappings(bufnr, on_close, closing_keys)
+  for _, key in ipairs(closing_keys) do
+    if type(key) == 'string' then
+      vim.keymap.set({ 'n' }, key, function()
+        on_close(nil)
+      end, { buffer = bufnr })
+    elseif type(key) == 'table' then
+      vim.keymap.set(key.modes, key[1], function()
+        vim.api.nvim_input('<ESC>')
+        on_close(nil)
+      end, { buffer = bufnr })
+    end
+  end
 
   local augroup = vim.api.nvim_create_augroup('ui', { clear = true })
   M.autocmd_id = vim.api.nvim_create_autocmd('BufLeave', {

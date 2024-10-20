@@ -102,7 +102,7 @@ function M.input(opts, on_confirm)
     select_and_close(line)
   end, { buffer = input_bufnr })
 
-  shared.close_mappings(input_bufnr, select_and_close)
+  shared.close_mappings(input_bufnr, select_and_close, config.input.closing_keys)
 end
 
 return M

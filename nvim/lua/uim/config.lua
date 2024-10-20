@@ -3,6 +3,10 @@ local M = {
   opts = {},
 }
 
+---@class uim.OptsClosingKeys
+---@field [1] string
+---@field modes string[]
+
 ---@class uim.OptsSelect
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor'
 ---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
@@ -10,11 +14,13 @@ local M = {
 ---@field keys_method? 'list' | 'intelligent'
 ---@field possible_chars? string[]
 ---@field ignore_chars? string[]
+---@field closing_keys? (string | uim.OptsClosingKeys)[]
 
 ---@class uim.OptsInput
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor' | 'cmdline'
 ---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
 ---@field title_pos? 'left' | 'center' | 'right'
+---@field closing_keys? (string | uim.OptsClosingKeys)[]
 
 ---@class uim.Opts
 ---@field select? uim.OptsSelect
@@ -30,11 +36,21 @@ M.opts = {
     possible_chars = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
                       'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' },
     ignore_chars = {},
+    closing_keys = {
+      { 'q', modes = { 'n', 'i', 'v' } },
+      { '<C-c>', modes = { 'n', 'i', 'v' } },
+      { '<ESC>', modes = { 'n', 'i', 'v' } },
+    },
   },
   input = {
     position = 'cmdline',
     border = 'none',
     title_pos = 'left',
+    closing_keys = {
+      'q',
+      { '<C-c>', modes = { 'n', 'i', 'v' } },
+      { '<ESC>', modes = { 'n', 'i', 'v' } },
+    },
   },
 }
 
