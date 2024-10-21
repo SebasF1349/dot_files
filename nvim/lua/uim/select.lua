@@ -18,6 +18,11 @@ function M.select(items, opts, on_choice)
     curr_conf = vim.tbl_deep_extend('force', {}, curr_conf, config.opts.kind[opts.kind])
   end
 
+  if #items == 1 and curr_conf.autoselect then
+    on_choice(nil, nil)
+    return
+  end
+
   local current_win = vim.api.nvim_get_current_win()
   local title = opts.prompt or 'Select one of:'
 

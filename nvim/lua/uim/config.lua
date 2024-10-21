@@ -15,6 +15,7 @@ local M = {
 ---@field possible_chars? string[]
 ---@field ignore_chars? string[]
 ---@field closing_keys? (string | uim.OptsClosingKeys)[]
+---@field autoselect? boolean
 
 ---@class uim.OptsInput
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor' | 'cmdline'
@@ -41,6 +42,7 @@ M.opts = {
       { '<C-c>', modes = { 'n', 'i', 'v' } },
       { '<ESC>', modes = { 'n', 'i', 'v' } },
     },
+    autoselect = false,
   },
   input = {
     position = 'cmdline',
