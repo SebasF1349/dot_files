@@ -15,7 +15,7 @@ local M = {}
 ---@param winOpts WinOpts
 ---@return integer
 function M.create_win(winOpts)
-  return vim.api.nvim_open_win(winOpts.bufnr, true, {
+  local winnr = vim.api.nvim_open_win(winOpts.bufnr, true, {
     relative = winOpts.relative or 'editor',
     width = winOpts.width,
     height = winOpts.height,
@@ -24,11 +24,13 @@ function M.create_win(winOpts)
     zindex = 1000,
     style = 'minimal',
     border = winOpts.border,
-    title = winOpts.title,
+    title = winOpts.title and { { winOpts.title, 'UimTitle' } },
     title_pos = winOpts.title_pos,
-    footer = winOpts.footer,
+    footer = winOpts.footer and { { winOpts.footer, 'UimFooter' } },
     noautocmd = true,
   })
+  vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:UimNormal,FloatBorder:UimBorder', { win = winnr })
+  return winnr
 end
 
 M.autocmd_id = nil

@@ -1,5 +1,11 @@
 local M = {}
 
+vim.api.nvim_set_hl(0, 'UimSelectLabels', { link = 'Title' })
+vim.api.nvim_set_hl(0, 'UimTitle', { link = 'FloatTitle' })
+vim.api.nvim_set_hl(0, 'UimFooter', { link = 'FloatTitle' })
+vim.api.nvim_set_hl(0, 'UimNormal', { link = 'NormalFloat' })
+vim.api.nvim_set_hl(0, 'UimBorder', { link = 'FloatBorder' })
+
 ---@param opts uim.Opts
 function M.setup(opts)
   local config = require('uim.config')
