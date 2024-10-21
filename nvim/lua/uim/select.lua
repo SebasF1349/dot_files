@@ -13,6 +13,12 @@ function M.select(items, opts, on_choice)
   opts = opts or {}
   local format_item = opts.format_item or tostring
 
+  if #items == 0 then
+    vim.notify('No items to select from', vim.log.levels.INFO)
+    on_choice(nil, nil)
+    return
+  end
+
   local curr_conf = vim.deepcopy(config.opts.select) or {}
   if config.opts.kind and config.opts.kind[opts.kind] then
     curr_conf = vim.tbl_deep_extend('force', {}, curr_conf, config.opts.kind[opts.kind])
