@@ -15,6 +15,7 @@ local M = {
 ---@field possible_chars? string[]
 ---@field ignore_chars? string[]
 ---@field closing_keys? (string | uim.OptsClosingKeys)[]
+---@field footer_labels? boolean
 ---@field autoselect? boolean
 
 ---@class uim.OptsInput
@@ -42,6 +43,7 @@ M.opts = {
       { '<C-c>', modes = { 'n', 'i', 'v' } },
       { '<ESC>', modes = { 'n', 'i', 'v' } },
     },
+    footer_labels = true,
     autoselect = false,
   },
   input = {

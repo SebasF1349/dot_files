@@ -155,7 +155,7 @@ function M.select(items, opts, on_choice)
     border = curr_conf.border,
     title = title,
     title_pos = curr_conf.title_pos,
-    footer = footer,
+    footer = curr_conf.footer_labels and footer or nil,
     height = -1,
     width = -1,
     row = -1,
