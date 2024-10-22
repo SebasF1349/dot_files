@@ -41,7 +41,8 @@ M.autocmd_id = nil
 function M.close_mappings(bufnr, on_close, closing_keys)
   for _, key in ipairs(closing_keys) do
     if type(key) == 'string' then
-      vim.keymap.set({ 'n' }, key, function()
+      vim.keymap.set({ 'n', 'i', 'v' }, key, function()
+        vim.api.nvim_input('<ESC>')
         on_close(nil)
       end, { buffer = bufnr })
     elseif type(key) == 'table' then

@@ -14,7 +14,7 @@ local M = {
 ---@field keys_method? 'list' | 'intelligent'
 ---@field possible_chars? string[]
 ---@field ignore_chars? string[]
----@field closing_keys? (string | uim.OptsClosingKeys)[]
+---@field closing_keys? (string | uim.OptsClosingKeys)[] -- string maps to all modes
 ---@field footer_labels? boolean
 ---@field autoselect? boolean
 
@@ -38,11 +38,7 @@ M.opts = {
     possible_chars = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
                       'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' },
     ignore_chars = {},
-    closing_keys = {
-      { 'q', modes = { 'n', 'i', 'v' } },
-      { '<C-c>', modes = { 'n', 'i', 'v' } },
-      { '<ESC>', modes = { 'n', 'i', 'v' } },
-    },
+    closing_keys = { 'q', '<C-c>', '<ESC>' },
     footer_labels = true,
     autoselect = false,
   },
@@ -50,11 +46,7 @@ M.opts = {
     position = 'cmdline',
     border = 'none',
     title_pos = 'left',
-    closing_keys = {
-      'q',
-      { '<C-c>', modes = { 'n', 'i', 'v' } },
-      { '<ESC>', modes = { 'n', 'i', 'v' } },
-    },
+    closing_keys = { { 'q', modes = { 'n', 'v' } }, '<C-c>', '<ESC>' },
   },
 }
 
