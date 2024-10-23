@@ -43,6 +43,7 @@ return {
   {
     'nvim-telescope/telescope.nvim',
     keys = { '<leader>f', '<leader>/' },
+    cmd = { 'Telescope' },
     config = function()
       local telescope = require('telescope')
       local actions = require('telescope.actions')
