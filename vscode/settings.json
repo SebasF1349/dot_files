@@ -2,6 +2,14 @@
     "[cpp]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
+    "[dart]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.rulers": [80],
+        "editor.selectionHighlight": false,
+        "editor.tabCompletion": "onlySnippets",
+        "editor.wordBasedSuggestions": "off"
+    },
     "[ejs]": {
         "editor.formatOnSave": false
     },
@@ -12,6 +20,7 @@
     "cmake.configureOnOpen": true,
     "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
     "diffEditor.ignoreTrimWhitespace": false,
+    "editor.accessibilitySupport": "off",
     "editor.acceptSuggestionOnEnter": "off",
     "editor.bracketPairColorization.enabled": true,
     "editor.codeActionsOnSave": {
