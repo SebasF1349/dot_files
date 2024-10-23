@@ -145,5 +145,42 @@
         "key": "ctrl+x",
         "command": "workbench.action.closePanel",
         "when": "!panelFocus && activePanel"
+    },
+    {
+        "key": "space e",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.toggleSidebarVisibility",
+                "workbench.files.action.focusFilesExplorer"
+            ]
+        },
+        "when": "neovim.mode == normal && (editorTextFocus || !inputFocus) && !sideBarFocus"
+    },
+    {
+        "key": "space e",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.toggleSidebarVisibility",
+                "workbench.action.focusActiveEditorGroup"
+            ]
+        },
+        "when": "sideBarFocus && !inputFocus"
+    },
+    {
+        "key": "space e",
+        "command": "workbench.action.toggleSidebarVisibility",
+        "when": "neovim.mode == normal && editorTextFocus && foldersViewVisible"
+    },
+    {
+        "key": "shift-j",
+        "command": "editor.action.moveLinesDownAction",
+        "when": "neovim.mode == visual && editorTextFocus"
+    },
+    {
+        "key": "shift-k",
+        "command": "editor.action.moveLinesUpAction",
+        "when": "neovim.mode == visual && editorTextFocus"
     }
 ]
