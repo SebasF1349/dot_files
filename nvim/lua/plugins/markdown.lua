@@ -176,7 +176,7 @@ return {
       },
     },
     keys = {
-      { '<leader>p', '<cmd>PasteImage<cr>', desc = 'Paste image from system clipboard' },
+      { '<leader>mi', '<cmd>PasteImage<cr>', desc = 'Paste [I]mage from system clipboard' },
     },
   },
 }
