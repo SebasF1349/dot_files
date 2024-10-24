@@ -167,8 +167,8 @@ function current_branch() {
 }
 
 function git_checkout_fzf() {
-    branch=$(git branch --all |
-        fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" |
+    branch=$(git branch --sort=-committerdate --all |
+        fzf --height "90%" --header "PLEASE CHOOSE A BRANCH TO CHECKOUT" --preview "git diff --color=always {1}" --pointer=">" |
         sed "s/remotes\/origin\///" | xargs)
     if [ -n "$branch" ]; then
         git checkout "$branch"
