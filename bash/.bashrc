@@ -179,8 +179,10 @@ alias g="git"
 alias gs="git status"
 alias gd="git diff"
 alias gdn='git diff --name-only ..origin/$(current_branch)'
+alias gdlc="git diff --cached HEAD^" #show diff of last commit
 alias gc="git commit -m"
 alias gac="git commit -am"
+alias gca="commit -a --amend --no-edit"
 alias gcl="git clone"
 alias ga="git add"
 alias ga.="git add ."
@@ -188,7 +190,7 @@ alias gad="git add ."
 alias gaa="git add --all"
 alias gap="git add --patch"
 alias gb="git branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(contents:subject) %(color:green)(%(committerdate:relative)) [%(authorname)]' --sort=-committerdate"
-alias gde="git branch -D"
+alias gbd="git branch -D"
 alias gch="git checkout"
 alias gcb="git checkout -b"
 alias gcf="git_checkout_fzf"
@@ -197,12 +199,10 @@ alias gpush="git push"
 alias gf='git fetch && git diff --name-only ..origin/$(current_branch)'
 alias gp="git pull"
 alias gpull="git pull"
-alias gl="git log"
 alias gst="git stash"
 alias gu="git reset HEAD~1 --mixed"
 alias gl="git log --graph --pretty=format:\"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]\" --decorate --date=relative"
 alias gll="git log --graph --pretty=format:\"%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]\" --decorate --numstat" #with files changed
-alias gdlc="git diff --cached HEAD^"                                                                           #show diff of last commit
 
 alias nv='${EDITOR}'
 alias nv.='${EDITOR} .'
