@@ -640,4 +640,7 @@ vim.keymap.set('n', '<leader>;', 'mzA;`z', { desc = 'Add [;] at the end of the 
 -- Abbreviations
 --------------------------------------------------
 
-vim.keymap.set('ca', 'Wa', 'wa')
+local cmds_typos = { 'Wa', 'WA' }
+for _, cmd in ipairs(cmds_typos) do
+  vim.keymap.set('ca', cmd, cmd:lower())
+end
