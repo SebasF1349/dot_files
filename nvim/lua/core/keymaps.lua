@@ -502,7 +502,7 @@ end
 -- based on https://www.reddit.com/r/neovim/comments/xrwo05/comment/ja7oyqy/
 ---@param mode "char"|"line"|"block"
 function _G.Substitute(mode)
-  local reg = vim.fn.getreg('"')
+  local reg = vim.fn.getreg()
   local text = vim.split(reg, '\n')
   if text[text] == '' then
     table.remove(text)
