@@ -22,6 +22,7 @@ vim.o.breakindent = true
 vim.o.undofile = true
 vim.o.backup = false
 vim.o.writebackup = false
+vim.o.autoread = true
 
 vim.o.ignorecase = true
 vim.o.smartcase = true
