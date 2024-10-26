@@ -38,8 +38,6 @@ else
   vim.o.completeopt = 'menu,menuone,noinsert,noselect'
 end
 
-vim.o.pumblend = 10
-vim.o.winblend = 10
 vim.o.pumheight = 10
 
 vim.opt.updatetime = 250
