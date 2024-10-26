@@ -46,7 +46,7 @@ M.opts = {
     position = 'cmdline',
     border = 'none',
     title_pos = 'left',
-    closing_keys = { { 'q', modes = { 'n', 'v' } }, '<C-c>', '<ESC>' },
+    closing_keys = { { 'q', modes = { 'n', 'v' } }, '<C-c>' },
   },
 }
 
