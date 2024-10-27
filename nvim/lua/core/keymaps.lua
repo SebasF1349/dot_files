@@ -520,12 +520,17 @@ function _G.Substitute(mode)
   end
 end
 
-vim.keymap.set(
-  { 'n', 'v' },
-  'S',
-  opfunc('_G.Substitute'),
-  { desc = '[S]ubstitute Operator', silent = true, expr = true }
-)
+vim.keymap.set({ 'n', 'v' }, 'S', opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })
+
+function _G.MakeList()
+  local starting = vim.api.nvim_buf_get_mark(0, '[')
+  local ending = vim.api.nvim_buf_get_mark(0, ']')
+  local line_start = starting[1]
+  local line_end = ending[1]
+  vim.cmd(line_start .. ',' .. line_end .. [[s/\v^(\s*)[^a-zA-Z]*(.*)/\1- \2]])
+end
+
+vim.keymap.set({ 'n', 'v' }, 'gl', opfunc('_G.MakeList'), { desc = 'Make Markdown [L]ist', silent = true, expr = true })
 
 --------------------------------------------------
 -- Notetaking
