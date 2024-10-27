@@ -1,6 +1,6 @@
 return {
   dir = '~/dot_files/nvim/lua/uim',
-  lazy = false,
+  event = { 'BufReadPost', 'BufNewFile' },
   config = function()
     local uim = require('uim')
     uim.setup({
