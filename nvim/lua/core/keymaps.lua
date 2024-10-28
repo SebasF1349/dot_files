@@ -255,13 +255,12 @@ local function get_fuzzy(cmd_line)
     local divider = cmd_line:sub(is_magic - 1, is_magic - 1)
     closed_fuzzy_block = cmd_line:find(divider, is_magic)
   end
-  vim.print(very_magic_pos, very_nomagic_pos, closed_fuzzy_block)
   if closed_fuzzy_block or not is_magic then
     return ' '
   elseif very_nomagic_pos then
-    return '\\.\\*' -- maybe change with non-greedy regex `\{-}`
+    return '\\.\\{-}'
   elseif very_magic_pos then
-    return '.*'
+    return '.{-}'
   end
 end
 
