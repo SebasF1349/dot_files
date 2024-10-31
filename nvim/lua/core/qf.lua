@@ -617,7 +617,7 @@ local function previewHover()
   vim.lsp.util.open_floating_preview(
     message,
     filetype,
-    { title = vim.fn.bufname(list.bufnr), border = 'rounded', height = 10, focusable = true }
+    { title = vim.fn.bufname(list.bufnr), border = { 'rounded' }, height = 10, focusable = true }
   )
 end
 
