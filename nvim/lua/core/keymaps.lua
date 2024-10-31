@@ -65,7 +65,10 @@ vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments line by 
 -- Add bash shortcuts for command line
 vim.keymap.set('c', '<C-a>', '<Home>', { desc = 'Move to start of line in cmdline mode' })
 vim.keymap.set('c', '<C-b>', '<Left>', { desc = 'Move to the left in cmdline mode' })
-vim.keymap.set('c', '<C-f>', '<Right>', { desc = 'Move to the right in cmdline mode' })
+vim.keymap.set('c', '<C-f>', function()
+  local c = vim.fn.getcmdpos()
+  return vim.fn.getcmdline():sub(c, c) == '' and '<C-f>' or '<Right>'
+end, { desc = 'Move to the right in cmdline mode or open cmd window if next char is empty', expr = true })
 vim.keymap.set('c', '<C-d>', '<Delete>', { desc = 'Delete char in cmdline mode' })
 vim.keymap.set('c', '<M-b>', '<S-Left>', { desc = 'Move one word to the left in cmdline mode' })
 vim.keymap.set('c', '<M-f>', '<S-Right>', { desc = 'Move one word to the right in cmdline mode' })
