@@ -62,20 +62,19 @@ vim.keymap.set('x', '.', ':normal .<CR>', { desc = 'Use . to repeat last change 
 
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments line by line' })
 
--- Add bash shortcuts for command line
-vim.keymap.set('c', '<C-a>', '<Home>', { desc = 'Move to start of line in cmdline mode' })
-vim.keymap.set('c', '<C-b>', '<Left>', { desc = 'Move to the left in cmdline mode' })
+-- BASH-style movement in cmd and insert mode
+vim.keymap.set({ 'i', 'c' }, '<C-a>', '<Home>', { desc = 'Move to start of line' })
+vim.keymap.set({ 'i', 'c' }, '<C-e>', '<End>', { desc = 'Move to end of line' })
+vim.keymap.set({ 'i', 'c' }, '<C-b>', '<Left>', { desc = 'Move to the left' })
 vim.keymap.set('c', '<C-f>', function()
   local c = vim.fn.getcmdpos()
   return vim.fn.getcmdline():sub(c, c) == '' and '<C-f>' or '<Right>'
 end, { desc = 'Move to the right in cmdline mode or open cmd window if next char is empty', expr = true })
-vim.keymap.set('c', '<C-d>', '<Delete>', { desc = 'Delete char in cmdline mode' })
-vim.keymap.set('c', '<M-b>', '<S-Left>', { desc = 'Move one word to the left in cmdline mode' })
-vim.keymap.set('c', '<M-f>', '<S-Right>', { desc = 'Move one word to the right in cmdline mode' })
-
--- BASH-style movement in insert mode
-vim.keymap.set('i', '<C-a>', '<C-o>^', { desc = 'Move to start of line in insert mode' })
-vim.keymap.set('i', '<C-e>', '<C-o>$', { desc = 'Move to end of line in insert mode' })
+vim.keymap.set('i', '<C-b>', '<Left>', { desc = 'Move to the left' })
+vim.keymap.set({ 'i', 'c' }, '<C-h>', '<BS>', { desc = 'Delete char before' })
+vim.keymap.set({ 'i', 'c' }, '<C-d>', '<Delete>', { desc = 'Delete char after' })
+vim.keymap.set({ 'i', 'c' }, '<M-b>', '<S-Left>', { desc = 'Move one word to the left' })
+vim.keymap.set({ 'i', 'c' }, '<M-f>', '<S-Right>', { desc = 'Move one word to the right' })
 
 vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
 
