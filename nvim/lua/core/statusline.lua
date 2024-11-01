@@ -288,24 +288,30 @@ local diagnostics_data = {
 local local_diagnostics = ''
 local workspace_diagnostics = ''
 local function custom_diagnostics()
-  if vim.fn.mode() == 'n' then
-    local_diagnostics = ''
-    workspace_diagnostics = ''
-    local workspace_count = vim.diagnostic.count(nil)
-    local local_count = vim.diagnostic.count(0)
-    for i, data in ipairs(diagnostics_data) do
-      local local_diag = local_count[i] or 0
-      local works_diag = workspace_count[i] or 0
-      if #local_diagnostics == 0 and local_diag > 0 and vim.o.buftype == '' then
-        local_diagnostics = string.format('%%#%s#%s', data.hi, data.icon)
-      end
-      if #workspace_diagnostics == 0 and works_diag > local_diag then
-        workspace_diagnostics = string.format('%%#Conceal#%s', data.icon)
-      end
+  if vim.fn.mode() ~= 'n' then
+    return ''
+  end
+
+  local_diagnostics = ''
+  workspace_diagnostics = ''
+  local workspace_count = vim.diagnostic.count(nil)
+  local local_count = vim.diagnostic.count(0)
+  for i, data in ipairs(diagnostics_data) do
+    local local_diag = local_count[i] or 0
+    local works_diag = workspace_count[i] or 0
+    if #local_diagnostics == 0 and local_diag > 0 and vim.o.buftype == '' then
+      local_diagnostics = string.format('%%#%s#%s', data.hi, data.icon)
+    end
+    if #workspace_diagnostics == 0 and works_diag > local_diag then
+      workspace_diagnostics = string.format('%%#SLDiagExternal#%s', data.icon)
     end
   end
 
-  return string.format(' %s%s', local_diagnostics, workspace_diagnostics)
+  if local_diagnostics == '' and workspace_diagnostics == '' then
+    return ''
+  end
+
+  return string.format('%s%s', local_diagnostics, workspace_diagnostics)
 end
 
 ---- STATUSLINE ----
