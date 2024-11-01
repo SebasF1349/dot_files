@@ -2,7 +2,59 @@
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local pinbufs = require('core.buffers')
 
-vim.api.nvim_set_hl(0, 'StatusLineSeparator', { bg = mocha.none, fg = mocha.blue })
+---- Highlights ----
+local custom_bg = mocha.surface0
+local curr_statusline_bg = vim.api.nvim_get_hl(0, { name = 'StatusLine' })['bg'] or custom_bg
+local statusline_normal = vim.api.nvim_get_hl(0, { name = 'Normal' })['fg']
+
+vim.api.nvim_set_hl(0, 'SLNormal', { bg = curr_statusline_bg, fg = statusline_normal })
+
+vim.api.nvim_set_hl(0, 'SLSeparator', { bg = curr_statusline_bg, fg = mocha.blue })
+
+-- modes hl --
+local modes_hi = {
+  N = { bg = curr_statusline_bg, fg = mocha.blue },
+  I = { bg = curr_statusline_bg, fg = mocha.green },
+  T = { bg = curr_statusline_bg, fg = mocha.green },
+  C = { bg = curr_statusline_bg, fg = mocha.peach },
+  V = { bg = curr_statusline_bg, fg = mocha.mauve },
+  R = { bg = curr_statusline_bg, fg = mocha.red },
+  O = { bg = curr_statusline_bg, fg = mocha.overlay2 },
+}
+
+for mode, hi in pairs(modes_hi) do
+  vim.api.nvim_set_hl(0, 'SLMode' .. mode, hi)
+end
+
+-- file hl --
+local active_buf_fg = vim.api.nvim_get_hl(0, { name = 'Normal' })['fg']
+vim.api.nvim_set_hl(0, 'SLActiveBuffer', { bg = curr_statusline_bg, fg = active_buf_fg })
+
+local inactive_buf_fg = vim.api.nvim_get_hl(0, { name = 'Comment' })['fg']
+vim.api.nvim_set_hl(0, 'SLInactiveBuffer', { bg = curr_statusline_bg, fg = inactive_buf_fg })
+
+-- context hl --
+-- local normal_fg = vim.api.nvim_get_hl(0, { name = 'Normal' })['fg']
+local normal_fg = vim.api.nvim_get_hl(0, { name = 'CursorLineNr' })['fg']
+vim.api.nvim_set_hl(0, 'SLContext', { bg = curr_statusline_bg, fg = normal_fg })
+
+-- diagnostics hl --
+local diag_error_fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticError' })['fg']
+local diag_warn_fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticWarn' })['fg']
+local diag_info_fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticInfo' })['fg']
+local diag_hint_fg = vim.api.nvim_get_hl(0, { name = 'DiagnosticHint' })['fg']
+local diag_external_fg = vim.api.nvim_get_hl(0, { name = 'Comment' })['fg']
+vim.api.nvim_set_hl(0, 'SLDiagError', { bg = curr_statusline_bg, fg = diag_error_fg })
+vim.api.nvim_set_hl(0, 'SLDiagWarn', { bg = curr_statusline_bg, fg = diag_warn_fg })
+vim.api.nvim_set_hl(0, 'SLDiagInfo', { bg = curr_statusline_bg, fg = diag_info_fg })
+vim.api.nvim_set_hl(0, 'SLDiagHint', { bg = curr_statusline_bg, fg = diag_hint_fg })
+vim.api.nvim_set_hl(0, 'SLDiagExternal', { bg = curr_statusline_bg, fg = diag_external_fg })
+
+-- git hl --
+local git_branch = vim.api.nvim_get_hl(0, { name = 'Special' })['fg']
+local git_diff = vim.api.nvim_get_hl(0, { name = 'Error' })['fg']
+vim.api.nvim_set_hl(0, 'SLBranch', { bg = curr_statusline_bg, fg = git_branch })
+vim.api.nvim_set_hl(0, 'SLDiff', { bg = curr_statusline_bg, fg = git_diff })
 
 ---- MODE ----
 local modes = {
@@ -43,25 +95,11 @@ local modes = {
   ['t'] = 'Terminal',
 }
 
-local modes_hi = {
-  N = { fg = mocha.blue },
-  I = { fg = mocha.green },
-  T = { fg = mocha.green },
-  C = { fg = mocha.peach },
-  V = { fg = mocha.mauve },
-  R = { fg = mocha.red },
-  O = { fg = mocha.overlay2 },
-}
-
-for mode, hi in pairs(modes_hi) do
-  vim.api.nvim_set_hl(0, 'StatusLineMode' .. mode, hi)
-end
-
 local function mode()
   local current_mode = vim.api.nvim_get_mode().mode
   local first_char = modes[current_mode]:sub(1, 1)
-  local mode_hi = modes[current_mode] and ('StatusLineMode' .. first_char) or 'StatusLineModeO'
-  return string.format(' %%#%s#%s', mode_hi, modes[current_mode]:sub(1, 1))
+  local mode_hi = modes[current_mode] and ('SLMode' .. first_char) or 'SLModeO'
+  return string.format('%%#%s#%s', mode_hi, modes[current_mode]:sub(1, 1))
 end
 
 ---- FILENAME ----
@@ -93,7 +131,7 @@ local function file()
     return ''
   end
   if label then
-    return string.format('%%#NonText# [%s] %%#Normal#%s ', label, title)
+    return string.format('%%#SLInactiveBuffer# [%s] %%#SLActiveBuffer#%s ', label, title)
   end
   local buffers = {}
   for _, pinbuf in ipairs(pinbufs.get_pinbufs()) do
@@ -125,16 +163,17 @@ local function file()
     end
     local file_display
     if bufnr ~= current_bufnr then
-      file_display = string.format('%%#NonText#%s', fname)
+      file_display = string.format('%%#SLInactiveBuffer#%s', fname)
     else
       local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
-      current_buf_shorten.fname = string.format('%%#Normal#%s', fname)
+      current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
       else
-        file_display = string.format('%%#NonText#%s/%%#Normal#%s', fpath, fname)
-        current_buf_shorten.path = string.format('%%#NonText#%s/%%#Normal#%s', vim.fn.pathshorten(fpath), fname)
+        file_display = string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', fpath, fname)
+        current_buf_shorten.path =
+          string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', vim.fn.pathshorten(fpath), fname)
       end
       current_buf_shorten.pos = #buffer_names + 1
     end
@@ -149,17 +188,17 @@ local function file()
   if #buffer_names == 0 then
     return ''
   end
-  local ret = string.format(' %s ', table.concat(buffer_names, ' %#StatusLineSeparator#| '))
+  local ret = string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   local max_columns = vim.o.columns
   local ret_length = #ret - 18 * #buffer_names
   if ret_length < max_columns then
     return ret
   elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.path
-    return string.format(' %s ', table.concat(buffer_names, ' %#StatusLineSeparator#| '))
+    return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.fname
-    return string.format(' %s ', table.concat(buffer_names, ' %#StatusLineSeparator#| '))
+    return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   elseif #buffer_names[current_buf_shorten.pos] < max_columns then
     return string.format(' %s […] ', buffer_names[current_buf_shorten.pos])
   elseif #current_buf_shorten.path < max_columns then
@@ -233,17 +272,17 @@ local function git()
   local behind = gstatus.behind ~= '0' and '' or ''
   local modified = (gstatus.modified or vim.o.modified) and '~' or ''
   if ahead == '' and behind == '' and modified == '' then
-    return string.format(' %%#Special#%s ', head)
+    return string.format('%%#SLBranch#%s', head)
   end
-  return string.format(' %%#Special#%s%%#Error#[%s%s%s] ', head, ahead, behind, modified)
+  return string.format('%%#SLBranch#%s%%#SLDiff#[%s%s%s]', head, ahead, behind, modified)
 end
 
 ---- DIAGNOSTICS ----
 local diagnostics_data = {
-  { icon = ' ', hi = 'DiagnosticError' },
-  { icon = ' ', hi = 'DiagnosticWarn' },
-  { icon = ' ', hi = 'DiagnosticInfo' },
-  { icon = ' ', hi = 'DiagnosticHint' },
+  { icon = ' ', hi = 'SLDiagError' },
+  { icon = ' ', hi = 'SLDiagWarn' },
+  { icon = ' ', hi = 'SLDiagInfo' },
+  { icon = ' ', hi = 'SLDiagHint' },
 }
 
 local local_diagnostics = ''
