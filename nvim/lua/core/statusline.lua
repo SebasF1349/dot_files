@@ -96,10 +96,8 @@ local modes = {
 }
 
 local function mode()
-  local current_mode = vim.api.nvim_get_mode().mode
-  local first_char = modes[current_mode]:sub(1, 1)
-  local mode_hi = modes[current_mode] and ('SLMode' .. first_char) or 'SLModeO'
-  return string.format('%%#%s#%s', mode_hi, modes[current_mode]:sub(1, 1))
+  local first_char = vim.fn.strtrans(vim.fn.mode()):upper():gsub('%W', '')
+  return string.format('%%#SLMode%s#%s', first_char, first_char)
 end
 
 ---- FILENAME ----
