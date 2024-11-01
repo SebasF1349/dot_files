@@ -206,6 +206,39 @@ local function file()
   end
 end
 
+---- Context ----
+local function get_context()
+  local success, treesitter = pcall(require, 'nvim-treesitter')
+  if not success then
+    return ''
+  end
+
+  local context = treesitter.statusline({
+
+    type_patterns = { 'class', 'function', 'method', 'impl' },
+
+    transform_fn = function(line)
+      line = line:gsub('local%s*', '')
+      line = line:gsub('class%s*', '')
+      line = line:gsub('function%s*', '')
+      line = line:gsub('fn%s*', '')
+      line = line:gsub('impl%s*', '')
+
+      return line:gsub('%s*[%(%{%[].*[%]%}%)]*%s*$', '')
+    end,
+
+    separator = ' -> ',
+
+    allow_duplicates = false,
+  })
+
+  if context == nil or #vim.trim(context) == 0 then
+    return ''
+  end
+
+  return '%#SLContext#[' .. context .. ']'
+end
+
 ---- GIT ----
 local gstatus = { head = '', ahead = '0', behind = '0', modified = false }
 
@@ -315,24 +348,34 @@ end
 ---- STATUSLINE ----
 Statusline = {
   active = function()
-    return table.concat({
-      mode(),
-      custom_diagnostics(),
-      '%#StatusLineSeparator#%=',
-      -- "%#StatusLineSeparator#├%=┤",
-      file(),
-      '%#StatusLineSeparator#%=',
-      git(),
-    })
+    if vim.o.columns > 80 then
+      return table.concat({
+        '%#SLNormal# ',
+        mode(),
+        file(),
+        '%=',
+        get_context(),
+        ' ',
+        custom_diagnostics(),
+        git(),
+        ' ',
+      })
+    else
+      return table.concat({
+        '%#SLNormal# ',
+        mode(),
+        file(),
+        '%=',
+        custom_diagnostics(),
+        git(),
+        ' ',
+      })
+    end
   end,
 }
 
 vim.g.qf_disable_statusline = true
 vim.opt.statusline = '%!v:lua.Statusline.active()'
 vim.opt.laststatus = 3
-vim.opt.fillchars:append({
-  stl = '─',
-  stlnc = '─',
-})
 vim.opt.ruler = false
 -- TODO: should I have cmdheigth = 0? (and increase waybar height)
