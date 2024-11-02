@@ -456,38 +456,45 @@ local surround = {
   { '*', '*' },
   { '_', '_' },
 }
-for _, pair in ipairs(surround) do
-  vim.keymap.set(
-    'n',
-    'ys' .. pair[1],
-    '"sciw' .. pair[1] .. '<C-r>s' .. pair[2] .. '<ESC>',
-    { desc = '[Y]ou [S]urround with [' .. pair[1] .. ']' }
-  )
 
-  vim.keymap.set('x', 's', '<NOP>', { desc = 'Disable v_s to be able to use surround' })
-  vim.keymap.set(
-    'x',
-    's' .. pair[1],
-    '"sc' .. pair[1] .. '<C-r>s' .. pair[2] .. '<ESC>',
-    { desc = '[S]urround with [' .. pair[1] .. ']' }
-  )
-
-  vim.keymap.set(
-    'n',
-    'ds' .. pair[1],
-    '"sci' .. pair[1] .. '<BS><Del><C-r>s',
-    { desc = '[D]elete [S]urrounding [' .. pair[1] .. ']' }
-  )
-
-  for _, replace in ipairs(surround) do
-    vim.keymap.set(
-      'n',
-      'cs' .. pair[1] .. replace[1],
-      '"sci' .. pair[1] .. '<BS><Del>' .. replace[1] .. '<C-r>s' .. replace[2],
-      { desc = '[C]hange [S]urround [' .. pair[1] .. '] with [' .. replace[1] .. ']' }
-    )
-  end
+local function get_pair()
+  local char = vim.fn.getcharstr()
+  return vim
+    .iter(surround)
+    :filter(function(item)
+      return item[1] == char or item[2] == char
+    end)
+    :flatten()
+    :totable()
 end
+
+vim.keymap.set('n', 'ys', function()
+  local pair = get_pair()
+  if #pair > 0 then
+    return '"sciw' .. pair[1] .. '<C-r>s' .. pair[2] .. '<ESC>'
+  end
+end, { desc = '[Y]ou [S]urround', expr = true })
+
+vim.keymap.set('x', 's', function()
+  local pair = get_pair()
+  if #pair > 0 then
+    return '"sc' .. pair[1] .. '<C-r>=trim(@s)<CR>' .. pair[2] .. '<ESC>'
+  end
+end, { desc = '[S]urround', expr = true })
+
+vim.keymap.set('n', 'ds', function()
+  local pair = get_pair()
+  if #pair > 0 then
+    return '"sci' .. pair[1] .. '<BS><Del><C-r>s'
+  end
+end, { desc = '[D]elete [S]urround', expr = true })
+
+vim.keymap.set('n', 'cs', function()
+  local pair, replace = get_pair(), get_pair()
+  if #pair > 0 and #replace > 0 then
+    return '"sci' .. pair[1] .. '<BS><Del>' .. replace[1] .. '<C-r>s' .. replace[2]
+  end
+end, { desc = '[C]hange [S]urround', expr = true })
 
 --------------------------------------------------
 -- Notetaking
