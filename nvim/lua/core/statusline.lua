@@ -320,7 +320,7 @@ local local_diagnostics = ''
 local workspace_diagnostics = ''
 local function custom_diagnostics()
   if vim.fn.mode() ~= 'n' then
-    return ''
+    return string.format('%s%s', local_diagnostics, workspace_diagnostics)
   end
 
   local_diagnostics = ''
