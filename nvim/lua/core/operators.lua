@@ -6,6 +6,107 @@ local function opfunc(func_name)
 end
 
 --------------------------------------------------
+-- Surround
+--------------------------------------------------
+
+-- with inspiration from https://github.com/Wansmer/nvim-config/blob/main/lua/modules/surround.lua
+
+local surround = {
+  { '(', ')' },
+  { '[', ']' },
+  { '{', '}' },
+  { "'", "'" },
+  { '"', '"' },
+  { '`', '`' },
+  { '<', '>' },
+  { '*', '*' },
+  { '_', '_' },
+}
+
+local function get_pair()
+  local char = vim.fn.getcharstr()
+  return vim
+    .iter(surround)
+    :filter(function(item)
+      return item[1] == char or item[2] == char
+    end)
+    :flatten()
+    :totable()
+end
+
+-- plaggio di plaggio: https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
+local function get_whitespace(line, side)
+  side = side or 'both'
+  local is_left = side == 'both' and true or side == 'left'
+  local is_right = side == 'both' and true or side == 'right'
+  local pad_left, pad_right = '', ''
+
+  if is_left then
+    local start, end_ = line:find('^%s+')
+    if start then
+      pad_left = line:sub(start, end_)
+      line = line:sub(end_ + 1)
+    end
+  end
+
+  if is_right then
+    local start, end_ = line:find('%s+$')
+    if start then
+      pad_right = line:sub(start, end_)
+      line = line:sub(1, -(#pad_right + 1))
+    end
+  end
+
+  return pad_left, line, pad_right
+end
+
+local function add_surround(pair, start_row, start_col, end_row, end_col)
+  local text = vim.api.nvim_buf_get_text(0, start_row, start_col, end_row, end_col, {})
+  local left_pad, first_line = get_whitespace(text[1], 'left')
+  text[1] = left_pad .. pair[1] .. first_line
+  local _, last_line, right_pad = get_whitespace(text[#text], 'right')
+  text[#text] = last_line .. pair[2] .. right_pad
+  vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, text)
+end
+
+---@param mode "char"|"line"|"block"
+function _G.Surround(mode)
+  local pair = get_pair()
+  if #pair == 0 then
+    return
+  end
+  local starting = vim.api.nvim_buf_get_mark(0, '[')
+  local ending = vim.api.nvim_buf_get_mark(0, ']')
+  if mode == 'char' then
+    add_surround(pair, starting[1] - 1, starting[2], ending[1] - 1, ending[2] + 1)
+  elseif mode == 'line' then
+    local len_last_line = #vim.fn.getline(ending[1])
+    add_surround(pair, starting[1] - 1, 0, ending[1] - 1, len_last_line)
+  elseif mode == 'block' then
+    for i = starting[1] - 1, ending[1] - 1 do
+      add_surround(pair, i, starting[2], i, ending[2] + 1)
+    end
+  end
+end
+
+vim.keymap.set('n', 'ys', opfunc('_G.Surround'), { desc = '[Y]ou [S]urround', silent = true, expr = true })
+vim.keymap.set('x', 's', opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
+
+vim.keymap.set('n', 'ds', function()
+  local pair = get_pair()
+  if #pair > 0 then
+    return '"sci' .. pair[1] .. '<BS><Del><C-r>s'
+  end
+end, { desc = '[D]elete [S]urround', expr = true })
+
+vim.keymap.set('n', 'cs', function()
+  local pair, replace = get_pair(), get_pair()
+  if #pair > 0 and #replace > 0 then
+    return '"sci' .. pair[1] .. '<BS><Del>' .. replace[1] .. '<C-r>s' .. replace[2]
+  end
+end, { desc = '[C]hange [S]urround', expr = true })
+
+--------------------------------------------------
 -- Substitute
 --------------------------------------------------
 
