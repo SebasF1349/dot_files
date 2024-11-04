@@ -78,6 +78,10 @@ vim.keymap.set({ 'i', 'c' }, '<M-f>', '<S-Right>', { desc = 'Move one word to th
 
 vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
 
+vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
+vim.keymap.set('n', 'gp', '"+p', { desc = 'Paste from system clipboard' })
+vim.keymap.set('x', 'gp', '"+P', { desc = 'Paste from system clipboard' })
+
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
