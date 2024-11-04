@@ -85,8 +85,8 @@ vim.keymap.set('x', 'gp', '"+P', { desc = 'Paste from system clipboard' })
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
-vim.keymap.set('n', 'dl', '0d$', { desc = '[D]elete [L]ine without newline' })
-vim.keymap.set('n', 'yl', '0y$', { desc = '[Y]ank [L]ine without newline' })
+vim.keymap.set('n', 'dl', '^d$', { desc = '[D]elete [L]ine without newline' })
+vim.keymap.set('n', 'yl', '^y$', { desc = '[Y]ank [L]ine without newline' })
 
 -- better cmdline history
 vim.keymap.set('c', '<C-n>', function()
