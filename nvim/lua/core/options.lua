@@ -136,13 +136,28 @@ vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnu
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = 'number'
 
+local function capitalize(str)
+  return str:lower():gsub('^%l', string.upper)
+end
+
 -- Diagnostics
 vim.diagnostic.config({
   underline = false,
   float = {
     scope = 'cursor',
     severity_sort = true,
-    source = true,
+    source = false,
+    header = '',
+    prefix = function(d)
+      local severity_name = capitalize(vim.diagnostic.severity[d.severity])
+      return '-' .. ' ', 'DiagnosticSign' .. severity_name
+    end,
+    format = function(d)
+      return d.message --.. ' '
+    end,
+    suffix = function(d)
+      return string.format('[%s: %s]', d.source, d.code), 'Underlined'
+    end,
   },
   jump = { float = true },
   severity_sort = true,
