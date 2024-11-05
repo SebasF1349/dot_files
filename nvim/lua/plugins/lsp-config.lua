@@ -93,7 +93,16 @@ return {
             buffer = event.buf,
             callback = function()
               vim.lsp.completion.trigger()
+          vim.lsp.completion.enable(true, event.data.client_id, event.buf, {
+            autotrigger = true,
+            convert = function(item)
+              local kind = vim.lsp.protocol.CompletionItemKind[item.kind]
+              return {
+                menu = '',
+                kind_hlgroup = 'CmpItemKind' .. kind,
+              }
             end,
+            desc = 'Highlight kinds as in cmp',
           })
           -- based on https://github.com/neovim/neovim/issues/29225#issuecomment-2159428607 (autocmd breaks snippets)
           vim.api.nvim_create_autocmd('CompleteChanged', {

@@ -62,9 +62,7 @@ return {
           LazySpecial = { fg = colors.green },
 
           Pmenu = { bg = float_bg, fg = colors.lavender },
-          PmenuSel = { bg = colors.green, fg = colors.base },
           PmenuKind = { bg = float_bg, fg = colors.mauve },
-          PmenuKindSel = { bg = colors.green, fg = colors.surface0, style = { 'bold' } },
           PmenuSbar = { bg = colors.surface0 },
           PmenuThumb = { bg = colors.overlay2 },
           NormalFloat = { bg = float_bg, fg = colors.lavender },
