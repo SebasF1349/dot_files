@@ -262,12 +262,6 @@ return {
             vim.lsp.buf.type_definition,
             { desc = 'LSP: [G]oto [T]ype Definition', buffer = event.buf }
           )
-          vim.keymap.set(
-            'n',
-            'grs',
-            vim.lsp.buf.signature_help,
-            { desc = 'LSP: [S]ignature Documentation on Hover', buffer = event.buf }
-          )
 
           vim.keymap.set('n', 'gro', function()
             if vim.fn.exists(':OrganizeImports') > 0 then
