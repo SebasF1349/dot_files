@@ -89,10 +89,6 @@ return {
             return
           end
 
-          vim.api.nvim_create_autocmd({ 'InsertEnter' }, {
-            buffer = event.buf,
-            callback = function()
-              vim.lsp.completion.trigger()
           vim.lsp.completion.enable(true, event.data.client_id, event.buf, {
             autotrigger = true,
             convert = function(item)
