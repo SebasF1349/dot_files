@@ -221,8 +221,8 @@ local function set_path()
           ','
         )
         :gsub('%./', '')
-      .. ','
-      .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
+    -- .. ','
+    -- .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
   else
     return ',,' .. table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
   end
@@ -233,7 +233,7 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
   end,
   once = true,
   group = general,
-  desc = 'Lazyload setting path until I want to use :find',
+  desc = 'Lazyload setting path',
 })
 
 local function open_external_file()
