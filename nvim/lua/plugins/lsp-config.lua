@@ -89,6 +89,46 @@ return {
             return
           end
 
+          -- vim.api.nvim_create_autocmd({ 'InsertEnter' }, {
+          --   buffer = event.buf,
+          --   callback = function()
+          --     vim.lsp.completion.trigger()
+          --   end,
+          -- })
+          -- -- based on https://github.com/neovim/neovim/issues/29225#issuecomment-2159428607 (autocmd breaks snippets)
+          -- vim.api.nvim_create_autocmd('CompleteChanged', {
+          --   buffer = event.buf,
+          --   callback = function()
+          --     local info = vim.fn.complete_info({ 'selected' })
+          --     local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
+          --     if not completionItem then
+          --       return
+          --     end
+          --
+          --     local resolvedItem = vim.lsp.buf_request_sync(
+          --       event.buf,
+          --       vim.lsp.protocol.Methods.completionItem_resolve,
+          --       completionItem,
+          --       500
+          --     ) or {}
+          --
+          --     local docs = vim.tbl_get(resolvedItem[event.data.client_id], 'result', 'documentation', 'value') or ''
+          --
+          --     local winData = vim.api.nvim__complete_set(info['selected'], { info = docs })
+          --     if not winData.winid or not vim.api.nvim_win_is_valid(winData.winid) then
+          --       return
+          --     end
+          --
+          --     if docs == '' then
+          --       vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Float', { win = winData.winid })
+          --       return
+          --     end
+          --
+          --     vim.api.nvim_set_option_value('winhighlight', 'Normal:NormalFloat', { win = winData.winid })
+          --     vim.treesitter.start(winData.bufnr, 'markdown')
+          --     vim.wo[winData.winid].conceallevel = 3
+          --   end,
+          -- })
           vim.lsp.completion.enable(true, event.data.client_id, event.buf, {
             autotrigger = true,
             convert = function(item)
