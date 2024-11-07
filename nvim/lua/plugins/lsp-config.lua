@@ -376,6 +376,28 @@ return {
         end,
       })
 
+
+      local hover = vim.lsp.buf.hover
+      ---@diagnostic disable-next-line: duplicate-set-field
+      vim.lsp.buf.hover = function()
+        local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
+        return hover({
+          anchor_bias = 'above',
+          max_height = max_height,
+          max_width = math.floor(vim.o.columns * 0.4),
+        })
+      end
+      local signature_help = vim.lsp.buf.signature_help
+      ---@diagnostic disable-next-line: duplicate-set-field
+      vim.lsp.buf.signature_help = function()
+        local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
+        return signature_help({
+          anchor_bias = 'above',
+          max_height = max_height,
+          max_width = math.floor(vim.o.columns * 0.4),
+        })
+      end
+
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
