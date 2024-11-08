@@ -27,7 +27,7 @@ local function base64(data)
 end
 
 local function set_user_var(key, value)
-  io.write(string.format('\027]1337;SetUserVar=%s=%s\a', key, M.base64(value)))
+  io.write(string.format('\027]1337;SetUserVar=%s=%s\a', key, base64(value)))
 end
 
 local wezterm = vim.api.nvim_create_augroup('Set Wezterm Vars', { clear = true })
