@@ -1,7 +1,7 @@
 local M = {}
 
 -- thanks Folke: https://github.com/folke/dot/blob/94ca5961fcfb44101c98d8eed92e137537bc3038/nvim/lua/util/init.lua#L95
-function M.base64(data)
+local function base64(data)
   data = tostring(data)
   local bit = require('bit')
   local b64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
@@ -26,8 +26,30 @@ function M.base64(data)
   return b64
 end
 
-function M.set_user_var(key, value)
+local function set_user_var(key, value)
   io.write(string.format('\027]1337;SetUserVar=%s=%s\a', key, M.base64(value)))
+end
+
+local wezterm = vim.api.nvim_create_augroup('Set Wezterm Vars', { clear = true })
+
+function M.setup()
+  vim.api.nvim_create_autocmd({ 'VimEnter' }, {
+    group = wezterm,
+    callback = function()
+      set_user_var('IS_NVIM', true)
+    end,
+    once = true,
+    desc = 'Set Wezterm var to true',
+  })
+
+  vim.api.nvim_create_autocmd({ 'VimLeave' }, {
+    group = wezterm,
+    callback = function()
+      set_user_var('IS_NVIM', false)
+    end,
+    once = true,
+    desc = 'Set Wezterm var to false',
+  })
 end
 
 return M

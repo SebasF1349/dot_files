@@ -266,7 +266,6 @@ end
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   group = general,
   callback = function()
-    require('utils.wezterm').set_user_var('IS_NVIM', true)
     if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
       vim.schedule(function()
         local cwd = vim.uv.cwd()
@@ -275,14 +274,4 @@ vim.api.nvim_create_autocmd({ 'VimEnter' }, {
     end
   end,
   once = true,
-  desc = 'Pin arglist buffers',
-})
-
-vim.api.nvim_create_autocmd({ 'VimLeave' }, {
-  group = general,
-  callback = function()
-    require('utils.wezterm').set_user_var('IS_NVIM', false)
-  end,
-  once = true,
-  desc = 'Pin arglist buffers',
 })
