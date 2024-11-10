@@ -237,8 +237,14 @@ function M.select(items, opts, on_choice)
       local item_whitespace = col_start - vim.fn.strchars(text[j] or '')
       local col = #(text[j] or '') + item_whitespace + 1
       table.insert(hl[j], { col, col + 1 + #choices[pos].option })
-      text[j] =
-        string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choices[pos].option, choices[pos].item)
+      text[j] = string.format(
+        '%s%s %s%s%s ',
+        text[j] or '',
+        (' '):rep(item_whitespace),
+        choices[pos].option,
+        curr_conf.label_separator,
+        choices[pos].item
+      )
       if choices[pos].option ~= '-' then
         vim.keymap.set('n', choices[pos].option, function()
           select_and_close(pos)
