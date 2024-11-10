@@ -10,6 +10,7 @@ local M = {
 ---@class uim.OptsSelect
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor'
 ---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
+---@field title? string
 ---@field title_pos? 'left' | 'center' | 'right'
 ---@field keys_method? 'list' | 'intelligent'
 ---@field possible_chars? string[]
@@ -32,6 +33,7 @@ M.opts = {
   select = {
     position = 'bottom',
     border = 'none',
+    title = nil,
     title_pos = 'left',
     keys_method = 'list',
     -- stylua: ignore

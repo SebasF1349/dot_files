@@ -30,7 +30,7 @@ function M.select(items, opts, on_choice)
   end
 
   local current_win = vim.api.nvim_get_current_win()
-  local title = opts.prompt or 'Select one of:'
+  local title = curr_conf.title or opts.prompt or 'Select one of:'
 
   local current_cursor = vim.o.guicursor
   local cursor_hl = 'HiddenCursor'
