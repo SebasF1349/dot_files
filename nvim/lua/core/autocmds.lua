@@ -236,6 +236,19 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
   desc = 'Lazyload setting path',
 })
 
+function FindFunc(cmdarg, _)
+  -- ideas: https://new.reddit.com/r/vim/comments/1ga5ckm/findexpr/
+  local cmd = 'fd --type file --full-path --color never ' -- TODO: find best args to use (regex or not?)
+  local list = vim.fn.systemlist(cmd)
+  return vim
+    .iter(list)
+    :filter(function(item)
+      return item:lower():find(cmdarg:lower(), 1, true)
+    end)
+    :totable()
+end
+vim.o.findfunc = 'v:lua.FindFunc'
+
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
   local fn = vim.fn.expand('%:p')
