@@ -38,7 +38,6 @@ return {
         semantic_tokens = true,
         telescope = true,
         treesitter = true,
-        which_key = true,
       },
       custom_highlights = function(colors)
         local utils = require('catppuccin.utils.colors')
