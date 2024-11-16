@@ -634,7 +634,7 @@ for _, cmd in ipairs(cmds_typos) do
   vim.keymap.set('ca', cmd, cmd:lower())
 end
 
-local custom_cmds_typos = { 'ME', 'MEss' }
+local custom_cmds_typos = { 'ME', 'MEss', 'RG', 'LA', 'MAson' }
 for _, cmd in ipairs(custom_cmds_typos) do
   vim.keymap.set('ca', cmd, cmd:sub(1, 1):upper() .. cmd:sub(2):lower())
 end
