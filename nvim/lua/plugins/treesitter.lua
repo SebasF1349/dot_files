@@ -2,6 +2,7 @@ return {
   {
     'nvim-treesitter/nvim-treesitter',
     event = { 'BufReadPost', 'BufNewFile' },
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     build = ':TSUpdate',
     init = function(plugin)
       -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
@@ -69,6 +70,72 @@ return {
         highlight = { enable = true },
         -- indent = { enable = true }, -- doesn't work properly
         matchup = { enable = true },
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true,
+            keymaps = {
+              ['io'] = '@block.inner',
+              ['ao'] = '@block.outer',
+              ['af'] = '@function.outer',
+              ['if'] = '@function.inner',
+              ['au'] = '@call.outer',
+              ['iu'] = '@call.inner',
+              ['ac'] = '@class.outer',
+              ['ic'] = '@class.inner',
+              ['aa'] = '@parameter.outer',
+              ['ia'] = '@parameter.inner',
+              ['a='] = '@assignment.outer',
+              ['i='] = '@assignment.inner',
+              ['l='] = '@assignment.lhs',
+              ['r='] = '@assignment.rhs',
+              ['a/'] = '@comment.outer',
+              ['i/'] = '@comment.inner', -- Only added inner for lua, add for other languages
+              ['aq'] = '@quote.outer',
+              ['iq'] = '@quote.inner',
+              -- ['ab'] = '@bracket.outer', -- Need more work, they are used in many cases
+              -- ['ib'] = '@bracket.inner',
+            },
+          },
+          move = {
+            enable = true,
+            goto_next_start = {
+              [']f'] = '@function.outer',
+              [']c'] = '@class.outer',
+              [']a'] = '@parameter.outer',
+              [']o'] = '@block.outer',
+              [']/'] = '@comment.outer',
+            },
+            goto_next_end = {
+              [']F'] = '@function.outer',
+              [']C'] = '@class.outer',
+              [']A'] = '@parameter.outer',
+              [']O'] = '@block.outer',
+            },
+            goto_previous_start = {
+              ['[f'] = '@function.outer',
+              ['[c'] = '@class.outer',
+              ['[a'] = '@parameter.outer',
+              ['[o'] = '@block.outer',
+              ['[/'] = '@comment.outer',
+            },
+            goto_previous_end = {
+              ['[F'] = '@function.outer',
+              ['[C'] = '@class.outer',
+              ['[A'] = '@parameter.outer',
+              ['[O'] = '@block.outer',
+            },
+          },
+          swap = {
+            enable = true,
+            swap_next = {
+              ['<leader>a'] = '@parameter.inner',
+            },
+            swap_previous = {
+              ['<leader>A'] = '@parameter.inner',
+            },
+          },
+        },
       })
 
       local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')

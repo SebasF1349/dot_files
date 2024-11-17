@@ -2,6 +2,7 @@ return {
   { 'nvim-treesitter/nvim-treesitter-textobjects' },
   {
     'echasnovski/mini.ai',
+    enabled = false,
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local ai = require('mini.ai')
