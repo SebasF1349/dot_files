@@ -99,6 +99,7 @@ window_rules:
             window_class: { regex: 'HwndWrapper\[PowerToys\.PowerAccent.*?\]' }
           - window_process: { equals: "Lively" }
             window_class: { regex: "HwndWrapper*" }
+          - window_process: { equals: "KeePassXC" }
 binding_modes:
     # When enabled, the focused window can be resized via arrow keys or HJKL.
     - name: "resize"
