@@ -114,6 +114,9 @@ nnoremap <C-q> <cmd>close<CR>
 nnoremap <C-r> <C-w><C-w>
 nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<CR><C-L>
 
+vnoremap "J", ":m '>+1<CR>gv=gv"
+vnoremap "K", ":m '<-2<CR>gv=gv"
+
 inoremap <C-U> <C-G>u<C-U>
 inoremap <C-W> <C-G>u<C-W>
 inoremap jk <esc>
