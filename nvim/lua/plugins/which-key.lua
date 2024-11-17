@@ -1,6 +1,7 @@
 return {
   'folke/which-key.nvim',
   event = 'VeryLazy',
+  enabled = false,
   config = function()
     local which_key = require('which-key')
 

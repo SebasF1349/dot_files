@@ -554,6 +554,77 @@ vim.keymap.set('n', "g'", function()
 end, { desc = 'Add tilde to letters', expr = true })
 
 vim.keymap.set('n', '<leader>;', 'mzA;`z', { desc = 'Add [;] at the end of the line' })
+
+--------------------------------------------------
+-- Toggler
+--------------------------------------------------
+
+-- Based on https://github.com/Wansmer/nvim-config/blob/main/lua/modules/toggler.lua
+---Every key and value should be in lowercase
+local opposites = {
+  ['true'] = 'false',
+  ['false'] = 'true',
+  ['const'] = 'let',
+  ['let'] = 'const',
+  ['global'] = 'local',
+  ['local'] = 'global',
+  ['==='] = '!==',
+  ['!=='] = '===',
+  ['=='] = '!=',
+  ['!='] = '<=',
+  ['<='] = '<',
+  ['<'] = '>',
+  ['>'] = '>=',
+  ['>='] = '==',
+  ['&&'] = '||',
+  ['||'] = '&&',
+  ['and'] = 'or',
+  ['or'] = 'and',
+}
+
+---Convert string's chars to same case like base string
+---If base string length less than target string, other chars will convert to case
+---like last char in base string.
+---@param base string Base string
+---@param str string String to convert
+---@return string
+local function to_same_register(base, str)
+  local base_list = vim.split(base, '', { plain = true })
+  local target_list = vim.split(str, '', { plain = true })
+
+  for i, ch in ipairs(target_list) do
+    local base_char = base_list[i] or base_list[#base_list]
+    target_list[i] = base_char == base_char:lower() and string.lower(ch) or string.upper(ch)
+  end
+
+  return table.concat(target_list)
+end
+
+local function toggle_word()
+  local ikw_orig = vim.opt.iskeyword:get()
+  vim.opt.iskeyword:append({ '!', '=', '<', '>', '&', '|' })
+
+  local text = vim.fn.expand('<cword>')
+
+  -- Checking if the symbol under cursor is a part of received word
+  -- (required to prevent wrong inserting, when cursor at punctuation and whitespace before the target word)
+  local col = vim.api.nvim_win_get_cursor(0)[2] + 1
+  local char = vim.api.nvim_get_current_line():sub(col, col)
+  local contains = string.find(tostring(text), char, 1, true) and true or false
+
+  local opp = text and contains and opposites[string.lower(tostring(text))]
+
+  if opp then
+    vim.cmd('normal! "_ciw' .. to_same_register(tostring(text), opp))
+  else
+    vim.cmd('normal! ')
+  end
+
+  vim.opt.iskeyword = ikw_orig
+end
+
+vim.keymap.set('n', '<C-a>', toggle_word, { desc = 'Toggle keywords' })
+
 --------------------------------------------------
 -- Abbreviations
 --------------------------------------------------
@@ -561,4 +632,9 @@ vim.keymap.set('n', '<leader>;', 'mzA;`z', { desc = 'Add [;] at the end of the 
 local cmds_typos = { 'Wa', 'WA' }
 for _, cmd in ipairs(cmds_typos) do
   vim.keymap.set('ca', cmd, cmd:lower())
+end
+
+local custom_cmds_typos = { 'ME', 'MEss', 'RG', 'LA', 'MAson' }
+for _, cmd in ipairs(custom_cmds_typos) do
+  vim.keymap.set('ca', cmd, cmd:sub(1, 1):upper() .. cmd:sub(2):lower())
 end

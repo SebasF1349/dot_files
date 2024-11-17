@@ -10,13 +10,15 @@ local M = {
 ---@class uim.OptsSelect
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor'
 ---@field border? 'none' | 'single' | 'double' | 'rounded' | 'solid' | 'shadow'
+---@field title? string
 ---@field title_pos? 'left' | 'center' | 'right'
 ---@field keys_method? 'list' | 'intelligent'
 ---@field possible_chars? string[]
 ---@field ignore_chars? string[]
----@field closing_keys? (string | uim.OptsClosingKeys)[] -- string maps to all modes
+---@field label_separator? string
 ---@field footer_labels? boolean
 ---@field autoselect? boolean
+---@field closing_keys? (string | uim.OptsClosingKeys)[] -- string maps to all modes
 
 ---@class uim.OptsInput
 ---@field position? 'bottom' | 'right' | 'center' | 'cursor' | 'cmdline'
@@ -32,15 +34,17 @@ M.opts = {
   select = {
     position = 'bottom',
     border = 'none',
+    title = nil,
     title_pos = 'left',
     keys_method = 'list',
     -- stylua: ignore
     possible_chars = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'",
                       'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' },
     ignore_chars = {},
-    closing_keys = { 'q', '<C-c>', '<ESC>' },
+    label_separator = ': ',
     footer_labels = true,
     autoselect = false,
+    closing_keys = { 'q', '<C-c>', '<ESC>' },
   },
   input = {
     position = 'cmdline',

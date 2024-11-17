@@ -236,6 +236,19 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
   desc = 'Lazyload setting path',
 })
 
+function FindFunc(cmdarg, _)
+  -- ideas: https://new.reddit.com/r/vim/comments/1ga5ckm/findexpr/
+  local cmd = 'fd --type file --full-path --color never ' -- TODO: find best args to use (regex or not?)
+  local list = vim.fn.systemlist(cmd)
+  return vim
+    .iter(list)
+    :filter(function(item)
+      return item:lower():find(cmdarg:lower(), 1, true)
+    end)
+    :totable()
+end
+vim.o.findfunc = 'v:lua.FindFunc'
+
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
   local fn = vim.fn.expand('%:p')
@@ -268,10 +281,11 @@ vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   callback = function()
     if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
       vim.schedule(function()
-        local cwd = vim.uv.cwd()
-        vim.cmd.Oil(cwd)
+        local dir = vim.fn.argc() == 1 and vim.fn.expand('%') or vim.uv.cwd()
+        vim.cmd.Oil(dir)
       end)
     end
   end,
   once = true,
+  desc = 'Open Oil if there is no file in the arglist',
 })

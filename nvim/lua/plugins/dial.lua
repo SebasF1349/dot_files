@@ -14,6 +14,7 @@ end
 
 return {
   'monaqa/dial.nvim',
+  enabled = false,
   -- stylua: ignore
   keys = {
     { "<C-a>", function() return dial(true) end, expr = true, desc = "Increment", mode = {"n", "v"} },

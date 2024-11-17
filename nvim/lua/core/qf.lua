@@ -692,6 +692,7 @@ end
 
 ---@param selectItemOpts SelectItemOpts
 local function openSelectedWin(selectItemOpts)
+  ---@type { opt: number, win: number }[]
   local wins = {}
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == '' and vim.o.filetype ~= 'qf' then
@@ -712,7 +713,7 @@ local function openSelectedWin(selectItemOpts)
       return item.opt
     end,
   }, function(item, idx)
-    if not idx then
+    if not idx or not item then
       return
     end
     local curr_win = vim.api.nvim_get_current_win()
