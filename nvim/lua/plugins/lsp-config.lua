@@ -140,52 +140,18 @@ return {
             end,
             desc = 'Highlight kinds as in cmp',
           })
-          -- based on https://github.com/neovim/neovim/issues/29225#issuecomment-2159428607 (autocmd breaks snippets)
-          vim.api.nvim_create_autocmd('CompleteChanged', {
-            buffer = event.buf,
-            callback = function()
-              local info = vim.fn.complete_info({ 'selected' })
-              local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
-              if not completionItem then
-                return
-              end
 
-              local resolvedItem = vim.lsp.buf_request_sync(
-                event.buf,
-                vim.lsp.protocol.Methods.completionItem_resolve,
-                completionItem,
-                500
-              ) or {}
-
-              local docs = vim.tbl_get(resolvedItem[event.data.client_id], 'result', 'documentation', 'value') or ''
-
-              local winData = vim.api.nvim__complete_set(info['selected'], { info = docs })
-              if not winData.winid or not vim.api.nvim_win_is_valid(winData.winid) then
-                return
-              end
-
-              if docs == '' then
-                vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Float', { win = winData.winid })
-                return
-              end
-
-              vim.api.nvim_set_option_value('winhighlight', 'Normal:NormalFloat', { win = winData.winid })
-              vim.treesitter.start(winData.bufnr, 'markdown')
-              vim.wo[winData.winid].conceallevel = 3
-            end,
-          })
-          vim.lsp.completion.enable(true, event.data.client_id, event.buf, { autotrigger = true })
+          vim.o.pumheight = 6
           vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert', 'fuzzy', 'popup' }
-          vim.keymap.set({ 'i', 's' }, '<C-l>', function()
-            if vim.fn.pumvisible() ~= 0 then
-              return '<C-y>'
-            elseif vim.snippet.active({ direction = 1 }) then
+
+          vim.keymap.set('s', '<C-l>', function()
+            if vim.snippet.active({ direction = 1 }) then
               return '<cmd>lua vim.snippet.jump(1)<cr>'
             else
-              vim.lsp.completion.trigger()
+              return '<C-l>'
             end
-          end, { desc = 'Select, Expand and Jump Snippet', expr = true, buffer = event.buf })
-          vim.keymap.set({ 'i', 's' }, '<C-h>', function()
+          end, { desc = 'Jump Snippet Forwards', expr = true, buffer = event.buf })
+          vim.keymap.set('s', '<C-h>', function()
             if vim.snippet.active({ direction = -1 }) then
               return '<cmd>lua vim.snippet.jump(-1)<cr>'
             else
@@ -196,12 +162,17 @@ return {
           vim.keymap.set('i', '<BS>', function()
             return vim.fn.pumvisible() ~= 0 and '<BS><cmd>lua vim.lsp.completion.trigger()<CR>' or '<BS>'
           end, { desc = 'Retrigger completion when deleting', expr = true, buffer = event.buf })
-          vim.keymap.set(
-            'i',
-            '<C-Space>',
-            vim.lsp.completion.trigger,
-            { silent = true, desc = 'Trigger LSP Completion', buffer = event.buf }
-          )
+          vim.keymap.set('i', '<C-n>', function()
+            if vim.fn.pumvisible() ~= 0 then
+              vim.api.nvim_input('<C-n>')
+            elseif next(vim.lsp.get_clients({ bufnr = 0 })) then
+              vim.lsp.completion.trigger()
+            elseif vim.bo.omnifunc == '' then
+              vim.api.nvim_input('<C-x><C-n>')
+            else
+              vim.api.nvim_input('<C-x><C-o>')
+            end
+          end, { desc = 'Trigger And Select Next Completion' })
           vim.keymap.set('i', '<CR>', function()
             if vim.fn.pumvisible() ~= 0 then
               return '<C-e><CR>'
@@ -211,13 +182,13 @@ return {
           end, { desc = 'Accept selected or new line', expr = true, buffer = event.buf })
           -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
-          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-            require('inlay-hint').setup()
-            vim.lsp.inlay_hint.enable(true)
-            vim.keymap.set('n', '<leader>ti', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
-            end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
-          end
+          -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          --   require('inlay-hint').setup()
+          --   vim.lsp.inlay_hint.enable(true)
+          --   vim.keymap.set('n', '<leader>ti', function()
+          --     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
+          --   end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
+          -- end
 
           local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
           local next_diag, prev_diag = ts_repeat_move.make_repeatable_move_pair(function()
@@ -229,6 +200,7 @@ return {
           vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
 
           -- Move to next/prev reference IN THE BUFFER
+          -- NOTE: it's fast, no need of cache apparently
           ---@param direction 1 | -1
           local function move_reference(direction)
             vim.lsp.buf.references(nil, {
@@ -288,12 +260,6 @@ return {
           vim.keymap.set('n', 'grd', '<C-]>', { desc = 'LSP: [G]oto [D]efinition', buffer = event.buf })
           vim.keymap.set(
             'n',
-            'gri',
-            vim.lsp.buf.implementation,
-            { desc = 'LSP: [G]oto [I]mplementation', buffer = event.buf }
-          )
-          vim.keymap.set(
-            'n',
             'grt',
             vim.lsp.buf.type_definition,
             { desc = 'LSP: [G]oto [T]ype Definition', buffer = event.buf }
@@ -310,6 +276,40 @@ return {
               })
             end
           end, { desc = 'LSP: [O]rganize Imports', buffer = event.buf })
+
+          if client.supports_method('textDocument/signatureHelp') then
+            vim.api.nvim_create_autocmd('InsertCharPre', {
+              buffer = 0,
+              callback = function()
+                local char = vim.v.char
+                if char == '(' or char == ',' then
+                  vim.defer_fn(function()
+                    vim.lsp.buf.signature_help()
+                  end, 3)
+                end
+              end,
+            })
+          end
+
+          -- can't get float_winnr
+          -- local float_winnr = -1
+          -- vim.keymap.set('i', '<C-b>', function()
+          --   if vim.api.nvim_win_is_valid(float_winnr) then
+          --     local cursor_pos = vim.api.nvim_win_get_cursor(float_winnr)
+          --     local new_row = math.max(1, cursor_pos[1] - vim.o.scrolloff / 2)
+          --     vim.api.nvim_win_set_cursor(float_winnr, { new_row, cursor_pos[2] })
+          --   else
+          --     return '<C-b>'
+          --   end
+          -- end, { desc = 'Scroll Backwards Docs' })
+          -- vim.keymap.set('i', '<C-f>', function()
+          --   if vim.api.nvim_win_is_valid(float_winnr) then
+          --     local cursor_pos = vim.api.nvim_win_get_cursor(float_winnr)
+          --     pcall(vim.api.nvim_win_set_cursor, float_winnr, { cursor_pos[1] + vim.o.scrolloff / 2, cursor_pos[2] })
+          --   else
+          --     return '<C-f>'
+          --   end
+          -- end, { desc = 'Scroll Forwards Docs' })
 
           -- based on https://github.com/mfussenegger/nvim-qwahl/blob/main/lua/qwahl.lua#L446C1-L468C4
           ---@param bufnr? integer 0 for current buffer; nil for all diagnostic
@@ -376,6 +376,20 @@ return {
         end,
       })
 
+      -- thanks Maria: https://github.com/MariaSolOs/dotfiles/blob/main/.config/nvim/lua/lsp.lua#L144C1-L156C2
+      -- Override the virtual text diagnostic handler so that the most severe diagnostic is shown first.
+      local show_handler = vim.diagnostic.handlers.virtual_text.show
+      assert(show_handler)
+      local hide_handler = vim.diagnostic.handlers.virtual_text.hide
+      vim.diagnostic.handlers.virtual_text = {
+        show = function(ns, bufnr, diagnostics, opts)
+          table.sort(diagnostics, function(diag1, diag2)
+            return diag1.severity > diag2.severity
+          end)
+          return show_handler(ns, bufnr, diagnostics, opts)
+        end,
+        hide = hide_handler,
+      }
 
       local hover = vim.lsp.buf.hover
       ---@diagnostic disable-next-line: duplicate-set-field
