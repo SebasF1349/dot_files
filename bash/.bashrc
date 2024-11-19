@@ -161,9 +161,17 @@ alias ...="cd ../.."
 
 # git
 
+export GIT_BASE=main
+
 function current_branch() {
     branch_name=$(git symbolic-ref --short -q HEAD)
     echo "$branch_name"
+}
+
+# gd ideas from https://blog.jez.io/cli-code-review/
+function git_diff_branch() {
+    local review_base="${1:-$GIT_BASE}"
+    git diff --stat "$(git merge-base HEAD "$review_base")"
 }
 
 function git_checkout_fzf() {
@@ -178,7 +186,11 @@ function git_checkout_fzf() {
 alias g="git"
 alias gs="git status"
 alias gd="git diff"
-alias gdn='git diff --name-only ..origin/$(current_branch)'
+alias gdf='git diff --name-only ..origin/$(current_branch)'
+alias gdn='git diff --name-only $(git merge-base HEAD "$GIT_BASE")'
+alias gdv='nvim -p $(gdn) +"tabdo Gdiffsplit $(current_branch)"'
+alias gdvf='nvim -p +"tabdo Gdiffsplit $(current_branch)"'
+alias gdb='git_diff_branch'
 alias gdlc="git diff --cached HEAD^" #show diff of last commit
 alias gc="git commit -m"
 alias gac="git commit -am"
