@@ -15,11 +15,12 @@ vim.api.nvim_set_hl(0, 'SLSeparator', { bg = curr_statusline_bg, fg = mocha.blue
 local modes_hi = {
   N = { bg = curr_statusline_bg, fg = mocha.blue },
   I = { bg = curr_statusline_bg, fg = mocha.green },
-  T = { bg = curr_statusline_bg, fg = mocha.green },
+  T = { bg = curr_statusline_bg, fg = mocha.teal },
   C = { bg = curr_statusline_bg, fg = mocha.peach },
   V = { bg = curr_statusline_bg, fg = mocha.mauve },
   R = { bg = curr_statusline_bg, fg = mocha.red },
   O = { bg = curr_statusline_bg, fg = mocha.overlay2 },
+  S = { bg = curr_statusline_bg, fg = mocha.yellow },
 }
 
 for mode, hi in pairs(modes_hi) do
@@ -57,44 +58,6 @@ vim.api.nvim_set_hl(0, 'SLBranch', { bg = curr_statusline_bg, fg = git_branch })
 vim.api.nvim_set_hl(0, 'SLDiff', { bg = curr_statusline_bg, fg = git_diff })
 
 ---- MODE ----
-local modes = {
-  ['n'] = 'Normal',
-  ['no'] = 'O-Pending',
-  ['nov'] = 'O-Pending',
-  ['noV'] = 'O-Pending',
-  ['no\22'] = 'O-Pending',
-  ['niI'] = 'Normal',
-  ['niR'] = 'Normal',
-  ['niV'] = 'Normal',
-  ['nt'] = 'Normal',
-  ['ntT'] = 'Normal',
-  ['v'] = 'Visual',
-  ['vs'] = 'Visual',
-  ['V'] = 'V-Line',
-  ['\22'] = 'V-Block',
-  ['\22s'] = 'V-Block',
-  ['s'] = 'Select',
-  ['S'] = 'S-Line',
-  ['\19'] = 'S-Block',
-  ['i'] = 'Insert',
-  ['ic'] = 'Insert',
-  ['ix'] = 'Insert',
-  ['R'] = 'Replace',
-  ['Rc'] = 'Replace',
-  ['Rx'] = 'Replace',
-  ['Rv'] = 'V-Replace',
-  ['Rvc'] = 'V-Replace',
-  ['Rvx'] = 'V-Replace',
-  ['c'] = 'Command',
-  ['cv'] = 'Ex',
-  ['ce'] = 'Ex',
-  ['r'] = 'Replace',
-  ['rm'] = 'More',
-  ['r?'] = 'Confirm',
-  ['!'] = 'Shell',
-  ['t'] = 'Terminal',
-}
-
 local function mode()
   local first_char = vim.fn.strtrans(vim.fn.mode()):upper():gsub('%W', '')
   return string.format('%%#SLMode%s#%s', first_char, first_char)
