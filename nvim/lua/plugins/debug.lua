@@ -53,15 +53,6 @@ return {
         end
       end,
     },
-
-    -- Lua adapter.
-    {
-      'jbyuki/one-small-step-for-vimkind',
-      -- stylua: ignore
-      keys = {
-        { "<leader>dl", function() require("osv").launch({ port = 8086 }) end, desc = "[D]ebug: [L]ua",},
-      },
-    },
   },
 
   -- stylua: ignore
@@ -81,18 +72,6 @@ return {
     sign('DapBreakpointCondition', { text = '●', texthl = 'DapBreakpointCondition', linehl = '', numhl = '' })
     sign('DapLogPoint', { text = '◆', texthl = 'DapLogPoint', linehl = '', numhl = '' })
     local dap = require('dap')
-    -- Lua configurations.
-    dap.adapters.nlua = function(callback, config)
-      callback({ type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 })
-    end
-    dap.configurations['lua'] = {
-      {
-        type = 'nlua',
-        request = 'attach',
-        name = 'Attach to running Neovim instance',
-      },
-    }
-
     -- C configurations.
     dap.adapters.codelldb = {
       type = 'server',
