@@ -7,14 +7,11 @@ vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
---Move things around when in visual mode
 vim.keymap.set('x', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('x', 'K', ":m '<-2<CR>gv=gv")
 
--- Press 'U' for redo
-vim.keymap.set('n', 'U', '<C-r>')
+vim.keymap.set('n', 'U', '<C-r>', { desc = 'Redo' })
 
--- Add empty lines before and after cursor line
 vim.keymap.set(
   'n',
   'O',
