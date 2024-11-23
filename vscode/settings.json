@@ -1,166 +1,172 @@
 {
-    "[cpp]": {
-        "editor.defaultFormatter": "ms-vscode.cpptools"
-    },
-    "[dart]": {
-        "editor.formatOnSave": true,
-        "editor.formatOnType": true,
-        "editor.rulers": [80],
-        "editor.selectionHighlight": false,
-        "editor.tabCompletion": "onlySnippets",
-        "editor.wordBasedSuggestions": "off"
-    },
-    "[ejs]": {
-        "editor.formatOnSave": false
-    },
-    "[rust]": {
-        "editor.defaultFormatter": "rust-lang.rust-analyzer",
-        "editor.formatOnSave": true
-    },
-    "cmake.configureOnOpen": true,
-    "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
-    "diffEditor.ignoreTrimWhitespace": false,
-    "editor.accessibilitySupport": "off",
-    "editor.acceptSuggestionOnEnter": "off",
-    "editor.bracketPairColorization.enabled": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit",
-        "source.sortImports": "explicit",
-        "source.organizeImports": "explicit"
-    },
-    "editor.codeLensFontFamily": "'JetBrainsMono Nerd Font'",
-    "editor.cursorBlinking": "solid",
-    "editor.cursorSmoothCaretAnimation": "on",
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.find.addExtraSpaceOnTop": false,
-    "editor.fontFamily": "'JetBrainsMono Nerd Font'",
-    "editor.fontLigatures": true,
-    "editor.formatOnPaste": true,
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[dart]": {
     "editor.formatOnSave": true,
-    "editor.guides.bracketPairs": true,
-    "editor.inlayHints.fontFamily": "'JetBrainsMono Nerd Font'",
-    "editor.lineNumbers": "relative",
-    "editor.linkedEditing": true,
-    "editor.minimap.enabled": false,
-    "editor.multiCursorModifier": "ctrlCmd",
-    "editor.overviewRulerBorder": false,
-    "editor.renderLineHighlight": "none",
-    "editor.scrollbar.horizontal": "hidden",
-    "editor.scrollbar.vertical": "hidden",
-    "editor.smoothScrolling": true,
-    "editor.suggest.showStatusBar": true,
-    "editor.tabCompletion": "on",
-    "editor.wordWrap": "bounded",
-    "editor.wordWrapColumn": 100,
-    "errorLens.fontFamily": "'JetBrainsMono Nerd Font'",
-    "eslint.codeAction.showDocumentation": {
-        "enable": true
+    "editor.formatOnType": true,
+    "editor.rulers": [80],
+    "editor.selectionHighlight": false,
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  },
+  "[ejs]": {
+    "editor.formatOnSave": false
+  },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  },
+  "cmake.configureOnOpen": true,
+  "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.accessibilitySupport": "off",
+  "editor.acceptSuggestionOnEnter": "off",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.sortImports": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.codeLensFontFamily": "'JetBrainsMono Nerd Font'",
+  "editor.cursorBlinking": "solid",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.find.addExtraSpaceOnTop": false,
+  "editor.fontFamily": "'JetBrainsMono Nerd Font'",
+  "editor.fontLigatures": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.guides.bracketPairs": true,
+  "editor.inlayHints.fontFamily": "'JetBrainsMono Nerd Font'",
+  "editor.linkedEditing": true,
+  "editor.minimap.enabled": false,
+  "editor.multiCursorModifier": "ctrlCmd",
+  "editor.overviewRulerBorder": false,
+  "editor.renderLineHighlight": "none",
+  "editor.scrollbar.horizontal": "hidden",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.smoothScrolling": true,
+  "editor.suggest.showStatusBar": true,
+  "editor.tabCompletion": "on",
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 100,
+  "errorLens.fontFamily": "'JetBrainsMono Nerd Font'",
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  "eslint.run": "onSave",
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "svelte",
+    "html",
+    "markdown",
+    "json"
+  ],
+  "extensions.autoUpdate": "onlyEnabledExtensions",
+  "extensions.ignoreRecommendations": true,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "files.associations": {
+    "header.ejs": "ejs"
+  },
+  "files.exclude": {
+    "*.env*": false
+  },
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.openRepositoryInParentFolders": "never",
+  "html.format.wrapLineLength": 0,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "lldb.suppressUpdateNotifications": true,
+  "notebook.output.fontFamily": "'JetBrainsMono Nerd Font'",
+  "prettier.documentSelectors": ["**/*.svelte"],
+  "prettier.printWidth": 100,
+  "prettier.tabWidth": 4,
+  "prettier.useTabs": false,
+  "scm.inputFontFamily": "'JetBrainsMono Nerd Font'",
+  "search.seedOnFocus": true,
+  "search.seedWithNearestWord": true,
+  "security.allowedUNCHosts": ["wsl.localhost", "wsl$"],
+  "security.workspace.trust.untrustedFiles": "open",
+  "svelte.enable-ts-plugin": true,
+  "telemetry.telemetryLevel": "off",
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
+  "todohighlight.exclude": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.vscode/**",
+    "**/.github/**",
+    "**/_output/**",
+    "**/*.min.*",
+    "**/*.map",
+    "**/.next/**"
+  ],
+  "todohighlight.include": [
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.html",
+    "**/*.php",
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "todohighlight.isCaseSensitive": true,
+  "todohighlight.isEnable": true,
+  "todohighlight.keywords": [
+    "DEBUG:",
+    "REVIEW:",
+    {
+      "color": "#ff0000",
+      "text": "NOTE:"
     },
-    "eslint.run": "onSave",
-    "eslint.validate": ["javascript", "typescript", "svelte", "html", "markdown", "json"],
-    "extensions.autoUpdate": "onlyEnabledExtensions",
-    "extensions.ignoreRecommendations": true,
-    "explorer.confirmDelete": false,
-    "explorer.confirmDragAndDrop": false,
-    "files.associations": {
-        "header.ejs": "ejs"
+    {
+      "color": "#000",
+      "isWholeLine": false,
+      "text": "HACK:"
     },
-    "files.exclude": {
-        "*.env*": false
+    {
+      "text": "TODO:"
     },
-    "files.trimFinalNewlines": true,
-    "files.trimTrailingWhitespace": true,
-    "git.autofetch": true,
-    "git.confirmSync": false,
-    "git.openRepositoryInParentFolders": "never",
-    "html.format.wrapLineLength": 0,
-    "javascript.updateImportsOnFileMove.enabled": "always",
-    "lldb.suppressUpdateNotifications": true,
-    "notebook.output.fontFamily": "'JetBrainsMono Nerd Font'",
-    "prettier.documentSelectors": ["**/*.svelte"],
-    "prettier.printWidth": 100,
-    "prettier.tabWidth": 4,
-    "prettier.useTabs": false,
-    "scm.inputFontFamily": "'JetBrainsMono Nerd Font'",
-    "search.seedOnFocus": true,
-    "search.seedWithNearestWord": true,
-    "security.allowedUNCHosts": ["wsl.localhost", "wsl$"],
-    "security.workspace.trust.untrustedFiles": "open",
-    "svelte.enable-ts-plugin": true,
-    "telemetry.telemetryLevel": "off",
-    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
-    "todohighlight.exclude": [
-        "**/node_modules/**",
-        "**/bower_components/**",
-        "**/dist/**",
-        "**/build/**",
-        "**/.vscode/**",
-        "**/.github/**",
-        "**/_output/**",
-        "**/*.min.*",
-        "**/*.map",
-        "**/.next/**"
-    ],
-    "todohighlight.include": [
-        "**/*.js",
-        "**/*.jsx",
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.html",
-        "**/*.php",
-        "**/*.css",
-        "**/*.scss"
-    ],
-    "todohighlight.isCaseSensitive": true,
-    "todohighlight.isEnable": true,
-    "todohighlight.keywords": [
-        "DEBUG:",
-        "REVIEW:",
-        {
-            "color": "#ff0000",
-            "text": "NOTE:"
-        },
-        {
-            "color": "#000",
-            "isWholeLine": false,
-            "text": "HACK:"
-        },
-        {
-            "text": "TODO:"
-        },
-        {
-            "text": "FIXED:"
-        }
-    ],
-    "todohighlight.maxFilesForSearch": 5120,
-    "todohighlight.toggleURI": false,
-    "typescript.updateImportsOnFileMove.enabled": "always",
-    "window.commandCenter": false,
-    "window.menuBarVisibility": "toggle",
-    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
-    "workbench.activityBar.location": "hidden",
-    "workbench.colorTheme": "Catppuccin Mocha",
-    "workbench.editor.closeOnFileDelete": true,
-    "workbench.editor.enablePreview": false,
-    "workbench.editor.labelFormat": "short",
-    "workbench.editor.limit.enabled": true,
-    "workbench.editor.limit.perEditorGroup": true,
-    "workbench.editor.limit.value": 1,
-    "workbench.editor.showTabs": "single",
-    "workbench.iconTheme": "material-icon-theme",
-    "workbench.panel.defaultLocation": "right",
-    "workbench.layoutControl.enabled": false,
-    "workbench.sideBar.location": "right",
-    "workbench.statusBar.visible": false,
-    "workbench.tree.indent": 16,
-    "workbench.tree.renderIndentGuides": "none",
-
-    "extensions.experimental.affinity": {
-        "asvetliakov.vscode-neovim": 1
-    },
-    "vscode-neovim.compositeKeys": {
-        "jk": {
-            "command": "vscode-neovim.escape"
-        }
+    {
+      "text": "FIXED:"
     }
+  ],
+  "todohighlight.maxFilesForSearch": 5120,
+  "todohighlight.toggleURI": false,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "window.commandCenter": false,
+  "window.menuBarVisibility": "toggle",
+  "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
+  "workbench.activityBar.location": "hidden",
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.editor.closeOnFileDelete": true,
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.labelFormat": "short",
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.perEditorGroup": true,
+  "workbench.editor.limit.value": 1,
+  "workbench.editor.showTabs": "single",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.panel.defaultLocation": "right",
+  "workbench.layoutControl.enabled": false,
+  "workbench.sideBar.location": "right",
+  "workbench.statusBar.visible": false,
+  "workbench.tree.indent": 16,
+  "workbench.tree.renderIndentGuides": "none",
+
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+  "vscode-neovim.compositeKeys": {
+    "jk": {
+      "command": "vscode-neovim.escape"
+    }
+  }
 }

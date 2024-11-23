@@ -131,7 +131,9 @@ vim.opt.fillchars:append({
 })
 
 vim.opt.signcolumn = 'yes'
-vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
+-- vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
+vim.opt.numberwidth = 3
+vim.opt.statuscolumn = '%=%{% v:virtnum > 0 ? "" : v:lnum %}%=%s'
 
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = 'number'
