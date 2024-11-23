@@ -135,7 +135,7 @@ return {
               local kind = vim.lsp.protocol.CompletionItemKind[item.kind]
               return {
                 menu = '',
-                kind_hlgroup = 'CmpItemKind' .. kind,
+                kind_hlgroup = kind and 'CmpItemKind' .. kind or 'CmpItemKindUnit',
               }
             end,
             desc = 'Highlight kinds as in cmp',
