@@ -62,6 +62,7 @@ return {
           'diff',
           -- work
           'php',
+          'phpdoc',
         },
         auto_install = true,
         sync_install = false,

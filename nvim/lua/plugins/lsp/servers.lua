@@ -185,7 +185,7 @@ M = {
   marksman = {},
 
   --work
-  phpactor = {},
+  intelephense = {},
 }
 
 return M

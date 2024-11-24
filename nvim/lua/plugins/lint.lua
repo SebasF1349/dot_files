@@ -20,6 +20,17 @@ return {
     }
 
     lint.linters.shellcheck.args = { '-x' }
+    -- exclude phpdocs lint
+    lint.linters.phpcs.args = {
+      '-q',
+      -- '--config-set php_version 70429',
+      '--exclude=PEAR.Commenting.FunctionComment,'
+        .. 'Squiz.Commenting.FunctionComment,'
+        .. 'Squiz.Commenting.LongConditionClosingComment,'
+        .. 'PEAR.Commenting.ClassComment',
+      '--report=json',
+      '-',
+    }
 
     local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
     vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
