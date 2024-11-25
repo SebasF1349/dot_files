@@ -185,7 +185,9 @@ M = {
   marksman = {},
 
   --work
-  intelephense = {},
+  intelephense = {
+    root_dir = vim.uv.cwd,
+  },
 }
 
 return M
