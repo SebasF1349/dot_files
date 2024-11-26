@@ -12,8 +12,9 @@ require("tabs").setup(config)
 config.color_scheme = "Catppuccin Mocha"
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-	local has_wsl = pcall(wezterm.run_child_process, { "wsl", "--version" })
-	if has_wsl then
+	local has_wsl, _, res = pcall(wezterm.run_child_process, { "wsl", "--version" })
+	local start = "WSL version"
+	if has_wsl and res:find(1, #start) then
 		config.default_prog = { "wsl.exe", "--cd", "~" }
 	else
 		config.default_prog = { "pwsh.exe" }
