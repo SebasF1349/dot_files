@@ -434,6 +434,10 @@ vim.keymap.set('n', '<leader>la', function()
   addToQuickfix('l')
 end, { desc = '[A]dd cursor position to [L]ocation List' })
 
+vim.keymap.set('n', '<leader>qg', function()
+  vim.cmd('tabedit | Git difftool --name-status')
+end, { desc = 'Open [Q]uickfix With [G]it Diff' })
+
 --------------------------------------------------
 -- Quickfix Autocmds
 --------------------------------------------------
@@ -785,6 +789,15 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
       listHistory('newer')
     end, { buffer = 0, desc = 'Open Newer List' })
     vim.keymap.set({ 'x' }, 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
+    vim.keymap.set('n', 'gd', function()
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive://') then
+          vim.api.nvim_win_close(win, true)
+        end
+      end
+      local qfitempos = vim.fn.getpos('.')
+      vim.cmd('cc ' .. qfitempos[2] .. ' | Gvdiffsplit')
+    end, { buffer = 0, desc = '[G]it [D]iff' })
   end,
   desc = 'Keymaps inside quickfix window',
 })

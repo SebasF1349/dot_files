@@ -1,5 +1,5 @@
 return {
-  { 'tpope/vim-fugitive', cmd = { 'G', 'Gdiffsplit' } },
+  { 'tpope/vim-fugitive', cmd = { 'G', 'Git', 'Gdiffsplit' } },
 
   { 'NMAC427/guess-indent.nvim', event = 'InsertEnter', opts = {} },
 
