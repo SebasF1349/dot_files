@@ -64,6 +64,7 @@ local function mode()
 end
 
 ---- FILENAME ----
+local dir_separator = vim.fn.has('win32') ~= 0 and '\\' or '/'
 -- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
 local function file()
   local ftype = vim.o.filetype
@@ -117,7 +118,7 @@ local function file()
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
     if is_svelte then
-      fname = vim.fn.fnamemodify(bufname, ':h:t') .. '/' .. fname
+      fname = vim.fn.fnamemodify(bufname, ':h:t') .. dir_separator .. fname
     end
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
@@ -132,9 +133,9 @@ local function file()
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
       else
-        file_display = string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', fpath, fname)
+        file_display = string.format('%%#SLInactiveBuffer#%s%s%%#SLActiveBuffer#%s', fpath, dir_separator, fname)
         current_buf_shorten.path =
-          string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', vim.fn.pathshorten(fpath), fname)
+          string.format('%%#SLInactiveBuffer#%s%s%%#SLActiveBuffer#%s', vim.fn.pathshorten(fpath), dir_separator, fname)
       end
       current_buf_shorten.pos = #buffer_names + 1
     end
