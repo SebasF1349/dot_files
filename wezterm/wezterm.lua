@@ -7,7 +7,6 @@ if wezterm.config_builder then
 end
 
 require("keys").setup(config)
-require("tabs").setup(config)
 
 config.color_scheme = "Catppuccin Mocha"
 
@@ -43,7 +42,11 @@ end
 
 --config.adjust_window_size_when_changing_font_size = false
 config.font = wezterm.font("JetBrainsMono Nerd Font")
+config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
+config.tab_max_width = 32
+config.unzoom_on_switch_pane = true
+config.show_new_tab_button_in_tab_bar = false
 config.inactive_pane_hsb = {
 	saturation = 1,
 	brightness = 0.5,
