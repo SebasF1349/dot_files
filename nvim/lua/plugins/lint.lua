@@ -23,10 +23,13 @@ return {
     -- exclude phpdocs lint
     lint.linters.phpcs.args = {
       '-q',
-      -- '--config-set php_version 70429',
+      -- '--config-set php_version 70419',
       '--exclude=PEAR.Commenting.FunctionComment,'
+        .. 'Generic.Files.LineLength,'
+        .. 'Generic.PHP.DisallowShortOpenTag,'
         .. 'Squiz.Commenting.FunctionComment,'
         .. 'Squiz.Commenting.LongConditionClosingComment,'
+        .. 'PEAR.Commenting.FileComment,'
         .. 'PEAR.Commenting.ClassComment',
       '--report=json',
       '-',
