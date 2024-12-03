@@ -48,6 +48,18 @@ function M.setup(config)
 		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
 		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
 		{ mods = M.modTab, key = "4", action = act.ActivateTab(3) },
+		{
+			mods = M.modTab,
+			key = "r",
+			action = act.PromptInputLine({
+				description = "Enter new name for tab",
+				action = wezterm.action_callback(function(window, pane, line)
+					if line and #line > 0 then
+						window:active_tab():set_title(line)
+					end
+				end),
+			}),
+		},
 		-- NOTE: worth making clipboard work with nvim keys too?
 		-- Clipboard
 		{ mods = M.modSplit, key = "C", action = act.CopyTo("Clipboard") },
