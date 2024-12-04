@@ -77,8 +77,6 @@ vim.opt.wildmode = 'longest:full,full'
 
 vim.opt.smoothscroll = true
 
-vim.opt.foldmethod = 'expr'
-vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldlevelstart = 99
 
 -- https://new.reddit.com/r/neovim/comments/1fzn1zt/custom_fold_text_function_with_treesitter_syntax/

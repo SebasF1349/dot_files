@@ -200,6 +200,27 @@ return {
       vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false })
       vim.keymap.set('v', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object' })
       vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', remap = false })
+
+      local function enable_foldexpr(bufnr)
+        if vim.api.nvim_buf_line_count(bufnr) > 40000 then
+          return
+        end
+        vim.api.nvim_buf_call(bufnr, function()
+          vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+          vim.wo[0][0].foldmethod = 'expr'
+          vim.cmd.normal('zx')
+        end)
+      end
+
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function(args)
+          if not pcall(vim.treesitter.start, args.buf) then
+            return
+          end
+
+          enable_foldexpr(args.buf)
+        end,
+      })
     end,
   },
   {
