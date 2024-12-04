@@ -18,6 +18,30 @@ function M.get_active_pinbuf()
   return active_pinbuf
 end
 
+function M.get_pinbufs_files()
+  ---@type string[]
+  local pinbufs_files = { tostring(active_pinbuf) }
+  for _, pinbuf in ipairs(pinbufs) do
+    table.insert(pinbufs_files, vim.fn.fnamemodify(vim.api.nvim_buf_get_name(pinbuf), ':p'))
+  end
+  return pinbufs_files
+end
+
+---@param pinbufs_files string[]
+function M.set_pinbufs_files(pinbufs_files)
+  pinbufs = {}
+  if #pinbufs_files == 0 then
+    return
+  end
+  active_pinbuf = tonumber(pinbufs_files[1]) or 0
+  table.remove(pinbufs_files, 1)
+  for _, pinbuf_file in ipairs(pinbufs_files) do
+    local bufnr = vim.fn.bufadd(pinbuf_file)
+    vim.fn.bufload(bufnr)
+    table.insert(pinbufs, bufnr)
+  end
+end
+
 ---@param bufnr number
 ---@return number | nil
 local function bufpin_pos(bufnr)

@@ -275,17 +275,3 @@ for _, ext in ipairs(file_types) do
     callback = open_external_file,
   })
 end
-
-vim.api.nvim_create_autocmd({ 'VimEnter' }, {
-  group = general,
-  callback = function()
-    if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
-      vim.schedule(function()
-        local dir = vim.fn.argc() == 1 and vim.fn.expand('%') or vim.uv.cwd()
-        vim.cmd.Oil(dir)
-      end)
-    end
-  end,
-  once = true,
-  desc = 'Open Oil if there is no file in the arglist',
-})
