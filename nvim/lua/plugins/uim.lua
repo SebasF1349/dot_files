@@ -1,5 +1,5 @@
 return {
-  dir = '~/dot_files/nvim/lua/uim',
+  dir = vim.fn.expand('%:p:h:h') .. '/uim',
   event = { 'BufReadPost', 'BufNewFile' },
   config = function()
     local uim = require('uim')
