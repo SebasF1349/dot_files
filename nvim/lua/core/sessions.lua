@@ -2,7 +2,7 @@ local pinbufs = require('core.buffers')
 local oss = require('utils.os')
 
 vim.o.sessionoptions = 'buffers,curdir,help,tabpages,winsize,terminal'
-local sessions_path = vim.fn.stdpath('data') .. oss.dir_separator .. 'sessions' .. oss.dir_separator
+local sessions_path = oss.joinpath(vim.fn.stdpath('data'), 'sessions')
 
 local function get_session_path()
   if vim.fn.isdirectory(sessions_path) == 0 then
@@ -10,7 +10,7 @@ local function get_session_path()
   end
   local session_name =
     vim.uv.cwd():gsub('%s+', ''):gsub(vim.env.HOME, ''):gsub('.:\\', ''):gsub(oss.dir_separator, '__')
-  return sessions_path .. session_name
+  return oss.joinpath(sessions_path, session_name)
 end
 
 local function sessionSave()
