@@ -53,7 +53,7 @@ local function bufpin_pos(bufnr)
 end
 
 ---@param bufnr? number
-local function add_pinbuf(bufnr)
+function M.add_pinbuf(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   if not bufpin_pos(bufnr) then
     table.insert(pinbufs, bufnr)
@@ -223,7 +223,7 @@ vim.keymap.set('n', '[b', function()
   move_through_buf_history(-1)
 end, { desc = 'Previous [B]uffer in History' })
 vim.keymap.set('n', 'gbp', move_to_bufpin, { desc = 'Move to [P]inned Buffer' })
-vim.keymap.set('n', 'gba', add_pinbuf, { desc = '[A]dd Pin Buffer' })
+vim.keymap.set('n', 'gba', M.add_pinbuf, { desc = '[A]dd Pin Buffer' })
 vim.keymap.set('n', 'gbd', remove_curr_pinbuf, { desc = '[D]elete Pin Buffer', expr = true })
 vim.keymap.set('n', 'gbc', select_remove_pinbuf, { desc = '[C]lean Pin Buffer' })
 vim.keymap.set('n', 'gbo', remove_other_bufpin, { desc = 'Make [O]nly Pin Buffer' })
@@ -233,7 +233,7 @@ vim.keymap.set('n', 'gbo', remove_other_bufpin, { desc = 'Make [O]nly Pin Buffer
 --------------------------------------------------
 
 vim.api.nvim_create_user_command('PinBuf', function()
-  add_pinbuf()
+  M.add_pinbuf()
 end, {})
 
 local edit_buffer = {
@@ -288,27 +288,6 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
     end
   end,
   desc = 'Update pinbufs when changing buffers',
-})
-
-vim.api.nvim_create_autocmd({ 'VimEnter' }, {
-  group = pinbufs_augroup,
-  callback = function()
-    if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
-      return
-    end
-    local args = vim.fn.argv()
-    if type(args) == 'string' then
-      args = { args }
-    end
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-      local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':p:.')
-      if vim.list_contains(args, fname) then
-        add_pinbuf(bufnr)
-      end
-    end
-  end,
-  once = true,
-  desc = 'Pin arglist buffers',
 })
 
 return M

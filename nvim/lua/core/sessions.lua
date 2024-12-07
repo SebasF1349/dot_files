@@ -58,12 +58,21 @@ if vim.v.vim_did_enter then
     if vim.fn.argc() == 0 then
       sessionLoad()
     end
-    return
-  end
-  if vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
+  elseif vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
     vim.schedule(function()
       local dir = vim.fn.argc() == 1 and vim.fn.expand('%') or vim.uv.cwd()
       vim.cmd.Oil(dir)
     end)
+  else
+    local args = vim.fn.argv()
+    if type(args) == 'string' then
+      args = { args }
+    end
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+      local fname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ':p:.')
+      if vim.list_contains(args, fname) then
+        pinbufs.add_pinbuf(bufnr)
+      end
+    end
   end
 end
