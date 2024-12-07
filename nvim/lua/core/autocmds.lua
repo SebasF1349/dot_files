@@ -247,7 +247,13 @@ function FindFunc(cmdarg, _)
     end)
     :totable()
 end
-vim.o.findfunc = 'v:lua.FindFunc'
+
+vim.api.nvim_create_autocmd({ 'DirChanged', 'UIEnter' }, {
+  callback = function()
+    vim.o.findfunc = 'v:lua.FindFunc'
+  end,
+  group = general,
+})
 
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
