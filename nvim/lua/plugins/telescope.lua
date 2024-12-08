@@ -1,3 +1,5 @@
+local oss = require('utils.os')
+
 return {
   {
     'nvim-lua/plenary.nvim',
@@ -5,7 +7,7 @@ return {
   {
     'nvim-telescope/telescope-fzf-native.nvim',
     build = function(plugin)
-      if vim.fn.has('win32') == 0 then
+      if not oss.is_win then
         local obj = vim.system({ 'cmake', '-S.', '-Bbuild', '-DCMAKE_BUILD_TYPE=Release' }, { cwd = plugin.dir }):wait()
         if obj.code ~= 0 then
           error(obj.stderr)

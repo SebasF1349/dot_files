@@ -1,3 +1,5 @@
+local oss = require('utils.os')
+
 return {
   'mfussenegger/nvim-dap',
   dependencies = {
@@ -46,7 +48,7 @@ return {
     {
       'microsoft/vscode-js-debug',
       build = function()
-        if vim.fn.has('win32') == 0 then
+        if not oss.is_win then
           return 'npm clean-install --legacy-peer-deps && npx gulp vsDebugServerBundle && move dist out'
         else
           return 'npm clean-install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out'
