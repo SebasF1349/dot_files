@@ -240,15 +240,16 @@ function FindFunc(cmdarg, _)
   -- ideas: https://new.reddit.com/r/vim/comments/1ga5ckm/findexpr/
   local cmd = 'fd --type file --full-path --color never ' -- TODO: find best args to use (regex or not?)
   local list = vim.fn.systemlist(cmd)
+  local cmdarg_clean = cmdarg:lower():gsub('%-', '%%-')
   return vim
     .iter(list)
     :filter(function(item)
-      return item:lower():find(cmdarg:lower(), 1, true)
+      return item:lower():find(cmdarg_clean)
     end)
     :totable()
 end
 
-vim.api.nvim_create_autocmd({ 'DirChanged', 'UIEnter' }, {
+vim.api.nvim_create_autocmd({ 'UIEnter' }, {
   callback = function()
     vim.o.findfunc = 'v:lua.FindFunc'
   end,

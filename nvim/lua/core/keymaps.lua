@@ -279,9 +279,12 @@ local function fuzzy_find(cmd_line, cmd_pos)
   if next_cmd_pos and cmd_pos > next_cmd_pos then
     return fuzzy_find(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
   end
-  local cmds = { 'edit', 'split', 'vsplit', 'find', 'sfind' }
-  if vim.list_contains(cmds, cmd_parsed.cmd) then
+  local edit_cmds = { 'edit', 'split', 'vsplit' }
+  local find_cmds = { 'find', 'sfind' }
+  if vim.list_contains(edit_cmds, cmd_parsed.cmd) then
     return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
+  elseif vim.list_contains(find_cmds, cmd_parsed.cmd) then
+    return '.*'
   else
     return get_fuzzy(cmd_line)
   end
