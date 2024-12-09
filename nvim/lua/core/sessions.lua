@@ -35,13 +35,20 @@ local function sessionLoad()
     pinbufs.set_pinbufs_files(pinbufs_files)
   end
 end
+
+local function sessionRemove()
+  local session_path = get_session_path()
+  vim.fs.rm(session_path, { force = true })
+  vim.fs.rm(session_path .. '.json', { force = true })
 end
 
 vim.api.nvim_create_user_command('SSave', sessionSave, { desc = 'Save Session And Quit' })
 vim.api.nvim_create_user_command('SLoad', sessionLoad, { desc = 'Load Session' })
+vim.api.nvim_create_user_command('SRemove', sessionRemove, { desc = 'Remove Session' })
 
 vim.keymap.set('n', '<leader>ss', sessionSave, { desc = '[S]ession [S]ave' })
 vim.keymap.set('n', '<leader>sl', sessionLoad, { desc = '[S]ession [L]oad' })
+vim.keymap.set('n', '<leader>sr', sessionRemove, { desc = '[S]ession [R]emove' })
 
 local auSession = vim.api.nvim_create_augroup('Sessions', {})
 
