@@ -186,7 +186,7 @@ M = {
 
   --work
   intelephense = {
-    root_dir = vim.uv.cwd,
+    root_dir = vim.fs.root(0, 'composer.root'),
   },
 }
 
