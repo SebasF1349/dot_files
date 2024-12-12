@@ -157,7 +157,7 @@ local function file()
   local ret = string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   local max_columns = vim.o.columns
   local ret_length = #ret - 18 * #buffer_names
-  if ret_length < max_columns then
+  if ret_length < max_columns or current_buf_shorten.pos == -1 then
     return ret
   elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.path
