@@ -277,7 +277,7 @@ return {
             end
           end, { desc = 'LSP: [O]rganize Imports', buffer = event.buf })
 
-          if client.supports_method('textDocument/signatureHelp') then
+          if client:supports_method('textDocument/signatureHelp') then
             vim.api.nvim_create_autocmd('InsertCharPre', {
               buffer = 0,
               callback = function()
@@ -395,7 +395,7 @@ return {
       ---@diagnostic disable-next-line: duplicate-set-field
       vim.lsp.buf.hover = function()
         local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
-        return hover({
+        hover({
           anchor_bias = 'above',
           max_height = max_height,
           max_width = math.floor(vim.o.columns * 0.4),
@@ -405,7 +405,7 @@ return {
       ---@diagnostic disable-next-line: duplicate-set-field
       vim.lsp.buf.signature_help = function()
         local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
-        return signature_help({
+        signature_help({
           anchor_bias = 'above',
           max_height = max_height,
           max_width = math.floor(vim.o.columns * 0.4),
