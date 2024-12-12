@@ -359,7 +359,10 @@ return {
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               group = highlight_augroup,
               buffer = event.buf,
-              callback = vim.lsp.buf.document_highlight,
+              callback = function()
+                vim.lsp.buf.clear_references()
+                vim.lsp.buf.document_highlight()
+              end,
             })
 
             -- When you move your cursor, the highlights will be cleared
