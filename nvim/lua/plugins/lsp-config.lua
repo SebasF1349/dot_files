@@ -144,20 +144,26 @@ return {
           vim.o.pumheight = 6
           vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert', 'fuzzy', 'popup' }
 
-          vim.keymap.set('s', '<C-l>', function()
-            if vim.snippet.active({ direction = 1 }) then
-              return '<cmd>lua vim.snippet.jump(1)<cr>'
-            else
-              return '<C-l>'
+          -- vim.keymap.set('s', '<C-l>', function()
+          --   if vim.snippet.active({ direction = 1 }) then
+          --     return '<cmd>lua vim.snippet.jump(1)<cr>'
+          --   else
+          --     return '<C-l>'
+          --   end
+          -- end, { desc = 'Jump Snippet Forwards', expr = true, buffer = event.buf })
+          -- vim.keymap.set('s', '<C-h>', function()
+          --   if vim.snippet.active({ direction = -1 }) then
+          --     return '<cmd>lua vim.snippet.jump(-1)<cr>'
+          --   else
+          --     return '<C-h>'
+          --   end
+          -- end, { desc = 'Jump Snippet Backwards', expr = true, buffer = event.buf })
+          vim.keymap.set({ 'i', 's' }, '<C-c>', function()
+            if vim.snippet then
+              vim.snippet.stop()
             end
-          end, { desc = 'Jump Snippet Forwards', expr = true, buffer = event.buf })
-          vim.keymap.set('s', '<C-h>', function()
-            if vim.snippet.active({ direction = -1 }) then
-              return '<cmd>lua vim.snippet.jump(-1)<cr>'
-            else
-              return '<C-h>'
-            end
-          end, { desc = 'Jump Snippet Backwards', expr = true, buffer = event.buf })
+            return '<ESC>'
+          end, { desc = 'Delete Selected Text', expr = true, buffer = event.buf })
           vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = event.buf })
           vim.keymap.set('i', '<BS>', function()
             return vim.fn.pumvisible() ~= 0 and '<BS><cmd>lua vim.lsp.completion.trigger()<CR>' or '<BS>'
@@ -179,7 +185,7 @@ return {
             else
               return '<CR>'
             end
-          end, { desc = 'Accept selected or new line', expr = true, buffer = event.buf })
+          end, { desc = 'New line', expr = true, buffer = event.buf })
           -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
           -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
