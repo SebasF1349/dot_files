@@ -1,10 +1,30 @@
 --------------------------------------------------
--- Togglers
+-- Globals
 --------------------------------------------------
 
 ---@class term
 ---@field buf_num number
 ---@field win_id number
+
+---@type term[]
+local terms = {}
+
+--------------------------------------------------
+-- Keymaps
+--------------------------------------------------
+
+vim.keymap.set({ 'n', 't' }, '<leader>tb', function()
+  local win = (terms[1].win_id and terms[1].win_id ~= -1) and terms[1].win_id or terms[2].win_id
+  if win and win ~= -1 and vim.api.nvim_win_is_valid(win) then
+    vim.api.nvim_set_current_win(win)
+  end
+end, { desc = 'Move to [T]erminal [B]uffer ' })
+
+vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
+
+--------------------------------------------------
+-- Togglers
+--------------------------------------------------
 
 ---@param term term
 local function check_term_data(term)
@@ -16,8 +36,6 @@ local function check_term_data(term)
   end
 end
 
----@type term[]
-local terms = {}
 ---@param num 1|2
 local function toggle_term(num)
   local term = terms[num]
@@ -36,24 +54,17 @@ local function toggle_term(num)
   end
 end
 
-for pos = 1, 2 do
+local TERMINALS_COUNT = 2
+
+for pos = 1, TERMINALS_COUNT do
   terms[pos] = { buf_num = -1, win_id = -1, is_hidden = -1 }
-  vim.keymap.set({ 'n', 't' }, 't' .. pos, function()
+  vim.keymap.set({ 'n', 't' }, '<leader>t' .. pos, function()
     toggle_term(pos)
   end, { desc = 'Toggle [T]erminal [' .. pos .. ']' })
 end
-vim.keymap.set({ 'n', 't' }, 'tt', function()
+vim.keymap.set({ 'n', 't' }, '<leader>tt', function()
   toggle_term(1)
 end, { desc = '[T]oggle [T]erminal 1' })
-
-vim.keymap.set({ 'n', 't' }, 'tb', function()
-  local win = (terms[1].win_id and terms[1].win_id ~= -1) and terms[1].win_id or terms[2].win_id
-  if win and win ~= -1 and vim.api.nvim_win_is_valid(win) then
-    vim.api.nvim_set_current_win(win)
-  end
-end, { desc = 'Move to [T]erminal [B]uffer ' })
-
-vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
 --------------------------------------------------
 -- Runners
@@ -81,7 +92,7 @@ local function run_term_command(cmd)
 end
 
 -- NOTE: improve keymaps checking this plugin code: https://github.com/samharju/yeet.nvim/blob/master/lua/yeet/buffer.lua
-vim.keymap.set('n', 'crb', function()
+vim.keymap.set('n', '<leader>cb', function()
   local build = { jdtls = 'mvn spring-boot:run' }
   for _, client in ipairs(vim.lsp.get_clients()) do
     if build[client.name] then
@@ -90,9 +101,9 @@ vim.keymap.set('n', 'crb', function()
     end
   end
   vim.notify('No Build command for attached lsps', vim.log.levels.INFO)
-end, { desc = '[C]ode [R]unner [B]uild' })
+end, { desc = '[C]ode [B]uild' })
 
-vim.keymap.set('n', 'crt', function()
+vim.keymap.set('n', '<leader>ct', function()
   local test = { jdtls = 'mvn test' }
   for _, client in ipairs(vim.lsp.get_clients()) do
     if test[client.name] then
@@ -101,11 +112,12 @@ vim.keymap.set('n', 'crt', function()
     end
   end
   vim.notify('No Test command for attached lsps', vim.log.levels.INFO)
-end, { desc = '[C]ode [R]unner [T]est' })
+end, { desc = '[C]ode [T]est' })
 
 --------------------------------------------------
 -- Autocmds
 --------------------------------------------------
+
 local terminal_autocmds = vim.api.nvim_create_augroup('Terminal Autocmds', { clear = true })
 
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
