@@ -64,8 +64,8 @@ return {
       vim.keymap.set('n', '<leader>bd', gitsigns.diffthis, { desc = '[B]uffer [D]iff' })
 
       -- Toggles
-      vim.keymap.set('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git [B]lame line' })
-      vim.keymap.set('n', '<leader>td', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
+      vim.keymap.set('n', '<leader>hb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git [B]lame line' })
+      vim.keymap.set('n', '<leader>hd', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
     end,
   },
 }

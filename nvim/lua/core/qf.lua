@@ -344,18 +344,18 @@ local function list_toggle(listType, diagnostics)
   end
 end
 
-vim.keymap.set('n', '<leader>tq', function()
+vim.keymap.set('n', '<leader>qq', function()
   list_toggle('c')
-end, { desc = '[T]oggle [Q]uickfix' })
+end, { desc = 'Toggle [Q]uickfix' })
 vim.keymap.set('n', '<leader>qd', function()
   list_toggle('c', true)
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
 vim.keymap.set('n', '<leader>qr', vim.lsp.buf.references, { desc = '[Q]uickfix [R]eferences' })
 vim.keymap.set('n', '<leader>qi', vim.lsp.buf.implementation, { desc = '[Q]uickfix [I]mplementation' })
 
-vim.keymap.set('n', '<leader>tl', function()
+vim.keymap.set('n', '<leader>ll', function()
   list_toggle('l')
-end, { desc = '[T]oggle [L]ocation List' })
+end, { desc = 'Toggle [L]ocation List' })
 vim.keymap.set('n', '<leader>ld', function()
   list_toggle('l', true)
 end, { desc = '[L]ocation List [D]iagnostics Toggle' })
