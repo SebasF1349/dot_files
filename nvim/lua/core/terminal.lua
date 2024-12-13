@@ -1,3 +1,7 @@
+--------------------------------------------------
+-- Togglers
+--------------------------------------------------
+
 ---@class term
 ---@field buf_num number
 ---@field win_id number
@@ -51,6 +55,10 @@ end, { desc = 'Move to [T]erminal [B]uffer ' })
 
 vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
+--------------------------------------------------
+-- Runners
+--------------------------------------------------
+
 local function scroll_to_end(bufnr, winid)
   vim.api.nvim_buf_call(bufnr, function()
     local target_line = vim.tbl_count(vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
@@ -94,3 +102,44 @@ vim.keymap.set('n', 'crt', function()
   end
   vim.notify('No Test command for attached lsps', vim.log.levels.INFO)
 end, { desc = '[C]ode [R]unner [T]est' })
+
+--------------------------------------------------
+-- Autocmds
+--------------------------------------------------
+local terminal_autocmds = vim.api.nvim_create_augroup('Terminal Autocmds', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'TermOpen' }, {
+  callback = function(event)
+    vim.opt.filetype = 'terminal'
+    vim.cmd('startinsert')
+    -- vim.opt.number = false
+    -- vim.opt.relativenumber = false
+    vim.opt.statuscolumn = ''
+    -- vim.wo.signcolumn = 'no'
+    vim.opt.buflisted = false
+    vim.o.winfixheight = true
+    vim.o.winfixwidth = true
+    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
+  end,
+  group = terminal_autocmds,
+  desc = 'Remove line numbers from terminal and start on insert',
+})
+
+vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  pattern = 'term://*',
+  callback = function()
+    vim.cmd('startinsert')
+  end,
+  group = terminal_autocmds,
+  desc = 'Move to terminal on insert mode',
+})
+
+vim.api.nvim_create_autocmd('WinEnter', {
+  callback = function()
+    if vim.bo.filetype == 'terminal' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+      vim.cmd('quit')
+    end
+  end,
+  group = terminal_autocmds,
+  desc = 'Close Neovim if the last window is a terminal window',
+})
