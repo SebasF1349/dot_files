@@ -46,42 +46,6 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   desc = "Don't auto comment after pressing enter in comment",
 })
 
-vim.api.nvim_create_autocmd({ 'TermOpen' }, {
-  callback = function(event)
-    vim.opt.filetype = 'terminal'
-    vim.cmd('startinsert')
-    vim.opt.number = false
-    vim.opt.relativenumber = false
-    vim.opt.statuscolumn = ''
-    vim.wo.signcolumn = 'no'
-    vim.opt.buflisted = false
-    vim.o.winfixheight = true
-    vim.o.winfixwidth = true
-    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
-  end,
-  group = general,
-  desc = 'Remove line numbers from terminal and start on insert',
-})
-
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-  pattern = 'term://*',
-  callback = function()
-    vim.cmd('startinsert')
-  end,
-  group = general,
-  desc = 'Move to terminal on insert mode',
-})
-
-vim.api.nvim_create_autocmd('WinEnter', {
-  callback = function()
-    if vim.bo.filetype == 'terminal' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
-      vim.cmd('quit')
-    end
-  end,
-  group = general,
-  desc = 'Close Neovim if the last window is a terminal window',
-})
-
 vim.api.nvim_create_autocmd({ 'FileType' }, {
   pattern = {
     'Jaq',
