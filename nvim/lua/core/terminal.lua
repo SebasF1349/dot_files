@@ -36,19 +36,33 @@ local function check_term_data(term)
   end
 end
 
+local term_cmd = 'botright vsplit | vertical resize 50 | set winfixwidth winfixheight'
+
 ---@param num 1|2
 local function toggle_term(num)
   local term = terms[num]
   check_term_data(term)
   if term.buf_num == -1 then
-    vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | term')
+    vim.cmd(term_cmd .. '| term')
     term.buf_num = vim.api.nvim_get_current_buf()
     term.win_id = vim.api.nvim_get_current_win()
-    vim.api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = term.win_id, scope = 'local' })
-  elseif term.win_id == -1 then
-    vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | b' .. term.buf_num)
-    term.win_id = vim.api.nvim_get_current_win()
     vim.cmd.startinsert()
+    vim.bo.filetype = 'terminal'
+    vim.bo.buflisted = false
+    vim.wo.statuscolumn = ''
+    vim.wo.winfixheight = true
+    vim.wo.winfixwidth = true
+    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = term.buf_num, silent = true })
+    vim.api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = term.win_id, scope = 'local' })
+    vim.api.nvim_create_autocmd('BufEnter', {
+      buffer = term.buf_num,
+      callback = function()
+        vim.cmd.startinsert()
+      end,
+    })
+  elseif term.win_id == -1 then
+    vim.cmd(term_cmd .. '| b' .. term.buf_num)
+    term.win_id = vim.api.nvim_get_current_win()
   else
     vim.api.nvim_win_close(term.win_id, true)
     term.win_id = -1
@@ -121,31 +135,10 @@ end, { desc = '[C]ode [T]est' })
 
 local terminal_autocmds = vim.api.nvim_create_augroup('Terminal Autocmds', { clear = true })
 
-vim.api.nvim_create_autocmd({ 'TermOpen' }, {
-  callback = function(event)
-    vim.opt.filetype = 'terminal'
-    vim.cmd.startinsert()
-    -- vim.opt.number = false
-    -- vim.opt.relativenumber = false
-    vim.opt.statuscolumn = ''
-    -- vim.wo.signcolumn = 'no'
-    vim.opt.buflisted = false
-    vim.o.winfixheight = true
-    vim.o.winfixwidth = true
-    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
-  end,
-  group = terminal_autocmds,
-  desc = 'Remove line numbers from terminal and start on insert',
-})
-
 vim.api.nvim_create_autocmd('WinEnter', {
   callback = function()
-    if vim.bo.filetype == 'terminal' then
-      if vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
-        vim.cmd('quit')
-      else
-        vim.cmd.startinsert()
-      end
+    if vim.bo.filetype == 'terminal' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+      vim.cmd('quit')
     end
   end,
   group = terminal_autocmds,
