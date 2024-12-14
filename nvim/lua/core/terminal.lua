@@ -13,14 +13,14 @@ local terms = {}
 -- Keymaps
 --------------------------------------------------
 
+vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
+
 vim.keymap.set({ 'n', 't' }, '<leader>tb', function()
   local win = (terms[1].win_id and terms[1].win_id ~= -1) and terms[1].win_id or terms[2].win_id
   if win and win ~= -1 and vim.api.nvim_win_is_valid(win) then
     vim.api.nvim_set_current_win(win)
   end
 end, { desc = 'Move to [T]erminal [B]uffer ' })
-
-vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
 --------------------------------------------------
 -- Togglers
@@ -48,6 +48,7 @@ local function toggle_term(num)
   elseif term.win_id == -1 then
     vim.cmd('botright vsplit | vertical resize 50 | set winfixwidth winfixheight | b' .. term.buf_num)
     term.win_id = vim.api.nvim_get_current_win()
+    vim.cmd.startinsert()
   else
     vim.api.nvim_win_close(term.win_id, true)
     term.win_id = -1
@@ -123,7 +124,7 @@ local terminal_autocmds = vim.api.nvim_create_augroup('Terminal Autocmds', { cle
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
   callback = function(event)
     vim.opt.filetype = 'terminal'
-    vim.cmd('startinsert')
+    vim.cmd.startinsert()
     -- vim.opt.number = false
     -- vim.opt.relativenumber = false
     vim.opt.statuscolumn = ''
@@ -137,19 +138,14 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
   desc = 'Remove line numbers from terminal and start on insert',
 })
 
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-  pattern = 'term://*',
-  callback = function()
-    vim.cmd('startinsert')
-  end,
-  group = terminal_autocmds,
-  desc = 'Move to terminal on insert mode',
-})
-
 vim.api.nvim_create_autocmd('WinEnter', {
   callback = function()
-    if vim.bo.filetype == 'terminal' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
-      vim.cmd('quit')
+    if vim.bo.filetype == 'terminal' then
+      if vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+        vim.cmd('quit')
+      else
+        vim.cmd.startinsert()
+      end
     end
   end,
   group = terminal_autocmds,
