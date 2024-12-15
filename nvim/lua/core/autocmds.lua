@@ -117,6 +117,22 @@ vim.api.nvim_create_autocmd({ 'WinEnter' }, {
   desc = 'Return to previous window when closing another one',
 })
 
+vim.api.nvim_create_autocmd({ 'WinEnter' }, {
+  callback = function()
+    vim.wo.cursorline = true
+  end,
+  group = general,
+  desc = 'Show cursorline',
+})
+vim.api.nvim_create_autocmd({ 'WinLeave' }, {
+  callback = function()
+    vim.lsp.buf.clear_references()
+    vim.wo.cursorline = false
+  end,
+  group = general,
+  desc = 'Hide cursorline when leaving window',
+})
+
 -- https://www.reddit.com/r/neovim/comments/1fbxxuo/comment/lm4scjx/
 vim.api.nvim_create_autocmd('FocusGained', {
   pattern = '*',
