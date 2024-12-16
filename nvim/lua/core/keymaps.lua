@@ -202,6 +202,8 @@ vim.keymap.set('c', '<space>', function()
   end
 end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
 
+vim.keymap.set('c', '<C-space>', '<space>', { desc = 'Easier Space' })
+
 -- NOTE: maybe use these two instead of ge and gE?
 vim.keymap.set('c', '*', function()
   local cmd_line = vim.fn.getcmdline()
