@@ -50,7 +50,7 @@ return {
       end, { desc = '[H]unk [R]eset' })
 
       -- Text object
-      vim.keymap.set({ 'o', 'x' }, '<leader>hS', gitsigns.select_hunk, { desc = '[H]unk [S]elect' })
+      vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = '[I]nside [H]unk TextObject' })
 
       -- Normal mode
       vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage' })
