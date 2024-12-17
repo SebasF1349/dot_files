@@ -754,6 +754,20 @@ local function listHistory(direction)
   vim.cmd(listType .. direction)
 end
 
+---@param what 'message' | 'file'
+local function yank(what)
+  local listType = getListType()
+  if not listType then
+    return
+  end
+  local list = getList(listType)
+  local line = vim.api.nvim_win_get_cursor(0)
+  local qfitem = list.items[line[1]]
+  local text = what == 'message' and vim.trim(qfitem.text)
+    or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(qfitem.bufnr), ':.')
+  vim.fn.setreg('', text)
+end
+
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
@@ -789,6 +803,12 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
       listHistory('newer')
     end, { buffer = 0, desc = 'Open Newer List' })
     vim.keymap.set({ 'x' }, 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
+    vim.keymap.set('n', 'yf', function()
+      yank('file')
+    end, { buffer = 0, desc = 'Yank Item File' })
+    vim.keymap.set('n', 'ym', function()
+      yank('message')
+    end, { buffer = 0, desc = 'Yank Item Message' })
     vim.keymap.set('n', 'gd', function()
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive://') then
