@@ -1,4 +1,3 @@
--- General Settings
 local general = vim.api.nvim_create_augroup('General Settings', { clear = true })
 
 vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
@@ -201,8 +200,6 @@ local function set_path()
           ','
         )
         :gsub('%./', '')
-    -- .. ','
-    -- .. table.concat(vim.fn.systemlist('fd --type f --max-depth 1 --absolute-path'), ','):gsub('%./', '') -- grab both the dirs and the top level filesystem
   else
     return ',,' .. table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
   end
@@ -216,9 +213,9 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
   desc = 'Lazyload setting path',
 })
 
+---@param cmdarg string
 function FindFunc(cmdarg, _)
-  -- ideas: https://new.reddit.com/r/vim/comments/1ga5ckm/findexpr/
-  local cmd = 'fd --type file --full-path --color never ' -- TODO: find best args to use (regex or not?)
+  local cmd = 'fd --type file --full-path --color never'
   local list = vim.fn.systemlist(cmd)
   local cmdarg_clean = cmdarg:lower():gsub('%-', '%%-')
   return vim
