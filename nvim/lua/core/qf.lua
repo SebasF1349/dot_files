@@ -174,7 +174,7 @@ local function grep_or_filter(listType, input)
     vim.cmd([[packadd cfilter]])
     vim.cmd(listType:upper() .. 'filter /' .. input .. '/')
   elseif listType == 'c' then
-    vim.cmd('silent! grep! "' .. input .. '"')
+    vim.cmd('silent! grep! ' .. input)
   else
     vim.cmd('silent lgrep! "' .. input .. '" %')
   end
