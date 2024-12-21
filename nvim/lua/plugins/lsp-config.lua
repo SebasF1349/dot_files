@@ -132,15 +132,17 @@ return {
           vim.lsp.completion.enable(true, event.data.client_id, event.buf, {
             autotrigger = true,
             convert = function(item)
+              local labelDetails = item.labelDetails and item.labelDetails.description or ''
               local kind = vim.lsp.protocol.CompletionItemKind[item.kind]
               return {
-                menu = '',
+                menu = labelDetails,
                 kind_hlgroup = kind and 'CmpItemKind' .. kind or 'CmpItemKindUnit',
               }
             end,
             desc = 'Highlight kinds as in cmp',
           })
 
+          vim.o.completeitemalign = 'abbr,menu,kind'
           vim.o.pumheight = 6
           vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert', 'fuzzy', 'popup' }
 
