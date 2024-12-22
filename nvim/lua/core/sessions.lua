@@ -20,7 +20,6 @@ end
 local function sessionSave()
   local session_path = get_session_path()
   vim.cmd('mksession! ' .. session_path)
-  vim.cmd.wa()
   local pinbufs_files = pinbufs.get_pinbufs_files()
   files.write_json(session_path .. '.json', pinbufs_files)
   vim.cmd.qa()
