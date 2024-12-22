@@ -19,7 +19,7 @@ if wezterm.target_triple == "x86_64-pc-windows-msvc" then
 		config.default_prog = { "pwsh.exe" }
 		config.default_cwd = "D:\\Trabajos\\Proyectos - Dev"
 	end
-	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland -- wait for wayland wez rewrite
+	-- config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland -- wait for wayland wez rewrite
 	-- local background_image = "\\\\wsl$\\Ubuntu\\home\\sebasf\\dot_files\\wallpaper\\wallpaper_clean_mini.jpeg"
 	local background_image = ".\\wallpaper_clean_mini.jpeg"
 	local scheme = wezterm.color.get_builtin_schemes()["Catppuccin Mocha"]
