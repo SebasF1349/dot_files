@@ -71,9 +71,7 @@ return {
       })
     end,
   },
-  { 'dmmulroy/ts-error-translator.nvim', ft = { 'typescript', 'svelte' }, opts = {} },
   { 'artemave/workspace-diagnostics.nvim' },
-  { 'felpafel/inlay-hint.nvim' }, -- check nvim-lsp-endhints to show inlay hints only in current line
   {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPost', 'BufNewFile' },
