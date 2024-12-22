@@ -1,5 +1,6 @@
 local M = {}
 
+-- TODO: Make highlights autoload (plugin/ directory)
 vim.api.nvim_set_hl(0, 'UimSelectLabels', { link = 'Title', default = true })
 vim.api.nvim_set_hl(0, 'UimTitle', { link = 'FloatTitle', default = true })
 vim.api.nvim_set_hl(0, 'UimFooter', { link = 'FloatTitle', default = true })

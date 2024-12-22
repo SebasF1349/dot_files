@@ -2,6 +2,10 @@ local M = {}
 
 local select_ns = vim.api.nvim_create_namespace('select_ui')
 
+---@generic T
+---@param items T[] Arbitrary items
+---@param opts { prompt: string|nil, kind: string|nil, format_item: fun(item: T): string } Additional options
+---@param on_choice fun(item: T|nil, idx: integer|nil)
 function M.select(items, opts, on_choice)
   local config = require('uim.config')
   local shared = require('uim.shared')
@@ -164,6 +168,7 @@ function M.select(items, opts, on_choice)
   local number_columns = 0
   local number_lines = 0
 
+  -- TODO: make height minimum 2 if there is no border
   if curr_conf.position == 'bottom' then
     number_columns = math.max(math.floor(vim.o.columns / (max_length + whitespace)), 1)
     number_lines = math.ceil(#choices / number_columns)
@@ -246,6 +251,7 @@ function M.select(items, opts, on_choice)
         choices[pos].item
       )
       if choices[pos].option ~= '-' then
+        -- TODO: maybe use vim.fn.getcharstr() instead of keymaps?
         vim.keymap.set('n', choices[pos].option, function()
           select_and_close(pos)
         end, { buffer = select_bufnr })

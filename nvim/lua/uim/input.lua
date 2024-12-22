@@ -1,5 +1,19 @@
 local M = {}
 
+-- TODO: Implement ->
+--     - completion (string|nil)
+--               Specifies type of completion supported
+--               for input. Supported types are the same
+--               that can be supplied to a user-defined
+--               command using the "-complete=" argument.
+--               See |:command-completion|
+--     - highlight (function)
+--               Function that will be used for highlighting
+--               user inputs.
+
+---@generic T
+---@param opts { prompt: string|nil, default: string|nil, completion: string|nil, highlight: fun(item: T): string } Additional options
+---@param on_confirm fun(input: string|nil)
 function M.input(opts, on_confirm)
   local config = require('uim.config').opts
   local shared = require('uim.shared')
