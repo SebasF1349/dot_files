@@ -324,12 +324,12 @@ mvg() {
 
 #Install scripts
 install-neovim() {
-    bash ~/dot_files/install_scripts/neovim-install.sh
+    bash ~/dot_files/install_scripts/install-neovim.sh
 }
 
 #Uninstall scripts
 uninstall-neovim() {
-    bash ~/dot_files/install_scripts/neovim-uninstall.sh
+    bash ~/dot_files/install_scripts/uninstall-neovim.sh
 }
 
 if [ "$DISTRO" = "debian" ]; then
