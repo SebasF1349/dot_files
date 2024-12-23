@@ -1,3 +1,4 @@
+local util = require('lspconfig.util')
 local M = {}
 
 local function organize_imports()
@@ -186,7 +187,18 @@ M = {
 
   --work
   intelephense = {
-    root_dir = vim.fs.root(0, 'composer.root'),
+    root_dir = function(pattern)
+      local cwd = vim.loop.cwd()
+      local root = util.root_pattern('composer.root', 'composer.json', '.git')(pattern)
+      return util.path.is_descendant(root, cwd) and root or cwd
+    end,
+    settings = {
+      intelephense = {
+        format = {
+          enable = (vim.loop.cwd():find('telesalud') or vim.loop.cwd():find('xampp_plataforma') or vim.loop.cwd():find('pasantia')) ~= nil,
+        },
+      },
+    },
   },
 }
 
