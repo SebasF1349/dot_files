@@ -42,8 +42,8 @@ function M.setup(config)
 		{ mods = M.modTab .. "|CTRL", key = "l", action = act.MoveTabRelative(1) },
 		{ mods = M.modTab .. "|CTRL", key = "h", action = act.MoveTabRelative(-1) },
 		-- Acivate Tabs
-		{ mods = M.modTab, key = "l", action = act({ ActivateTabRelative = 1 }) },
-		{ mods = M.modTab, key = "h", action = act({ ActivateTabRelative = -1 }) },
+		{ mods = M.modTab, key = "n", action = act({ ActivateTabRelative = 1 }) },
+		{ mods = M.modTab, key = "p", action = act({ ActivateTabRelative = -1 }) },
 		{ mods = M.modTab, key = "1", action = act.ActivateTab(0) },
 		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
 		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
