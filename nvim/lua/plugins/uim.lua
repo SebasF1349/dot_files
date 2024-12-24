@@ -2,6 +2,7 @@ local oss = require('utils.os')
 
 return {
   dir = oss.joinpath(vim.fn.stdpath('config'), 'lua', 'uim'),
+  name = 'uim',
   event = { 'BufReadPost', 'BufNewFile' },
   config = function()
     local uim = require('uim')

@@ -61,6 +61,7 @@ return {
           'vimdoc',
           -- misc
           'diff',
+          'comment',
           'regex',
           'sql',
           -- work
@@ -203,6 +204,8 @@ return {
       vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false })
       vim.keymap.set('v', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object' })
       vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', remap = false })
+
+      vim.api.nvim_set_hl(0, '@lsp.type.comment', {})
 
       local function enable_foldexpr(bufnr)
         if vim.api.nvim_buf_line_count(bufnr) > 40000 then

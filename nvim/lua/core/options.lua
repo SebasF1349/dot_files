@@ -30,9 +30,9 @@ vim.opt.shortmess = 'aoOstTWIcCF'
 vim.o.formatoptions = 'qjl1'
 
 if nvim_version.is_nightly() then
-  vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy,popup'
+  vim.o.completeopt = 'menu,menuone,noselect,fuzzy,popup'
 else
-  vim.o.completeopt = 'menu,menuone,noinsert,noselect'
+  vim.o.completeopt = 'menu,menuone,noselect'
 end
 
 vim.o.pumheight = 10

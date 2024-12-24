@@ -147,6 +147,13 @@ end
 vim.keymap.set('n', 'ys', opfunc('_G.Surround'), { desc = '[Y]ou [S]urround', silent = true, expr = true })
 vim.keymap.set('x', 's', opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
 
+vim.keymap.set('n', 'gs', function()
+  local pair = get_pair()
+  if #pair > 0 then
+    return 'ysiw' .. pair[1]
+  end
+end, { desc = 'Word [S]urround', expr = true, remap = true })
+
 vim.keymap.set('n', 'ds', function()
   local pair = get_pair()
   if #pair > 0 then

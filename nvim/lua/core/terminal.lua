@@ -24,6 +24,14 @@ vim.keymap.set({ 'n', 't' }, '<leader>tb', function()
   end
 end, { desc = 'Move to [T]erminal [B]uffer ' })
 
+vim.keymap.set('t', 'gf', function()
+  local file = vim.fn.expand('<cfile>')
+  if file ~= '' then
+    vim.cmd('wincmd p')
+    vim.cmd('sfind ' .. file)
+  end
+end, { desc = 'Open file under the cursor' })
+
 --------------------------------------------------
 -- Togglers
 --------------------------------------------------

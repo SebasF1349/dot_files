@@ -59,6 +59,13 @@ vim.keymap.set('x', '.', ':normal .<CR>', { desc = 'Use . to repeat last change 
 
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments line by line' })
 
+vim.keymap.set('x', 'I', function()
+  return vim.fn.mode() == 'V' and '^<C-v>I' or 'I'
+end, { desc = 'Insert on multiple lines', expr = true })
+vim.keymap.set('x', 'A', function()
+  return vim.fn.mode() == 'V' and '$<C-v>A' or 'A'
+end, { desc = 'Append on multiple lines', expr = true })
+
 -- BASH-style movement in cmd and insert mode
 vim.keymap.set({ 'i', 'c' }, '<C-a>', '<Home>', { desc = 'Move to start of line' })
 vim.keymap.set({ 'i', 'c' }, '<C-e>', '<End>', { desc = 'Move to end of line' })
@@ -97,15 +104,16 @@ end, { desc = 'Move Through Cmdline History', expr = true })
 -- Searching
 --------------------------------------------------
 
+-- NOTE: doesn't work if search results count are larger than screen (but who searches that way?)
 vim.api.nvim_create_user_command('GSearch', function(opts)
-  vim.api.nvim_input(':g<C-v>/\\V' .. opts.args .. '/#<CR>:')
+  vim.api.nvim_input(':g<C-v>/\\V' .. opts.args .. '/#<CR>: ')
 end, {
   nargs = '*',
   complete = function(ArgLead, _, _)
     -- https://vi.stackexchange.com/a/25005
     local content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    content = vim.fn.join(content, ' ')
-    content = vim.fn.split(content, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
+    local content_str = vim.fn.join(content, ' ')
+    content = vim.fn.split(content_str, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
     content = vim.tbl_filter(function(str)
       return #str > 2
         and vim.fn.match(str, '^[a-zA-Z_]\\+') > -1
@@ -223,6 +231,25 @@ end, { desc = 'Expand %% to File Directory', expr = true })
 
 vim.keymap.set('n', '<C-q>', '<cmd>close<CR>', { desc = 'Window [Q]uit' })
 vim.keymap.set('n', '<C-r>', '<C-w><C-w>', { desc = 'Move A[R]ound Windows' })
+
+vim.keymap.set(
+  'n',
+  '<C-w>\\',
+  [[<cmd>exe min([winheight('%'),line('$')]).'wincmd _'<CR>]],
+  { desc = 'Set Height Equal to Buffer Height' }
+)
+vim.keymap.set(
+  'x',
+  '<C-w>\\',
+  [[<esc><cmd>exe (line("'>") - line("'<") + 1).'wincmd _'<CR>]],
+  { desc = 'Set Height Equal to Selection Height' }
+)
+vim.keymap.set(
+  'n',
+  '<C-w>|',
+  [[<cmd>exe (col('$') + 7).'wincmd |'<bar>setlocal winfixwidth<CR>]],
+  { desc = 'Set Width Equal to Line Width' }
+)
 
 local nav = {
   h = 'Left',
@@ -461,7 +488,7 @@ vim.keymap.set('n', '<leader>;', 'mzA;`z', { desc = 'Add [;] at the end of the 
 --------------------------------------------------
 
 -- Based on https://github.com/Wansmer/nvim-config/blob/main/lua/modules/toggler.lua
----Every key and value should be in lowercase
+-- Every key and value should be in lowercase
 local opposites = {
   ['true'] = 'false',
   ['false'] = 'true',

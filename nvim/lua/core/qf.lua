@@ -252,12 +252,12 @@ function _G.qftf(info)
     for line, content in ipairs(lines) do
       line = line - 1
       local space = content:find('%s')
-      vim.highlight.range(qfbufnr, qfim_namespace, 'Directory', { line, 1 }, { line, space })
+      vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { line, 1 }, { line, space })
       local _, sep_end = content:find('│')
       if not sep_end then
         goto continue
       end
-      vim.highlight.range(qfbufnr, qfim_namespace, 'Comment', { line, space }, { line, sep_end })
+      vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { line, space }, { line, sep_end })
       local message = content:sub(sep_end + ('│'):len() - 1)
       local msg_hl = 'Title'
       for key, value in pairs(signs) do
@@ -266,7 +266,7 @@ function _G.qftf(info)
           break
         end
       end
-      vim.highlight.range(qfbufnr, qfim_namespace, msg_hl, { line, sep_end }, { line, vim.o.columns })
+      vim.hl.range(qfbufnr, qfim_namespace, msg_hl, { line, sep_end }, { line, vim.o.columns })
       ::continue::
     end
   end)
@@ -920,7 +920,7 @@ vim.api.nvim_create_autocmd('WinEnter', {
 vim.api.nvim_create_autocmd('WinClosed', {
   group = qf_group,
   callback = function(opt)
-    local loclist = vim.fn.getloclist(opt.file, { winid = 0 })
+    local loclist = vim.fn.getloclist(tonumber(opt.file) or 0, { winid = 0 })
     if loclist and loclist.winid ~= 0 then
       vim.cmd('close ' .. loclist.winid)
     end
