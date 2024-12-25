@@ -323,14 +323,7 @@ mvg() {
 }
 
 #Install scripts
-install-neovim() {
-    bash ~/dot_files/install_scripts/install-neovim.sh
-}
-
-#Uninstall scripts
-uninstall-neovim() {
-    bash ~/dot_files/install_scripts/uninstall-neovim.sh
-}
+export PATH=$PATH:~/dot_files/install_scripts/
 
 if [ "$DISTRO" = "debian" ]; then
     # set variable identifying the chroot you work in (used in the prompt below)
