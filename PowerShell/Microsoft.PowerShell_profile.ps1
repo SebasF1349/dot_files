@@ -4,6 +4,85 @@
 # Open
 # notepad $PROFILE
 
+# Utils
+
+function uu {
+    winget update
+}
+
+# Dirs
+
+function .. {
+    Set-Location ..
+}
+
+function cdf {
+    param (
+        [string]$dir = $env:HOME
+    )
+
+    $selected_dir = fd $dir --type d | fzf +m
+
+    if ($selected_dir) {
+        Set-Location -Path $selected_dir
+    }
+}
+
+
+function eza {
+    $exe = (Get-Command eza -CommandType Application).Source
+    Start-Process $exe -ArgumentList "-lah" -NoNewWindow
+}
+
+# Nvim
+
+$env:EDITOR = 'nvim'
+
+Remove-Item -Force Alias:nv
+Set-Alias nv nvim
+
+function nvf {
+    param (
+        [string]$dir = "."
+    )
+
+    $selected_dir = fd $dir --type d --max-depth 2 | fzf
+
+    if ($selected_dir) {
+        Set-Location -Path $selected_dir
+
+        $files = fzf --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}" | Out-String
+        $files = $files.Trim()
+
+        if ($files) {
+            $editor = $env:EDITOR
+            if (-not $editor) {
+                $editor = "vim"
+            }
+            & $editor $files
+        }
+    }
+}
+
+function nvff {
+    param([string]$query)
+
+    $files = fzf --query="$query" --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}" | Out-String
+    $files = $files.Trim()
+
+    if ($files) {
+        $editor = $env:EDITOR
+        if (-not $editor) {
+            $editor = "vim"
+        }
+        & $editor $files
+    }
+}
+
+# Git
+
+$env:GIT_BASE = 'main'
+
 # Based on https://github.com/gluons/powershell-git-aliases/blob/master/src/aliases.ps1
 
 function Get-Git-CurrentBranch {
@@ -38,16 +117,35 @@ function gaa {
 function gad {
 	git add . $args
 }
+function gap {
+	git add --patch $args
+}
 function gs {
 	git status $args
 }
 function gd {
 	git diff $args
 }
-function gdn {
+function gdf {
 	$CurrentBranch = Get-Git-CurrentBranch
 
 	git diff --name-only ..origin/$CurrentBranch $args
+}
+function gdn {
+    git diff --name-only $(git merge-base HEAD $env:GIT_BASE)
+}
+function gdv {
+	$CurrentBranch = Get-Git-CurrentBranch
+
+    nvim -p $(gdn) +"tabdo Gdiffsplit $CurrentBranch"
+}
+function gdvf {
+	$CurrentBranch = Get-Git-CurrentBranch
+
+    nvim -p +"tabdo Gdiffsplit $CurrentBranch"
+}
+function gdlc {
+	git diff --cached HEAD^ $args
 }
 function gc {
 	git commit -m $args
@@ -90,13 +188,10 @@ function gu {
 	git reset HEAD~1 --mixed $args
 }
 function gl {
-	git log --pretty=format:\"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]\" --decorate --date=relative $args
+	git log --graph --pretty=format:\"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]\" --decorate --date=relative $args
 }
 function gll {
-	git log --pretty=format:\"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]\" --decorate --numstat $args
-}
-function gdlc {
-	git diff --cached HEAD^ $args
+	git log --graph --pretty=format:\"%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]\" --decorate --numstat $args
 }
 
 # Prompt
