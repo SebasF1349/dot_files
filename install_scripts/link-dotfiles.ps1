@@ -24,7 +24,7 @@ $file_links = @{
 $dir_links = @{
     "$env:LocalAppData\nvim\" = "..\nvim\" 
     "$env:USERPROFILE\.glzr\" = "..\.glzr\"
-    "$env:APPDATA\bat\" = "..\bat\"\
+    "$env:APPDATA\bat\" = "..\bat\"
 }
 
 # LibreOffice?
