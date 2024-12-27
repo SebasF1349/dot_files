@@ -147,6 +147,36 @@ vim.api.nvim_create_autocmd('FocusGained', {
   desc = 'Show where the cursor is',
 })
 
+local cmd_range_ns = vim.api.nvim_create_namespace('cmd-range')
+vim.api.nvim_create_autocmd('CmdlineChanged', {
+  callback = function()
+    if vim.fn.getcmdtype() ~= ':' then
+      return
+    end
+    vim.api.nvim_buf_clear_namespace(0, cmd_range_ns, 0, -1)
+    local cmd_line = vim.fn.getcmdline()
+    local ok, cmd = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
+    if not ok then
+      return
+    end
+    local range = cmd.range
+    if not range or vim.tbl_isempty(range) then
+      return
+    end
+    vim.hl.range(0, cmd_range_ns, 'ColorColumn', { range[1], 0 }, { range[2] or range[2], 0 }, { regtype = 'V' })
+    vim.cmd('redraw')
+  end,
+  group = general,
+  desc = 'Show cmdline ranges',
+})
+vim.api.nvim_create_autocmd('CmdlineLeave', {
+  callback = function()
+    vim.api.nvim_buf_clear_namespace(0, cmd_range_ns, 0, -1)
+  end,
+  group = general,
+  desc = 'Remove ranges highlights',
+})
+
 local function show_toc()
   local bufname = vim.api.nvim_buf_get_name(0)
   local info = vim.fn.getloclist(0, { winid = 1 })
