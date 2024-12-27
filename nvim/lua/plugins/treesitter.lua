@@ -102,44 +102,6 @@ return {
               -- ['ib'] = '@bracket.inner',
             },
           },
-          move = {
-            enable = true,
-            goto_next_start = {
-              [']f'] = '@function.outer',
-              [']c'] = '@class.outer',
-              [']a'] = '@parameter.outer',
-              [']o'] = '@block.outer',
-              [']/'] = '@comment.outer',
-            },
-            goto_next_end = {
-              [']F'] = '@function.outer',
-              [']C'] = '@class.outer',
-              [']A'] = '@parameter.outer',
-              [']O'] = '@block.outer',
-            },
-            goto_previous_start = {
-              ['[f'] = '@function.outer',
-              ['[c'] = '@class.outer',
-              ['[a'] = '@parameter.outer',
-              ['[o'] = '@block.outer',
-              ['[/'] = '@comment.outer',
-            },
-            goto_previous_end = {
-              ['[F'] = '@function.outer',
-              ['[C'] = '@class.outer',
-              ['[A'] = '@parameter.outer',
-              ['[O'] = '@block.outer',
-            },
-          },
-          swap = {
-            enable = true,
-            swap_next = {
-              ['<leader>a'] = '@parameter.inner',
-            },
-            swap_previous = {
-              ['<leader>A'] = '@parameter.inner',
-            },
-          },
         },
       })
 
@@ -236,6 +198,27 @@ return {
     init = function()
       vim.g.matchup_matchparen_offscreen = {}
       vim.g.matchup_matchparen_enabled = 0
+    end,
+  },
+  {
+    'aaronik/treewalker.nvim',
+    lazy = false,
+    config = function()
+      local treewalker = require('treewalker')
+      treewalker.setup({
+        highlight = true, -- Whether to briefly highlight the node after jumping to it
+        highlight_duration = 250, -- How long should above highlight last (in ms)
+      })
+
+      vim.keymap.set({ 'n', 'v' }, '<M-k>', '<cmd>Treewalker Up<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<M-j>', '<cmd>Treewalker Down<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<M-l>', '<cmd>Treewalker Right<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<M-h>', '<cmd>Treewalker Left<cr>', { silent = true })
+      vim.keymap.set('n', '<M-K>', '<cmd>Treewalker SwapUp<cr>', { silent = true })
+      vim.keymap.set('n', '<M-J>', '<cmd>Treewalker SwapDown<cr>', { silent = true })
+      -- using 'nvim-treesitter/nvim-treesitter',
+      vim.keymap.set('n', '<M-L>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { silent = true })
+      vim.keymap.set('n', '<M-H>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { silent = true })
     end,
   },
 }
