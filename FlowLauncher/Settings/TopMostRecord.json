@@ -1,0 +1,14 @@
+{
+  "records": {
+    "!w syste": {
+      "Title": "System",
+      "SubTitle": "Panel de control \u003E System and Security",
+      "PluginID": "5043CETYU6A748679OPA02D27D99677A"
+    },
+    "wezterm": {
+      "Title": "WezTerm",
+      "SubTitle": "",
+      "PluginID": "791FC278BA414111B8D1886DFE447410"
+    }
+  }
+}

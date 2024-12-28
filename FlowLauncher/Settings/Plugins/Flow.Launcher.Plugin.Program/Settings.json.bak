@@ -1,0 +1,33 @@
+{
+  "LastIndexTime": "2024-12-24T08:11:23.559208-03:00",
+  "ProgramSources": [
+    {
+      "Location": "C:\\Program Files\\RStudio\\bin\\sumatra",
+      "Name": "sumatra",
+      "Enabled": true,
+      "UniqueIdentifier": "c:\\program files\\rstudio\\bin\\sumatra"
+    }
+  ],
+  "DisabledProgramSources": [],
+  "CustomSuffixes": [],
+  "CustomProtocols": [],
+  "BuiltinSuffixesStatus": {
+    "exe": true,
+    "appref-ms": true,
+    "lnk": true
+  },
+  "BuiltinProtocolsStatus": {
+    "steam": true,
+    "epic": true,
+    "http": false
+  },
+  "UseCustomSuffixes": false,
+  "UseCustomProtocols": false,
+  "EnableStartMenuSource": true,
+  "EnableDescription": false,
+  "HideAppsPath": true,
+  "HideUninstallers": true,
+  "EnableRegistrySource": true,
+  "EnablePathSource": false,
+  "EnableUWP": true
+}

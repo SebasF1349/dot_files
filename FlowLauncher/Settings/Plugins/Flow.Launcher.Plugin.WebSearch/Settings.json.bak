@@ -1,0 +1,104 @@
+{
+  "SearchSources": [
+    {
+      "Title": "Google",
+      "ActionKeyword": "goo",
+      "Icon": "google.png",
+      "CustomIcon": false,
+      "Url": "https://www.google.com/search?q={q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Wikipedia",
+      "ActionKeyword": "wiki",
+      "Icon": "wiki.png",
+      "CustomIcon": false,
+      "Url": "https://en.wikipedia.org/wiki/{q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Twitter",
+      "ActionKeyword": "twitter",
+      "Icon": "twitter.png",
+      "CustomIcon": false,
+      "Url": "https://twitter.com/search?q={q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Google Maps",
+      "ActionKeyword": "maps",
+      "Icon": "google_maps.png",
+      "CustomIcon": false,
+      "Url": "https://maps.google.com/maps?q={q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Google Translate",
+      "ActionKeyword": "translate",
+      "Icon": "google_translate.png",
+      "CustomIcon": false,
+      "Url": "https://translate.google.com/#auto|en|{q}",
+      "Enabled": true
+    },
+    {
+      "Title": "DuckDuckGo",
+      "ActionKeyword": "duckduckgo",
+      "Icon": "duckduckgo.png",
+      "CustomIcon": false,
+      "Url": "https://duckduckgo.com/?q={q}",
+      "Enabled": true
+    },
+    {
+      "Title": "GitHub",
+      "ActionKeyword": "github",
+      "Icon": "github.png",
+      "CustomIcon": false,
+      "Url": "https://github.com/search?q={q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Gmail",
+      "ActionKeyword": "gmail",
+      "Icon": "gmail.png",
+      "CustomIcon": false,
+      "Url": "https://mail.google.com/mail/ca/u/0/#apps/{q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Google Drive",
+      "ActionKeyword": "drive",
+      "Icon": "google_drive.png",
+      "CustomIcon": false,
+      "Url": "https://drive.google.com/?hl=en\u0026tab=bo#search/{q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Stack Overflow",
+      "ActionKeyword": "stackoverflow",
+      "Icon": "stackoverflow.png",
+      "CustomIcon": false,
+      "Url": "https://stackoverflow.com/search?q={q}",
+      "Enabled": true
+    },
+    {
+      "Title": "Google Images",
+      "ActionKeyword": "image",
+      "Icon": "google.png",
+      "CustomIcon": false,
+      "Url": "https://www.google.com/search?q={q}\u0026tbm=isch",
+      "Enabled": true
+    },
+    {
+      "Title": "YouTube",
+      "ActionKeyword": "yt",
+      "Icon": "youtube.png",
+      "CustomIcon": false,
+      "Url": "https://www.youtube.com/results?search_query={q}",
+      "Enabled": true
+    }
+  ],
+  "EnableSuggestion": false,
+  "Suggestion": "Google",
+  "BrowserPath": null,
+  "OpenInNewBrowser": true
+}

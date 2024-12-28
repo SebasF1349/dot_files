@@ -1,0 +1,1208 @@
+{
+  "Items": [
+    {
+      "Query": "stre",
+      "ExecutedDateTime": "2024-11-06T13:20:04.239591-03:00"
+    },
+    {
+      "Query": "sht",
+      "ExecutedDateTime": "2024-11-06T17:00:52.5220564-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-06T22:33:01.1242487-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-06T22:33:06.4498555-03:00"
+    },
+    {
+      "Query": "shutdown",
+      "ExecutedDateTime": "2024-11-06T22:38:42.689797-03:00"
+    },
+    {
+      "Query": "workbe",
+      "ExecutedDateTime": "2024-11-07T18:20:08.288943-03:00"
+    },
+    {
+      "Query": "expl",
+      "ExecutedDateTime": "2024-11-07T18:56:44.879591-03:00"
+    },
+    {
+      "Query": "ches",
+      "ExecutedDateTime": "2024-11-07T19:06:16.7404022-03:00"
+    },
+    {
+      "Query": "D:\\Trabajos\\Proyectos - Dev\\cuatrimestre-4\\diseno_administracion_bases_datos\\tps\\biblioteca.sql",
+      "ExecutedDateTime": "2024-11-07T20:27:13.6372951-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-07T23:53:50.5007416-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-08T10:01:25.8233795-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-08T10:01:30.0541654-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-08T13:49:41.9410349-03:00"
+    },
+    {
+      "Query": "chese",
+      "ExecutedDateTime": "2024-11-08T13:55:44.4472677-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-08T14:59:36.4192309-03:00"
+    },
+    {
+      "Query": "shutdow",
+      "ExecutedDateTime": "2024-11-08T22:51:50.5905867-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-09T09:21:51.1395015-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-09T09:21:52.8894955-03:00"
+    },
+    {
+      "Query": "chess",
+      "ExecutedDateTime": "2024-11-09T09:22:06.5940325-03:00"
+    },
+    {
+      "Query": "inte",
+      "ExecutedDateTime": "2024-11-09T17:17:00.1825686-03:00"
+    },
+    {
+      "Query": "cal",
+      "ExecutedDateTime": "2024-11-09T17:33:16.7634082-03:00"
+    },
+    {
+      "Query": "= 16*5\u002B1",
+      "ExecutedDateTime": "2024-11-09T18:12:55.1746527-03:00"
+    },
+    {
+      "Query": "!w sett",
+      "ExecutedDateTime": "2024-11-09T23:08:12.9599873-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-09T23:13:33.9297882-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-11-09T23:37:56.6119496-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-10T10:40:12.6513212-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-11-10T10:40:16.0415365-03:00"
+    },
+    {
+      "Query": "mio",
+      "ExecutedDateTime": "2024-11-10T21:59:06.0930155-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-11-10T23:53:07.3128922-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-11T14:50:24.0893253-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-11T14:50:37.9913245-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-11T14:52:55.5552015-03:00"
+    },
+    {
+      "Query": "mio",
+      "ExecutedDateTime": "2024-11-12T17:31:03.9855134-03:00"
+    },
+    {
+      "Query": "stre",
+      "ExecutedDateTime": "2024-11-12T17:31:08.6556074-03:00"
+    },
+    {
+      "Query": "mio",
+      "ExecutedDateTime": "2024-11-12T18:05:37.1726706-03:00"
+    },
+    {
+      "Query": "vsc",
+      "ExecutedDateTime": "2024-11-13T15:28:07.5622646-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-13T15:28:37.7952605-03:00"
+    },
+    {
+      "Query": "vs",
+      "ExecutedDateTime": "2024-11-13T15:29:51.757398-03:00"
+    },
+    {
+      "Query": "stre",
+      "ExecutedDateTime": "2024-11-13T16:17:34.6788264-03:00"
+    },
+    {
+      "Query": "chess",
+      "ExecutedDateTime": "2024-11-13T16:20:04.4586265-03:00"
+    },
+    {
+      "Query": "!w",
+      "ExecutedDateTime": "2024-11-13T17:03:44.5231448-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-11-13T17:12:34.6419409-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-14T15:04:53.8404768-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-11-14T15:04:56.8061716-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-14T15:05:09.9506005-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-15T15:00:33.9118689-03:00"
+    },
+    {
+      "Query": "zo",
+      "ExecutedDateTime": "2024-11-15T15:00:42.5179198-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-15T15:03:40.4508976-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-15T17:11:29.1542079-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-16T11:16:08.7630496-03:00"
+    },
+    {
+      "Query": "chess",
+      "ExecutedDateTime": "2024-11-16T11:57:55.077344-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-16T12:53:52.4139718-03:00"
+    },
+    {
+      "Query": "dis",
+      "ExecutedDateTime": "2024-11-16T17:33:15.5557399-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-16T23:15:03.2199825-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-11-17T00:11:49.1706039-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-17T11:12:02.9791184-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-17T12:04:47.7734712-03:00"
+    },
+    {
+      "Query": "exp",
+      "ExecutedDateTime": "2024-11-17T12:05:31.1986508-03:00"
+    },
+    {
+      "Query": "pas",
+      "ExecutedDateTime": "2024-11-17T12:10:46.4952208-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-17T12:16:14.9289741-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-18T14:39:57.1274746-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-18T14:54:54.022851-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-18T19:46:39.2635138-03:00"
+    },
+    {
+      "Query": "android",
+      "ExecutedDateTime": "2024-11-18T20:20:36.6118703-03:00"
+    },
+    {
+      "Query": "resta",
+      "ExecutedDateTime": "2024-11-18T20:52:13.5429351-03:00"
+    },
+    {
+      "Query": "android",
+      "ExecutedDateTime": "2024-11-18T20:54:59.757101-03:00"
+    },
+    {
+      "Query": "wez",
+      "ExecutedDateTime": "2024-11-18T20:55:31.3795986-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-18T20:59:28.2985325-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-18T21:10:54.5329057-03:00"
+    },
+    {
+      "Query": "andr",
+      "ExecutedDateTime": "2024-11-18T21:14:30.2317565-03:00"
+    },
+    {
+      "Query": "androi",
+      "ExecutedDateTime": "2024-11-18T21:20:13.3323009-03:00"
+    },
+    {
+      "Query": "and",
+      "ExecutedDateTime": "2024-11-18T21:22:48.2641509-03:00"
+    },
+    {
+      "Query": "!w unin",
+      "ExecutedDateTime": "2024-11-18T21:25:14.6760681-03:00"
+    },
+    {
+      "Query": "android",
+      "ExecutedDateTime": "2024-11-18T21:37:16.3361785-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-18T23:16:45.0086884-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-19T15:32:24.7565753-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-19T15:32:27.8817888-03:00"
+    },
+    {
+      "Query": "androi",
+      "ExecutedDateTime": "2024-11-19T16:11:23.4953254-03:00"
+    },
+    {
+      "Query": "!w envi",
+      "ExecutedDateTime": "2024-11-19T16:34:59.139066-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-19T16:36:55.6769858-03:00"
+    },
+    {
+      "Query": "!w unin",
+      "ExecutedDateTime": "2024-11-19T16:37:23.6752569-03:00"
+    },
+    {
+      "Query": "expl",
+      "ExecutedDateTime": "2024-11-19T16:40:14.6822342-03:00"
+    },
+    {
+      "Query": "intel",
+      "ExecutedDateTime": "2024-11-19T17:08:58.5478522-03:00"
+    },
+    {
+      "Query": "andoi",
+      "ExecutedDateTime": "2024-11-19T17:09:05.1264162-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-19T17:22:49.8563487-03:00"
+    },
+    {
+      "Query": "androi",
+      "ExecutedDateTime": "2024-11-19T18:00:20.1128819-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-19T22:55:55.4140258-03:00"
+    },
+    {
+      "Query": "shutdow",
+      "ExecutedDateTime": "2024-11-20T00:30:48.3568042-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-20T12:45:23.4414945-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-20T12:45:25.6393415-03:00"
+    },
+    {
+      "Query": "note",
+      "ExecutedDateTime": "2024-11-20T18:18:06.2615153-03:00"
+    },
+    {
+      "Query": "!w",
+      "ExecutedDateTime": "2024-11-20T18:33:44.6083909-03:00"
+    },
+    {
+      "Query": "note",
+      "ExecutedDateTime": "2024-11-20T19:10:59.9992622-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-11-20T19:24:41.8219621-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-20T19:28:53.6186088-03:00"
+    },
+    {
+      "Query": "undav",
+      "ExecutedDateTime": "2024-11-20T20:48:19.7912414-03:00"
+    },
+    {
+      "Query": "D:\\Trabajos\\UNDAV\\",
+      "ExecutedDateTime": "2024-11-20T20:48:20.0363645-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-21T14:43:01.1535968-03:00"
+    },
+    {
+      "Query": "chess",
+      "ExecutedDateTime": "2024-11-21T17:46:10.9767773-03:00"
+    },
+    {
+      "Query": "geller",
+      "ExecutedDateTime": "2024-11-21T17:48:34.0848714-03:00"
+    },
+    {
+      "Query": "D:\\Libros\\Jugadores\\Geller, Efim\\",
+      "ExecutedDateTime": "2024-11-21T17:51:22.810006-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-11-21T18:33:38.7786606-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-21T23:18:53.8632888-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-22T14:55:59.241191-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-22T14:56:02.3430507-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-22T14:56:09.8384926-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-11-22T17:19:36.6015126-03:00"
+    },
+    {
+      "Query": "notep",
+      "ExecutedDateTime": "2024-11-22T18:07:39.0950057-03:00"
+    },
+    {
+      "Query": "curri",
+      "ExecutedDateTime": "2024-11-22T20:18:05.6193522-03:00"
+    },
+    {
+      "Query": "D:\\Curriculum Vitae\\",
+      "ExecutedDateTime": "2024-11-22T20:18:05.9350315-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-22T21:58:13.5723269-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-22T22:50:00.3400659-03:00"
+    },
+    {
+      "Query": "!w",
+      "ExecutedDateTime": "2024-11-23T11:39:58.4363918-03:00"
+    },
+    {
+      "Query": "vs",
+      "ExecutedDateTime": "2024-11-23T11:43:08.9670869-03:00"
+    },
+    {
+      "Query": "shutdo",
+      "ExecutedDateTime": "2024-11-24T00:46:06.2870434-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-24T10:03:32.1167247-03:00"
+    },
+    {
+      "Query": "notep",
+      "ExecutedDateTime": "2024-11-24T19:47:52.2718531-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-24T22:55:27.956538-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-25T14:50:20.7590039-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-25T14:50:25.0849734-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-25T14:52:00.0961796-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-25T22:24:47.5175923-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-26T16:40:06.3030371-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-26T16:40:08.6519509-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-11-26T16:54:22.3452465-03:00"
+    },
+    {
+      "Query": "!w defe",
+      "ExecutedDateTime": "2024-11-26T17:05:44.635776-03:00"
+    },
+    {
+      "Query": "!w blu",
+      "ExecutedDateTime": "2024-11-26T21:12:50.5239236-03:00"
+    },
+    {
+      "Query": "workben",
+      "ExecutedDateTime": "2024-11-26T21:54:46.5575037-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-26T23:57:34.5251644-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-27T13:02:07.0980217-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-27T13:02:09.142392-03:00"
+    },
+    {
+      "Query": "ches",
+      "ExecutedDateTime": "2024-11-27T13:26:36.9960092-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-27T13:47:27.9727038-03:00"
+    },
+    {
+      "Query": "putt",
+      "ExecutedDateTime": "2024-11-27T13:51:08.8431667-03:00"
+    },
+    {
+      "Query": "put",
+      "ExecutedDateTime": "2024-11-27T13:51:58.9323124-03:00"
+    },
+    {
+      "Query": "expl",
+      "ExecutedDateTime": "2024-11-27T13:53:36.3744097-03:00"
+    },
+    {
+      "Query": "putty",
+      "ExecutedDateTime": "2024-11-27T13:53:45.0803562-03:00"
+    },
+    {
+      "Query": "D:\\Trabajos\\ACADEMIA EA\\Putty Keys DO\\",
+      "ExecutedDateTime": "2024-11-27T13:53:45.8352488-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-27T13:55:29.3141573-03:00"
+    },
+    {
+      "Query": "put",
+      "ExecutedDateTime": "2024-11-27T13:57:02.8361196-03:00"
+    },
+    {
+      "Query": "putt",
+      "ExecutedDateTime": "2024-11-27T14:24:20.03057-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-11-27T23:07:44.7252989-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-11-28T15:02:37.8589957-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-28T15:02:41.6089686-03:00"
+    },
+    {
+      "Query": "z",
+      "ExecutedDateTime": "2024-11-28T15:02:48.1394123-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-11-28T15:02:52.9608267-03:00"
+    },
+    {
+      "Query": "expl",
+      "ExecutedDateTime": "2024-11-28T15:56:15.0850114-03:00"
+    },
+    {
+      "Query": "ter",
+      "ExecutedDateTime": "2024-11-28T17:01:49.2236439-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-11-28T18:12:19.3266092-03:00"
+    },
+    {
+      "Query": "note",
+      "ExecutedDateTime": "2024-11-28T19:59:47.7189483-03:00"
+    },
+    {
+      "Query": "= 4200*1,035",
+      "ExecutedDateTime": "2024-11-28T20:00:04.4490899-03:00"
+    },
+    {
+      "Query": "= 4200*100/(100-3,5)",
+      "ExecutedDateTime": "2024-11-28T20:03:12.88996-03:00"
+    },
+    {
+      "Query": "ga",
+      "ExecutedDateTime": "2024-11-28T23:20:20.2006719-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-11-29T00:27:09.9299638-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-29T14:47:42.4038641-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-29T14:47:44.7294389-03:00"
+    },
+    {
+      "Query": "zo",
+      "ExecutedDateTime": "2024-11-29T14:47:56.8973934-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-11-29T23:20:07.1203567-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-11-30T11:17:27.3314654-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-11-30T11:17:29.9129348-03:00"
+    },
+    {
+      "Query": "notep",
+      "ExecutedDateTime": "2024-11-30T11:51:46.1714324-03:00"
+    },
+    {
+      "Query": "streio",
+      "ExecutedDateTime": "2024-11-30T13:22:34.4540167-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-11-30T20:26:29.2478906-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-11-30T21:10:44.5319614-03:00"
+    },
+    {
+      "Query": "stre",
+      "ExecutedDateTime": "2024-11-30T21:40:17.9726642-03:00"
+    },
+    {
+      "Query": "shutdown",
+      "ExecutedDateTime": "2024-11-30T23:45:22.1411391-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-01T09:30:35.1114114-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-01T09:30:36.637317-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-12-01T15:01:34.6001429-03:00"
+    },
+    {
+      "Query": "androi",
+      "ExecutedDateTime": "2024-12-01T21:57:05.0665802-03:00"
+    },
+    {
+      "Query": "shutdo",
+      "ExecutedDateTime": "2024-12-01T23:25:40.4896134-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-02T14:38:47.3486499-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-02T14:38:49.193907-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-02T14:58:58.7305982-03:00"
+    },
+    {
+      "Query": "cal",
+      "ExecutedDateTime": "2024-12-02T20:00:24.2407312-03:00"
+    },
+    {
+      "Query": "ex",
+      "ExecutedDateTime": "2024-12-02T21:33:59.0493681-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-02T23:05:54.4461903-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-03T17:38:23.8719096-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-03T17:38:38.2780983-03:00"
+    },
+    {
+      "Query": "note",
+      "ExecutedDateTime": "2024-12-03T17:40:42.1935925-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-03T22:14:02.6791227-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-04T12:57:41.5263797-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-04T12:57:43.7385078-03:00"
+    },
+    {
+      "Query": "expo",
+      "ExecutedDateTime": "2024-12-04T17:33:05.712653-03:00"
+    },
+    {
+      "Query": "shutdo",
+      "ExecutedDateTime": "2024-12-04T22:07:23.7565631-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-05T14:54:53.9111776-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-12-05T14:54:56.3491334-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-05T14:57:53.8261593-03:00"
+    },
+    {
+      "Query": "qbi",
+      "ExecutedDateTime": "2024-12-05T20:12:02.6117254-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-06T15:01:25.6810958-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-12-06T22:22:47.9859503-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-06T23:03:44.0239041-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-07T10:09:06.7176418-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-12-07T10:09:08.7072271-03:00"
+    },
+    {
+      "Query": "dia",
+      "ExecutedDateTime": "2024-12-07T11:00:54.8427862-03:00"
+    },
+    {
+      "Query": "mio",
+      "ExecutedDateTime": "2024-12-07T13:10:54.8931598-03:00"
+    },
+    {
+      "Query": "termin",
+      "ExecutedDateTime": "2024-12-07T18:07:33.21117-03:00"
+    },
+    {
+      "Query": "ter",
+      "ExecutedDateTime": "2024-12-07T18:07:41.299678-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-12-07T18:11:29.7142118-03:00"
+    },
+    {
+      "Query": "visual",
+      "ExecutedDateTime": "2024-12-07T18:45:14.7823283-03:00"
+    },
+    {
+      "Query": "visu",
+      "ExecutedDateTime": "2024-12-07T18:48:32.7157619-03:00"
+    },
+    {
+      "Query": "visual",
+      "ExecutedDateTime": "2024-12-07T18:48:36.2516551-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-07T22:03:38.7062615-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-08T10:08:48.4816742-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-08T10:08:49.75932-03:00"
+    },
+    {
+      "Query": "stre",
+      "ExecutedDateTime": "2024-12-08T13:29:38.1436154-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-12-09T05:25:15.923062-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-09T17:40:05.7543573-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-09T17:40:09.4725456-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-09T17:42:27.4766543-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-09T22:36:42.4861457-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-10T18:07:48.4070726-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-10T18:07:50.9094771-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-10T22:02:05.3678472-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-11T15:21:14.9834739-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-12-11T15:21:21.3496001-03:00"
+    },
+    {
+      "Query": "notepad",
+      "ExecutedDateTime": "2024-12-11T15:25:13.6202857-03:00"
+    },
+    {
+      "Query": "!w blo",
+      "ExecutedDateTime": "2024-12-11T15:30:53.9385283-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-12-11T15:33:11.2100256-03:00"
+    },
+    {
+      "Query": "dia",
+      "ExecutedDateTime": "2024-12-11T16:09:32.4008838-03:00"
+    },
+    {
+      "Query": "workbe",
+      "ExecutedDateTime": "2024-12-11T17:35:48.7453067-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-12-11T17:43:31.5744333-03:00"
+    },
+    {
+      "Query": "expl",
+      "ExecutedDateTime": "2024-12-11T17:46:40.0032252-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-11T18:28:05.1994526-03:00"
+    },
+    {
+      "Query": "!w blue",
+      "ExecutedDateTime": "2024-12-11T18:28:33.9874718-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-11T23:00:48.6161121-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-12T18:27:39.7511612-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-12T18:27:43.8290222-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-12T18:27:51.7408432-03:00"
+    },
+    {
+      "Query": "!w blu",
+      "ExecutedDateTime": "2024-12-12T21:58:49.8088855-03:00"
+    },
+    {
+      "Query": "chess",
+      "ExecutedDateTime": "2024-12-12T21:59:32.915541-03:00"
+    },
+    {
+      "Query": "suma",
+      "ExecutedDateTime": "2024-12-12T21:59:44.4512066-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-13T00:13:54.2672624-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-13T14:53:20.3562554-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-12-13T14:53:22.3133642-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-13T14:53:29.313338-03:00"
+    },
+    {
+      "Query": "descar",
+      "ExecutedDateTime": "2024-12-13T20:27:07.48472-03:00"
+    },
+    {
+      "Query": "D:\\Descargas\\",
+      "ExecutedDateTime": "2024-12-13T20:27:07.9934697-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-13T23:22:42.3647799-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-14T10:43:32.650274-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-12-14T10:43:37.1679744-03:00"
+    },
+    {
+      "Query": "!w blu",
+      "ExecutedDateTime": "2024-12-14T11:16:44.051975-03:00"
+    },
+    {
+      "Query": "!w",
+      "ExecutedDateTime": "2024-12-14T11:17:37.0199992-03:00"
+    },
+    {
+      "Query": "workbe",
+      "ExecutedDateTime": "2024-12-14T12:17:20.6791139-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-14T23:18:41.0661108-03:00"
+    },
+    {
+      "Query": "!w power",
+      "ExecutedDateTime": "2024-12-15T16:04:09.8642082-03:00"
+    },
+    {
+      "Query": "!w energy",
+      "ExecutedDateTime": "2024-12-15T16:07:14.0025931-03:00"
+    },
+    {
+      "Query": "!w bater",
+      "ExecutedDateTime": "2024-12-15T16:07:51.9406424-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-15T16:08:02.6332215-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-15T16:08:18.7285989-03:00"
+    },
+    {
+      "Query": "!w setti",
+      "ExecutedDateTime": "2024-12-15T16:08:39.5183107-03:00"
+    },
+    {
+      "Query": "!w energy",
+      "ExecutedDateTime": "2024-12-15T16:09:57.8624256-03:00"
+    },
+    {
+      "Query": "workb",
+      "ExecutedDateTime": "2024-12-15T16:12:08.6387614-03:00"
+    },
+    {
+      "Query": "expl",
+      "ExecutedDateTime": "2024-12-15T16:13:19.0720153-03:00"
+    },
+    {
+      "Query": "workbe",
+      "ExecutedDateTime": "2024-12-15T18:21:43.1468744-03:00"
+    },
+    {
+      "Query": "shutdown",
+      "ExecutedDateTime": "2024-12-15T19:05:18.0327532-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-16T13:08:34.9832012-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-16T13:08:36.6765992-03:00"
+    },
+    {
+      "Query": "mio",
+      "ExecutedDateTime": "2024-12-16T13:08:48.1568892-03:00"
+    },
+    {
+      "Query": "workbe",
+      "ExecutedDateTime": "2024-12-16T16:11:24.8355412-03:00"
+    },
+    {
+      "Query": "!w blu",
+      "ExecutedDateTime": "2024-12-16T23:14:01.5398767-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-12-16T23:22:07.0493168-03:00"
+    },
+    {
+      "Query": "workbench",
+      "ExecutedDateTime": "2024-12-16T23:47:57.2157764-03:00"
+    },
+    {
+      "Query": "work",
+      "ExecutedDateTime": "2024-12-16T23:49:25.3379154-03:00"
+    },
+    {
+      "Query": "workn",
+      "ExecutedDateTime": "2024-12-16T23:52:01.0778668-03:00"
+    },
+    {
+      "Query": "work",
+      "ExecutedDateTime": "2024-12-16T23:57:07.8219785-03:00"
+    },
+    {
+      "Query": "shutdown",
+      "ExecutedDateTime": "2024-12-17T00:08:00.7342759-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-17T17:55:36.3489117-03:00"
+    },
+    {
+      "Query": "viv",
+      "ExecutedDateTime": "2024-12-17T17:55:42.6507722-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-17T21:37:42.5376513-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-18T16:18:08.7826444-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-18T16:18:14.8371102-03:00"
+    },
+    {
+      "Query": "pass",
+      "ExecutedDateTime": "2024-12-18T19:32:53.4656728-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-12-18T22:53:51.2173152-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-19T14:50:01.1708393-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-19T14:50:02.8914958-03:00"
+    },
+    {
+      "Query": "zo",
+      "ExecutedDateTime": "2024-12-19T14:50:18.2650211-03:00"
+    },
+    {
+      "Query": "workbe",
+      "ExecutedDateTime": "2024-12-19T18:07:15.5279145-03:00"
+    },
+    {
+      "Query": "documents",
+      "ExecutedDateTime": "2024-12-19T18:13:53.691247-03:00"
+    },
+    {
+      "Query": "D:\\Trabajos\\ACADEMIA EA\\Backup26-4-21\\wp-content\\plugins\\elementor-pro\\modules\\woocommerce\\documents\\",
+      "ExecutedDateTime": "2024-12-19T18:13:54.3595176-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-12-19T18:16:16.3168922-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-19T22:08:03.6912931-03:00"
+    },
+    {
+      "Query": "!w blu",
+      "ExecutedDateTime": "2024-12-19T22:08:57.3937805-03:00"
+    },
+    {
+      "Query": "chess",
+      "ExecutedDateTime": "2024-12-19T22:09:18.3247868-03:00"
+    },
+    {
+      "Query": "suma",
+      "ExecutedDateTime": "2024-12-19T22:10:05.0138494-03:00"
+    },
+    {
+      "Query": "shutdo",
+      "ExecutedDateTime": "2024-12-20T00:05:29.249954-03:00"
+    },
+    {
+      "Query": "glaz",
+      "ExecutedDateTime": "2024-12-20T14:48:43.0585748-03:00"
+    },
+    {
+      "Query": "va",
+      "ExecutedDateTime": "2024-12-20T14:48:47.3213765-03:00"
+    },
+    {
+      "Query": "zoo",
+      "ExecutedDateTime": "2024-12-20T14:49:40.7544369-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-21T22:19:15.0481287-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-22T09:13:00.4148094-03:00"
+    },
+    {
+      "Query": "viva",
+      "ExecutedDateTime": "2024-12-22T09:13:05.0205662-03:00"
+    },
+    {
+      "Query": "shut",
+      "ExecutedDateTime": "2024-12-22T09:49:28.1718905-03:00"
+    },
+    {
+      "Query": "va",
+      "ExecutedDateTime": "2024-12-23T22:13:18.8352335-03:00"
+    },
+    {
+      "Query": "shutd",
+      "ExecutedDateTime": "2024-12-23T22:19:13.6862926-03:00"
+    },
+    {
+      "Query": "!w",
+      "ExecutedDateTime": "2024-12-24T07:26:41.2746509-03:00"
+    },
+    {
+      "Query": "gla",
+      "ExecutedDateTime": "2024-12-24T07:26:56.06242-03:00"
+    },
+    {
+      "Query": "explo",
+      "ExecutedDateTime": "2024-12-24T07:32:44.2700244-03:00"
+    },
+    {
+      "Query": "cal",
+      "ExecutedDateTime": "2024-12-24T08:15:06.6151369-03:00"
+    },
+    {
+      "Query": "calc",
+      "ExecutedDateTime": "2024-12-24T08:16:08.8333204-03:00"
+    },
+    {
+      "Query": "eplo",
+      "ExecutedDateTime": "2024-12-24T11:41:11.5738471-03:00"
+    }
+  ]
+}
