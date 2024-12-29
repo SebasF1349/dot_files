@@ -79,6 +79,14 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
   desc = 'Resize splits after resizing nvim',
 })
 
+vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  callback = function()
+    vim.fn.matchadd('ColorColumn', '\\%101v', 100)
+  end,
+  group = general,
+  desc = 'Show when lines are longer than 80 chars',
+})
+
 vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
   callback = function(event)
     if event.match:match('^%w%w+://') then
