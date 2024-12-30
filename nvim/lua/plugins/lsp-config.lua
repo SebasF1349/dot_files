@@ -364,7 +364,9 @@ return {
               callback = function()
                 vim.schedule(function()
                   vim.lsp.buf.clear_references()
-                  vim.lsp.buf.document_highlight()
+                  if vim.fn.mode() == 'n' then
+                    vim.lsp.buf.document_highlight()
+                  end
                 end)
               end,
             })
