@@ -142,7 +142,7 @@ return {
 
           vim.o.completeitemalign = 'abbr,menu,kind'
           vim.o.pumheight = 6
-          vim.opt.completeopt = { 'menuone', 'noinsert', 'fuzzy', 'popup' }
+          vim.opt.completeopt = { 'menuone', 'noselect', 'fuzzy', 'popup' }
 
           -- vim.keymap.set('s', '<C-l>', function()
           --   if vim.snippet.active({ direction = 1 }) then
@@ -179,13 +179,6 @@ return {
               vim.api.nvim_input('<C-x><C-o>')
             end
           end, { desc = 'Trigger And Select Next Completion' })
-          vim.keymap.set('i', '<CR>', function()
-            if vim.fn.pumvisible() ~= 0 then
-              return '<C-e><CR>'
-            else
-              return '<CR>'
-            end
-          end, { desc = 'New line', expr = true, buffer = event.buf })
           -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
           -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
