@@ -274,6 +274,24 @@ mkcd() {
         cd -P -- "$1" || exit
 }
 
+# cd if dir or edit if file
+t() {
+    if [[ $# -eq 1 && (-d "$1" || "$1" == "-") ]]; then
+        builtin cd "$1" || return
+        if command -v eza >/dev/null 2>&1; then
+            eza -lah
+        else
+            ls -bvxAF --color --group-directories-first
+        fi
+    elif test $# -eq 0; then
+        builtin cd "$HOME" || return
+    elif test -f "$1" || test ! -e "$1" || test $# -gt 1; then
+        $EDITOR "$@"
+    else
+        printf "t: case not accounted for\n"
+    fi
+}
+
 # do sudo, or sudo the last command if no argument given
 s() {
     if [[ $# == 0 ]]; then
