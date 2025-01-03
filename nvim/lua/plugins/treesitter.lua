@@ -129,10 +129,10 @@ return {
         local line = vim.api.nvim_get_current_line()
         local start, ending = math.huge, math.huge
         for _, pattern in ipairs(sub_word_limiters) do
+          ---@type number|nil, number|nil
           local s, e = 0, 0
           repeat
             s = s + 1
-            ---@diagnostic disable-next-line: cast-local-type
             s, e = line:find(pattern, s)
             local standingOnOrInFront = e and e > cursor_pos[2]
           until standingOnOrInFront or not s
