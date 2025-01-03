@@ -23,7 +23,8 @@
 
 [core]
     pager = delta
-    autocrlf = false
+    ; autocrlf = false
+    eol = lf
 [interactive]
     diffFilter = delta --color-only --features=interactive
 [delta]
