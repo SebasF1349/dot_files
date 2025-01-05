@@ -212,15 +212,17 @@ return {
         highlight_duration = 250, -- How long should above highlight last (in ms)
       })
 
-      vim.keymap.set({ 'n', 'v' }, '<M-k>', '<cmd>Treewalker Up<cr>', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<M-j>', '<cmd>Treewalker Down<cr>', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<M-l>', '<cmd>Treewalker Right<cr>', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<M-h>', '<cmd>Treewalker Left<cr>', { silent = true })
-      vim.keymap.set('n', '<M-K>', '<cmd>Treewalker SwapUp<cr>', { silent = true })
-      vim.keymap.set('n', '<M-J>', '<cmd>Treewalker SwapDown<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-k>', '<cmd>Treewalker Up<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-j>', '<cmd>Treewalker Down<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-l>', '<cmd>Treewalker Right<cr>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-h>', '<cmd>Treewalker Left<cr>', { silent = true })
+      vim.keymap.set('n', '<A-K>', '<cmd>Treewalker SwapUp<cr>', { silent = true })
+      vim.keymap.set('n', '<A-J>', '<cmd>Treewalker SwapDown<cr>', { silent = true })
+      vim.keymap.set('n', '<A-L>', '<cmd>Treewalker SwapRight<CR>', { silent = true })
+      vim.keymap.set('n', '<A-H>', '<cmd>Treewalker SwapLeft<CR>', { silent = true })
       -- using 'nvim-treesitter/nvim-treesitter',
-      vim.keymap.set('n', '<M-L>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { silent = true })
-      vim.keymap.set('n', '<M-H>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { silent = true })
+      -- vim.keymap.set('n', '<M-L>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { silent = true })
+      -- vim.keymap.set('n', '<M-H>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { silent = true })
     end,
   },
 }
