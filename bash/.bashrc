@@ -342,6 +342,7 @@ mvg() {
 
 #Install scripts
 export PATH=$PATH:~/dot_files/install_scripts/
+export PATH=$PATH:/usr/local/go/bin
 
 if [ "$DISTRO" = "debian" ]; then
     # set variable identifying the chroot you work in (used in the prompt below)
