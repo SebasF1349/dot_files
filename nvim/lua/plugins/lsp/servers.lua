@@ -186,71 +186,18 @@ M = {
   marksman = {},
 
   gopls = {
-    capabilities = {
-      textDocument = {
-        completion = {
-          completionItem = {
-            commitCharactersSupport = true,
-            deprecatedSupport = true,
-            documentationFormat = { 'markdown', 'plaintext' },
-            preselectSupport = true,
-            insertReplaceSupport = true,
-            labelDetailsSupport = true,
-            snippetSupport = true,
-            resolveSupport = {
-              properties = {
-                'documentation',
-                'details',
-                'additionalTextEdits',
-              },
-            },
-          },
-          contextSupport = true,
-          dynamicRegistration = true,
-        },
-      },
-    },
-    filetypes = { 'go', 'gomod', 'gosum', 'gotmpl', 'gohtmltmpl', 'gotexttmpl' },
-    message_level = vim.lsp.protocol.MessageType.Error,
-    cmd = {
-      'gopls', -- share the gopls instance if there is one already
-      '-remote.debug=:0',
-    },
-    root_dir = function(fname)
-      local has_lsp, lspconfig = pcall(require, 'lspconfig')
-      if has_lsp then
-        local util = lspconfig.util
-        return util.root_pattern('go.work', 'go.mod')(fname)
-          or util.root_pattern('.git')(fname)
-          or util.path.dirname(fname)
-      end
-    end,
-    flags = { allow_incremental_sync = true, debounce_text_changes = 500 },
     settings = {
       gopls = {
-        -- more settings: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-        -- not supported
-        analyses = {
-          unreachable = true,
-          nilness = true,
-          unusedparams = true,
-          useany = true,
-          unusedwrite = true,
-          ST1003 = true,
-          undeclaredname = true,
-          fillreturns = true,
-          nonewvars = true,
-          fieldalignment = false,
-          shadow = true,
-        },
+        gofumpt = true,
         codelenses = {
-          generate = true, -- show the `go generate` lens.
-          gc_details = true, -- Show a code lens toggling the display of gc's choices.
+          gc_details = false,
+          generate = true,
+          regenerate_cgo = true,
+          run_govulncheck = true,
           test = true,
           tidy = true,
-          vendor = true,
-          regenerate_cgo = true,
           upgrade_dependency = true,
+          vendor = true,
         },
         hints = {
           assignVariableTypes = true,
@@ -261,36 +208,19 @@ M = {
           parameterNames = true,
           rangeVariableTypes = true,
         },
+        -- analyses = {
+        --   fieldalignment = true,
+        --   nilness = true,
+        --   unusedparams = true,
+        --   unusedwrite = true,
+        --   useany = true,
+        -- },
         usePlaceholders = true,
         completeUnimported = true,
         staticcheck = true,
-        matcher = 'Fuzzy',
-        diagnosticsDelay = '500ms',
-        symbolMatcher = 'fuzzy',
+        directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
         semanticTokens = true,
-        noSemanticTokens = true, -- disable semantic string tokens so we can use treesitter highlight injection
-
-        -- ['local'] = get_current_gomod(),
-        gofumpt = true, -- _GO_NVIM_CFG.lsp_gofumpt or false, -- true|false, -- turn on for new repos, gofmpt is good but also create code turmoils
-        buildFlags = { '-tags', 'integration' },
       },
-    },
-    -- NOTE: it is important to add handler to formatting handlers
-    -- the async formatter will call these handlers when gopls responed
-    -- without these handlers, the file will not be saved
-    handlers = {
-      range_format = function(...)
-        vim.lsp.handlers.range_format(...)
-        if vim.fn.getbufinfo('%')[1].changed == 1 then
-          vim.cmd('noautocmd write')
-        end
-      end,
-      formatting = function(...)
-        vim.lsp.handlers.formatting(...)
-        if vim.fn.getbufinfo('%')[1].changed == 1 then
-          vim.cmd('noautocmd write')
-        end
-      end,
     },
   },
 
