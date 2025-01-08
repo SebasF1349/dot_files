@@ -68,17 +68,31 @@ end, { desc = 'Append on multiple lines', expr = true })
 
 -- BASH-style movement in cmd and insert mode
 vim.keymap.set({ 'i', 'c' }, '<C-a>', '<Home>', { desc = 'Move to start of line' })
-vim.keymap.set({ 'i', 'c' }, '<C-e>', '<End>', { desc = 'Move to end of line' })
+vim.keymap.set({ 'i' }, '<C-e>', function()
+  if vim.fn.pumvisible() ~= 0 then
+    return '<C-e>'
+  else
+    return '<End>'
+  end
+end, { desc = 'Move to end of line when no pum', expr = true })
 vim.keymap.set({ 'i', 'c' }, '<C-b>', '<Left>', { desc = 'Move to the left' })
-vim.keymap.set('c', '<C-f>', function()
+vim.keymap.set({ 'c' }, '<C-f>', function()
   local c = vim.fn.getcmdpos()
   return vim.fn.getcmdline():sub(c, c) == '' and '<C-f>' or '<Right>'
-end, { desc = 'Move to the right in cmdline mode or open cmd window if next char is empty', expr = true })
-vim.keymap.set('i', '<C-b>', '<Left>', { desc = 'Move to the left' })
+end, { desc = 'Move to the right if not in last column', expr = true })
 vim.keymap.set({ 'i', 'c' }, '<C-h>', '<BS>', { desc = 'Delete char before' })
-vim.keymap.set({ 'i', 'c' }, '<C-d>', '<Delete>', { desc = 'Delete char after' })
-vim.keymap.set({ 'i', 'c' }, '<M-b>', '<S-Left>', { desc = 'Move one word to the left' })
-vim.keymap.set({ 'i', 'c' }, '<M-f>', '<S-Right>', { desc = 'Move one word to the right' })
+vim.keymap.set({ 'i' }, '<C-d>', function()
+  local cur = vim.api.nvim_win_get_cursor(0)
+  local line = vim.api.nvim_get_current_line()
+  if cur[2] >= #line then
+    return '<C-d>'
+  else
+    return '<Delete>'
+  end
+end, { desc = 'Delete char after if not in last columne', expr = true })
+vim.keymap.set({ 'c' }, '<C-d>', '<Delete>', { desc = 'Delete char after' })
+vim.keymap.set({ 'i', 'c' }, '<A-b>', '<S-Left>', { desc = 'Move one word to the left' })
+vim.keymap.set({ 'i', 'c' }, '<A-f>', '<S-Right>', { desc = 'Move one word to the right' })
 
 vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
 
