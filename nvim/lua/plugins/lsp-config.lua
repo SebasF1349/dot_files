@@ -291,7 +291,7 @@ return {
             })
           end
 
-          for _, key in ipairs({ '<C-b>', '<C-f>' }) do
+          for _, key in ipairs({ '<C-u>', '<C-d>' }) do
             vim.keymap.set({ 'n', 'i' }, key, function()
               local winnr = vim.b.lsp_floating_preview
               if not winnr or not vim.api.nvim_win_is_valid(winnr) then
@@ -301,7 +301,7 @@ return {
               end
               local cursor_pos = vim.api.nvim_win_get_cursor(winnr)
               local win_config = vim.api.nvim_win_get_config(winnr)
-              local new_row = key == '<C-b>' and math.max(cursor_pos[1] - win_config.height + 1, 1)
+              local new_row = key == '<C-u>' and math.max(cursor_pos[1] - win_config.height + 1, 1)
                 or math.min(cursor_pos[1] + win_config.height - 1, vim.fn.line('$', winnr))
               vim.api.nvim_win_set_cursor(winnr, { new_row, cursor_pos[2] })
             end, { desc = 'Scroll Docs' })
