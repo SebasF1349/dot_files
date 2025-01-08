@@ -154,6 +154,7 @@ fi
 export PATH="$HOME/.local/share/bob/nvim-bin/:$PATH"
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 export EDITOR=nvim
+export MANPAGER='nvim +Man!'
 
 alias cd..="cd .."
 alias ..="cd .."
