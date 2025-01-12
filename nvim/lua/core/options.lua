@@ -2,6 +2,10 @@ local nvim_version = require('utils.nvim-version')
 
 vim.o.hlsearch = false
 
+-- Disable cursor blinking in terminal mode.
+-- Using the same cursor for terminal as in insert mode is more vimmish but less terminalish
+vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor'
+
 vim.opt.number = true
 vim.opt.relativenumber = true
 
