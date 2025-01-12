@@ -171,7 +171,7 @@ vim.api.nvim_create_autocmd('CmdlineChanged', {
     if not range or vim.tbl_isempty(range) then
       return
     end
-    vim.hl.range(0, cmd_range_ns, 'ColorColumn', { range[1], 0 }, { range[2] or range[2], 0 }, { regtype = 'V' })
+    vim.hl.range(0, cmd_range_ns, 'ColorColumn', { range[1], 0 }, { range[2] or range[1], 0 }, { regtype = 'V' })
     vim.cmd('redraw')
   end,
   group = general,
