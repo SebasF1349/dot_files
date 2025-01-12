@@ -384,27 +384,6 @@ return {
         end,
       })
 
-      -- thanks lewis: https://github.com/lewis6991/dotfiles/blob/main/config/nvim/lua/lewis6991/diagnostic.lua#L25
-      -- Override the virtual text diagnostic handler so that the most severe diagnostic is shown first,
-      -- without changing normal order for same severity.
-      local show_handler = vim.diagnostic.handlers.virtual_text.show
-      assert(show_handler)
-      local hide_handler = vim.diagnostic.handlers.virtual_text.hide
-      vim.diagnostic.handlers.virtual_text = {
-        show = function(ns, bufnr, diagnostics, opts)
-          local max_severity_per_line = {}
-          for _, d in pairs(diagnostics) do
-            local m = max_severity_per_line[d.lnum]
-            if not m or d.severity < m.severity then
-              max_severity_per_line[d.lnum] = d
-            end
-          end
-          local filtered_diagnostics = vim.tbl_values(max_severity_per_line)
-          show_handler(ns, bufnr, filtered_diagnostics, opts)
-        end,
-        hide = hide_handler,
-      }
-
       local hover = vim.lsp.buf.hover
       ---@diagnostic disable-next-line: duplicate-set-field
       vim.lsp.buf.hover = function()
