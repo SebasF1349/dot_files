@@ -183,6 +183,8 @@ local function get_context()
 
   local context = treesitter.statusline({
 
+    indicator_size = vim.o.columns / 4,
+
     type_patterns = { 'class', 'function', 'method', 'impl' },
 
     transform_fn = function(line)
