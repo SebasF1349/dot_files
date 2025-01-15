@@ -105,6 +105,23 @@ return {
               -- ['ib'] = '@bracket.inner',
             },
           },
+          move = {
+            enable = true,
+            goto_next_start = {
+              [']a'] = '@parameter.outer',
+              [']/'] = '@comment.outer',
+            },
+            goto_next_end = {
+              [']A'] = '@parameter.outer',
+            },
+            goto_previous_start = {
+              ['[a'] = '@parameter.outer',
+              ['[/'] = '@comment.outer',
+            },
+            goto_previous_end = {
+              ['[A'] = '@parameter.outer',
+            },
+          },
         },
       })
 
