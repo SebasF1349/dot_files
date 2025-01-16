@@ -227,14 +227,16 @@ M = {
   --work
   intelephense = {
     root_dir = function(pattern)
-      local cwd = vim.loop.cwd()
+      local cwd = vim.uv.cwd()
       local root = util.root_pattern('composer.root', 'composer.json', '.git')(pattern)
       return util.path.is_descendant(root, cwd) and root or cwd
     end,
     settings = {
       intelephense = {
         format = {
-          enable = (vim.loop.cwd():find('telesalud') or vim.loop.cwd():find('xampp_plataforma') or vim.loop.cwd():find('pasantia')) ~= nil,
+          enable = (vim.uv.cwd():find('telesalud') or vim.uv.cwd():find('xampp_plataforma') or vim.uv
+            .cwd()
+            :find('pasantia')) ~= nil,
         },
       },
     },
