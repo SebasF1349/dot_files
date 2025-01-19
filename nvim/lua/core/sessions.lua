@@ -55,7 +55,10 @@ vim.api.nvim_create_autocmd('VimLeave', {
   group = auSession,
   callback = function()
     local session_path = get_session_path()
-    if not vim.uv.fs_stat(session_path) then
+    local has_opt = vim.iter(vim.v.argv):any(function(v)
+      return v:find('+')
+    end)
+    if not vim.uv.fs_stat(session_path) or has_opt then
       return
     end
     sessionSave()
@@ -66,7 +69,11 @@ vim.api.nvim_create_autocmd('VimLeave', {
 -- using an autocmd on VimEnter to load session opens buffers with empty filetype
 if vim.v.vim_did_enter then
   local session_path = get_session_path()
-  if vim.uv.fs_stat(session_path) then
+  local has_opt = vim.iter(vim.v.argv):any(function(v)
+    return v:find('+')
+  end)
+  if has_opt then
+  elseif vim.uv.fs_stat(session_path) then
     if vim.fn.argc() == 0 then
       sessionLoad()
     end
