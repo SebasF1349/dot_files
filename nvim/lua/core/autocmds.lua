@@ -175,8 +175,8 @@ vim.api.nvim_create_autocmd('CmdlineChanged', {
     if not range or vim.tbl_isempty(range) then
       return
     end
-    vim.hl.range(0, cmd_range_ns, 'ColorColumn', { range[1], 0 }, { range[2] or range[1], 0 }, { regtype = 'V' })
-    vim.cmd('redraw')
+    local first_line, last_line = range[1] - 1, range[2] and range[2] - 1 or range[1] - 1
+    vim.hl.range(0, cmd_range_ns, 'ColorColumn', { first_line, 0 }, { last_line, 0 }, { regtype = 'V' })
   end,
   group = general,
   desc = 'Show cmdline ranges',
