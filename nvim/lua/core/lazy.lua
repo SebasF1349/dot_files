@@ -1,3 +1,5 @@
+local oss = require('utils.os')
+
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
@@ -24,8 +26,11 @@ require('lazy').setup({ { import = 'plugins' } }, {
     autocmds = true,
     keymaps = false,
   },
+  rocks = { enabled = false },
+  dev = {
+    path = oss.joinpath(vim.fn.stdpath('config'), 'custom'),
+  },
   performance = {
-    cache = { enabled = true },
     rtp = {
       disabled_plugins = {
         '2html_plugin',
