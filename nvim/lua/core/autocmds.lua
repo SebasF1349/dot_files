@@ -81,10 +81,14 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
 
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
   callback = function()
-    vim.fn.matchadd('ColorColumn', '\\%101v', 100)
+    vim.schedule(function()
+      if vim.o.buftype == '' then
+        vim.fn.matchadd('ColorColumn', '\\%101v', 100)
+      end
+    end)
   end,
   group = general,
-  desc = 'Show when lines are longer than 80 chars',
+  desc = 'Show when lines are longer than 100 chars',
 })
 
 vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
