@@ -1,4 +1,5 @@
 local nvim_version = require('utils.nvim-version')
+local get_diagnostic_hl = require('utils.ui').get_diagnostic_hl
 
 vim.o.hlsearch = false
 
@@ -137,10 +138,6 @@ vim.opt.statuscolumn = '%=%{% v:virtnum > 0 ? "" : v:lnum %}%=%s'
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = 'number'
 
-local function capitalize(str)
-  return str:lower():gsub('^%l', string.upper)
-end
-
 -- Diagnostics
 vim.diagnostic.config({
   underline = false,
@@ -150,7 +147,7 @@ vim.diagnostic.config({
     source = false,
     header = '',
     prefix = function(d)
-      local severity_name = capitalize(vim.diagnostic.severity[d.severity])
+      local severity_name = get_diagnostic_hl(d.severity)
       return '-' .. ' ', 'DiagnosticSign' .. severity_name
     end,
     format = function(d)

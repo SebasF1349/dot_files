@@ -1,3 +1,7 @@
+local ui = require('utils.ui')
+local signs = ui.diagnostic_icons_char
+local highlights = ui.diagnostic_hl_char
+
 --------------------------------------------------
 -- Types
 --------------------------------------------------
@@ -34,24 +38,6 @@
 ---@field title string
 ---@field winid number
 ---@field filewinid? number
-
---------------------------------------------------
--- "Global" variables in this file
---------------------------------------------------
-
-local signs = {
-  E = ' ',
-  W = ' ',
-  H = '',
-  I = ' ',
-}
-
-local highlights = {
-  E = 'DiagnosticError',
-  W = 'DiagnosticWarn',
-  H = 'DiagnosticHint',
-  I = 'DiagnosticInfo',
-}
 
 --------------------------------------------------
 -- Utils

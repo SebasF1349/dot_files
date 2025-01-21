@@ -1,5 +1,8 @@
 local lsp_mappings = require('plugins.lsp.lsp-packages').lspconfig_to_package
 local servers = require('plugins.lsp.servers')
+local ui = require('utils.ui')
+local signs = ui.diagnostic_icons_num
+local get_diagnostic_hl = ui.get_diagnostic_hl
 
 return {
   {
@@ -319,7 +322,6 @@ return {
                 if new_line then
                   d.message = d.message:sub(1, new_line - 1)
                 end
-                local signs = { ' ', ' ', ' ', ' ' }
                 local bufname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
                 local lnum = d.lnum or d.end_lnum
                 return string.format('%s%s (%s:%s)', signs[d.severity], d.message, bufname, lnum + 1)

@@ -1,6 +1,7 @@
 -- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local oss = require('utils.os')
+local signs = require('utils.ui').diagnostic_icons_num
 
 ---- Highlights ----
 local custom_bg = mocha.surface0
@@ -291,10 +292,10 @@ end
 
 ---- DIAGNOSTICS ----
 local diagnostics_data = {
-  { icon = ' ', hi = 'SLDiagError' },
-  { icon = ' ', hi = 'SLDiagWarn' },
-  { icon = ' ', hi = 'SLDiagInfo' },
-  { icon = ' ', hi = 'SLDiagHint' },
+  { icon = signs[1], hi = 'SLDiagError' },
+  { icon = signs[2], hi = 'SLDiagWarn' },
+  { icon = signs[3], hi = 'SLDiagInfo' },
+  { icon = signs[4], hi = 'SLDiagHint' },
 }
 
 local local_diagnostics = ''
