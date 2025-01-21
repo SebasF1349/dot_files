@@ -6,7 +6,7 @@ return {
   {
     'danymat/neogen',
     keys = {
-      { 'ga', "<cmd>lua require('neogen').generate()<CR>", mode = 'n', desc = '[A]nnotate Code' },
+      { 'gd', "<cmd>lua require('neogen').generate()<CR>", mode = 'n', desc = 'Add [D]ocs' },
     },
     opts = { snippet_engine = 'nvim' },
   },
