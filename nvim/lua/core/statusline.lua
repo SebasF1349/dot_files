@@ -1,6 +1,5 @@
 -- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
 local mocha = require('catppuccin.palettes').get_palette('mocha')
-local pinbufs = require('core.buffers')
 local oss = require('utils.os')
 
 ---- Highlights ----
@@ -65,7 +64,6 @@ local function mode()
 end
 
 ---- FILENAME ----
--- NOTE: maybe use a custom list to garantize the order they are shown and stop the shenanigans
 local function file()
   local ftype = vim.o.filetype
   local label, title
@@ -96,25 +94,27 @@ local function file()
     return string.format('%%#SLInactiveBuffer# [%s] %%#SLActiveBuffer#%s ', label, title)
   end
   local buffers = {}
-  for _, pinbuf in ipairs(pinbufs.get_pinbufs()) do
-    table.insert(buffers, pinbuf)
+  for _, arg in
+    ipairs(vim.fn.argv()--[[@as string[] ]])
+  do
+    table.insert(buffers, arg)
   end
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == '' then
       local bufnr = vim.api.nvim_win_get_buf(win)
-      if not vim.list_contains(buffers, bufnr) then
-        table.insert(buffers, bufnr)
+      local bufname = vim.api.nvim_buf_get_name(bufnr)
+      bufname = vim.fn.fnamemodify(bufname, ':.')
+      if not vim.list_contains(buffers, bufname) then
+        table.insert(buffers, bufname)
       end
     end
   end
   local current_bufnr = vim.api.nvim_get_current_buf()
+  local current_bufname = vim.api.nvim_buf_get_name(current_bufnr)
+  current_bufname = vim.fn.fnamemodify(current_bufname, ':.')
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
   local buffer_names = {}
-  for i, bufnr in ipairs(buffers) do
-    if not vim.api.nvim_buf_is_valid(bufnr) then
-      goto continue
-    end
-    local bufname = vim.api.nvim_buf_get_name(bufnr)
+  for i, bufname in ipairs(buffers) do
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
     if is_svelte then
@@ -124,11 +124,12 @@ local function file()
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
     end
     local file_display
-    if bufnr ~= current_bufnr then
+    if bufname ~= current_bufname then
       file_display = string.format('%%#SLInactiveBuffer#%s', fname)
     else
       local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
       current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
+      current_buf_shorten.pos = #buffer_names + 1
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
@@ -141,22 +142,26 @@ local function file()
           fname
         )
       end
-      current_buf_shorten.pos = #buffer_names + 1
     end
-    if i > #pinbufs.get_pinbufs() then
-      file_display = string.format('%s[t]', file_display)
-    elseif i == pinbufs.get_active_pinbuf() and buffers[i] ~= current_bufnr then
-      file_display = string.format('%s[*]', file_display)
+    if i == vim.fn.argidx() + 1 then
+      if bufname == current_bufname then
+        file_display = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', file_display)
+        current_buf_shorten.fname = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', current_buf_shorten.fname)
+        current_buf_shorten.path = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', current_buf_shorten.path)
+      else
+        file_display = string.format('%%#SLInactiveBuffer#[%s%%#SLInactiveBuffer#]', file_display)
+      end
     end
     vim.list_extend(buffer_names, { file_display })
-    ::continue::
   end
   if #buffer_names == 0 then
     return ''
   end
   local ret = string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   local max_columns = vim.o.columns
-  local ret_length = #ret - 18 * #buffer_names
+  local HL_LENGTH = 18
+  local HL_LENGTH_CURRENT = 36
+  local ret_length = #ret - HL_LENGTH * #buffer_names - HL_LENGTH_CURRENT
   if ret_length < max_columns or current_buf_shorten.pos == -1 then
     return ret
   elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
