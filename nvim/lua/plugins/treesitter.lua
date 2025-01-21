@@ -223,17 +223,55 @@ return {
         highlight_duration = 250, -- How long should above highlight last (in ms)
       })
 
-      vim.keymap.set({ 'n', 'v' }, '<A-k>', '<cmd>Treewalker Up<cr>', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<A-j>', '<cmd>Treewalker Down<cr>', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<A-l>', '<cmd>Treewalker Right<cr>', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<A-h>', '<cmd>Treewalker Left<cr>', { silent = true })
-      vim.keymap.set('n', '<A-K>', '<cmd>Treewalker SwapUp<cr>', { silent = true })
-      vim.keymap.set('n', '<A-J>', '<cmd>Treewalker SwapDown<cr>', { silent = true })
-      vim.keymap.set('n', '<A-L>', '<cmd>Treewalker SwapRight<CR>', { silent = true })
-      vim.keymap.set('n', '<A-H>', '<cmd>Treewalker SwapLeft<CR>', { silent = true })
-      -- using 'nvim-treesitter/nvim-treesitter',
-      -- vim.keymap.set('n', '<M-L>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { silent = true })
-      -- vim.keymap.set('n', '<M-H>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-k>', '<cmd>Treewalker Up<cr>zz', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-j>', '<cmd>Treewalker Down<cr>zz', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-l>', '<cmd>Treewalker Right<cr>zz', { silent = true })
+      vim.keymap.set({ 'n', 'v' }, '<A-h>', '<cmd>Treewalker Left<cr>zz', { silent = true })
+      vim.keymap.set('n', '<A-K>', '<cmd>Treewalker SwapUp<cr>zz', { silent = true })
+      vim.keymap.set('n', '<A-J>', '<cmd>Treewalker SwapDown<cr>zz', { silent = true })
+      vim.keymap.set('n', '<A-L>', '<cmd>Treewalker SwapRight<CR>zz', { silent = true })
+      vim.keymap.set('n', '<A-H>', '<cmd>Treewalker SwapLeft<CR>zz', { silent = true })
+
+      -- Text-Objects
+      local targets = require('treewalker.targets')
+      local nodes = require('treewalker.nodes')
+      local function nodeMoveTextObject(target)
+        if not target then
+          return
+        end
+        local start_row, _, end_row, _ = target:range(false)
+        vim.cmd('normal! V' .. start_row + 1 .. 'ggo' .. end_row + 1 .. 'gg')
+      end
+
+      vim.keymap.set('v', 'on', function()
+        local target = targets.out()
+        nodeMoveTextObject(target)
+      end, { desc = 'Out Node Text-Object', silent = true })
+      vim.keymap.set('o', 'on', '<cmd>normal von<CR>', { desc = 'Out Node Text-Object', silent = true })
+
+      vim.keymap.set('v', 'in', function()
+        local target = targets.inn()
+        nodeMoveTextObject(target)
+      end, { desc = 'In Node Text-Object', silent = true })
+      vim.keymap.set('o', 'in', '<cmd>normal vin<CR>', { desc = 'In Node Text-Object', silent = true })
+
+      vim.keymap.set('v', 'un', function()
+        local target = targets.up()
+        nodeMoveTextObject(target)
+      end, { desc = 'Up Node Text-Object', silent = true })
+      vim.keymap.set('o', 'un', '<cmd>normal vun<CR>', { desc = 'Up Node Text-Object', silent = true })
+
+      vim.keymap.set('v', 'dn', function()
+        local target = targets.down()
+        nodeMoveTextObject(target)
+      end, { desc = 'Down Node Text-Object', silent = true })
+      vim.keymap.set('o', 'dn', '<cmd>normal vdn<CR>', { desc = 'Down Text-Object', silent = true })
+
+      vim.keymap.set('v', 'an', function()
+        local target = nodes.get_current()
+        nodeMoveTextObject(target)
+      end, { desc = 'Around Current Node Text-Object', silent = true })
+      vim.keymap.set('o', 'an', '<cmd>normal van<CR>', { desc = 'Around Current Text-Object', silent = true })
     end,
   },
 }
