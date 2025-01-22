@@ -198,13 +198,13 @@ function _G.qftf(info)
     local e = list[i]
     local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type }
     if is_ldiag then
-      item.name = tostring(e.lnum)
+      item.name = tostring(e.lnum) .. ':' .. e.lnum
       limit = #item.name > limit - 1 and #item.name - 1 or limit
     elseif e.valid == 1 and e.bufnr > 0 then
       local fname = vim.fn.bufname(e.bufnr)
       if fname ~= '' then
         fname = vim.fn.fnamemodify(fname, ':p:~:.')
-        item.name = vim.fn.fnamemodify(fname, ':p:t')
+        item.name = vim.fn.fnamemodify(fname, ':p:t') .. ':' .. e.lnum
         item.path = vim.fn.fnamemodify(fname, ':h')
         if item.path == '.' then
           item.path = ''
@@ -237,8 +237,10 @@ function _G.qftf(info)
     local lines = vim.api.nvim_buf_get_lines(qfbufnr, 0, -1, true)
     for line, content in ipairs(lines) do
       line = line - 1
+      local dots = content:find(':')
+      vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { line, 1 }, { line, dots - 1 })
       local space = content:find('%s')
-      vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { line, 1 }, { line, space })
+      vim.hl.range(qfbufnr, qfim_namespace, 'Delimiter', { line, dots - 1 }, { line, space })
       local _, sep_end = content:find('│')
       if not sep_end then
         goto continue
