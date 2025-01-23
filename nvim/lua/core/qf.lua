@@ -196,16 +196,17 @@ function _G.qftf(info)
   local limit = 0
   for i = info.start_idx, info.end_idx do
     local e = list[i]
-    local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type }
+    local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type, lnum_length = 0 }
     if is_ldiag then
       item.name = tostring(e.lnum)
       limit = #item.name > limit - 1 and #item.name - 1 or limit
-    elseif e.valid == 1 and e.bufnr > 0 then
-      local fname = vim.fn.bufname(e.bufnr)
+    elseif e.valid == 1 then -- what does valid do??
+      local fname = e.filename or vim.fn.bufname(e.bufnr)
       if fname ~= '' then
         fname = vim.fn.fnamemodify(fname, ':p:~:.')
         item.name = vim.fn.fnamemodify(fname, ':p:t') .. ':' .. e.lnum
         item.path = vim.fn.fnamemodify(fname, ':h')
+        item.lnum_length = #tostring(e.lnum) + 1
         if item.path == '.' then
           item.path = ''
         end
@@ -225,37 +226,22 @@ function _G.qftf(info)
     elseif #item.path > 0 and #item.path + #item.name + 1 > limit then
       item.path = formatLong:format(item.path:sub(2 - limit + #item.name))
     end
-    local type = item.type == '' and '' or (signs[item.type] and signs[item.type] or signs.I)
+    local icon = item.type == '' and '' or (signs[item.type] and signs[item.type] or signs.I)
     local path = pathFmt:format(item.name, item.path == '' and '' or ' ', item.path)
-    local str = validFmt:format(path, (' '):rep(limit - #path), type, item.message)
+    local whitespace = (' '):rep(limit - #path)
+    item.separator_position = #path + #whitespace + 2
+    local str = validFmt:format(path, whitespace, icon, item.message)
     table.insert(ret, str)
   end
   vim.schedule(function()
-    -- NOTE: this is needed because somehow diagnostics toggle runs 3 times with incomplete data after a [L]Rg command (?)
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
-    -- NOTE: check if this regex based highlight is slower
-    local lines = vim.api.nvim_buf_get_lines(qfbufnr, 0, -1, true)
-    for line, content in ipairs(lines) do
-      line = line - 1
-      local dots = content:find(':')
-      vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { line, 1 }, { line, dots - 1 })
-      local space = content:find('%s')
-      vim.hl.range(qfbufnr, qfim_namespace, 'Delimiter', { line, dots - 1 }, { line, space })
-      local _, sep_end = content:find('│')
-      if not sep_end then
-        goto continue
-      end
-      vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { line, space }, { line, sep_end })
-      local message = content:sub(sep_end + ('│'):len() - 1)
-      local msg_hl = 'CursorLineNr'
-      for key, value in pairs(signs) do
-        if vim.startswith(message, value) then
-          msg_hl = highlights[key]
-          break
-        end
-      end
-      vim.hl.range(qfbufnr, qfim_namespace, msg_hl, { line, sep_end }, { line, vim.o.columns })
-      ::continue::
+    for i, item in ipairs(items) do
+      i = i - 1
+      vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { i, 1 }, { i, #item.name - item.lnum_length })
+      vim.hl.range(qfbufnr, qfim_namespace, 'Delimiter', { i, #item.name - item.lnum_length }, { i, #item.name })
+      vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { i, #item.name }, { i, item.separator_position })
+      local msg_hl = highlights[item.type] or 'CursorLineNr'
+      vim.hl.range(qfbufnr, qfim_namespace, msg_hl, { i, item.separator_position }, { i, vim.o.columns })
     end
   end)
   return ret
