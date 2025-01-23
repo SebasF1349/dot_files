@@ -198,7 +198,7 @@ function _G.qftf(info)
     local e = list[i]
     local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type }
     if is_ldiag then
-      item.name = tostring(e.lnum) .. ':' .. e.lnum
+      item.name = tostring(e.lnum)
       limit = #item.name > limit - 1 and #item.name - 1 or limit
     elseif e.valid == 1 and e.bufnr > 0 then
       local fname = vim.fn.bufname(e.bufnr)
