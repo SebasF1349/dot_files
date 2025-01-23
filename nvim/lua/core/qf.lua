@@ -327,7 +327,8 @@ local function list_toggle(listType, diagnostics)
       })
       vim.cmd(listType .. 'open')
     else
-      vim.cmd(('%s%shistory | %sopen'):format(qf_diag_list.nr, listType, listType))
+      -- NOTE: looks like a nvim bug that #chistory redraws the qf
+      vim.cmd(('silent %s%shistory | %sopen'):format(qf_diag_list.nr, listType, listType))
     end
   end
 end
