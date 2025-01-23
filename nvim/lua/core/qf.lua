@@ -247,7 +247,7 @@ function _G.qftf(info)
       end
       vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { line, space }, { line, sep_end })
       local message = content:sub(sep_end + ('│'):len() - 1)
-      local msg_hl = 'Title'
+      local msg_hl = 'CursorLineNr'
       for key, value in pairs(signs) do
         if vim.startswith(message, value) then
           msg_hl = highlights[key]
