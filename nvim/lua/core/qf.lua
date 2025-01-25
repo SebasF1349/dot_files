@@ -451,6 +451,15 @@ local function list_toggle(listType, diagnostics)
   end
 end
 
+---@param listType ListType
+local function moveToList(listType)
+  local list = getList(listType)
+  local win = list.winid
+  if vim.api.nvim_win_is_valid(win) then
+    vim.api.nvim_set_current_win(win)
+  end
+end
+
 vim.keymap.set('n', '<leader>qq', function()
   list_toggle('c')
 end, { desc = 'Toggle [Q]uickfix' })
@@ -459,6 +468,9 @@ vim.keymap.set('n', '<leader>qd', function()
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
 vim.keymap.set('n', '<leader>qr', vim.lsp.buf.references, { desc = '[Q]uickfix [R]eferences' })
 vim.keymap.set('n', '<leader>qi', vim.lsp.buf.implementation, { desc = '[Q]uickfix [I]mplementation' })
+vim.keymap.set('n', '<leader>qb', function()
+  moveToList('c')
+end, { desc = 'Move to [Q]uickfix [B]uffer' })
 
 vim.keymap.set('n', '<leader>ll', function()
   list_toggle('l')
@@ -469,6 +481,9 @@ end, { desc = '[L]ocation List [D]iagnostics Toggle' })
 vim.keymap.set('n', '<leader>ls', function()
   document_symbols({ 'function' })
 end, { desc = '[L]ocation List [S]ymbols' })
+vim.keymap.set('n', '<leader>lb', function()
+  moveToList('l')
+end, { desc = 'Move to [L]ocation List [B]uffer' })
 
 ---@param listType ListType
 ---@param direction 'n' | 'p'
