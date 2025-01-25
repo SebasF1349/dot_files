@@ -184,7 +184,6 @@ function _G.qftf(info)
   local ret = {}
   local listType = info.quickfix == 1 and 'c' or 'l'
   local list = getList(listType, nil, info.winid)
-  local is_ldiag = listType == 'l' and list.context ~= '' and list.context.qfim and list.context.qfim.type == 'ldiag'
   local qfbufnr = list.qfbufnr
   list = list.items
   local items = {}
@@ -192,10 +191,7 @@ function _G.qftf(info)
   for i = info.start_idx, info.end_idx do
     local e = list[i]
     local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type, lnum_length = 0 }
-    if is_ldiag then
-      item.name = tostring(e.lnum)
-      limit = #item.name > limit - 1 and #item.name - 1 or limit
-    elseif e.valid == 1 then -- what does valid do??
+    if e.valid == 1 then -- what does valid do??
       local fname = e.filename or vim.fn.bufname(e.bufnr)
       if fname ~= '' then
         fname = vim.fn.fnamemodify(fname, ':p:~:.')
