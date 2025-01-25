@@ -193,10 +193,10 @@ local function fuzzy_find(cmd_line, cmd_pos)
   if not ok then
     return ' '
   end
-  if #cmd_parsed.args == 0 and cmd_parsed.nextcmd == '' then
+  local next_cmd_pos = cmd_line:find('|')
+  if #cmd_parsed.args == 0 and (cmd_parsed.nextcmd == '' or cmd_pos <= next_cmd_pos) then
     return ' '
   end
-  local next_cmd_pos = cmd_line:find('|')
   if next_cmd_pos and cmd_pos > next_cmd_pos then
     return fuzzy_find(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
   end
