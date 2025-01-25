@@ -185,11 +185,6 @@ function _G.qftf(info)
   local listType = info.quickfix == 1 and 'c' or 'l'
   local list = getList(listType, nil, info.winid)
   local is_ldiag = listType == 'l' and list.context ~= '' and list.context.qfim and list.context.qfim.type == 'ldiag'
-  local qfwinid = list.winid
-  vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
-  -- vim.api.nvim_set_option_value("fillchars", "eob: ,fold: ", { win = qfwinid })
-  vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = qfwinid, scope = 'local' })
-  vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = qfwinid, scope = 'local' })
   local qfbufnr = list.qfbufnr
   list = list.items
   local items = {}
@@ -445,6 +440,10 @@ vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
   end,
 })
 
+--------------------------------------------------
+-- Quickfix Options
+--------------------------------------------------
+
 ---@return number
 local function getHeight()
   local size = getActiveList().size
@@ -481,19 +480,30 @@ end
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
-  callback = function()
+  callback = function(args)
     vim.cmd('wincmd J')
-    vim.opt.number = true
-    vim.opt_local.relativenumber = false
-    vim.opt_local.statuscolumn = ''
-    vim.opt_local.hidden = true
-    vim.bo.buflisted = false
-    vim.wo.winfixheight = true
-    vim.wo.winfixbuf = true
     vim.api.nvim_win_set_height(0, getHeight())
-    vim.o.previewheight = 10
+    -- NOTE: vim.fn.setqflist "opens" the qf and the win is valid if done immediately
+    vim.schedule(function()
+      local qfwinid = vim.fn.bufwinid(args.buf)
+      if not vim.api.nvim_win_is_valid(qfwinid) then
+        return
+      end
+      vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
+      vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
+      vim.api.nvim_set_option_value('buflisted', false, { buf = args.buf, scope = 'local' })
+      vim.api.nvim_set_option_value('winfixheight', true, { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('winfixbuf', true, { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('statuscolumn', '', { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('number', true, { win = qfwinid, scope = 'local' })
+      vim.api.nvim_set_option_value('relativenumber', false, { win = qfwinid, scope = 'local' })
+    end)
   end,
-  desc = 'Qf syntax + options',
+  desc = 'Qf options',
 })
 
 --------------------------------------------------
