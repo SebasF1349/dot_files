@@ -339,7 +339,7 @@ vim.keymap.set('n', '<leader>ls', function()
 end, { desc = '[L]ocation List [S]ymbols' })
 
 ---@param listType ListType
----@param direction "n" | "p"
+---@param direction 'n' | 'p'
 ---@param file boolean
 local function move(listType, direction, file)
   local list = getList(listType)
@@ -350,7 +350,7 @@ local function move(listType, direction, file)
   ---@diagnostic disable-next-line: param-type-mismatch
   local ok, _ = pcall(vim.cmd, file and listType .. direction .. 'f' or listType .. direction)
   if not ok then
-    vim.cmd(listType .. (direction == 'next' and 'first' or 'last'))
+    vim.cmd(listType .. (direction == 'n' and 'first' or 'last'))
   end
 end
 
