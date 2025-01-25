@@ -144,7 +144,7 @@ local function file()
         )
       end
     end
-    if i == vim.fn.argidx() + 1 then
+    if i == vim.fn.argidx() + 1 and vim.fn.argc() ~= 0 then
       if bufname == current_bufname then
         file_display = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', file_display)
         current_buf_shorten.fname = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', current_buf_shorten.fname)
