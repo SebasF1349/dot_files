@@ -12,6 +12,7 @@ local highlights = ui.diagnostic_hl_char
 
 ---@class qfitem
 ---@field bufnr number
+---@field filename string
 ---@field module string
 ---@field lnum number
 ---@field end_lnum number
@@ -175,8 +176,108 @@ vim.api.nvim_create_user_command('LRg', function(opts)
 end, { nargs = 1 })
 
 --------------------------------------------------
+-- Treesitter highlighting
+--------------------------------------------------
+
+-- https://github.com/stevearc/quicker.nvim/blob/master/lua/quicker/highlight.lua#L25
+
+---@class uim.TSHighlight
+---@field [1] integer start_col
+---@field [2] integer end_col
+---@field [3] string highlight group
+
+local _cached_queries = {}
+---@param lang string
+---@return vim.treesitter.Query?
+local function get_highlight_query(lang)
+  local query = _cached_queries[lang]
+  if query == nil then
+    query = vim.treesitter.query.get(lang, 'highlights') or false
+    _cached_queries[lang] = query
+  end
+  if query then
+    return query
+  end
+end
+
+---@param bufnr integer
+---@param lnum integer
+---@return uim.TSHighlight[]
+local function buf_get_ts_highlights(bufnr, lnum)
+  local filetype = vim.bo[bufnr].filetype
+  if not filetype or filetype == '' then
+    filetype = vim.filetype.match({ buf = bufnr }) or ''
+  end
+  local lang = vim.treesitter.language.get_lang(filetype) or filetype
+  if lang == '' then
+    return {}
+  end
+  local ok, parser = pcall(vim.treesitter.get_parser, bufnr, lang)
+  if not ok or not parser then
+    return {}
+  end
+
+  local row = lnum - 1
+  if not parser:is_valid() then
+    parser:parse(true)
+  end
+
+  local hls = {}
+  parser:for_each_tree(function(tstree, tree)
+    if not tstree then
+      return
+    end
+
+    local root_node = tstree:root()
+    local root_start_row, _, root_end_row, _ = root_node:range()
+
+    -- Only worry about trees within the line range
+    if root_start_row > row or root_end_row < row then
+      return
+    end
+
+    local query = get_highlight_query(tree:lang())
+
+    -- Some injected languages may not have highlight queries.
+    if not query then
+      return
+    end
+
+    for capture, node, metadata in query:iter_captures(root_node, bufnr, row, root_end_row + 1) do
+      if capture == nil then
+        break
+      end
+
+      local range = vim.treesitter.get_range(node, bufnr, metadata[capture])
+      local start_row, start_col, _, end_row, end_col, _ = unpack(range)
+      if start_row > row then
+        break
+      end
+      local capture_name = query.captures[capture]
+      local hl = string.format('@%s.%s', capture_name, tree:lang())
+      if end_row > start_row then
+        end_col = -1
+      end
+      table.insert(hls, { start_col, end_col, hl })
+    end
+  end)
+
+  return hls
+end
+
+--------------------------------------------------
 -- Better Quickfix Window Style
 --------------------------------------------------
+
+---@class uim.qfitem_processed
+---@field bufnr number
+---@field lnum number
+---@field lnum_length number
+---@field separator_position number
+---@field text string
+---@field name string
+---@field path string
+---@field type string
 
 local qfim_namespace = vim.api.nvim_create_namespace('qfim')
 
@@ -186,11 +287,22 @@ function _G.qftf(info)
   local list = getList(listType, nil, info.winid)
   local qfbufnr = list.qfbufnr
   list = list.items
+  ---@type uim.qfitem_processed[]
   local items = {}
   local limit = 0
   for i = info.start_idx, info.end_idx do
     local e = list[i]
-    local item = { name = ' ', path = '', message = vim.fn.trim(e.text), type = e.type, lnum_length = 0 }
+    ---@type uim.qfitem_processed
+    local item = {
+      name = ' ',
+      path = '',
+      text = vim.trim(e.text),
+      type = e.type,
+      lnum_length = 0,
+      bufnr = e.bufnr,
+      lnum = e.lnum,
+      separator_position = 0,
+    }
     if e.valid == 1 then -- what does valid do??
       local fname = e.filename or vim.fn.bufname(e.bufnr)
       if fname ~= '' then
@@ -221,7 +333,7 @@ function _G.qftf(info)
     local path = pathFmt:format(item.name, item.path == '' and '' or ' ', item.path)
     local whitespace = (' '):rep(limit - #path)
     item.separator_position = #path + #whitespace + 2
-    local str = validFmt:format(path, whitespace, icon, item.message)
+    local str = validFmt:format(path, whitespace, icon, item.text)
     table.insert(ret, str)
   end
   vim.schedule(function()
@@ -231,8 +343,37 @@ function _G.qftf(info)
       vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { i, 1 }, { i, #item.name - item.lnum_length })
       vim.hl.range(qfbufnr, qfim_namespace, 'Delimiter', { i, #item.name - item.lnum_length }, { i, #item.name })
       vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { i, #item.name }, { i, item.separator_position })
+
+      -- TS highlight
+      if not vim.api.nvim_buf_is_loaded(item.bufnr) then
+        vim.fn.bufload(item.bufnr)
+      end
+
+      local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
+      if src_line then
+        -- I trim spaces so I need to take that into account before comparing
+        -- (if the og line has spaces at the end it deserves to not be found)
+        local src_space = src_line:match('^%s*'):len()
+
+        -- Only add highlights if the text in the quickfix matches the source line
+        if item.text == src_line:sub(src_space + 1) then
+          local offset = item.separator_position + 3 - src_space
+          local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
+          for _, hl in ipairs(hls) do
+            local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
+            if end_col == -1 then
+              end_col = src_line:len()
+            end
+            vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
+          end
+          goto skip_default
+        end
+      end
+
       local msg_hl = highlights[item.type] or 'CursorLineNr'
       vim.hl.range(qfbufnr, qfim_namespace, msg_hl, { i, item.separator_position }, { i, vim.o.columns })
+
+      ::skip_default::
     end
   end)
   return ret
