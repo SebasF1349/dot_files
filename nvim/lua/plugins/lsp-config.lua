@@ -90,12 +90,6 @@ return {
             return
           end
 
-          vim.api.nvim_create_autocmd({ 'InsertEnter' }, {
-            buffer = event.buf,
-            callback = function()
-              vim.lsp.completion.trigger()
-            end,
-          })
           -- based on https://github.com/neovim/neovim/issues/29225#issuecomment-2159428607 (autocmd there breaks snippets)
           vim.api.nvim_create_autocmd('CompleteChanged', {
             buffer = event.buf,
@@ -168,9 +162,6 @@ return {
             return '<ESC>'
           end, { desc = 'Delete Selected Text', expr = true, buffer = event.buf })
           vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = event.buf })
-          vim.keymap.set('i', '<BS>', function()
-            return vim.fn.pumvisible() ~= 0 and '<BS><cmd>lua vim.lsp.completion.trigger()<CR>' or '<BS>'
-          end, { desc = 'Retrigger completion when deleting', expr = true, buffer = event.buf })
           vim.keymap.set('i', '<C-n>', function()
             if vim.fn.pumvisible() ~= 0 then
               vim.api.nvim_input('<C-n>')
