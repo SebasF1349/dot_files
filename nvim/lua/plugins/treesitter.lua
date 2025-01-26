@@ -215,7 +215,7 @@ return {
   },
   {
     'aaronik/treewalker.nvim',
-    lazy = false,
+    event = { 'BufReadPost', 'BufNewFile' },
     config = function()
       local treewalker = require('treewalker')
       treewalker.setup({
@@ -244,34 +244,39 @@ return {
       end
 
       vim.keymap.set('v', 'on', function()
+        vim.cmd('normal! ^')
         local target = targets.out()
         nodeMoveTextObject(target)
       end, { desc = 'Out Node Text-Object', silent = true })
-      vim.keymap.set('o', 'on', '<cmd>normal von<CR>', { desc = 'Out Node Text-Object', silent = true })
+      vim.keymap.set('o', 'on', '<cmd>normal von<CR>', { desc = '[O]ut [N]ode Text-Object', silent = true })
 
       vim.keymap.set('v', 'in', function()
+        vim.cmd('normal! ^')
         local target = targets.inn()
         nodeMoveTextObject(target)
       end, { desc = 'In Node Text-Object', silent = true })
-      vim.keymap.set('o', 'in', '<cmd>normal vin<CR>', { desc = 'In Node Text-Object', silent = true })
+      vim.keymap.set('o', 'in', '<cmd>normal vin<CR>', { desc = '[I]n [N]ode Text-Object', silent = true })
 
       vim.keymap.set('v', 'un', function()
+        vim.cmd('normal! ^')
         local target = targets.up()
         nodeMoveTextObject(target)
       end, { desc = 'Up Node Text-Object', silent = true })
-      vim.keymap.set('o', 'un', '<cmd>normal vun<CR>', { desc = 'Up Node Text-Object', silent = true })
+      vim.keymap.set('o', 'un', '<cmd>normal vun<CR>', { desc = '[U]p [N]ode Text-Object', silent = true })
 
       vim.keymap.set('v', 'dn', function()
+        vim.cmd('normal! ^')
         local target = targets.down()
         nodeMoveTextObject(target)
       end, { desc = 'Down Node Text-Object', silent = true })
-      vim.keymap.set('o', 'dn', '<cmd>normal vdn<CR>', { desc = 'Down Text-Object', silent = true })
+      vim.keymap.set('o', 'dn', '<cmd>normal vdn<CR>', { desc = '[D]own [N]ode Text-Object', silent = true })
 
       vim.keymap.set('v', 'an', function()
+        vim.cmd('normal! ^')
         local target = nodes.get_current()
         nodeMoveTextObject(target)
       end, { desc = 'Around Current Node Text-Object', silent = true })
-      vim.keymap.set('o', 'an', '<cmd>normal van<CR>', { desc = 'Around Current Text-Object', silent = true })
+      vim.keymap.set('o', 'an', '<cmd>normal van<CR>', { desc = '[A]round Current [N]ode Text-Object', silent = true })
     end,
   },
 }
