@@ -94,10 +94,10 @@ end
 ---@return qflist
 local function getList(listType, nr, winid)
   nr = nr or 0
-  winid = winid or 0
   if listType == 'c' then
     return vim.fn.getqflist({ nr = nr, all = 0 })
   else
+    winid = winid or 0
     local ll = vim.fn.getloclist(winid, { nr = nr, all = 0 })
     if not ll.filewinid then
       ll.filewinid = -1
@@ -573,7 +573,7 @@ vim.keymap.set('n', '<leader>qg', function()
 end, { desc = 'Open [Q]uickfix With [G]it Diff' })
 
 --------------------------------------------------
--- Quickfix Autocmds
+-- Quickfix Diagnostics
 --------------------------------------------------
 
 local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
@@ -941,15 +941,15 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     vim.keymap.set('n', '<C-p>', function()
       moveWithPreview('p')
     end, { buffer = 0, desc = 'Move and Preview Previous QF Item' })
-    vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
-    vim.keymap.set('n', 'K', previewHover, { buffer = 0, desc = 'Show Message on Hover' })
-    vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
     vim.keymap.set('n', '<C-o>', function()
       listHistory('older')
     end, { buffer = 0, desc = 'Open Older List' })
     vim.keymap.set('n', '<C-i>', function()
       listHistory('newer')
     end, { buffer = 0, desc = 'Open Newer List' })
+    vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
+    vim.keymap.set('n', 'K', previewHover, { buffer = 0, desc = 'Show Message on Hover' })
+    vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
     vim.keymap.set({ 'x' }, 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
     vim.keymap.set('n', 'yf', function()
       yank('file')
