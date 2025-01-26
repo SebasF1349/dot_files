@@ -280,20 +280,6 @@ return {
             end
           end, { desc = 'LSP: [O]rganize Imports', buffer = event.buf })
 
-          if client:supports_method('textDocument/signatureHelp') then
-            vim.api.nvim_create_autocmd('InsertCharPre', {
-              buffer = 0,
-              callback = function()
-                local char = vim.v.char
-                if char == '(' or char == ',' then
-                  vim.defer_fn(function()
-                    vim.lsp.buf.signature_help()
-                  end, 3)
-                end
-              end,
-            })
-          end
-
           for _, key in ipairs({ '<C-u>', '<C-d>' }) do
             vim.keymap.set({ 'n', 'i' }, key, function()
               local winnr = vim.b.lsp_floating_preview
