@@ -55,17 +55,13 @@ return {
       -- Normal mode
       vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage' })
       vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset' })
-      vim.keymap.set('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = '[H]unk [U]ndo' })
       vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = '[H]unk [P]review' })
+      vim.keymap.set('n', '<leader>hb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git [B]lame line' })
 
       -- Buffer
       vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage' })
       vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset' })
       vim.keymap.set('n', '<leader>bd', gitsigns.diffthis, { desc = '[B]uffer [D]iff' })
-
-      -- Toggles
-      vim.keymap.set('n', '<leader>hb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git [B]lame line' })
-      vim.keymap.set('n', '<leader>hd', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
     end,
   },
 }
