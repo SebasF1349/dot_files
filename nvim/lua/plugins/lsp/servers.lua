@@ -122,8 +122,8 @@ M = {
           checkThirdParty = false,
           library = {
             '${3rd}/luv/library',
-            vim.env.VIMRUNTIME, -- this apparently gives faster and better diagnostics than `unpack`
-            -- unpack(vim.api.nvim_get_runtime_file("", true)),
+            vim.env.VIMRUNTIME,
+            vim.fn.stdpath('data') .. '/lazy', -- plugins types
           },
         },
       })
