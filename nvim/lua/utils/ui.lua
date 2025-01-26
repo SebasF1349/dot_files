@@ -15,10 +15,10 @@ M.get_diagnostic_hl = function(severity)
 end
 
 M.diagnostic_hl_char =
-  { E = 'DiagnosticSignError', W = 'DiagnosticSignWarn', H = 'DiagnosticSignHint', I = 'DiagnosticSignInfo' }
+  { E = 'DiagnosticSignError', W = 'DiagnosticSignWarn', I = 'DiagnosticSignInfo', N = 'DiagnosticSignHint' }
 
-M.diagnostic_icons_num = { ' ', ' ', ' ', ' ' }
+M.diagnostic_icons_num = { ' ', ' ', ' ', ' ' }
 
-M.diagnostic_icons_char = { E = ' ', W = ' ', H = ' ', I = ' ' }
+M.diagnostic_icons_char = { E = ' ', W = ' ', I = ' ', N = ' ' }
 
 return M
