@@ -202,7 +202,7 @@ return {
           vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
 
           -- replaced my own implementation with Folke's which is more performant: https://github.com/folke/snacks.nvim/blob/main/lua/snacks/words.lua#L117
-          local ns = vim.api.nvim_create_namespace('vim_lsp_references')
+          local ns = vim.api.nvim_create_namespace('nvim.lsp.references')
 
           ---@alias LspWord {from:{[1]:number, [2]:number}, to:{[1]:number, [2]:number}} 1-0 indexed
 
