@@ -115,6 +115,7 @@ local function file()
   current_bufname = vim.fn.fnamemodify(current_bufname, ':.')
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
   local buffer_names = {}
+  local display_length = 0
   for i, bufname in ipairs(buffers) do
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
@@ -124,6 +125,7 @@ local function file()
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
     end
+    display_length = display_length + #fname + 3 -- separators + []
     local file_display
     if bufname ~= current_bufname then
       file_display = string.format('%%#SLInactiveBuffer#%s', fname)
@@ -142,6 +144,7 @@ local function file()
           oss.dir_separator,
           fname
         )
+        display_length = display_length + #fpath + 1
       end
     end
     if i == vim.fn.argidx() + 1 and vim.fn.argc() ~= 0 then
@@ -158,17 +161,13 @@ local function file()
   if #buffer_names == 0 then
     return ''
   end
-  local ret = string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   local max_columns = vim.o.columns
-  local HL_LENGTH = 18
-  local HL_LENGTH_CURRENT = 36
-  local ret_length = #ret - HL_LENGTH * #buffer_names - HL_LENGTH_CURRENT
-  if ret_length < max_columns or current_buf_shorten.pos == -1 then
-    return ret
-  elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
+  if display_length < max_columns or current_buf_shorten.pos == -1 then
+    return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
+  elseif display_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.path
     return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
-  elseif ret_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
+  elseif display_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
     buffer_names[current_buf_shorten.pos] = current_buf_shorten.fname
     return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
   elseif #buffer_names[current_buf_shorten.pos] < max_columns then
