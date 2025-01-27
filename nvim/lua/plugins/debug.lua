@@ -85,10 +85,5 @@ return {
       },
     }
 
-    -- Add configurations from launch.json
-    require('dap.ext.vscode').load_launchjs(nil, {
-      ['codelldb'] = { 'c' },
-      ['pwa-node'] = { 'typescript', 'javascript' },
-    })
   end,
 }
