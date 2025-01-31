@@ -125,17 +125,32 @@ end, {
   nargs = '*',
   complete = function(ArgLead, _, _)
     -- https://vi.stackexchange.com/a/25005
-    local content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    local content_str = vim.fn.join(content, ' ')
-    content = vim.fn.split(content_str, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
-    content = vim.tbl_filter(function(str)
-      return #str > 2
-        and vim.fn.match(str, '^[a-zA-Z_]\\+') > -1
-        and vim.fn.match(str, '^' .. ArgLead) > -1 -- so it starts with the word
-        and vim.fn.match(str, ArgLead) > -1 -- so it only cointains the word?
-    end, content)
-    content = vim.fn.sort(content)
-    return vim.fn.uniq(content)
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    local lines_str = vim.fn.join(lines, ' ')
+    local words = vim.fn.split(lines_str, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
+    words = vim
+      .iter(words)
+      :filter(function(v)
+        return v:find(ArgLead, 1, true)
+      end)
+      :map(function(v)
+        if not v:find('%.') then
+          return v
+        end
+        local variations = {}
+        local parts = vim.split(v, '%.')
+        for i = 1, #parts do
+          local part = table.concat(parts, '.', 1, i)
+          if part:find(ArgLead, 1, true) then
+            table.insert(variations, part)
+          end
+        end
+        return variations
+      end)
+      :flatten()
+      :totable()
+    table.sort(words)
+    return vim.fn.uniq(words)
   end,
 })
 vim.keymap.set('n', 'g/', ':GSearch ', { desc = 'Search with [G]lobal' })
