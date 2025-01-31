@@ -762,10 +762,10 @@ local function previewHover()
   )
 end
 
----@param direction "n" | "p"
+---@param direction 1 | -1
 local function moveWithPreview(direction)
   local current_pos = vim.fn.getcurpos()
-  local move_line = direction == 'n' and current_pos[2] + 1 or current_pos[2] - 1
+  local move_line = current_pos[2] + direction
   local list_size = getActiveList().size
   if move_line < 1 then
     move_line = list_size
@@ -925,10 +925,10 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
       selectItem({ keep_cursor = true })
     end, { buffer = 0, desc = 'Open and Stay in QF' })
     vim.keymap.set('n', '<C-n>', function()
-      moveWithPreview('n')
+      moveWithPreview(1)
     end, { buffer = 0, desc = 'Move and Preview Next QF Item' })
     vim.keymap.set('n', '<C-p>', function()
-      moveWithPreview('p')
+      moveWithPreview(-1)
     end, { buffer = 0, desc = 'Move and Preview Previous QF Item' })
     vim.keymap.set('n', '<C-o>', function()
       listHistory('older')
