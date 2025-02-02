@@ -260,6 +260,29 @@ return {
             { desc = 'LSP: [G]oto [T]ype Definition', buffer = event.buf }
           )
 
+          local preview_namespace = vim.api.nvim_create_namespace('preview')
+          vim.keymap.set('n', 'grp', function()
+            local diag = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
+            if #diag == 0 then
+              return
+            end
+            local hls = {}
+            diag = vim
+              .iter(diag)
+              :map(function(d)
+                table.insert(hls, get_diagnostic_hl(d.severity))
+                return signs[d.severity] .. ' ' .. d.code .. ': ' .. d.message
+              end)
+              :totable()
+            local bufnr = vim.api.nvim_create_buf(false, true)
+            vim.api.nvim_buf_set_lines(bufnr, 0, #diag, false, diag)
+            vim.o.previewheight = math.min(#diag + 1, 5)
+            for line, hl in ipairs(hls) do
+              vim.hl.range(bufnr, preview_namespace, hl, { line - 1, 0 }, { line - 1, vim.o.columns })
+            end
+            vim.cmd('pbuffer ' .. bufnr)
+          end, { desc = 'Open Diagnostics Preview' })
+
           vim.keymap.set('n', 'gro', function()
             if vim.fn.exists(':OrganizeImports') > 0 then
               vim.cmd('OrganizeImports')
