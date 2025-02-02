@@ -245,7 +245,8 @@ return {
 
       vim.keymap.set('v', 'on', function()
         vim.cmd('normal! ^')
-        local target = targets.out()
+        local node = nodes.get_current()
+        local target = targets.out(node)
         nodeMoveTextObject(target)
       end, { desc = 'Out Node Text-Object', silent = true })
       vim.keymap.set('o', 'on', '<cmd>normal von<CR>', { desc = '[O]ut [N]ode Text-Object', silent = true })
