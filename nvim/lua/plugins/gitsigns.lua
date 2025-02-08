@@ -22,24 +22,21 @@ return {
     on_attach = function()
       local gitsigns = require('gitsigns')
 
-      local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
-      local next_hunk, prev_hunk = ts_repeat_move.make_repeatable_move_pair(function()
+      -- Navigation
+      vim.keymap.set('n', ']h', function()
         if vim.wo.diff then
           vim.cmd.normal({ ']c', bang = true })
         else
           gitsigns.nav_hunk('next')
         end
-      end, function()
+      end, { desc = 'Jump to next Hunk' })
+      vim.keymap.set('n', '[h', function()
         if vim.wo.diff then
           vim.cmd.normal({ '[c', bang = true })
         else
           gitsigns.nav_hunk('prev')
         end
-      end)
-
-      -- Navigation
-      vim.keymap.set('n', ']h', next_hunk, { desc = 'Jump to next Hunk' })
-      vim.keymap.set('n', '[h', prev_hunk, { desc = 'Jump to previous Hunk' })
+      end, { desc = 'Jump to previous Hunk' })
 
       -- Visual mode
       vim.keymap.set('x', '<leader>hs', function()

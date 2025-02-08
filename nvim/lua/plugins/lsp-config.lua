@@ -184,14 +184,12 @@ return {
           --   end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
           -- end
 
-          local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
-          local next_diag, prev_diag = ts_repeat_move.make_repeatable_move_pair(function()
+          vim.keymap.set('n', ']d', function()
             vim.diagnostic.jump({ count = 1 })
-          end, function()
+          end, { desc = 'LSP: Go to next [D]iagnostic message', buffer = event.buf })
+          vim.keymap.set('n', '[d', function()
             vim.diagnostic.jump({ count = -1 })
-          end)
-          vim.keymap.set('n', ']d', next_diag, { desc = 'LSP: Go to next [D]iagnostic message', buffer = event.buf })
-          vim.keymap.set('n', '[d', prev_diag, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
+          end, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
 
           -- replaced my own implementation with Folke's which is more performant: https://github.com/folke/snacks.nvim/blob/main/lua/snacks/words.lua#L117
           local ns = vim.api.nvim_create_namespace('nvim.lsp.references')

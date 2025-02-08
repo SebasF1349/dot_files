@@ -2,7 +2,6 @@ return {
   {
     'nvim-treesitter/nvim-treesitter',
     event = { 'BufReadPost', 'BufNewFile' },
-    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     build = ':TSUpdate',
     init = function(plugin)
       -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
@@ -78,100 +77,7 @@ return {
         highlight = { enable = true },
         -- indent = { enable = true }, -- doesn't work properly
         matchup = { enable = true },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ['io'] = '@block.inner',
-              ['ao'] = '@block.outer',
-              ['af'] = '@function.outer',
-              ['if'] = '@function.inner',
-              ['au'] = '@call.outer',
-              ['iu'] = '@call.inner',
-              ['ac'] = '@class.outer',
-              ['ic'] = '@class.inner',
-              ['aa'] = '@parameter.outer',
-              ['ia'] = '@parameter.inner',
-              ['a='] = '@assignment.outer',
-              ['i='] = '@assignment.inner',
-              ['l='] = '@assignment.lhs',
-              ['r='] = '@assignment.rhs',
-              ['a/'] = '@comment.outer',
-              ['i/'] = '@comment.inner', -- Only added inner for lua, add for other languages
-              ['aq'] = '@quote.outer',
-              ['iq'] = '@quote.inner',
-              -- ['ab'] = '@bracket.outer', -- Need more work, they are used in many cases
-              -- ['ib'] = '@bracket.inner',
-            },
-          },
-          move = {
-            enable = true,
-            goto_next_start = {
-              ['],'] = '@parameter.outer',
-              [']/'] = '@comment.outer',
-            },
-            goto_previous_start = {
-              ['[,'] = '@parameter.outer',
-              ['[/'] = '@comment.outer',
-            },
-          },
-        },
       })
-
-      local ts_repeat_move = require('nvim-treesitter.textobjects.repeatable_move')
-
-      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move)
-      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_opposite)
-
-      vim.keymap.set({ 'n', 'x', 'o' }, 'f', ts_repeat_move.builtin_f_expr, { expr = true })
-      vim.keymap.set({ 'n', 'x', 'o' }, 'F', ts_repeat_move.builtin_F_expr, { expr = true })
-      vim.keymap.set({ 'n', 'x', 'o' }, 't', ts_repeat_move.builtin_t_expr, { expr = true })
-      vim.keymap.set({ 'n', 'x', 'o' }, 'T', ts_repeat_move.builtin_T_expr, { expr = true })
-
-      -- More Text-Objects
-      local sub_word_limiters = {
-        '%u[%l%d]+%f[^%l%d]',
-        '%f[%S][%l%d]+%f[^%l%d]',
-        '%f[%P][%l%d]+%f[^%l%d]',
-        '^[%l%d]+%f[^%l%d]',
-      }
-
-      ---@param type 'i' | 'a'
-      function _G.subWord(type)
-        local cursor_pos = vim.api.nvim_win_get_cursor(0)
-        local line = vim.api.nvim_get_current_line()
-        local start, ending = math.huge, math.huge
-        for _, pattern in ipairs(sub_word_limiters) do
-          ---@type number|nil, number|nil
-          local s, e = 0, 0
-          repeat
-            s = s + 1
-            s, e = line:find(pattern, s)
-            local standingOnOrInFront = e and e > cursor_pos[2]
-          until standingOnOrInFront or not s
-
-          if s and e and s > 0 and s < start then
-            start, ending = s, e
-          end
-        end
-        vim.api.nvim_win_set_cursor(0, { cursor_pos[1], start - 1 })
-        if vim.api.nvim_get_mode().mode:find('v') then
-          vim.cmd.normal({ 'o', bang = true })
-        else
-          vim.cmd.normal({ 'v', bang = true })
-        end
-        if type == 'a' and vim.list_contains({ '_', '-' }, line:sub(ending + 1, ending + 1)) then
-          vim.api.nvim_win_set_cursor(0, { cursor_pos[1], ending })
-        else
-          vim.api.nvim_win_set_cursor(0, { cursor_pos[1], ending - 1 })
-        end
-      end
-
-      vim.keymap.set('v', 'ie', ':<C-U>lua _G.subWord("i")<CR>', { desc = 'SubWord Text-Object', silent = true })
-      vim.keymap.set('o', 'ie', '<cmd>normal vie<CR>', { desc = 'SubWord Text-Object', silent = true })
-      vim.keymap.set('v', 'ae', ':<C-U>lua _G.subWord("a")<CR>', { desc = 'SubWord Text-Object', silent = true })
-      vim.keymap.set('o', 'ae', '<cmd>normal vae<CR>', { desc = 'SubWord Text-Object', silent = true })
 
       -- can use ['az'] = { query = '@fold', query_group = 'folds' , silent =true }, but needs an offset for iz
       -- more robust option (do I want the if/else behaviour?) : https://vimways.org/2018/transactions-pending/
