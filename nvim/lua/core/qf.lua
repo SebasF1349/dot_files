@@ -824,7 +824,7 @@ local function selectItem(selectItemOpts)
       local item = qflist.items[qfitempos[2]]
       local split =
         vim.api.nvim_open_win(item.bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == 'v' })
-      vim.api.nvim_win_set_cursor(split, { item.lnum, item.col - 1 })
+      vim.api.nvim_win_set_cursor(split, { math.max(item.lnum, 1), math.max(item.col, 0) })
     end
   end
   vim.schedule(function()
