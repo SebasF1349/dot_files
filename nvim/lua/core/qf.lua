@@ -325,6 +325,12 @@ function _G.qftf(info)
         if item.path == '.' then
           item.path = ''
         end
+        if e.lnum > 0 then
+          item.name = vim.fn.fnamemodify(fname, ':p:t') .. ':' .. e.lnum
+          item.lnum_length = #tostring(e.lnum) + 1
+        else
+          item.name = vim.fn.fnamemodify(fname, ':p:t')
+        end
         if #item.name + #item.path > limit then
           limit = #item.name + #item.path
         end
