@@ -45,7 +45,7 @@ return {
           }
           return { from = from, to = to, vis_mode = 'V' }
         end,
-        l = { {
+        ['-'] = { {
           '\n()%s*().-()\n()',
           '^()%s*().-()\n()',
         } },
