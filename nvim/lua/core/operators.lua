@@ -72,26 +72,36 @@ vim.keymap.set(
 -- with inspiration from https://github.com/Wansmer/nvim-config/blob/main/lua/modules/surround.lua
 
 local surround = {
-  { '(', ')' },
-  { '[', ']' },
-  { '{', '}' },
-  { "'", "'" },
-  { '"', '"' },
-  { '`', '`' },
-  { '<', '>' },
-  { '*', '*' },
-  { '_', '_' },
+  ['('] = { '(', ')' },
+  ['b'] = { '(', ')' },
+  [')'] = { '(', ')' },
+  ['['] = { '[', ']' },
+  [']'] = { '[', ']' },
+  ['{'] = { '{', '}' },
+  ['}'] = { '{', '}' },
+  ["'"] = { "'", "'" },
+  ['"'] = { '"', '"' },
+  ['`'] = { '`', '`' },
+  ['<'] = { '<', '>' },
+  ['>'] = { '<', '>' },
+  ['*'] = { '*', '*' },
+  ['_'] = { '_', '_' },
 }
 
 local function get_pair()
   local char = vim.fn.getcharstr()
-  return vim
-    .iter(surround)
-    :filter(function(item)
-      return item[1] == char or item[2] == char
+  if vim.b.surroundPair then
+    local _, item = vim.iter(vim.b.surroundPair):find(function(t, i)
+      return char == t
     end)
-    :flatten()
-    :totable()
+    if item then
+      return item
+    end
+  end
+  local _, item = vim.iter(surround):find(function(t, i)
+    return char == t
+  end)
+  return item
 end
 
 -- plaggio di plaggio: https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
@@ -132,7 +142,7 @@ end
 ---@param mode "char"|"line"|"block"
 function _G.Surround(mode)
   local pair = get_pair()
-  if #pair == 0 then
+  if not pair then
     return
   end
   local starting = vim.api.nvim_buf_get_mark(0, '[')
@@ -154,21 +164,21 @@ vim.keymap.set('x', 's', _G.opfunc('_G.Surround'), { desc = '[S]urround', silent
 
 vim.keymap.set('n', 'gs', function()
   local pair = get_pair()
-  if #pair > 0 then
+  if pair then
     return 'ysiw' .. pair[1]
   end
 end, { desc = 'Word [S]urround', expr = true, remap = true })
 
 vim.keymap.set('n', 'ds', function()
   local pair = get_pair()
-  if #pair > 0 then
+  if pair then
     return '"sci' .. pair[1] .. '<BS><Del><C-r>s'
   end
 end, { desc = '[D]elete [S]urround', expr = true })
 
 vim.keymap.set('n', 'cs', function()
   local pair, replace = get_pair(), get_pair()
-  if #pair > 0 and #replace > 0 then
+  if pair and replace then
     return '"sci' .. pair[1] .. '<BS><Del>' .. replace[1] .. '<C-r>s' .. replace[2]
   end
 end, { desc = '[C]hange [S]urround', expr = true })
