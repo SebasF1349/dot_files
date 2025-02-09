@@ -33,6 +33,8 @@ return {
             path = ('https://%s'):format(path)
           elseif is_repo then
             path = ('https://github.com/%s'):format(path)
+          elseif vim.b.friendlyManual and vim.b.friendlyManual ~= '' then
+            path = (vim.b.manual):format(path)
           elseif not is_dir then
             path = ('https://google.com/search?q=%s'):format(path)
           end
