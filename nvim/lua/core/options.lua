@@ -117,12 +117,13 @@ function _G.custom_foldtext()
   fold_virt_text(result, start, vim.v.foldstart - 1)
   local number_lines = vim.v.foldend - vim.v.foldstart
   table.insert(result, { ' [ ' .. number_lines .. ' lines ] ', 'Delimiter' })
-  fold_virt_text(result, end_, vim.v.foldend - 1, #(end_str:match('^(%s+)') or ''))
+  if vim.o.filetype ~= 'markdown' then
+    fold_virt_text(result, end_, vim.v.foldend - 1, #(end_str:match('^(%s+)') or ''))
+  end
   return result
 end
 
 vim.opt.foldtext = 'v:lua.custom_foldtext()'
--- vim.opt.foldtext = ''
 
 vim.opt.fillchars:append({
   fold = ' ',

@@ -1,4 +1,4 @@
-local function opfunc(func_name)
+function _G.opfunc(func_name)
   return function()
     vim.o.operatorfunc = 'v:lua.' .. func_name
     return 'g@'
@@ -58,7 +58,12 @@ function _G.Evaluate(mode)
   end
 end
 
-vim.keymap.set({ 'n', 'v' }, 'g=', opfunc('_G.Evaluate'), { desc = 'Evaluate Expression', silent = true, expr = true })
+vim.keymap.set(
+  { 'n', 'v' },
+  'g=',
+  _G.opfunc('_G.Evaluate'),
+  { desc = 'Evaluate Expression', silent = true, expr = true }
+)
 
 --------------------------------------------------
 -- Surround
@@ -144,8 +149,8 @@ function _G.Surround(mode)
   end
 end
 
-vim.keymap.set('n', 'ys', opfunc('_G.Surround'), { desc = '[Y]ou [S]urround', silent = true, expr = true })
-vim.keymap.set('x', 's', opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
+vim.keymap.set('n', 'ys', _G.opfunc('_G.Surround'), { desc = '[Y]ou [S]urround', silent = true, expr = true })
+vim.keymap.set('x', 's', _G.opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
 
 vim.keymap.set('n', 'gs', function()
   local pair = get_pair()
@@ -193,18 +198,4 @@ function _G.Substitute(mode)
   end
 end
 
-vim.keymap.set({ 'n', 'v' }, 'S', opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })
-
---------------------------------------------------
--- MakeLists
---------------------------------------------------
-
-function _G.MakeList()
-  local starting = vim.api.nvim_buf_get_mark(0, '[')
-  local ending = vim.api.nvim_buf_get_mark(0, ']')
-  local line_start = starting[1]
-  local line_end = ending[1]
-  vim.cmd(line_start .. ',' .. line_end .. [[s/\v^(\s*)[^a-zA-Z]*(.*)/\1- \2]])
-end
-
-vim.keymap.set({ 'n', 'v' }, 'gl', opfunc('_G.MakeList'), { desc = 'Make Markdown [L]ist', silent = true, expr = true })
+vim.keymap.set({ 'n', 'v' }, 'S', _G.opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })

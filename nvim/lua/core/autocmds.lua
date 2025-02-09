@@ -189,47 +189,6 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
   desc = 'Remove ranges highlights',
 })
 
-local function show_toc()
-  local bufname = vim.api.nvim_buf_get_name(0)
-  local info = vim.fn.getloclist(0, { winid = 1 })
-  if vim.tbl_isempty(info) and vim.api.nvim_get_option_value('qf_toc', { win = info.winid }) == #bufname then
-    vim.cmd('lopen')
-    return
-  end
-  local list = vim
-    .iter(ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)))
-    :filter(function(_, line)
-      return line:match('^#+')
-    end)
-    :map(function(lnum, line)
-      return { bufnr = vim.fn.bufnr('%'), lnum = lnum, text = line }
-    end)
-    :totable()
-  vim.fn.setloclist(0, list, ' ')
-  vim.cmd('lopen')
-  vim.w.qf_toc = bufname
-end
-
-vim.api.nvim_create_autocmd({ 'FileType' }, {
-  pattern = 'markdown',
-  callback = function()
-    vim.opt_local.textwidth = 0
-    vim.opt_local.colorcolumn = '81'
-    vim.opt_local.wrap = true
-    vim.opt_local.wrapmargin = 0
-    vim.opt_local.linebreak = true
-    vim.opt_local.spell = true
-    vim.opt_local.spelllang = { 'es', 'en' }
-    vim.opt_local.tabstop = 2
-    vim.opt_local.softtabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.expandtab = true
-
-    vim.keymap.set('n', 'gO', show_toc, { desc = 'Show TOC', buffer = 0 })
-  end,
-  desc = 'Markdown defaults',
-})
-
 vim.api.nvim_create_autocmd({ 'FileType' }, {
   pattern = 'php',
   callback = function()
