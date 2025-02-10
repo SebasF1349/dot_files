@@ -167,20 +167,8 @@ local function grep_or_filter(listType, input)
   end
 end
 
-local function grep_async(input)
-  vim.system(
-    { 'rg', '--vimgrep', '--smart-case', input },
-    {},
-    vim.schedule_wrap(function(res)
-      vim.g.ripgrep_async = res.stdout:sub(1, -2)
-      vim.cmd('silent! cgetexpr g:ripgrep_async')
-    end)
-  )
-end
-
 vim.api.nvim_create_user_command('Rg', function(opts)
-  -- grep_or_filter('c', opts.args)
-  grep_async(opts.args)
+  grep_or_filter('c', opts.args)
 end, { nargs = 1 })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
