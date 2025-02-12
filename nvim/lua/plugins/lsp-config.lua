@@ -125,14 +125,72 @@ return {
               vim.wo[winData.winid].conceallevel = 3
             end,
           })
+
+          local Kind = vim.lsp.protocol.CompletionItemKind
+          local completion_kinds = {
+            Text = ' ',
+            Method = '󰆧',
+            Function = '󰊕',
+            Constructor = ' ',
+            Field = '',
+            Variable = ' ',
+            Class = '󰠱 ',
+            Interface = ' ',
+            Module = ' ',
+            Property = '󰜢 ',
+            Unit = ' ',
+            Value = ' ',
+            Enum = '練',
+            Keyword = '󰌋',
+            Snippet = '',
+            Color = ' ',
+            File = ' ',
+            Reference = ' ',
+            Folder = ' ',
+            EnumMember = ' ',
+            Constant = ' ',
+            Struct = '',
+            Event = ' ',
+            Operator = ' ',
+            TypeParameter = ' ',
+            Boolean = ' ',
+            Array = ' ',
+          }
+
+          ---@param completion_item lsp.CompletionItem
+          local function intelephense(completion_item)
+            local label = completion_item.label
+            local detail = completion_item.labelDetails and completion_item.labelDetails.detail
+              or completion_item.detail
+            local kind = completion_item.kind
+
+            if (kind == Kind.Function or kind == Kind.Method) and detail and #detail > 0 then
+              local signature = detail:sub(#label + 1)
+              return string.format('%s fn %s {}', label, signature)
+            elseif kind == Kind.EnumMember and detail and #detail > 0 then
+              return string.format('%s %s', label, detail)
+            elseif (kind == Kind.Property or kind == Kind.Variable) and detail and #detail > 0 then
+              detail = string.gsub(detail, '.*\\(.)', '%1')
+              return string.format('%s fn(): %s', label, detail)
+            elseif kind == Kind.Constant and detail and #detail > 0 then
+              return string.format('%s %s', label, detail)
+            else
+              return label
+            end
+          end
+
           vim.lsp.completion.enable(true, event.data.client_id, event.buf, {
             autotrigger = true,
             convert = function(item)
-              local labelDetails = item.labelDetails and ' [' .. item.labelDetails.description .. ']' or ''
-              local kind = vim.lsp.protocol.CompletionItemKind[item.kind]
+              local label = intelephense(item)
+              if #label > 60 then
+                label = label:sub(1, 60) .. '…'
+              end
+              local kind = Kind[item.kind]
               return {
-                abbr = item.label .. labelDetails,
+                abbr = label,
                 menu = '',
+                kind = completion_kinds[kind],
                 kind_hlgroup = kind and 'CmpItemKind' .. kind or 'CmpItemKindUnit',
               }
             end,
@@ -141,6 +199,7 @@ return {
 
           vim.o.pumheight = 6
           vim.opt.completeopt = { 'menuone', 'noselect', 'fuzzy', 'popup' }
+          vim.o.completeitemalign = 'kind,abbr,menu'
 
           -- vim.keymap.set('s', '<C-l>', function()
           --   if vim.snippet.active({ direction = 1 }) then
