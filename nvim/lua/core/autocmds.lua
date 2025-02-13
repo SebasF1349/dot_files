@@ -39,7 +39,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- This is needed as the formatoptions are set in ft files in neovim core
 vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   callback = function()
-    vim.cmd('set formatoptions-=cro')
+    vim.opt.formatoptions:remove({ 'c', 'r', 'o' })
   end,
   group = general,
   desc = "Don't auto comment after pressing enter in comment",
