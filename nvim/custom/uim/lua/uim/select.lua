@@ -170,6 +170,7 @@ function M.select(items, opts, on_choice)
 
   -- TODO: make height minimum 2 if there is no border
   if curr_conf.position == 'bottom' then
+    -- TODO: change all this logic with `relative: laststatus` once 0.11 gets released
     number_columns = math.max(math.floor(vim.o.columns / (max_length + whitespace)), 1)
     number_lines = math.ceil(#choices / number_columns)
     win_opts.height = math.max(

@@ -1,4 +1,35 @@
 --------------------------------------------------
+-- Index
+--------------------------------------------------
+
+-- LEADER
+--- a (alternative files)
+--- b (buffer-git)
+--- c (code)
+---- cf (format)
+---- cl (lint)
+---- cb (build)
+---- ct (test)
+--- d (debug)
+--- f (telescope)
+--- h (hunks)
+--- j (splitjoin)
+--- l (location list)
+--- m (markdown)
+--- n (neotest-java)
+--- q (quickfix)
+--- r (refactoring)
+--- s (open in split)
+--- t (terminal)
+--- v (open in vertical split)
+--- w (open in window)
+
+-- g
+--- a (arglist)
+--- d (generate docs/annotations)
+--- r (lsp)
+
+--------------------------------------------------
 -- Basics
 --------------------------------------------------
 

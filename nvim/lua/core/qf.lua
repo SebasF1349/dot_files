@@ -639,6 +639,7 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
   callback = function(args)
+    -- NOTE: add an autcmd to autoclose preview window
     vim.cmd('wincmd J')
     vim.api.nvim_win_set_height(0, getHeight())
     -- NOTE: vim.fn.setqflist "opens" the qf and the win is valid if done immediately
