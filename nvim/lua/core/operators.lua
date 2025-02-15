@@ -193,11 +193,11 @@ vim.keymap.set('n', 'ys', _G.opfunc('_G.Surround'), { desc = '[Y]ou [S]urround',
 vim.keymap.set('x', 's', _G.opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
 
 vim.keymap.set('n', 'gs', function()
-  local pair = get_pair()
-  if pair then
-    return 'ysiw' .. pair[1]
+  local char = vim.fn.getcharstr()
+  if char then
+    return 'ysiw' .. char
   end
-end, { desc = 'Word [S]urround', expr = true, remap = true })
+end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 
 -- FIX: doesn't work with multiline pairs
 -- only deletes first pairDelete[1] and last pairDelete[2]
