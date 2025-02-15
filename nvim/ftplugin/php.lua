@@ -1,10 +1,14 @@
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
 vim.b.surroundPair = {
-  ['-'] = { '<?php ', ' ?>' },
-  ['='] = { '<?= ', ' ?>' },
+  ['-'] = { { '<?php ' }, { ' ?>' } },
+  ['_'] = { { '<?php', '' }, { '', '?>' } },
+  ['='] = { { '<?= ' }, { ' ?>' } },
+  ['+'] = { { '<?=', '' }, { '', '?>' } },
 }
 
+--- Text-object for php blocks (<?= and <?php)
+---@param type 'a' | 'i'
 local function phpTextObject(type)
   local curr = vim.api.nvim_win_get_cursor(0)
   local o = vim.fn.search('<?', 'bWc')
@@ -18,6 +22,7 @@ local function phpTextObject(type)
     vim.api.nvim_win_set_cursor(0, curr)
     return
   end
+  -- <?php blocks may have no ending if it ends at the end of the file
   if e == 0 then
     local last_line = vim.fn.getpos('$')[2]
     local last_col = vim.fn.col({ last_line, '$' })
