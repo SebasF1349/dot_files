@@ -106,6 +106,11 @@ local function get_pair()
 end
 
 -- https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
+
+--- Get whitespace around line (maybe too much for surrounding)
+---@param line string
+---@param side 'left' | 'right' | 'both'
+---@return string, string, string
 local function get_whitespace(line, side)
   side = side or 'both'
   local is_left = side == 'both' and true or side == 'left'
@@ -131,6 +136,10 @@ local function get_whitespace(line, side)
   return pad_left, line, pad_right
 end
 
+--- Add pair around text
+---@param text string[]
+---@param pair string[]
+---@return string[]
 local function add_pair(text, pair)
   local left_pad, first_line = get_whitespace(text[1], 'left')
   local newText = {}
@@ -148,6 +157,12 @@ local function add_pair(text, pair)
   return newText
 end
 
+--- Add surround to a block of lines
+---@param pair string[]
+---@param start_row integer
+---@param start_col integer
+---@param end_row integer
+---@param end_col integer
 local function add_surround(pair, start_row, start_col, end_row, end_col)
   local text = vim.api.nvim_buf_get_text(0, start_row, start_col, end_row, end_col, {})
   text = add_pair(text, pair)
@@ -186,6 +201,9 @@ end, { desc = 'Word [S]urround', expr = true, remap = true })
 
 -- FIX: doesn't work with multiline pairs
 -- only deletes first pairDelete[1] and last pairDelete[2]
+--- Remove (or replace) surrounding pairs
+---@param pairDelete string[]
+---@param pairAdd? string[]
 local function operateSurround(pairDelete, pairAdd)
   local curr = vim.api.nvim_win_get_cursor(0)
   local o = vim.fn.search(pairDelete[1][1], 'bW')
