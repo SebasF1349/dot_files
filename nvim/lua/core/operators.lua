@@ -69,42 +69,43 @@ vim.keymap.set(
 -- Surround
 --------------------------------------------------
 
--- with inspiration from https://github.com/Wansmer/nvim-config/blob/main/lua/modules/surround.lua
+-- TODO: accept input data from ui.input (like for tags or function names)
 
+-- FIX: try to reduce boilerplate
 local surround = {
-  ['('] = { '(', ')' },
-  ['b'] = { '(', ')' },
-  [')'] = { '(', ')' },
-  ['['] = { '[', ']' },
-  [']'] = { '[', ']' },
-  ['{'] = { '{', '}' },
-  ['}'] = { '{', '}' },
-  ["'"] = { "'", "'" },
-  ['"'] = { '"', '"' },
-  ['`'] = { '`', '`' },
-  ['<'] = { '<', '>' },
-  ['>'] = { '<', '>' },
-  ['*'] = { '*', '*' },
-  ['_'] = { '_', '_' },
+  ['('] = { { '(' }, { ')' } },
+  ['b'] = { { '(' }, { ')' } },
+  [')'] = { { '(' }, { ')' } },
+  ['['] = { { '[' }, { ']' } },
+  [']'] = { { '[' }, { ']' } },
+  ['{'] = { { '{' }, { '}' } },
+  ['}'] = { { '{' }, { '}' } },
+  ["'"] = { { "'" }, { "'" } },
+  ['"'] = { { '"' }, { '"' } },
+  ['`'] = { { '`' }, { '`' } },
+  ['<'] = { { '<' }, { '>' } },
+  ['>'] = { { '<' }, { '>' } },
+  ['*'] = { { '*' }, { '*' } },
+  ['_'] = { { '_' }, { '_' } },
 }
 
 local function get_pair()
   local char = vim.fn.getcharstr()
   if vim.b.surroundPair then
-    local _, item = vim.iter(vim.b.surroundPair):find(function(t, i)
+    local _, item = vim.iter(vim.b.surroundPair):find(function(t, _)
       return char == t
     end)
     if item then
       return item
     end
   end
-  local _, item = vim.iter(surround):find(function(t, i)
+  local _, item = vim.iter(surround):find(function(t, _)
     return char == t
   end)
   return item
 end
 
--- plaggio di plaggio: https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
+-- https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
 local function get_whitespace(line, side)
   side = side or 'both'
   local is_left = side == 'both' and true or side == 'left'
@@ -130,12 +131,26 @@ local function get_whitespace(line, side)
   return pad_left, line, pad_right
 end
 
+local function add_pair(text, pair)
+  local left_pad, first_line = get_whitespace(text[1], 'left')
+  local newText = {}
+  for i = 1, #pair[1] do
+    table.insert(newText, pair[1][i])
+  end
+  newText[#newText] = left_pad .. newText[#newText] .. first_line
+  for i = 2, #text do
+    table.insert(newText, text[i])
+  end
+  newText[#newText] = newText[#newText] .. pair[2][1]
+  for i = 2, #pair[2] do
+    table.insert(newText, pair[2][i])
+  end
+  return newText
+end
+
 local function add_surround(pair, start_row, start_col, end_row, end_col)
   local text = vim.api.nvim_buf_get_text(0, start_row, start_col, end_row, end_col, {})
-  local left_pad, first_line = get_whitespace(text[1], 'left')
-  text[1] = left_pad .. pair[1] .. first_line
-  local _, last_line, right_pad = get_whitespace(text[#text], 'right')
-  text[#text] = last_line .. pair[2] .. right_pad
+  text = add_pair(text, pair)
   vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, text)
 end
 
@@ -169,19 +184,51 @@ vim.keymap.set('n', 'gs', function()
   end
 end, { desc = 'Word [S]urround', expr = true, remap = true })
 
+-- FIX: doesn't work with multiline pairs
+-- only deletes first pairDelete[1] and last pairDelete[2]
+local function operateSurround(pairDelete, pairAdd)
+  local curr = vim.api.nvim_win_get_cursor(0)
+  local o = vim.fn.search(pairDelete[1][1], 'bW')
+  if o == 0 then
+    return
+  end
+  local opening = vim.api.nvim_win_get_cursor(0)
+  local e = vim.fn.search(pairDelete[2][#pairDelete[2]], 'eW')
+  local ending = vim.api.nvim_win_get_cursor(0)
+  if e == 0 or ending[1] < curr[1] or (ending[1] == curr[1] and ending[2] < curr[2]) then
+    vim.api.nvim_win_set_cursor(0, curr)
+    return
+  end
+
+  local lines = vim.api.nvim_buf_get_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, {})
+  vim.print(lines)
+  lines[1] = lines[1]:sub(#pairDelete[1][1] + 1, -1)
+  if #lines[1] == 0 then
+    table.remove(lines, 1)
+  end
+  lines[#lines] = lines[#lines]:sub(1, -1 * (#pairDelete[2][#pairDelete[2]] + 1))
+  if #lines[#lines] == 0 then
+    table.remove(lines, #lines)
+  end
+  if pairAdd then
+    lines = add_pair(lines, pairAdd)
+  end
+  vim.api.nvim_buf_set_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, lines)
+end
+
 vim.keymap.set('n', 'ds', function()
   local pair = get_pair()
   if pair then
-    return '"sci' .. pair[1] .. '<BS><Del><C-r>s'
+    operateSurround(pair)
   end
-end, { desc = '[D]elete [S]urround', expr = true })
+end, { desc = '[D]elete [S]urround' })
 
 vim.keymap.set('n', 'cs', function()
   local pair, replace = get_pair(), get_pair()
   if pair and replace then
-    return '"sci' .. pair[1] .. '<BS><Del>' .. replace[1] .. '<C-r>s' .. replace[2]
+    operateSurround(pair, replace)
   end
-end, { desc = '[C]hange [S]urround', expr = true })
+end, { desc = '[C]hange [S]urround' })
 
 --------------------------------------------------
 -- Substitute
