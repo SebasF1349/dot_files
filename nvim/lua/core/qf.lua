@@ -298,12 +298,13 @@ local GIT_STATUS_MAP = {
 ---@field type string
 
 local qfim_namespace = vim.api.nvim_create_namespace('qfim')
+local qfbufnr
 
 function _G.qftf(info)
   local ret = {}
   local listType = info.quickfix == 1 and 'c' or 'l'
   local list = getList(listType, nil, info.winid)
-  local qfbufnr = list.qfbufnr
+  qfbufnr = list.qfbufnr
   local diffs
   local isDiff = isDiffTool(list)
   if isDiff then
@@ -679,27 +680,28 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   pattern = 'quickfix',
   callback = function(args)
     -- NOTE: add an autcmd to autoclose preview window
+    -- NOTE: no se puede usar args.buf porque aparentemente la ventana se abre varias veces ?
+    if not qfbufnr then
+      return
+    end
+    local qfwinid = vim.fn.bufwinid(qfbufnr)
+    if not vim.api.nvim_win_is_valid(qfwinid) then
+      return
+    end
     vim.cmd('wincmd J')
     vim.api.nvim_win_set_height(0, getHeight())
-    -- NOTE: vim.fn.setqflist "opens" the qf and the win is valid if done immediately
-    vim.schedule(function()
-      local qfwinid = vim.fn.bufwinid(args.buf)
-      if not vim.api.nvim_win_is_valid(qfwinid) then
-        return
-      end
-      vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
-      vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
-      vim.api.nvim_set_option_value('buflisted', false, { buf = args.buf, scope = 'local' })
-      vim.api.nvim_set_option_value('winfixheight', true, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('winfixbuf', true, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('statuscolumn', '', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('number', true, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('relativenumber', false, { win = qfwinid, scope = 'local' })
-    end)
+    vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
+    vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
+    vim.api.nvim_set_option_value('buflisted', false, { buf = args.buf, scope = 'local' })
+    vim.api.nvim_set_option_value('winfixheight', true, { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('winfixbuf', true, { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('statuscolumn', '', { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('number', true, { win = qfwinid, scope = 'local' })
+    vim.api.nvim_set_option_value('relativenumber', false, { win = qfwinid, scope = 'local' })
   end,
   desc = 'Qf options',
 })
