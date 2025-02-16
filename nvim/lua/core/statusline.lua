@@ -125,12 +125,14 @@ local function file()
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
     end
+    fname = vim.fs.normalize(fname)
     display_length = display_length + #fname + 3 -- separators + []
     local file_display
     if bufname ~= current_bufname then
       file_display = string.format('%%#SLInactiveBuffer#%s', fname)
     else
       local fpath = is_svelte and vim.fn.fnamemodify(bufname, ':~:.:h:h') or vim.fn.fnamemodify(bufname, ':~:.:h')
+      fpath = vim.fs.normalize(fpath)
       current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
       current_buf_shorten.pos = #buffer_names + 1
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then

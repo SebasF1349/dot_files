@@ -1,4 +1,16 @@
 --------------------------------------------------
+-- Utils
+--------------------------------------------------
+
+--- Get normalized filename
+---@param bufnr integer
+---@return string
+local function getBufName(bufnr)
+  local buf = vim.api.nvim_buf_get_name(bufnr)
+  return vim.fs.normalize(vim.fn.fnamemodify(buf, ':.'))
+end
+
+--------------------------------------------------
 -- Arglist Management
 --------------------------------------------------
 
@@ -42,8 +54,7 @@ local function cycle_prev()
   if vim.fn.argc() == 0 then
     return
   end
-  local bufname = vim.api.nvim_buf_get_name(0)
-  bufname = vim.fn.fnamemodify(bufname, ':.')
+  local bufname = getBufName(0)
   local moves = vim.fn.argidx() + 1 - vim.v.count1
   if
     not vim.list_contains(vim.fn.argv()--[[@as string[] ]], bufname)
@@ -55,9 +66,8 @@ end
 
 ---@param bufnr? number
 local function insert(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local buf = vim.api.nvim_buf_get_name(bufnr)
-  buf = vim.fn.fnamemodify(buf, ':.')
+  bufnr = bufnr or 0
+  local buf = getBufName(bufnr)
   vim.cmd('argedit ' .. buf .. ' | argdedupe')
 end
 
@@ -86,9 +96,7 @@ end
 ---@param exclude? boolean don't delete current
 local function remove_all(exclude)
   if exclude then
-    local bufnr = vim.api.nvim_get_current_buf()
-    local buf = vim.api.nvim_buf_get_name(bufnr)
-    buf = vim.fn.fnamemodify(buf, ':.')
+    local buf = getBufName(0)
     vim.cmd('silent! args ' .. buf)
   else
     vim.cmd('silent! %argdelete')
@@ -163,9 +171,7 @@ local args_augroup = vim.api.nvim_create_augroup('Arglist', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
   group = args_augroup,
   callback = function()
-    local bufnr = vim.api.nvim_win_get_buf(0)
-    local buf = vim.api.nvim_buf_get_name(bufnr)
-    buf = vim.fn.fnamemodify(buf, ':.')
+    local buf = getBufName(0)
     for i, a in
       ipairs(vim.fn.argv()--[[@as string[] ]])
     do
