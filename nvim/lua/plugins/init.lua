@@ -1,5 +1,17 @@
 return {
-  { 'tpope/vim-fugitive', cmd = { 'G', 'Git', 'Gdiffsplit' } },
+  {
+    'tpope/vim-fugitive',
+    cmd = { 'G', 'Git', 'Gdiffsplit' },
+    keys = { { '<leader>g', '<cmd>tabnew | 0G<CR>', desc = 'Open fu[G]itive in a new tab' } },
+    config = function()
+      local function diffModeMap(key, cmd, desc)
+        local c = vim.wo.diff and cmd or 'normal! ' .. key
+        vim.keymap.set('n', key, c, { desc = desc, silent = true })
+      end
+      diffModeMap('gh', ':diffget //2 <CR>', 'Git: get lhs of diff')
+      diffModeMap('gl', ':diffget //3 <CR>', 'Git: get rhs of diff')
+    end,
+  },
 
   { 'NMAC427/guess-indent.nvim', event = 'InsertEnter', opts = {} },
 
