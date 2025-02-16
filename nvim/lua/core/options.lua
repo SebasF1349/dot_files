@@ -67,6 +67,8 @@ vim.opt.signcolumn = 'yes'
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
+vim.o.diffopt = 'internal,filler,closeoff,indent-heuristic,linematch:60,algorithm:histogram'
+
 vim.opt.fileencoding = 'utf-8'
 
 vim.opt.iskeyword:append('-')
