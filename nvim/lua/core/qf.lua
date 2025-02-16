@@ -146,6 +146,12 @@ local function getDiagList(listType)
   end
 end
 
+---@param list qflist
+---@return boolean
+local function isDiffTool(list)
+  return list.title:find('difftool') ~= nil
+end
+
 --------------------------------------------------
 -- Better Grep
 --------------------------------------------------
@@ -269,6 +275,18 @@ end
 -- Better Quickfix Window Style
 --------------------------------------------------
 
+local GIT_STATUS_MAP = {
+  ['A'] = 'ADDED',
+  ['B'] = 'BROKEN',
+  ['C'] = 'COPIED',
+  ['D'] = 'DELETED',
+  ['M'] = 'MODIFIED',
+  ['R'] = 'RENAMED',
+  ['T'] = 'CHANGED',
+  ['U'] = 'UNMERGED',
+  ['X'] = 'UNKNOWN',
+}
+
 ---@class uim.qfitem_processed
 ---@field bufnr number
 ---@field lnum number
@@ -286,6 +304,17 @@ function _G.qftf(info)
   local listType = info.quickfix == 1 and 'c' or 'l'
   local list = getList(listType, nil, info.winid)
   local qfbufnr = list.qfbufnr
+  local diffs
+  local isDiff = isDiffTool(list)
+  if isDiff then
+    diffs = vim.system({ 'git', 'diff', '--numstat' }, { text = true }):wait()
+    diffs = vim.split(diffs.stdout, '\n')
+    diffs = vim.iter(diffs):rskip(1):fold({}, function(acc, diff)
+      diff = vim.split(diff, '\t')
+      acc[vim.fn.bufnr(diff[3])] = { added = diff[1], removed = diff[2] }
+      return acc
+    end)
+  end
   list = list.items
   ---@type uim.qfitem_processed[]
   local items = {}
@@ -296,7 +325,7 @@ function _G.qftf(info)
     local item = {
       name = ' ',
       path = '',
-      text = vim.trim(e.text),
+      text = '',
       type = e.type,
       lnum_length = 0,
       bufnr = e.bufnr,
@@ -307,9 +336,7 @@ function _G.qftf(info)
       local fname = e.filename or vim.fn.bufname(e.bufnr)
       if fname ~= '' then
         fname = vim.fn.fnamemodify(fname, ':p:~:.')
-        item.name = vim.fn.fnamemodify(fname, ':p:t') .. ':' .. e.lnum
         item.path = vim.fn.fnamemodify(fname, ':h')
-        item.lnum_length = #tostring(e.lnum) + 1
         if item.path == '.' then
           item.path = ''
         end
@@ -321,6 +348,18 @@ function _G.qftf(info)
         end
         if #item.name + #item.path > limit then
           limit = #item.name + #item.path
+        end
+        if not isDiff then
+          item.text = vim.trim(e.text)
+        elseif diffs and diffs[e.bufnr] then
+          item.text = (GIT_STATUS_MAP[e.text:sub(1, 1)] or '')
+            .. ' (+'
+            .. diffs[e.bufnr].added
+            .. '-'
+            .. diffs[e.bufnr].removed
+            .. ')'
+        else
+          item.text = GIT_STATUS_MAP[e.text:sub(1, 1)]
         end
       end
     end
@@ -787,6 +826,16 @@ local function get_prev_win(winnr)
   return prev_win
 end
 
+function openAsDiff()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive://') then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+  local qfitempos = vim.fn.getpos('.')
+  vim.cmd('cc ' .. qfitempos[2] .. ' | Gvdiffsplit')
+end
+
 ---@class SelectItemOpts
 ---@field keep_cursor? boolean false by default
 ---@field split? "v" | "h" nil by default
@@ -800,6 +849,10 @@ local function selectItem(selectItemOpts)
     return
   end
   local qflist = getList(qftype)
+  if isDiffTool(qflist) then
+    openAsDiff()
+    return
+  end
   local qfitempos = vim.fn.getpos('.')
   local preview = getPreview()
   if preview then
@@ -860,6 +913,15 @@ local function openSelectedWin(selectItemOpts)
 end
 
 local function closeList()
+  local listType = getListType()
+  if not listType then
+    return
+  end
+  local list = getList(listType)
+  if isDiffTool(list) then
+    pcall(vim.cmd.tabclose)
+    return
+  end
   local preview = getPreview()
   if preview then
     vim.cmd('pclose')
@@ -941,15 +1003,7 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     vim.keymap.set('n', 'ym', function()
       yank('message')
     end, { buffer = 0, desc = 'Yank Item Message' })
-    vim.keymap.set('n', 'gd', function()
-      for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive://') then
-          vim.api.nvim_win_close(win, true)
-        end
-      end
-      local qfitempos = vim.fn.getpos('.')
-      vim.cmd('cc ' .. qfitempos[2] .. ' | Gvdiffsplit')
-    end, { buffer = 0, desc = '[G]it [D]iff' })
+    vim.keymap.set('n', 'gd', openAsDiff, { buffer = 0, desc = '[G]it [D]iff' })
   end,
   desc = 'Keymaps inside quickfix window',
 })
