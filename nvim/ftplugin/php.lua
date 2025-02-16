@@ -53,6 +53,47 @@ vim.keymap.set({ 'x', 'o' }, 'a=', function()
   phpTextObject('a')
 end, { desc = 'PHP Block Text-Object', silent = true })
 
+local snippets = {
+  fn = [[${1:public} function ${2:FunctionName}(${3:})
+{
+    ${0}
+}]],
+  ['if'] = [[if (${1:condition}) {
+    ${0}
+}]],
+  ife = [[if (${1:condition}) {
+    ${2}
+} else {
+    ${0}
+}]],
+  ['if?'] = [[${1} ? ${3:a} : ${4:b} ;]],
+  ['else'] = [[else {
+    ${0}
+}]],
+  ['elseif'] = [[elseif (${1}) {
+    ${0}
+}]],
+  fore = [[foreach (\$${1:variable} as \$${2:key} ${3:key => value}) {
+    "${0}",
+}]],
+  this = [[\$this->$0;]],
+  print = [[var_dump($0);]],
+  printe = [[var_dump($0);exit();]],
+  ['-'] = [[<?php ${0} ?>]],
+  ['_'] = [[<?php
+    ${0}
+?>]],
+  ['='] = [[<?= ${0} ?>]],
+  ['+'] = [[<?=
+    ${0}
+?>]],
+}
+
+-- NOTE: snippets are not added to the undo (maybe :una ?)
+for key, snippet in pairs(snippets) do
+  _G.addSnippet(key, snippet)
+end
+
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:friendlyManual b:surroundPair'
