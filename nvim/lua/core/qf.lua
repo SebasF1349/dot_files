@@ -826,7 +826,7 @@ end
 
 local function openAsDiff()
   for _, win in ipairs(vim.api.nvim_list_wins()) do
-    if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive://') then
+    if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive:') then
       vim.api.nvim_win_close(win, true)
     end
   end
