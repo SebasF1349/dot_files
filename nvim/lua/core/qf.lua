@@ -466,34 +466,30 @@ local function list_toggle(listType, diagnostics)
   local list = getList(listType)
   if list.winid ~= 0 then
     vim.cmd(listType .. 'close')
-  elseif
-    (not diagnostics and list.size == 0)
-    or (listType == 'l' and diagnostics and #vim.diagnostic.get(0) == 0)
-    or (listType == 'c' and diagnostics and #vim.diagnostic.get() == 0)
-  then
-    vim.notify('List is Empty', vim.log.levels.WARN)
-  elseif not diagnostics then
-    vim.cmd(listType .. 'open')
-  end
-  if
-    diagnostics
-    and (list.winid == 0 or list.context == '' or not list.context.qfim or list.context.qfim.type ~= listType .. 'diag')
-  then
-    local qf_diag_list = getDiagList(listType)
-    if not qf_diag_list then
-      local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
-      local items = vim.diagnostic.toqflist(diag_list)
-      local title = listType == 'c' and 'All Diagnostics' or 'Local Diagnostics'
-      setList(listType, {
-        title = title,
-        items = items,
-        context = { qfim = { type = listType .. 'diag' } },
-      })
-      vim.cmd(listType .. 'open')
+  elseif diagnostics then
+    local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
+    local items = vim.diagnostic.toqflist(diag_list)
+    if #items == 0 then
+      vim.notify('List is Empty', vim.log.levels.INFO)
     else
-      -- NOTE: looks like a nvim bug that #chistory redraws the qf
-      vim.cmd(('silent %s%shistory | %sopen'):format(qf_diag_list.nr, listType, listType))
+      local qf_diag_list = getDiagList(listType)
+      if qf_diag_list then
+        -- NOTE: looks like a nvim bug that #chistory redraws the qf
+        vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
+      else
+        local title = listType == 'c' and 'All Diagnostics' or 'Local Diagnostics'
+        setList(listType, {
+          title = title,
+          items = items,
+          context = { qfim = { type = listType .. 'diag' } },
+        })
+      end
+      vim.cmd(listType .. 'open')
     end
+  elseif list.size == 0 then
+    vim.notify('List is Empty', vim.log.levels.INFO)
+  else
+    vim.cmd(listType .. 'open')
   end
 end
 
@@ -828,7 +824,7 @@ local function get_prev_win(winnr)
   return prev_win
 end
 
-function openAsDiff()
+local function openAsDiff()
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive://') then
       vim.api.nvim_win_close(win, true)
