@@ -830,8 +830,7 @@ local function openAsDiff()
       vim.api.nvim_win_close(win, true)
     end
   end
-  local qfitempos = vim.fn.getpos('.')
-  vim.cmd('cc ' .. qfitempos[2] .. ' | Gvdiffsplit')
+  vim.cmd('. cc | Gvdiffsplit')
 end
 
 ---@class SelectItemOpts
