@@ -22,7 +22,32 @@ function M.setup(config)
 	config.disable_default_key_bindings = true
 	config.keys = {
 		-- New Tab
-		{ mods = M.modTab, key = "t", action = act.SpawnTab("CurrentPaneDomain") },
+		{
+			mods = M.modTab,
+			key = "t",
+			action = act.PromptInputLine({
+				description = "Enter name of new tab",
+				action = wezterm.action_callback(function(window, pane, line)
+					if line and #line > 0 then
+						window:perform_action(act.SpawnTab("CurrentPaneDomain"), pane)
+						window:active_tab():set_title(line)
+					end
+				end),
+			}),
+		},
+		{ mods = M.modTab, key = "T", action = act.SpawnTab("CurrentPaneDomain") },
+		{
+			mods = M.modTab,
+			key = "r",
+			action = act.PromptInputLine({
+				description = "Enter new name for tab",
+				action = wezterm.action_callback(function(window, pane, line)
+					if line and #line > 0 then
+						window:active_tab():set_title(line)
+					end
+				end),
+			}),
+		},
 		-- New Tab on Windows
 		{
 			mods = M.modTab,
@@ -36,7 +61,6 @@ function M.setup(config)
 				domain = { DomainName = "local" },
 				cwd = "D:\\Trabajos\\Proyectos - Dev",
 			}),
-			-- action = act.SpawnTab("CurrentPaneDomain")
 		},
 		-- Move Tabs
 		{ mods = M.modTab .. "|CTRL", key = "l", action = act.MoveTabRelative(1) },
@@ -48,18 +72,6 @@ function M.setup(config)
 		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
 		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
 		{ mods = M.modTab, key = "4", action = act.ActivateTab(3) },
-		{
-			mods = M.modTab,
-			key = "r",
-			action = act.PromptInputLine({
-				description = "Enter new name for tab",
-				action = wezterm.action_callback(function(window, pane, line)
-					if line and #line > 0 then
-						window:active_tab():set_title(line)
-					end
-				end),
-			}),
-		},
 		-- NOTE: worth making clipboard work with nvim keys too?
 		-- Clipboard
 		{ mods = M.modSplit, key = "C", action = act.CopyTo("Clipboard") },
