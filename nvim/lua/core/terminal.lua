@@ -12,6 +12,16 @@ local terms = {}
 local terminal_autocmds = vim.api.nvim_create_augroup('Terminal Autocmds', { clear = true })
 
 --------------------------------------------------
+-- Options
+--------------------------------------------------
+
+if require('utils.os').is_win then
+  vim.o.shell = 'pwsh'
+else
+  vim.o.shell = '/bin/bash'
+end
+
+--------------------------------------------------
 -- Keymaps
 --------------------------------------------------
 
