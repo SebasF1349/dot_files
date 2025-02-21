@@ -43,19 +43,6 @@ vim.keymap.set('x', 'K', ":m '<-2<CR>gv=gv")
 
 vim.keymap.set('n', 'U', '<C-r>', { desc = 'Redo' })
 
-vim.keymap.set(
-  'n',
-  'O',
-  [[v:count == 1 ? ':<C-u>call append(line(".") - 1, repeat([""], v:count1))<CR>' : 'O']],
-  { desc = 'Create new line above', expr = true }
-)
-vim.keymap.set(
-  'n',
-  'o',
-  [[v:count == 1 ? ':<C-u>call append(line("."), repeat([""], v:count1))<CR>' : 'o']],
-  { desc = 'Create new line below', expr = true }
-)
-
 -- Center buffer while navigating
 vim.keymap.set('n', 'n', 'nzzzv')
 vim.keymap.set('n', 'N', 'Nzzzv')
