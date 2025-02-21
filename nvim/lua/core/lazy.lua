@@ -41,7 +41,7 @@ require('lazy').setup({ { import = 'plugins' } }, {
         'getscriptPlugin',
         'gzip',
         'logipat',
-        'matchit',
+        -- 'matchit',
         'matchparen',
         'netrwPlugin',
         'optwin',

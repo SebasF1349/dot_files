@@ -76,7 +76,6 @@ return {
         modules = {},
         highlight = { enable = true },
         -- indent = { enable = true }, -- doesn't work properly
-        matchup = { enable = true },
       })
 
       -- can use ['az'] = { query = '@fold', query_group = 'folds' , silent =true }, but needs an offset for iz
@@ -108,15 +107,6 @@ return {
           enable_foldexpr(args.buf)
         end,
       })
-    end,
-  },
-  {
-    'andymass/vim-matchup',
-    event = { 'BufReadPost', 'BufNewFile' },
-    -- how to lazy load matchup?, I only really need it when pressing % but using % as trigger doesn't work
-    init = function()
-      vim.g.matchup_matchparen_offscreen = {}
-      vim.g.matchup_matchparen_enabled = 0
     end,
   },
   {
