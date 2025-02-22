@@ -242,6 +242,24 @@ vim.api.nvim_create_autocmd({ 'UIEnter' }, {
   group = general,
 })
 
+vim.opt.messagesopt = 'wait:500,history:1000'
+vim.api.nvim_create_autocmd({ 'CmdlineEnter' }, {
+  callback = function()
+    vim.opt.messagesopt:append('hit-enter')
+  end,
+  once = true,
+  group = general,
+  desc = 'Lazyload setting path',
+})
+vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorMoved' }, {
+  callback = function()
+    vim.opt.messagesopt:remove('hit-enter')
+  end,
+  once = true,
+  group = general,
+  desc = 'Lazyload setting path',
+})
+
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
   local fn = vim.fn.expand('%:p')
