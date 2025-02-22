@@ -241,11 +241,11 @@ return {
           --   end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
           -- end
 
-          vim.keymap.set('n', ']d', function()
-            vim.diagnostic.jump({ count = 1 })
+          vim.keymap.set('n', ']e', function()
+            vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
           end, { desc = 'LSP: Go to next [D]iagnostic message', buffer = event.buf })
-          vim.keymap.set('n', '[d', function()
-            vim.diagnostic.jump({ count = -1 })
+          vim.keymap.set('n', '[e', function()
+            vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
           end, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
 
           -- replaced my own implementation with Folke's which is more performant: https://github.com/folke/snacks.nvim/blob/main/lua/snacks/words.lua#L117
