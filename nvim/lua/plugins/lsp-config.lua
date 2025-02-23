@@ -360,6 +360,13 @@ return {
               end
               local cursor_pos = vim.api.nvim_win_get_cursor(winnr)
               local win_config = vim.api.nvim_win_get_config(winnr)
+              local bufnr = vim.api.nvim_win_get_buf(winnr)
+              local buflns = vim.api.nvim_buf_line_count(bufnr)
+              if win_config.height >= buflns then
+                local keys = vim.api.nvim_replace_termcodes(key, true, false, true)
+                vim.api.nvim_feedkeys(keys, 'n', true)
+                return
+              end
               local new_row = key == '<C-u>' and math.max(cursor_pos[1] - win_config.height + 1, 1)
                 or math.min(cursor_pos[1] + win_config.height - 1, vim.fn.line('$', winnr))
               vim.api.nvim_win_set_cursor(winnr, { new_row, cursor_pos[2] })
