@@ -1,11 +1,12 @@
 -- based on https://github.com/folke/dot/blob/master/config/wezterm/keys.lua
 local wezterm = require("wezterm")
 local act = wezterm.action
-
+local sessions = require("sessions")
 local utils = require("utils")
 
 local M = {}
 
+M.modWorkspace = "CTRL|ALT"
 M.modSplit = "SHIFT|ALT"
 M.modTab = "ALT"
 
@@ -21,6 +22,30 @@ end)
 function M.setup(config)
 	config.disable_default_key_bindings = true
 	config.keys = {
+		-- Workspaces
+		{
+			mods = M.modWorkspace,
+			key = "s",
+			action = wezterm.action_callback(function(_, _)
+				sessions.save_state()
+			end),
+		},
+		{
+			mods = M.modWorkspace,
+			key = "w",
+			action = wezterm.action_callback(function(win, pane)
+				sessions.select_workspace(win, pane)
+			end),
+		},
+		{
+			mods = M.modWorkspace,
+			key = "q",
+			action = wezterm.action_callback(function(win, _)
+				sessions.close_all_tabs(win:mux_window())
+			end),
+		},
+		{ mods = M.modWorkspace, key = "n", action = act.SwitchWorkspaceRelative(1) },
+		{ mods = M.modWorkspace, key = "p", action = act.SwitchWorkspaceRelative(-1) },
 		-- New Tab
 		{
 			mods = M.modTab,
