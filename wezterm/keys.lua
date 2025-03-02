@@ -74,9 +74,10 @@ function M.setup(config)
 				end),
 			}),
 		},
+		{ mods = M.modTab, key = "q", action = act.CloseCurrentTab({ confirm = false }) },
 		-- Move Tabs
-		{ mods = M.modTab .. "|CTRL", key = "l", action = act.MoveTabRelative(1) },
-		{ mods = M.modTab .. "|CTRL", key = "h", action = act.MoveTabRelative(-1) },
+		{ mods = M.modTab, key = ".", action = act.MoveTabRelative(1) },
+		{ mods = M.modTab, key = ",", action = act.MoveTabRelative(-1) },
 		-- Acivate Tabs
 		{ mods = M.modTab, key = "n", action = act({ ActivateTabRelative = 1 }) },
 		{ mods = M.modTab, key = "p", action = act({ ActivateTabRelative = -1 }) },
