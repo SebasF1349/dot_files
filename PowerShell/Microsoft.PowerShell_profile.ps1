@@ -4,6 +4,9 @@
 # Open
 # notepad $PROFILE
 
+$Profile_dir = (get-item $PROFILE).Directory.FullName
+Import-Module $Profile_dir\install-neovim.ps1
+
 # Utils
 
 function uu {
