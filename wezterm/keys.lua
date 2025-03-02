@@ -54,8 +54,9 @@ function M.setup(config)
 				description = "Enter name of new tab",
 				action = wezterm.action_callback(function(window, pane, line)
 					if line and #line > 0 then
-						window:perform_action(act.SpawnTab("CurrentPaneDomain"), pane)
-						window:active_tab():set_title(line)
+						local tab_name, domain = utils.get_domain(line)
+						local tab, _, _ = window:mux_window():spawn_tab({ domain = domain })
+						tab:set_title(tab_name)
 					end
 				end),
 			}),
@@ -71,20 +72,6 @@ function M.setup(config)
 						window:active_tab():set_title(line)
 					end
 				end),
-			}),
-		},
-		-- New Tab on Windows
-		{
-			mods = M.modTab,
-			key = "w",
-			action = wezterm.action.SpawnCommandInNewTab({
-				args = { "pwsh.exe" },
-				-- this is normally the default, but I'd recommend making it explicit
-				-- when working on windows with WSL and other mux domains.
-				-- This ensures that the command will be run on the wezterm GUI host
-				-- and not in some other domain
-				domain = { DomainName = "local" },
-				cwd = "D:\\Trabajos\\Proyectos - Dev",
 			}),
 		},
 		-- Move Tabs
