@@ -52,7 +52,7 @@ function M.setup(config)
 			key = "t",
 			action = act.PromptInputLine({
 				description = "Enter name of new tab",
-				action = wezterm.action_callback(function(window, pane, line)
+				action = wezterm.action_callback(function(window, _, line)
 					if line and #line > 0 then
 						local tab_name, domain = utils.get_domain(line)
 						local tab, _, _ = window:mux_window():spawn_tab({ domain = domain })
@@ -67,7 +67,7 @@ function M.setup(config)
 			key = "r",
 			action = act.PromptInputLine({
 				description = "Enter new name for tab",
-				action = wezterm.action_callback(function(window, pane, line)
+				action = wezterm.action_callback(function(window, _, line)
 					if line and #line > 0 then
 						window:active_tab():set_title(line)
 					end
@@ -79,8 +79,8 @@ function M.setup(config)
 		{ mods = M.modTab, key = ".", action = act.MoveTabRelative(1) },
 		{ mods = M.modTab, key = ",", action = act.MoveTabRelative(-1) },
 		-- Acivate Tabs
-		{ mods = M.modTab, key = "n", action = act({ ActivateTabRelative = 1 }) },
-		{ mods = M.modTab, key = "p", action = act({ ActivateTabRelative = -1 }) },
+		{ mods = M.modTab, key = "n", action = act.ActivateTabRelative(1) },
+		{ mods = M.modTab, key = "p", action = act.ActivateTabRelative(-1) },
 		{ mods = M.modTab, key = "1", action = act.ActivateTab(0) },
 		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
 		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
@@ -97,10 +97,10 @@ function M.setup(config)
 		{ mods = M.modSplit, key = "Enter", action = M.smart_split },
 		{ mods = M.modSplit, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 		{ mods = M.modSplit, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.modSplit, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
-		{ mods = M.modSplit, key = "S", action = wezterm.action.PaneSelect({ mode = "SwapWithActive" }) },
-		{ mods = M.modSplit, key = "R", action = wezterm.action.RotatePanes("Clockwise") },
-		{ mods = M.modSplit, key = "z", action = wezterm.action.TogglePaneZoomState },
+		{ mods = M.modSplit, key = "Q", action = act.CloseCurrentPane({ confirm = false }) },
+		{ mods = M.modSplit, key = "S", action = act.PaneSelect({ mode = "SwapWithActive" }) },
+		{ mods = M.modSplit, key = "R", action = act.RotatePanes("Clockwise") },
+		{ mods = M.modSplit, key = "z", action = act.TogglePaneZoomState },
 		M.split_nav("resize", "CTRL|SHIFT", "<", "Left"),
 		M.split_nav("resize", "CTRL|SHIFT", ">", "Right"),
 		M.split_nav("resize", "CTRL", ",", "Up"),
