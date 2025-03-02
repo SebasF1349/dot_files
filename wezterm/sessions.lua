@@ -4,8 +4,6 @@ local workspaces_dir = wezterm.executable_dir .. "/workspaces/"
 
 local M = {}
 
-local active_workspaces = {}
-
 -- Largely based on https://github.com/MLFlexer/resurrect.wezterm,
 -- but resurrect doesn't work for me, has too many features
 -- and doesn't even open the workspace (just loads window in current workspace)
@@ -99,7 +97,6 @@ function M.close_all_tabs(mux_window)
 				:perform_action(wezterm.action.CloseCurrentTab({ confirm = false }), mux_window:active_pane())
 		end)
 	end
-	active_workspaces[wezterm.mux.get_active_workspace()] = nil
 end
 
 ---@return {id: string, label: string}
@@ -203,8 +200,8 @@ function M.select_workspace(win, pane, replace)
 					new_workspace(win, pane, replace)
 					return
 				end
-				for workspace, workspace_label in pairs(active_workspaces) do
-					if workspace_label == workspace_name then
+				for _, workspace in ipairs(wezterm.mux.get_workspace_names()) do
+					if workspace == workspace_name then
 						wezterm.mux.set_active_workspace(workspace)
 						return
 					end
@@ -223,7 +220,6 @@ function M.select_workspace(win, pane, replace)
 					end
 					load_workspace(state, window)
 					wezterm.mux.set_active_workspace(state.name)
-					active_workspaces[wezterm.mux.get_active_workspace()] = workspace_name
 				end
 			end),
 		}),
