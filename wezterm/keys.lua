@@ -84,13 +84,12 @@ function M.setup(config)
 		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
 		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
 		{ mods = M.modTab, key = "4", action = act.ActivateTab(3) },
-		-- NOTE: worth making clipboard work with nvim keys too?
 		-- Clipboard
-		{ mods = M.modSplit, key = "C", action = act.CopyTo("Clipboard") },
-		{ mods = M.modSplit, key = "V", action = act.PasteFrom("Clipboard") },
-		-- { mods = M.mod, key = "Space", action = act.QuickSelect },
-		-- { mods = M.mod, key = "X", action = act.ActivateCopyMode },
-		-- { mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
+		{ mods = M.modTab, key = "c", action = act.CopyTo("Clipboard") },
+		{ mods = M.modTab, key = "v", action = act.PasteFrom("Clipboard") },
+		{ mods = M.modTab, key = "y", action = act.ActivateCopyMode },
+		{ mods = M.modTab, key = "s", action = act.QuickSelect },
+		{ mods = M.modTab, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
 		-- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
 		-- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
 		-- Splits
