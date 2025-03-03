@@ -1,0 +1,28 @@
+(defcfg
+    process-unmapped-keys yes
+    concurrent-tap-hold yes
+    windows-altgr cancel-lctl-press
+)
+
+(defsrc
+    caps esc lmet spc
+)
+
+(deflayer default
+    @escctrl @esc-behavior @leftmeta @space
+)
+
+(defalias
+    escctrl  (tap-hold 0 190 esc lctrl)
+    esc-behavior (tap-hold 190 190 esc caps)
+    leftmeta (chord launcher leftmeta)
+    space (chord launcher space)
+)
+
+(defchords launcher 500
+  (leftmeta      ) lmet
+  (         space) spc
+  (leftmeta space) A-spc
+)
+
+;; vim: syntax=lisp
