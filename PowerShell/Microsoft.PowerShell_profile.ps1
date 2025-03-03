@@ -4,8 +4,8 @@
 # Open
 # notepad $PROFILE
 
-$Profile_dir = (get-item $PROFILE).Directory.FullName
-Import-Module $Profile_dir\install-neovim.ps1
+$dot_files = Write-Output (Get-Item $PROFILE).ResolveLinkTarget('true').Directory.Parent.FullName
+Import-Module $dot_files\install_scripts\install-neovim.ps1
 
 # Utils
 

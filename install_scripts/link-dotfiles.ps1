@@ -12,7 +12,6 @@ $config_dirs = @(
 
 $file_links = @{
     "$PROFILE" = "..\Powershell\Microsoft.PowerShell_profile.ps1"
-    "$Profile_dir\install-neovim.ps1" = "..\install_scripts\install-neovim.ps1"
     "$env:USERPROFILE\.config\starship.toml" = "..\starship\starship.toml"
     "$env:USERPROFILE\.vimrc" = "..\vim\.vimrc"
     "C:\Program Files\WezTerm\wezterm.lua" = "..\wezterm\wezterm.lua"
