@@ -14,14 +14,14 @@ $file_links = @{
     "$PROFILE" = "..\Powershell\Microsoft.PowerShell_profile.ps1"
     "$env:USERPROFILE\.config\starship.toml" = "..\starship\starship.toml"
     "$env:USERPROFILE\.vimrc" = "..\vim\.vimrc"
-    "C:\Program Files\WezTerm\wezterm.lua" = "..\wezterm\wezterm.lua"
-    "C:\Program Files\WezTerm\keys.lua" = "..\wezterm\keys.lua"
-    "C:\Program Files\WezTerm\utils.lua" = "..\wezterm\utils.lua"
-    "C:\Program Files\WezTerm\sessions.lua" = "..\wezterm\sessions.lua"
-    "C:\Program Files\WezTerm\wallpaper_clean_mini.jpeg" = "..\wallpaper\wallpaper_clean_mini.jpeg"
+    "$env:Programfiles\WezTerm\wezterm.lua" = "..\wezterm\wezterm.lua"
+    "$env:Programfiles\WezTerm\keys.lua" = "..\wezterm\keys.lua"
+    "$env:Programfiles\WezTerm\utils.lua" = "..\wezterm\utils.lua"
+    "$env:Programfiles\WezTerm\sessions.lua" = "..\wezterm\sessions.lua"
+    "$env:Programfiles\WezTerm\wallpaper_clean_mini.jpeg" = "..\wallpaper\wallpaper_clean_mini.jpeg"
     "$env:LocalAppData\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" = "..\windows_terminal\settings.json"
     "$env:USERPROFILE\.gitconfig" = "..\git\.gitconfig"
-    "C:\Program Files\Kanata\kanata.kbd" = "..\kanata\kanata.kbd"
+    "$env:Programfiles\Kanata\kanata.kbd" = "..\kanata\kanata.kbd"
 }
 
 $dir_links = @{
