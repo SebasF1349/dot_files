@@ -112,6 +112,15 @@ local function project_dirs()
 	return projects
 end
 
+---@param workspace string
+local function update_previous_workspace(workspace)
+	local current_workspace = wezterm.mux.get_active_workspace()
+	if current_workspace == workspace then
+		return
+	end
+	wezterm.GLOBAL.previous_workspace = current_workspace
+end
+
 --------------------------------------------------
 -- Load or Create Workspace
 --------------------------------------------------
@@ -166,6 +175,7 @@ local function new_workspace(win, pane, replace)
 					close_all_other_tabs(t, w)
 					tab = t
 				else
+					update_previous_workspace(workspace_name)
 					tab, _, _ = wezterm.mux.spawn_window({
 						workspace = workspace_name,
 						domain = domain,
@@ -202,6 +212,7 @@ function M.select_workspace(win, pane, replace)
 				end
 				for _, workspace in ipairs(wezterm.mux.get_workspace_names()) do
 					if workspace == workspace_name then
+						update_previous_workspace(workspace_name)
 						wezterm.mux.set_active_workspace(workspace)
 						return
 					end
@@ -213,6 +224,7 @@ function M.select_workspace(win, pane, replace)
 						wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), workspace_name)
 						window = get_active_mux_window(workspace_name)
 					else
+						update_previous_workspace(workspace_name)
 						_, _, window = wezterm.mux.spawn_window({
 							workspace = state.name,
 							cwd = "", -- FIX: without this a first not-in-state tab gets created ??

@@ -42,10 +42,41 @@ function M.setup(config)
 			key = "q",
 			action = wezterm.action_callback(function(win, _)
 				sessions.close_all_tabs(win:mux_window())
+				local workspace = wezterm.GLOBAL.previous_workspace
+				if not workspace then
+					return
+				end
+				wezterm.mux.set_active_workspace(workspace)
 			end),
 		},
-		{ mods = M.modWorkspace, key = "n", action = act.SwitchWorkspaceRelative(1) },
-		{ mods = M.modWorkspace, key = "p", action = act.SwitchWorkspaceRelative(-1) },
+		{
+			mods = M.modWorkspace,
+			key = "n",
+			action = wezterm.action_callback(function(win, pane)
+				wezterm.GLOBAL.previous_workspace = win:active_workspace()
+				win:perform_action(act.SwitchWorkspaceRelative(1), pane)
+			end),
+		},
+		{
+			mods = M.modWorkspace,
+			key = "p",
+			action = wezterm.action_callback(function(win, pane)
+				wezterm.GLOBAL.previous_workspace = win:active_workspace()
+				win:perform_action(act.SwitchWorkspaceRelative(-1), pane)
+			end),
+		},
+		{
+			mods = M.modWorkspace,
+			key = "3", -- #
+			action = wezterm.action_callback(function(win, _)
+				local workspace = wezterm.GLOBAL.previous_workspace
+				if not workspace then
+					return
+				end
+				wezterm.GLOBAL.previous_workspace = win:active_workspace()
+				wezterm.mux.set_active_workspace(workspace)
+			end),
+		},
 		-- New Tab
 		{
 			mods = M.modTab,
