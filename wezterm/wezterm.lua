@@ -19,7 +19,7 @@ if utils.is_windows() then
 	else
 		config.default_cwd = "D:\\Trabajos\\Proyectos - Dev"
 	end
-	config.default_prog = { "pwsh.exe" }
+	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland and my windows notebook?
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"
 	local scheme = wezterm.color.get_builtin_schemes()["Catppuccin Mocha"]
