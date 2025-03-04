@@ -5,6 +5,7 @@ vim.b.surroundPair = {
   ['_'] = { { '<?php', '' }, { '', '?>' } },
   ['='] = { { '<?= ' }, { ' ?>' } },
   ['+'] = { { '<?=', '' }, { '', '?>' } },
+  ['p'] = { { 'var_dump(' }, { ');exit;' } },
 }
 
 --- Text-object for php blocks (<?= and <?php)
