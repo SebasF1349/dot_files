@@ -17,7 +17,6 @@ if utils.is_windows() then
 	if has_wsl and res:gsub("\0", ""):sub(1, #start) == start then
 		config.default_domain = "WSL:Ubuntu"
 	else
-		config.default_cwd = "D:\\Trabajos\\Proyectos - Dev"
 	end
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland and my windows notebook?
