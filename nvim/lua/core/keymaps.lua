@@ -33,7 +33,12 @@
 -- Basics
 --------------------------------------------------
 
-vim.keymap.set('i', 'jk', '<Esc>')
+vim.keymap.set({ 'i', 'v', 'c' }, 'jk', function()
+  if vim.snippet then
+    vim.snippet.stop()
+  end
+  return '<ESC>'
+end, { desc = 'Return to normal mode in every mode', expr = true })
 
 vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
