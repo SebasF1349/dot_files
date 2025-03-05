@@ -242,6 +242,8 @@ local function fuzzy_find(cmd_line, cmd_pos)
     return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
   elseif vim.list_contains(find_cmds, cmd_parsed.cmd) then
     return '.*'
+  elseif cmd_parsed.cmd == 'help' then
+    return '*'
   else
     return get_fuzzy(cmd_line)
   end
