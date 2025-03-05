@@ -3,10 +3,10 @@ return {
   cmd = 'Refactor',
   -- stylua: ignore
   keys = {
-    { '<leader>rr', ':Refactor ', mode = { 'n', 'x' }, desc = '[R]efactoring' },
-    { '<leader>rp', function() require('refactoring').debug.printf() end, mode = { 'n' }, desc = '[R]efactoring: Debug [P]rint', },
+    { '<leader>rr', function() require('refactoring').select_refactor({ prefer_ex_cmd = true }) end, mode = { 'n', 'x' }, desc = '[R]efactoring', },
+    { '<leader>rp', function() require('refactoring').debug.printf() end, desc = '[R]efactoring: Debug [P]rint', },
     { '<leader>rv', function() require('refactoring').debug.print_var() end, mode = { 'n', 'x' }, desc = '[R]efactoring: Debug [V]ariable', },
-    { '<leader>rc', function() require('refactoring').debug.cleanup() end, mode = { 'n' }, desc = '[R]efactoring: [C]lear Debug', },
+    { '<leader>rc', function() require('refactoring').debug.cleanup() end, desc = '[R]efactoring: [C]lear Debug', },
   },
   dependencies = {
     'nvim-lua/plenary.nvim',
