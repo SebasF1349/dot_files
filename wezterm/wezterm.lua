@@ -85,6 +85,7 @@ end)
 
 wezterm.on("gui-startup", function(cmd)
 	local sessions = require("sessions")
+	sessions.setup()
 	local _, pane, window = wezterm.mux.spawn_window(cmd or {})
 	sessions.select_workspace(window:gui_window(), pane, true)
 end)

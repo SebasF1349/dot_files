@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local utils = require("utils")
-local workspaces_dir = wezterm.executable_dir .. "/workspaces/"
+local home_from_path = utils.is_windows() and "\\AppData\\Roaming\\wezterm\\workspaces\\" or "/.local/share/wezterm/"
+local workspaces_dir = wezterm.home_dir .. home_from_path
 
 local M = {}
 
@@ -23,6 +24,27 @@ local M = {}
 ---@alias window_state {title: string, tabs: tab_state[]}
 ---@alias tab_state {title: string, pane: pane_state, is_active: boolean}
 ---@alias pane_state {left: integer, top: integer, height: integer, width: integer, cwd: string, domain: string, is_active: boolean, is_zoomed: boolean}
+
+--------------------------------------------------
+-- Setup
+--------------------------------------------------
+
+local function exists(file)
+	local ok, err, code = os.rename(file, file)
+	if not ok then
+		if code == 13 then
+			-- Permission denied, but it exists
+			return true
+		end
+	end
+	return ok, err
+end
+
+function M.setup()
+	if not exists(workspaces_dir) then
+		os.execute("mkdir " .. workspaces_dir)
+	end
+end
 
 --------------------------------------------------
 -- Json
