@@ -213,12 +213,6 @@ return {
           --     return '<C-h>'
           --   end
           -- end, { desc = 'Jump Snippet Backwards', expr = true, buffer = event.buf })
-          vim.keymap.set({ 'i', 's' }, '<C-c>', function()
-            if vim.snippet then
-              vim.snippet.stop()
-            end
-            return '<ESC>'
-          end, { desc = 'Delete Selected Text', expr = true, buffer = event.buf })
           vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = event.buf })
           vim.keymap.set('i', '<C-n>', function()
             if vim.fn.pumvisible() ~= 0 then
