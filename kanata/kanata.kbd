@@ -13,7 +13,7 @@
 )
 
 (defalias
-    escctrl  (tap-hold 0 190 esc lctrl)
+    escctrl (tap-hold 0 190 esc lctrl)
     esc-behavior (tap-hold 190 190 esc caps)
     leftmeta (chord launcher leftmeta)
     space (chord launcher space)
