@@ -35,7 +35,7 @@ _link() {
     local source=${1}
     local link=${2}
     if [ -f "$link" ] || [ -d "$link" ]; then
-        echo "⚠ $i already exists"
+        echo "⚠ $link already exists"
     elif ln -s "$source" "$link"; then
         echo "✓ $source linked"
     else
