@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local utils = require("utils")
-local home_from_path = utils.is_windows() and "\\AppData\\Roaming\\wezterm\\workspaces\\" or "/.local/share/wezterm/"
+local home_from_path = utils.is_windows() and "\\AppData\\Roaming\\wezterm\\workspaces\\"
+	or "/.local/share/wezterm/workspaces/"
 local workspaces_dir = wezterm.home_dir .. home_from_path
 
 local M = {}
