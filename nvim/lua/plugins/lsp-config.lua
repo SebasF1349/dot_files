@@ -80,6 +80,7 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPost', 'BufNewFile' },
     config = function()
+      require('plugins.lsp.preview')
       local oss = require('utils.os')
       vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (oss.is_win and ';' or ':') .. vim.env.PATH
 
