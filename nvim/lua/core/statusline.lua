@@ -1,6 +1,5 @@
 -- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
 local mocha = require('catppuccin.palettes').get_palette('mocha')
-local oss = require('utils.os')
 local signs = require('utils.ui').diagnostic_icons_num
 
 ---- Highlights ----
@@ -98,13 +97,13 @@ local function file()
   for _, arg in
     ipairs(vim.fn.argv()--[[@as string[] ]])
   do
-    table.insert(buffers, arg)
+    table.insert(buffers, vim.fs.normalize(vim.fn.fnamemodify(arg, ':.')))
   end
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     if vim.api.nvim_win_get_config(win).relative == '' then
       local bufnr = vim.api.nvim_win_get_buf(win)
       local bufname = vim.api.nvim_buf_get_name(bufnr)
-      bufname = vim.fn.fnamemodify(bufname, ':.')
+      bufname = vim.fs.normalize(vim.fn.fnamemodify(bufname, ':.'))
       if not vim.list_contains(buffers, bufname) then
         table.insert(buffers, bufname)
       end
@@ -112,7 +111,7 @@ local function file()
   end
   local current_bufnr = vim.api.nvim_get_current_buf()
   local current_bufname = vim.api.nvim_buf_get_name(current_bufnr)
-  current_bufname = vim.fn.fnamemodify(current_bufname, ':.')
+  current_bufname = vim.fs.normalize(vim.fn.fnamemodify(current_bufname, ':.'))
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
   local buffer_names = {}
   local display_length = 0
@@ -120,7 +119,7 @@ local function file()
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
     if is_svelte then
-      fname = oss.joinpath(vim.fn.fnamemodify(bufname, ':h:t'), fname)
+      fname = vim.fn.normalize(vim.fn.joinpath(vim.fn.fnamemodify(bufname, ':h:t'), fname))
     end
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
@@ -139,13 +138,9 @@ local function file()
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
       else
-        file_display = string.format('%%#SLInactiveBuffer#%s%s%%#SLActiveBuffer#%s', fpath, oss.dir_separator, fname)
-        current_buf_shorten.path = string.format(
-          '%%#SLInactiveBuffer#%s%s%%#SLActiveBuffer#%s',
-          vim.fn.pathshorten(fpath),
-          oss.dir_separator,
-          fname
-        )
+        file_display = string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', fpath, fname)
+        current_buf_shorten.path =
+          string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', vim.fn.pathshorten(fpath), fname)
         display_length = display_length + #fpath + 1
       end
     end

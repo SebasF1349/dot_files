@@ -10,6 +10,14 @@ local function getBufName(bufnr)
   return vim.fs.normalize(vim.fn.fnamemodify(buf, ':.'))
 end
 
+local function getArgs()
+  local args = vim.fn.argv() --[[@as string[] ]]
+  for i, arg in ipairs(args) do
+    args[i] = vim.fs.normalize(vim.fn.fnamemodify(arg, ':.'))
+  end
+  return args
+end
+
 --------------------------------------------------
 -- Arglist Management
 --------------------------------------------------
@@ -31,7 +39,7 @@ local function select()
   if vim.fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  vim.ui.select(vim.fn.argv()--[[@as string[] ]], {
+  vim.ui.select(getArgs(), {
     prompt = 'Select buffer:',
     format_item = function(item)
       return item == vim.fn.argv(vim.fn.argidx()) and '[' .. item .. ']' or item
@@ -56,9 +64,7 @@ local function cycle_prev()
   end
   local bufname = getBufName(0)
   local moves = vim.fn.argidx() + 1 - vim.v.count1
-  if
-    not vim.list_contains(vim.fn.argv()--[[@as string[] ]], bufname)
-  then
+  if not vim.list_contains(getArgs(), bufname) then
     moves = moves + 1
   end
   move(moves)
@@ -86,7 +92,7 @@ local function remove_select()
   if vim.fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  vim.ui.select(vim.fn.argv()--[[@as string[] ]], { prompt = 'Select buffer to delete:' }, function(_, selected)
+  vim.ui.select(getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
     if selected then
       remove(selected)
     end
@@ -172,9 +178,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
   group = args_augroup,
   callback = function()
     local buf = getBufName(0)
-    for i, a in
-      ipairs(vim.fn.argv()--[[@as string[] ]])
-    do
+    for i, a in ipairs(getArgs()) do
       if a == buf and i ~= vim.fn.argidx() + 1 then
         move(i)
       end
