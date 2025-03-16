@@ -219,7 +219,7 @@ return {
             if vim.fn.pumvisible() ~= 0 then
               vim.api.nvim_input('<C-n>')
             elseif next(vim.lsp.get_clients({ bufnr = 0 })) then
-              vim.lsp.completion.trigger()
+              vim.lsp.completion.get()
             elseif vim.bo.omnifunc == '' then
               vim.api.nvim_input('<C-x><C-n>')
             else
