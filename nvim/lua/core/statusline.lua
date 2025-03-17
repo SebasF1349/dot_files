@@ -119,7 +119,7 @@ local function file()
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
     if is_svelte then
-      fname = vim.fn.normalize(vim.fn.joinpath(vim.fn.fnamemodify(bufname, ':h:t'), fname))
+      fname = vim.fn.joinpath(vim.fn.fnamemodify(bufname, ':h:t'), fname)
     end
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
