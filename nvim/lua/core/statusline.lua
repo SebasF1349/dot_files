@@ -125,6 +125,11 @@ local function file()
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
     end
     fname = vim.fs.normalize(fname)
+    local bufnr = vim.fn.bufnr(fname)
+    local modified = bufnr ~= -1 and vim.bo[bufnr].modified or false
+    if modified then
+      fname = fname .. '•'
+    end
     display_length = display_length + #fname + 3 -- separators + []
     local file_display
     if bufname ~= current_bufname then
