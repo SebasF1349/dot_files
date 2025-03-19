@@ -1,7 +1,7 @@
 return {
   {
     'tpope/vim-fugitive',
-    cmd = { 'G', 'Git', 'Gdiffsplit' },
+    cmd = { 'G', 'Git', 'Gvdiffsplit', 'Gdiffsplit' },
     keys = { { '<leader>g', '<cmd>tabnew | 0G<CR>', desc = 'Open fu[G]itive in a new tab' } },
     config = function()
       local function diffModeMap(key, cmd, desc)
