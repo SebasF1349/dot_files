@@ -159,26 +159,14 @@ end
 vim.opt.grepprg = 'rg --vimgrep --smart-case'
 vim.opt.grepformat = '%f:%l:%c:%m'
 
--- https://github.com/oncomouse/dotfiles/blob/5abf79588d28379aa071fc7767dda46b9d90fb74/conf/vim/init.lua#L190-L205
-local function grep_or_filter(listType, input)
-  local trigger_win = vim.fn.getwininfo(vim.fn.win_getid())[1]
-  local prefix = trigger_win.loclist == 1 and 'l' or 'c'
-  if trigger_win.quickfix == 1 and prefix == listType then
-    vim.cmd([[packadd cfilter]])
-    vim.cmd(listType:upper() .. 'filter /' .. input .. '/')
-  elseif listType == 'c' then
-    vim.cmd('silent! grep! ' .. input)
-  else
-    vim.cmd('silent lgrep! "' .. input .. '" %')
-  end
-end
+vim.cmd([[packadd cfilter]])
 
 vim.api.nvim_create_user_command('Rg', function(opts)
-  grep_or_filter('c', opts.args)
+  vim.cmd('silent! grep! ' .. opts.args)
 end, { nargs = 1 })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
-  grep_or_filter('l', opts.args)
+  vim.cmd('silent lgrep! "' .. opts.args .. '" %')
 end, { nargs = 1 })
 
 --------------------------------------------------
