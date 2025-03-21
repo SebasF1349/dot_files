@@ -105,14 +105,14 @@
 
 <div class="flex h-full items-center justify-between px-4">
 	<div class="flex">
-		<button
-			aria-label="tiling-direction"
-			type="button"
-			class="chip-icon mr-4 h-fit py-0 preset-outlined-primary-500"
-			onclick={() => glazewm!.runCommand('toggle-tiling-direction')}
-		>
-			{glazewm?.tilingDirection[0].toUpperCase()}
-		</button>
+		<!-- <button -->
+		<!-- 	aria-label="tiling-direction" -->
+		<!-- 	type="button" -->
+		<!-- 	class="chip-icon mr-4 h-fit py-0 preset-outlined-primary-500" -->
+		<!-- 	onclick={() => glazewm!.runCommand('toggle-tiling-direction')} -->
+		<!-- > -->
+		<!-- 	{glazewm?.tilingDirection[0].toUpperCase()} -->
+		<!-- </button> -->
 		{#if glazewm}
 			{console.log(glazewm.currentWorkspaces)}
 			{#each glazewm.currentWorkspaces as workspace}
@@ -129,54 +129,54 @@
 			{/each}
 		{/if}
 	</div>
-	<div class="flex gap-4 justify-self-end">
-		{#if weather}
-			<div class="badge h-fit py-0 preset-tonal-secondary">
-				{weather_icons[weather.status]}&nbsp;
-				{Math.round(weather.celsiusTemp)}°
-			</div>
-		{/if}
-		{#if network}
-			<div
-				class="badge-icon h-fit preset-tonal-secondary {network.defaultInterface?.type == 'wifi'
-					? 'pr-1'
-					: 'pr-1'}"
-			>
-				{#if network.defaultInterface?.type == 'ethernet'}
-					󰱓
-				{:else if network.defaultInterface?.type == 'wifi' && network.defaultGateway}
-					{#if (network.defaultGateway.signalStrength = 0)}
-						󰤯
-					{:else if network.defaultGateway.signalStrength <= 25}
-						󰤟
-					{:else if network.defaultGateway.signalStrength <= 50}
-						󰤢
-					{:else if network.defaultGateway.signalStrength <= 75}
-						󰤥
-					{:else}
-						󰤨
-					{/if}
-				{:else}
-					󰛵
-				{/if}
-			</div>
-			{#if network.defaultInterface?.type == 'wifi'}
-				<div>
-					{network.defaultGateway?.signalStrength}
-				</div>
-			{/if}
-		{:else}
-			<div class="badge-icon h-fit pr-1 preset-tonal-secondary">󰅛</div>
-		{/if}
-		{#if battery}
-			<div class="badge h-fit py-0 preset-tonal-secondary">
-				{battery.chargePercent}
-			</div>
-		{/if}
-		{#if date}
-			<div class="badge h-fit py-0 preset-tonal-secondary">
-				{date.formatted}
-			</div>
-		{/if}
-	</div>
+	<!-- <div class="flex gap-4 justify-self-end"> -->
+	<!-- 	{#if weather} -->
+	<!-- 		<div class="badge h-fit py-0 preset-tonal-secondary"> -->
+	<!-- 			{weather_icons[weather.status]}&nbsp; -->
+	<!-- 			{Math.round(weather.celsiusTemp)}° -->
+	<!-- 		</div> -->
+	<!-- 	{/if} -->
+	<!-- 	{#if network} -->
+	<!-- 		<div -->
+	<!-- 			class="badge-icon h-fit preset-tonal-secondary {network.defaultInterface?.type == 'wifi' -->
+	<!-- 				? 'pr-1' -->
+	<!-- 				: 'pr-1'}" -->
+	<!-- 		> -->
+	<!-- 			{#if network.defaultInterface?.type == 'ethernet'} -->
+	<!-- 				󰱓 -->
+	<!-- 			{:else if network.defaultInterface?.type == 'wifi' && network.defaultGateway} -->
+	<!-- 				{#if (network.defaultGateway.signalStrength = 0)} -->
+	<!-- 					󰤯 -->
+	<!-- 				{:else if network.defaultGateway.signalStrength <= 25} -->
+	<!-- 					󰤟 -->
+	<!-- 				{:else if network.defaultGateway.signalStrength <= 50} -->
+	<!-- 					󰤢 -->
+	<!-- 				{:else if network.defaultGateway.signalStrength <= 75} -->
+	<!-- 					󰤥 -->
+	<!-- 				{:else} -->
+	<!-- 					󰤨 -->
+	<!-- 				{/if} -->
+	<!-- 			{:else} -->
+	<!-- 				󰛵 -->
+	<!-- 			{/if} -->
+	<!-- 		</div> -->
+	<!-- 		{#if network.defaultInterface?.type == 'wifi'} -->
+	<!-- 			<div> -->
+	<!-- 				{network.defaultGateway?.signalStrength} -->
+	<!-- 			</div> -->
+	<!-- 		{/if} -->
+	<!-- 	{:else} -->
+	<!-- 		<div class="badge-icon h-fit pr-1 preset-tonal-secondary">󰅛</div> -->
+	<!-- 	{/if} -->
+	<!-- 	{#if battery} -->
+	<!-- 		<div class="badge h-fit py-0 preset-tonal-secondary"> -->
+	<!-- 			{battery.chargePercent} -->
+	<!-- 		</div> -->
+	<!-- 	{/if} -->
+	<!-- 	{#if date} -->
+	<!-- 		<div class="badge h-fit py-0 preset-tonal-secondary"> -->
+	<!-- 			{date.formatted} -->
+	<!-- 		</div> -->
+	<!-- 	{/if} -->
+	<!-- </div> -->
 </div>

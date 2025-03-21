@@ -10,4 +10,5 @@ body {
 :root [data-theme='catppuccin'] {
 	--base-font-family: JetBrainsMono Nerd Font;
 	--heading-font-family: JetBrainsMono Nerd Font;
+    background: transparent;
 }
