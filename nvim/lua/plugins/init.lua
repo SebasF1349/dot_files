@@ -5,8 +5,10 @@ return {
     keys = { { '<leader>g', '<cmd>tabnew | 0G<CR>', desc = 'Open fu[G]itive in a new tab' } },
     config = function()
       local function diffModeMap(key, cmd, desc)
-        local c = vim.wo.diff and cmd or 'normal! ' .. key
-        vim.keymap.set('n', key, c, { desc = desc, silent = true })
+        vim.keymap.set({ 'n', 'x' }, key, function()
+          return not vim.wo.diff and 'normal! ' .. key
+            or (vim.fn.mode() == 'n' and '?<<<<<<<<CR>V/>>>>>>><CR>' .. cmd or cmd)
+        end, { desc = desc, silent = true, expr = true })
       end
       diffModeMap('gh', ':diffget //2 <CR>', 'Git: get lhs of diff')
       diffModeMap('gl', ':diffget //3 <CR>', 'Git: get rhs of diff')
