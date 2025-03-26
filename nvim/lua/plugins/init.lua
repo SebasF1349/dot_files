@@ -2,7 +2,10 @@ return {
   {
     'tpope/vim-fugitive',
     cmd = { 'G', 'Git', 'Gvdiffsplit', 'Gdiffsplit' },
-    keys = { { '<leader>g', '<cmd>tabnew | 0G<CR>', desc = 'Open fu[G]itive in a new tab' } },
+    keys = {
+      { '<leader>gg', '<cmd>tab G<CR>', desc = 'Open fu[G]itive in a new tab' },
+      { '<leader>gd', '<cmd>Gvdiffsplit<CR>', desc = '[D]iff Current File' },
+    },
     config = function()
       local function diffModeMap(key, cmd, desc)
         vim.keymap.set({ 'n', 'x' }, key, function()
