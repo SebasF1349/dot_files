@@ -245,7 +245,7 @@ vim.api.nvim_create_autocmd({ 'UIEnter' }, {
 vim.opt.messagesopt = 'wait:500,history:1000'
 vim.api.nvim_create_autocmd({ 'CmdlineEnter' }, {
   callback = function()
-    vim.opt.messagesopt:append('hit-enter')
+    vim.opt.messagesopt = 'hit-enter,history:1000'
   end,
   once = true,
   group = general,
@@ -253,7 +253,7 @@ vim.api.nvim_create_autocmd({ 'CmdlineEnter' }, {
 })
 vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorMoved' }, {
   callback = function()
-    vim.opt.messagesopt:remove('hit-enter')
+    vim.opt.messagesopt = 'wait:500,history:1000'
   end,
   once = true,
   group = general,
