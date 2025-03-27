@@ -1,7 +1,5 @@
 local get_diagnostic_hl = require('utils.ui').get_diagnostic_hl
 
-vim.o.hlsearch = false
-
 -- Disable cursor blinking in terminal mode.
 -- Using the same cursor for terminal as in insert mode is more vimmish but less terminalish
 vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor'
@@ -38,7 +36,8 @@ vim.o.formatoptions = 'qjl1'
 
 vim.o.pumheight = 10
 
-vim.opt.updatetime = 250
+vim.cmd('packadd nohlsearch')
+vim.opt.updatetime = 2000
 vim.opt.timeoutlen = 300
 
 vim.opt.tabstop = 4
