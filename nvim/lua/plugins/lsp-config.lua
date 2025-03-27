@@ -96,6 +96,10 @@ return {
           vim.api.nvim_create_autocmd('CompleteChanged', {
             buffer = event.buf,
             callback = function()
+              if not client:supports_method('completionItem/resolve') then
+                return
+              end
+
               local info = vim.fn.complete_info({ 'selected' })
               local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
               if not completionItem then
