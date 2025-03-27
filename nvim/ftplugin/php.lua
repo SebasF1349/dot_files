@@ -1,3 +1,6 @@
+-- FIX: this seems to not be working: https://github.com/neovim/neovim/blob/master/runtime/ftplugin/php.vim#L76C7-L76C20
+-- try this? https://github.com/neovim/neovim/blob/master/runtime/ftplugin/lua.vim
+
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
 vim.b.surroundPair = {
