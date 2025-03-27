@@ -468,13 +468,12 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-      for server_name, server in pairs(servers) do
-        -- to avoid double lsp server, as java lsp is launched by the jdtls extension
-        if server_name ~= 'jdtls' then
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end
+      local configs = {}
+      for _, v in ipairs(vim.api.nvim_get_runtime_file('lsp/*', true)) do
+        local name = vim.fn.fnamemodify(v, ':t:r')
+        configs[name] = true
       end
+      vim.lsp.enable(vim.tbl_keys(configs))
     end,
   },
 }
