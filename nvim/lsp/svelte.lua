@@ -1,5 +1,5 @@
 return {
   cmd = { 'svelteserver', '--stdio' },
   filetypes = { 'svelte' },
-  root_dir = { 'package.json', '.git' },
+  root_markers = { 'package.json', '.git' },
 }

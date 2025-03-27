@@ -9,7 +9,7 @@ return {
     'typescriptreact',
     'typescript.tsx',
   },
-  root_dir = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
+  root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
   single_file_support = true,
   settings = {
     typescript = {

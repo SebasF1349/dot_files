@@ -96,7 +96,7 @@ return {
       new_config.settings.editor.tabSize = vim.lsp.util.get_effective_tabstop()
     end
   end,
-  root_dir = {
+  root_markers = {
     'tailwind.config.js',
     'tailwind.config.cjs',
     'tailwind.config.mjs',

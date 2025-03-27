@@ -1,18 +1,16 @@
-local root_files = {
-  '.luarc.json',
-  '.luarc.jsonc',
-  '.luacheckrc',
-  '.stylua.toml',
-  'stylua.toml',
-  'selene.toml',
-  'selene.yml',
-  '.git',
-}
-
 return {
   cmd = { 'lua-language-server' },
   filetypes = { 'lua' },
-  root_markers = root_files,
+  root_markers = {
+    '.luarc.json',
+    '.luarc.jsonc',
+    '.luacheckrc',
+    '.stylua.toml',
+    'stylua.toml',
+    'selene.toml',
+    'selene.yml',
+    '.git',
+  },
   single_file_support = true,
   log_level = vim.lsp.protocol.MessageType.Warning,
   on_init = function(client)
