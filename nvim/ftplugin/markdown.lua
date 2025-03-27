@@ -53,6 +53,17 @@ end
 
 vim.keymap.set({ 'n', 'v' }, 'gl', _G.opfunc('_G.MakeList'), { desc = 'Make [L]ist', silent = true, expr = true })
 
+vim.keymap.set('n', '<leader>x', function()
+  local line = vim.api.nvim_get_current_line()
+  if line:find('- [ ]', 1, true) then
+    local new_line = line:gsub('- %b[]', '- [x]')
+    vim.api.nvim_set_current_line(new_line)
+  elseif line:find('- [x]', 1, true) then
+    local new_line = line:gsub('- %b[]', '- [ ]')
+    vim.api.nvim_set_current_line(new_line)
+  end
+end, { desc = 'Toggle TODO' })
+
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'setlocal tabstop< softtabstop< shiftwidth< expandtab< textwidth< colorcolumn< wrap< wrapmargin< linebreak< spell< spelllang< '
@@ -60,3 +71,4 @@ vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. ' | sil! nunmap <buffer> <leader>mt'
   .. ' | sil! nunmap <buffer> gl'
   .. ' | sil! vunmap <buffer> gl'
+  .. ' | sil! nunmap <buffer> <leader>x'
