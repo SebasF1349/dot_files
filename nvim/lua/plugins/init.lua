@@ -3,7 +3,7 @@ return {
     'tpope/vim-fugitive',
     cmd = { 'G', 'Git', 'Gvdiffsplit', 'Gdiffsplit' },
     keys = {
-      { '<leader>gg', '<cmd>tab G<CR>', desc = 'Open fu[G]itive in a new tab' },
+      { '<leader>gg', '<cmd>tab G<CR>]]', desc = 'Open fu[G]itive in a new tab', remap = true },
       { '<leader>gd', '<cmd>Gvdiffsplit<CR>', desc = '[D]iff Current File' },
     },
     config = function()
