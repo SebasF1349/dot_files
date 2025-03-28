@@ -34,7 +34,6 @@ return {
           'lua',
           'python',
           'rust',
-          'java',
           -- web
           'javascript',
           'typescript',
