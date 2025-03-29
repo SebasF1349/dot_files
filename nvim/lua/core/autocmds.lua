@@ -246,18 +246,16 @@ vim.opt.messagesopt = 'wait:500,history:1000'
 vim.api.nvim_create_autocmd({ 'CmdlineEnter' }, {
   callback = function()
     vim.opt.messagesopt = 'hit-enter,history:1000'
+    vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorMoved' }, {
+      callback = function()
+        vim.opt.messagesopt = 'wait:500,history:1000'
+      end,
+      once = true,
+      group = general,
+    })
   end,
-  once = true,
   group = general,
-  desc = 'Lazyload setting path',
-})
-vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorMoved' }, {
-  callback = function()
-    vim.opt.messagesopt = 'wait:500,history:1000'
-  end,
-  once = true,
-  group = general,
-  desc = 'Lazyload setting path',
+  desc = 'Only show Cmdline message when triggered',
 })
 
 local function open_external_file()
