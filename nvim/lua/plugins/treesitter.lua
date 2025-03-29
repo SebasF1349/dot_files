@@ -79,7 +79,7 @@ return {
 
       -- can use ['az'] = { query = '@fold', query_group = 'folds' , silent =true }, but needs an offset for iz
       -- more robust option (do I want the if/else behaviour?) : https://vimways.org/2018/transactions-pending/
-      vim.keymap.set('v', 'iz', ':<C-U>silent! normal! [zjV]zk<CR>', { desc = 'Fold Text-Object', silent = true })
+      vim.keymap.set('v', 'iz', ':<C-U>silent! normal! [zV]zkoj<CR>', { desc = 'Fold Text-Object', silent = true })
       vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false, silent = true })
       vim.keymap.set('v', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object', silent = true })
       vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', remap = false, silent = true })
