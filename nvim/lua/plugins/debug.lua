@@ -5,32 +5,24 @@ return {
   dependencies = {
     -- Fancy UI for the debugger
     {
-      'rcarriga/nvim-dap-ui',
-      dependencies = 'nvim-neotest/nvim-nio',
-      -- stylua: ignore
-      keys = {
-        { "<leader>du", function() require("dapui").toggle() end, desc = "[D]ebut: Toggle [U]I", },
-        { "<leader>de", function() require("dapui").eval() require("dapui").eval() end, desc = "[D]ebug: [E]valuate Expression", },
-      },
+      'igorlfs/nvim-dap-view',
       config = function()
         local dap = require('dap')
-        local dapui = require('dapui')
-        dapui.setup()
-        -- somehow the ui doesn't close the first time
-        dap.listeners.after.event_initialized['dapui_config'] = function()
-          dapui.open({})
+        local dapview = require('dap-view')
+        dap.listeners.before.attach['dap-view-config'] = function()
+          dapview.open()
         end
-        dap.listeners.before.event_terminated['dapui_config'] = function()
-          dapui.close({})
-          dapui.close({})
+        dap.listeners.before.launch['dap-view-config'] = function()
+          dapview.open()
         end
-        dap.listeners.before.event_exited['dapui_config'] = function()
-          dapui.close({})
-          dapui.close({})
+        dap.listeners.before.event_terminated['dap-view-config'] = function()
+          dapview.close()
+        end
+        dap.listeners.before.event_exited['dap-view-config'] = function()
+          dapview.close()
         end
       end,
     },
-
     -- Virtual text.
     {
       'theHamsta/nvim-dap-virtual-text',
@@ -59,21 +51,33 @@ return {
 
   -- stylua: ignore
   keys = {
-    { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "[D]ebug: Toggle [B]reakpoint",},
-    { "<leader>dB", "<cmd>FzfLua dap_breakpoints<cr>", desc = "[D]ebug: List [B]reakpoints",},
-    { "<leader>dC", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end, desc = "[D]ebug: Breakpoint [C]ondition",},
-    { "<leader>dc", function() require("dap").continue() end, desc = "[D]ebug: [C]ontinue",},
-    { "<leader>dt", function() require("dap").terminate() end, desc = "[D]ebug: [T]erminate",},
-    { "<leader>dO", function() require("dap").step_over() end, desc = "[D]ebug: Step [O]ver",},
-    { "<leader>di", function() require("dap").step_into() end, desc = "[D]ebug: Step [I]nto",},
-    { "<leader>do", function() require("dap").step_out() end, desc = "[D]ebug: Step [O]ut",},
+    { '<leader>db', function() require('dap').toggle_breakpoint() end, desc = '[D]ebug: Toggle [B]reakpoint',},
+    { '<leader>dB', function() require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = '[D]ebug: [B]reakpoint Condition',},
+    { '<leader>dc', function() require('dap').continue() end, desc = '[D]ebug: [C]ontinue',},
   },
   config = function()
     local sign = vim.fn.sign_define
     sign('DapBreakpoint', { text = '●', texthl = 'DapBreakpoint', linehl = '', numhl = '' })
     sign('DapBreakpointCondition', { text = '●', texthl = 'DapBreakpointCondition', linehl = '', numhl = '' })
     sign('DapLogPoint', { text = '◆', texthl = 'DapLogPoint', linehl = '', numhl = '' })
+    sign('DapStopped', { text = '→', texthl = 'DapStopped', linehl = '', numhl = '' })
+    sign('DapBreakpointRejected', { text = '✗', texthl = 'DapBreakpointRejected', linehl = '', numhl = '' })
     local dap = require('dap')
+    local widgets = require('dap.ui.widgets')
+
+    vim.keymap.set('n', '<leader>dC', dap.clear_breakpoints, { desc = '[D]ebug: [C]lear Breakpoint' })
+    vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = '[D]ebug: [T]erminate' })
+    vim.keymap.set('n', '<leader>dr', dap.restart, { desc = '[D]ebug: [R]estart' })
+    vim.keymap.set('n', '<leader>dO', dap.step_over, { desc = '[D]ebug: Step [O]ver' })
+    vim.keymap.set('n', '<leader>di', dap.step_into, { desc = '[D]ebug: Step [I]nto' })
+    vim.keymap.set('n', '<leader>do', dap.step_out, { desc = '[D]ebug: Step [O]ut' })
+    vim.keymap.set('n', '<leader>ds', function()
+      widgets.centered_float(widgets.scopes, { border = 'solid' })
+    end, { desc = '[D]ebug: [S]copes' })
+    vim.keymap.set('n', '<leader>dk', function()
+      widgets.hover(nil, { border = 'solid' })
+    end, { desc = '[D]ebug: [K]Hover' })
+
     -- C configurations.
     dap.adapters.codelldb = {
       type = 'server',
@@ -99,5 +103,17 @@ return {
         port = 9003,
       },
     }
+
+    -- Close terminal on exit (maybe it close on error too?)
+    dap.listeners.after.event_initialized['custom.terminal-autoclose'] = function(session)
+      session.on_close['custom.terminal-autoclose'] = function()
+        for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local bufname = vim.api.nvim_buf_get_name(buf)
+          if bufname:find('%[dap%-terminal%]') then
+            vim.api.nvim_buf_delete(buf, { force = true })
+          end
+        end
+      end
+    end
   end,
 }
