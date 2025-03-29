@@ -67,6 +67,7 @@ return {
           'sql',
           -- work
           'php',
+          'php_only',
           'phpdoc',
         },
         auto_install = true,
