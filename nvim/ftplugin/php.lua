@@ -81,8 +81,8 @@ local snippets = {
     "${0}",
 }]],
   this = [[\$this->$0;]],
-  print = [[var_dump($0);]],
-  printe = [[var_dump($0);exit();]],
+  p = [[var_dump($0);]],
+  pe = [[var_dump($0);exit();]],
   ['-'] = [[<?php ${0} ?>]],
   ['_'] = [[<?php
     ${0}
