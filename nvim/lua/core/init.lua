@@ -1,6 +1,7 @@
 require('core.options')
 require('core.keymaps')
 require('core.operators')
+require('core.lsp')
 require('core.snippets')
 require('core.lazy')
 require('core.autocmds')

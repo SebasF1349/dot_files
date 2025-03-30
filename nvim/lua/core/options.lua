@@ -155,7 +155,6 @@ vim.diagnostic.config({
       return string.format('[%s: %s]', d.source, d.code), 'Underlined'
     end,
   },
-  jump = { float = true },
   severity_sort = true,
   signs = {
     text = {

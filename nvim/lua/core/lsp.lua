@@ -1,10 +1,11 @@
-local lsp_mappings = require('plugins.lsp.lsp-packages').lspconfig_to_package
 local ui = require('utils.ui')
 local signs = ui.diagnostic_icons_num
 local get_diagnostic_hl = ui.get_diagnostic_hl
 
 local oss = require('utils.os')
 vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (oss.is_win and ';' or ':') .. vim.env.PATH
+
+local M = {}
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
@@ -153,6 +154,24 @@ vim.api.nvim_create_autocmd('LspAttach', {
     --   end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
     -- end
 
+    local reset_vl = vim.schedule_wrap(function()
+      vim.diagnostic.config({ virtual_lines = { current_line = true } })
+      vim.api.nvim_create_autocmd('CursorMoved', {
+        once = true,
+        callback = function()
+          vim.diagnostic.config({ virtual_lines = false })
+        end,
+      })
+    end)
+
+    vim.keymap.set('n', ']d', function()
+      vim.diagnostic.jump({ count = 1 })
+      reset_vl()
+    end, { desc = 'LSP: Go to next [D]iagnostic message' })
+    vim.keymap.set('n', '[d', function()
+      vim.diagnostic.jump({ count = -1 })
+      reset_vl()
+    end, { desc = 'LSP: Go to prev [D]iagnostic message' })
     vim.keymap.set('n', ']e', function()
       vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
     end, { desc = 'LSP: Go to next [E]rror message', buffer = event.buf })
@@ -211,7 +230,17 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set(
       'n',
       'gre',
-      vim.diagnostic.open_float,
+      -- vim.diagnostic.open_float,
+      function()
+        vim.diagnostic.config({ virtual_lines = { current_line = true } })
+        vim.api.nvim_create_autocmd('CursorMoved', {
+          group = vim.api.nvim_create_augroup('line-diagnostics', { clear = true }),
+          callback = function()
+            vim.diagnostic.config({ virtual_lines = false })
+            return true
+          end,
+        })
+      end,
       { desc = 'LSP: Open Floating [E]rror Message', buffer = event.buf }
     )
     vim.keymap.set('n', 'grd', '<C-]>', { desc = 'LSP: [G]oto [D]efinition', buffer = event.buf })
@@ -356,103 +385,43 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-local hover = vim.lsp.buf.hover
----@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.hover = function()
+local function float_config()
   local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
-  hover({
+  return {
     anchor_bias = 'above',
     max_height = max_height,
     max_width = math.floor(vim.o.columns * 0.4),
-  })
+  }
+end
+local hover = vim.lsp.buf.hover
+---@diagnostic disable-next-line: duplicate-set-field
+vim.lsp.buf.hover = function()
+  hover(float_config())
 end
 local signature_help = vim.lsp.buf.signature_help
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.buf.signature_help = function()
-  local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
-  signature_help({
-    anchor_bias = 'above',
-    max_height = max_height,
-    max_width = math.floor(vim.o.columns * 0.4),
-  })
+  signature_help(float_config())
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
+capabilities.textDocument.semanticTokens.multilineTokenSupport = true
 
-local servers = {}
+vim.lsp.config('*', {
+  capabilities = capabilities,
+  root_markers = { '.git' },
+})
+
+M.servers = {}
 for _, v in ipairs(vim.api.nvim_get_runtime_file('lsp/*', true)) do
   local name = vim.fn.fnamemodify(v, ':t:r')
-  servers[name] = true
+  M.servers[name] = true
 end
-vim.lsp.enable(vim.tbl_keys(servers))
 
-return {
-  {
-    'williamboman/mason.nvim',
-    cmd = { 'Mason', 'MasonInstall', 'MasonInstallAll', 'MasonInstallNew', 'MasonUpdate' },
-    config = function()
-      local ensure_installed = vim.tbl_keys(servers or {})
-      for i, server in ipairs(ensure_installed) do
-        ensure_installed[i] = lsp_mappings[server]
-      end
+vim.lsp.enable(vim.tbl_keys(M.servers))
 
-      vim.list_extend(ensure_installed, {
-        -- web
-        'eslint_d',
-        'prettier',
-        -- markdown
-        'markdownlint',
-        'markdown-toc',
-        -- lua
-        'stylua', -- formatter
-        -- shell
-        'shellcheck', -- linter
-        'shfmt', -- formatter
-        -- "yamllint", -- linter
-        'yamlfmt', -- formatter
-        -- json
-        'jsonlint', -- linter
-        -- text
-        'vale', -- linter
-        -- sql
-        -- "sqlfluff", -- linter
-        -- work
-        'phpcs',
-        'php-cs-fixer',
-        'php-debug-adapter',
-      })
+vim.lsp.commands['editor.action.triggerParameterHints'] = vim.lsp.buf.signature_help
+vim.lsp.commands['editor.action.triggerSuggest'] = vim.lsp.completion.get
 
-      vim.api.nvim_create_user_command('MasonInstallAll', function()
-        if ensure_installed and #ensure_installed > 0 then
-          vim.cmd('MasonInstall ' .. table.concat(ensure_installed, ' '))
-        end
-      end, {})
-
-      vim.api.nvim_create_user_command('MasonInstallNew', function()
-        if not ensure_installed or #ensure_installed == 0 then
-          return
-        end
-        local mason_registry = require('mason-registry')
-        local installed_packages = mason_registry.get_installed_package_names()
-        for _, package in ipairs(ensure_installed) do
-          if not vim.tbl_contains(installed_packages, package) then
-            vim.cmd('MasonInstall ' .. package)
-          end
-        end
-      end, {})
-
-      require('mason').setup({
-        ui = {
-          icons = {
-            package_installed = '✓',
-            package_pending = '➜',
-            package_uninstalled = '✗',
-          },
-          height = 0.8,
-        },
-      })
-    end,
-  },
-  { 'artemave/workspace-diagnostics.nvim' },
-}
+return M
