@@ -164,10 +164,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     vim.keymap.set('n', ']e', function()
       vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
-    end, { desc = 'LSP: Go to next [D]iagnostic message', buffer = event.buf })
+    end, { desc = 'LSP: Go to next [E]rror message', buffer = event.buf })
     vim.keymap.set('n', '[e', function()
       vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
-    end, { desc = 'LSP: Go to prev [D]iagnostic message', buffer = event.buf })
+    end, { desc = 'LSP: Go to prev [E]rror message', buffer = event.buf })
 
     -- replaced my own implementation with Folke's which is more performant: https://github.com/folke/snacks.nvim/blob/main/lua/snacks/words.lua#L117
     local ns = vim.api.nvim_create_namespace('nvim.lsp.references')
