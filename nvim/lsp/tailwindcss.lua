@@ -33,7 +33,7 @@ return {
     'mustache',
     'njk',
     'nunjucks',
-    'php',
+    -- 'php',
     'razor',
     'slim',
     'twig',
