@@ -98,6 +98,9 @@ for key, snippet in pairs(snippets) do
   _G.addSnippet(key, snippet)
 end
 
+vim.keymap.set('n', 'L', 'f$', { desc = 'Next variable' })
+vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable' })
+
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:friendlyManual b:surroundPair'
@@ -105,3 +108,5 @@ vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. ' | sil! ounmap <buffer> i='
   .. ' | sil! vunmap <buffer> a='
   .. ' | sil! ounmap <buffer> a='
+  .. ' | sil! nunmap <buffer> L'
+  .. ' | sil! nunmap <buffer> H'
