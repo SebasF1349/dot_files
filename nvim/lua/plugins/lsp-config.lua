@@ -14,45 +14,36 @@ vim.api.nvim_create_autocmd('LspAttach', {
       return
     end
 
-    -- based on https://github.com/neovim/neovim/issues/29225#issuecomment-2159428607 (autocmd there breaks snippets)
-    vim.api.nvim_create_autocmd('CompleteChanged', {
-      buffer = event.buf,
-      callback = function()
-        if not client:supports_method('completionItem/resolve') then
-          return
-        end
-
-        local info = vim.fn.complete_info({ 'selected' })
-        local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
-        if not completionItem then
-          return
-        end
-
-        local resolvedItem = vim.lsp.buf_request_sync(
-          event.buf,
-          vim.lsp.protocol.Methods.completionItem_resolve,
-          completionItem,
-          500
-        ) or {}
-
-        local docs = vim.tbl_get(resolvedItem[event.data.client_id], 'result', 'documentation', 'value') or ''
-
-        -- NOTE: How to use preview window? I can't write in a buffer while in completion E565
-        local winData = vim.api.nvim__complete_set(info['selected'], { info = docs })
-        if not winData.winid or not vim.api.nvim_win_is_valid(winData.winid) then
-          return
-        end
-
-        if docs == '' then
-          vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Float', { win = winData.winid })
-          return
-        end
-
-        vim.api.nvim_set_option_value('winhighlight', 'Normal:NormalFloat', { win = winData.winid })
-        vim.treesitter.start(winData.bufnr, 'markdown')
-        vim.wo[winData.winid].conceallevel = 3
-      end,
-    })
+    if client:supports_method('completionItem/resolve') then
+      local cancel_prev = function() end
+      vim.api.nvim_create_autocmd('CompleteChanged', {
+        buffer = event.buf,
+        callback = function()
+          cancel_prev()
+          local info = vim.fn.complete_info({ 'selected' })
+          local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
+          if nil == completionItem then
+            return
+          end
+          _, cancel_prev = vim.lsp.buf_request(
+            event.buf,
+            vim.lsp.protocol.Methods.completionItem_resolve,
+            completionItem,
+            function(_, item, _)
+              if not item then
+                return
+              end
+              local docs = (item.documentation or {}).value
+              local win = vim.api.nvim__complete_set(info['selected'], { info = docs })
+              if win.winid and vim.api.nvim_win_is_valid(win.winid) then
+                vim.treesitter.start(win.bufnr, 'markdown')
+                vim.wo[win.winid].conceallevel = 3
+              end
+            end
+          )
+        end,
+      })
+    end
 
     local Kind = vim.lsp.protocol.CompletionItemKind
     local completion_kinds = {
