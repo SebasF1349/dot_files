@@ -47,17 +47,12 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
 
 vim.api.nvim_create_autocmd({ 'FileType' }, {
   pattern = {
-    'Jaq',
     'query',
     'checkhealth',
     'git',
     'help',
     'man',
-    'lspinfo',
-    'spectre_panel',
-    'lir',
     'tsplayground',
-    'fugitive',
     '',
   },
   callback = function(event)
