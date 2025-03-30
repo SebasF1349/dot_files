@@ -123,6 +123,10 @@ vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
 vim.keymap.set('n', 'gp', '"+p', { desc = 'Paste from system clipboard' })
 vim.keymap.set('x', 'gp', '"+P', { desc = 'Paste from system clipboard' })
 
+vim.keymap.set('i', '<C-=>', '<C-r>+', { desc = 'Paste from system clipboard in insert mode' })
+vim.keymap.set('i', "<C-'>", '<C-r>"', { desc = 'Paste in insertmode' })
+vim.keymap.set('i', '<C-0>', '<C-r>0', { desc = 'Paste yanked text in insertmode' })
+
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
