@@ -5,6 +5,10 @@ return {
     local ai = require('mini.ai')
     ai.setup({
       n_lines = 500,
+      mappings = {
+        goto_left = '[g',
+        goto_right = ']g',
+      },
       custom_textobjects = {
         t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags (why not builtin?)
         d = { '%f[%d%._][%d%._]+' }, -- digits with _ separator
