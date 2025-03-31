@@ -183,10 +183,8 @@ end, {
 })
 vim.keymap.set('n', 'g/', ':GSearch ', { desc = 'Search with [G]lobal' })
 
--- stylua: ignore
-vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark for easier return' })
--- stylua: ignore
-vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark for easier return' })
+vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark' })
+vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark' })
 
 local function add_magic(cmd_line, cmd_pos)
   local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
