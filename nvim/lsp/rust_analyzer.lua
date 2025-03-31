@@ -16,7 +16,7 @@ return {
   end,
   settings = {
     autoformat = true,
-    ['rust_analyzer'] = {
+    ['rust-analyzer'] = {
       diagnostics = {
         enable = true,
       },
@@ -48,10 +48,7 @@ return {
         },
       },
       check = {
-        command = {
-          'cargo',
-          'clippy',
-        },
+        command = { 'cargo', 'clippy' },
       },
       checkOnSave = {
         command = 'clippy',
