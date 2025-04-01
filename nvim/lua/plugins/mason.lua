@@ -1,4 +1,3 @@
-local lsp_mappings = require('plugins.lsp.lsp-packages').lspconfig_to_package
 local servers = require('core.lsp').servers
 
 return {
@@ -7,9 +6,6 @@ return {
     cmd = { 'Mason', 'MasonInstall', 'MasonInstallAll', 'MasonInstallNew', 'MasonUpdate', 'MasonUninstallNotEnsured' },
     config = function()
       local ensure_installed = vim.tbl_keys(servers or {})
-      for i, server in ipairs(ensure_installed) do
-        ensure_installed[i] = lsp_mappings[server]
-      end
 
       vim.list_extend(ensure_installed, {
         -- web
