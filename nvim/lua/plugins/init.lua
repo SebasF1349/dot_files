@@ -49,6 +49,8 @@ return {
     end,
   },
 
+  { 'artemave/workspace-diagnostics.nvim' },
+
   {
     'echasnovski/mini.splitjoin',
     keys = { '<leader>j' },
