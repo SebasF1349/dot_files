@@ -18,7 +18,7 @@ return {
       changedelete = { text = '└' },
       untracked = { text = '┆' },
     },
-    preview_config = { border = 'none' },
+    preview_config = { border = 'solid' },
     on_attach = function()
       local gitsigns = require('gitsigns')
 
