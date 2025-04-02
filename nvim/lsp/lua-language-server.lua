@@ -11,7 +11,6 @@ return {
     'selene.yml',
     '.git',
   },
-  single_file_support = true,
   log_level = vim.lsp.protocol.MessageType.Warning,
   on_init = function(client)
     local path = client.workspace_folders[1].name

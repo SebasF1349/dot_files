@@ -22,7 +22,6 @@ return {
     end
     cb(path)
   end,
-  single_file_support = true,
   settings = {
     gopls = {
       gofumpt = true,
