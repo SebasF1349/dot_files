@@ -182,44 +182,39 @@ local function file()
 end
 
 ---- Context ----
+local function clean_node(line)
+  line = line:gsub('local%s+', '')
+  line = line:gsub('class%s+', '')
+  line = line:gsub('public%s+', '')
+  line = line:gsub('private%s+', '')
+  line = line:gsub('static%s+', '')
+  line = line:gsub('function%s+', '')
+  line = line:gsub('fn%s+', '')
+  line = line:gsub('extends%s+.*', '')
+  line = line:gsub('implements%s+.*', '')
+  line = line:gsub('impl%s+', '')
+  line = vim.trim(line)
+  return line:gsub('%s*[%(%{%[].*[%]%}%)]*%s*$', '')
+end
+
+local nodes_per_ft = { lua = { 'function_declaration' } }
 local function get_context()
-  local success, treesitter = pcall(require, 'nvim-treesitter')
-  if not success then
+  local nodes = nodes_per_ft[vim.o.filetype]
+  if not nodes then
     return ''
   end
-
-  local context = treesitter.statusline({
-
-    indicator_size = vim.o.columns / 4,
-
-    type_patterns = { 'class', 'function', 'method', 'impl' },
-
-    transform_fn = function(line)
-      line = line:gsub('local%s+', '')
-      line = line:gsub('class%s+', '')
-      line = line:gsub('public%s+', '')
-      line = line:gsub('private%s+', '')
-      line = line:gsub('static%s+', '')
-      line = line:gsub('function%s+', '')
-      line = line:gsub('fn%s+', '')
-      line = line:gsub('extends%s+.*', '')
-      line = line:gsub('implements%s+.*', '')
-      line = line:gsub('impl%s+', '')
-      line = vim.trim(line)
-
-      return line:gsub('%s*[%(%{%[].*[%]%}%)]*%s*$', '')
-    end,
-
-    separator = ' -> ',
-
-    allow_duplicates = false,
-  })
-
-  if context == nil or #vim.trim(context) == 0 then
-    return ''
+  local curr_line = vim.api.nvim_win_get_cursor(0)
+  local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
+  local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank }, ignore_injections = false })
+  while curr_node do
+    if vim.list_contains(nodes, curr_node:type()) then
+      local line = curr_node:range()
+      local context = vim.api.nvim_buf_get_lines(0, line, line + 1, false)
+      return '%#SLContext#[' .. clean_node(context[1]) .. ']'
+    end
+    curr_node = curr_node:parent()
   end
-
-  return '%#SLContext#[' .. context .. ']'
+  return ''
 end
 
 ---- GIT ----
