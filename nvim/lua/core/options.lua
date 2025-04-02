@@ -32,6 +32,8 @@ vim.o.fillchars = 'eob: '
 vim.opt.shortmess = 'aoOstTWIcCF'
 vim.o.formatoptions = 'qjl1'
 
+vim.o.winborder = 'solid'
+
 -- vim.o.completeopt = 'menu,menuone,noselect,fuzzy,popup'
 
 vim.o.pumheight = 10
