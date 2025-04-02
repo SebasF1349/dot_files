@@ -51,7 +51,6 @@ vim.api.nvim_create_autocmd({ 'FileType' }, {
     'checkhealth',
     'git',
     'help',
-    'man',
     'tsplayground',
     '',
   },
