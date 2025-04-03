@@ -173,8 +173,6 @@ end, { nargs = 1 })
 -- Treesitter highlighting
 --------------------------------------------------
 
--- https://github.com/stevearc/quicker.nvim/blob/master/lua/quicker/highlight.lua#L25
-
 ---@class uim.TSHighlight
 ---@field [1] integer start_col
 ---@field [2] integer end_col
@@ -596,7 +594,6 @@ end, { desc = 'Open [Q]uickfix With [G]it Diff' })
 
 local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
 
--- Based on https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941
 vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
   group = vim.api.nvim_create_augroup('user_diagnostic_qflist', {}),
   callback = function()
@@ -796,6 +793,15 @@ local function moveWithPreview(direction)
   openPreview()
 end
 
+local function openAsDiff()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive:') then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+  vim.cmd('. cc | Gvdiffsplit')
+end
+
 ---@param winnr integer
 ---@return integer
 local function get_prev_win(winnr)
@@ -810,15 +816,6 @@ local function get_prev_win(winnr)
     end
   end
   return prev_win
-end
-
-local function openAsDiff()
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    if vim.startswith(vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(win)), 'fugitive:') then
-      vim.api.nvim_win_close(win, true)
-    end
-  end
-  vim.cmd('. cc | Gvdiffsplit')
 end
 
 ---@class SelectItemOpts
@@ -1086,3 +1083,5 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- https://github.com/ten3roberts/qf.nvim (for some ideas)
 -- https://github.com/folke/trouble.nvim (for the hover idea)
 -- https://github.com/stevearc/qf_helper.nvim (sync qflist cursor position)
+-- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941 (diagnostics autoupdate)
+-- https://github.com/stevearc/quicker.nvim/blob/master/lua/quicker/highlight.lua#L25 (ts highlighting)
