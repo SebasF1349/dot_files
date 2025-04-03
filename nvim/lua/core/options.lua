@@ -27,8 +27,6 @@ vim.o.helpheight = 0
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
-vim.o.fillchars = 'eob: '
-
 vim.opt.shortmess = 'aoOstTWIcCF'
 vim.o.formatoptions = 'qjl1'
 
@@ -78,8 +76,6 @@ vim.opt.wildmode = 'longest:full,full'
 
 vim.opt.smoothscroll = true
 
-vim.opt.foldlevelstart = 99
-
 -- https://new.reddit.com/r/neovim/comments/1fzn1zt/custom_fold_text_function_with_treesitter_syntax/
 local function fold_virt_text(result, s, lnum, coloff)
   if not coloff then
@@ -122,13 +118,15 @@ function _G.custom_foldtext()
 end
 
 vim.opt.foldtext = 'v:lua.custom_foldtext()'
+vim.opt.foldlevelstart = 99
 
-vim.opt.fillchars:append({
+vim.opt.fillchars = {
+  eob = ' ',
   fold = ' ',
   foldopen = ' ',
   foldclose = ' ',
   foldsep = ' ',
-})
+}
 
 vim.opt.signcolumn = 'yes'
 -- vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
