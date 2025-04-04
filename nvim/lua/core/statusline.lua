@@ -197,7 +197,10 @@ local function clean_node(line)
   return line:gsub('%s*[%(%{%[].*[%]%}%)]*%s*$', '')
 end
 
-local nodes_per_ft = { lua = { 'function_declaration' } }
+local nodes_per_ft = {
+  lua = { 'function_declaration' },
+  php = { 'method_declaration', 'class_declaration', 'function_declaration' },
+}
 local function get_context()
   local nodes = nodes_per_ft[vim.o.filetype]
   if not nodes then
