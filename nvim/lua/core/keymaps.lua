@@ -142,6 +142,36 @@ vim.keymap.set('c', '<C-p>', function()
   return vim.fn.wildmenumode() == 1 and '<C-p>' or '<up>'
 end, { desc = 'Move Through Cmdline History', expr = true })
 
+vim.keymap.set('i', '<Tab>', function()
+  if vim.snippet.active({ direction = 1 }) then
+    vim.snippet.jump(1)
+    return
+  end
+  local curr_cursor = vim.api.nvim_win_get_cursor(0)
+  local non_blank = vim.api.nvim_get_current_line():find('%S')
+  if not non_blank or curr_cursor[2] < non_blank then
+    local keys = vim.api.nvim_replace_termcodes('<Tab>', true, false, true)
+    vim.api.nvim_feedkeys(keys, 'n', true)
+    return
+  end
+  local curr_node = vim.treesitter.get_node({ ignore_injections = false })
+  if not curr_node then
+    return
+  end
+  local _, _, rowe, cole = curr_node:range()
+  if curr_cursor[1] == rowe or curr_cursor[2] == cole then
+    local parent = curr_node:parent()
+    if not parent then
+      return
+    end
+    _, _, rowe, cole = parent:range()
+  end
+  if vim.fn.line('$') == rowe then
+    return
+  end
+  vim.api.nvim_win_set_cursor(0, { rowe + 1, cole })
+end, { desc = 'Use Tab to Escape TS Node in Insert Mode' })
+
 --------------------------------------------------
 -- Searching
 --------------------------------------------------
