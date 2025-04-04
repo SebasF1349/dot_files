@@ -3,6 +3,8 @@
 
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
+vim.b.contextStatus = { 'method_declaration', 'class_declaration', 'function_declaration', 'function_definition' }
+
 vim.b.surroundPair = {
   ['-'] = { { '<?php ' }, { ' ?>' } },
   ['_'] = { { '<?php', '' }, { '', '?>' } },
@@ -103,7 +105,7 @@ vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable' })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
-  .. 'unlet! b:friendlyManual b:surroundPair'
+  .. 'unlet! b:friendlyManual b:surroundPair b:contextStatus'
   .. ' | sil! vunmap <buffer> i='
   .. ' | sil! ounmap <buffer> i='
   .. ' | sil! vunmap <buffer> a='
