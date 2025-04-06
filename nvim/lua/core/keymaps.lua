@@ -644,7 +644,7 @@ vim.keymap.set('n', '<C-a>', toggle_word, { desc = 'Toggle keywords' })
 -- Abbreviations
 --------------------------------------------------
 
-local cmds_typos = { 'W', 'Wa', 'WA', 'X', 'Xa', 'XA' }
+local cmds_typos = { 'W', 'Wa', 'WA', 'X', 'Xa', 'XA', 'H' }
 for _, cmd in ipairs(cmds_typos) do
   vim.keymap.set('ca', cmd, cmd:lower())
 end
