@@ -183,14 +183,6 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
   desc = 'Remove ranges highlights',
 })
 
-vim.api.nvim_create_autocmd({ 'FileType' }, {
-  pattern = 'php',
-  callback = function()
-    vim.bo.commentstring = '// %s'
-  end,
-  desc = 'Fix comments in php',
-})
-
 local function set_path()
   local is_git = require('utils.is-git')()
   if not is_git then

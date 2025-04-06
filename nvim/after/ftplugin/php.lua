@@ -1,6 +1,8 @@
 -- FIX: this seems to not be working: https://github.com/neovim/neovim/blob/master/runtime/ftplugin/php.vim#L76C7-L76C20
 -- try this? https://github.com/neovim/neovim/blob/master/runtime/ftplugin/lua.vim
 
+vim.bo.commentstring = '// %s'
+
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
 vim.b.contextStatus = { 'method_declaration', 'class_declaration', 'function_declaration', 'function_definition' }
@@ -106,6 +108,7 @@ vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable' })
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:friendlyManual b:surroundPair b:contextStatus'
+  .. ' | setlocal commentstring< '
   .. ' | sil! vunmap <buffer> i='
   .. ' | sil! ounmap <buffer> i='
   .. ' | sil! vunmap <buffer> a='
