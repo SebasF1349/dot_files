@@ -279,15 +279,9 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
 
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
-  local cmd = 'fd --type file --full-path --color never'
-  local list = vim.fn.systemlist(cmd)
-  local cmdarg_clean = cmdarg:lower():gsub('%-', '%%-')
-  return vim
-    .iter(list)
-    :filter(function(item)
-      return item:lower():find(cmdarg_clean)
-    end)
-    :totable()
+  local cmd = 'fd  --type file --full-path --color never "' .. cmdarg .. '"'
+  local result = vim.fn.systemlist(cmd)
+  return result
 end
 
 vim.api.nvim_create_autocmd({ 'UIEnter' }, {
