@@ -251,7 +251,7 @@ local function get_fuzzy(cmd_line)
     closed_fuzzy_block = cmd_line:find(divider, is_magic)
   end
   if closed_fuzzy_block or not is_magic then
-    return ' '
+    return '<c-]><space>'
   elseif very_nomagic_pos then
     return '\\.\\{-}'
   elseif very_magic_pos then
@@ -262,11 +262,11 @@ end
 local function fuzzy_find(cmd_line, cmd_pos)
   local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
   if not ok then
-    return ' '
+    return '<c-]><space>'
   end
   local next_cmd_pos = cmd_line:find('|')
   if #cmd_parsed.args == 0 and (cmd_parsed.nextcmd == '' or cmd_pos <= next_cmd_pos) then
-    return ' '
+    return '<c-]><space>'
   end
   if next_cmd_pos and cmd_pos > next_cmd_pos then
     return fuzzy_find(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
@@ -293,7 +293,7 @@ vim.keymap.set('c', '<space>', function()
     local cmd_pos = vim.fn.getcmdpos()
     return fuzzy_find(cmd_line, cmd_pos)
   else
-    return ' '
+    return '<c-]><space>'
   end
 end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
 
