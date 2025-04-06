@@ -46,7 +46,11 @@ vim.api.nvim_create_autocmd('VimLeave', {
     local has_opt = vim.iter(vim.v.argv):any(function(v)
       return v:find('+')
     end)
-    if not vim.uv.fs_stat(session_path) or has_opt then
+    local has_code_bufs = vim.iter(vim.api.nvim_list_wins()):any(function(win)
+      local bufnr = vim.api.nvim_win_get_buf(win)
+      return vim.bo[bufnr].buftype == ''
+    end)
+    if not vim.uv.fs_stat(session_path) or has_opt or not has_code_bufs then
       return
     end
     sessionSave()
