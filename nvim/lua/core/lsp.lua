@@ -154,24 +154,24 @@ vim.api.nvim_create_autocmd('LspAttach', {
     --   end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = event.buf })
     -- end
 
-    local reset_vl = vim.schedule_wrap(function()
-      vim.diagnostic.config({ virtual_lines = { current_line = true } })
-      vim.api.nvim_create_autocmd('CursorMoved', {
-        once = true,
-        callback = function()
-          vim.diagnostic.config({ virtual_lines = false })
-        end,
-      })
-    end)
+    -- local reset_vl = vim.schedule_wrap(function()
+    --   vim.diagnostic.config({ virtual_lines = { current_line = true } })
+    --   vim.api.nvim_create_autocmd('CursorMoved', {
+    --     once = true,
+    --     callback = function()
+    --       vim.diagnostic.config({ virtual_lines = false })
+    --     end,
+    --   })
+    -- end)
 
-    vim.keymap.set('n', ']d', function()
-      vim.diagnostic.jump({ count = 1 })
-      reset_vl()
-    end, { desc = 'LSP: Go to next [D]iagnostic message' })
-    vim.keymap.set('n', '[d', function()
-      vim.diagnostic.jump({ count = -1 })
-      reset_vl()
-    end, { desc = 'LSP: Go to prev [D]iagnostic message' })
+    -- vim.keymap.set('n', ']d', function()
+    --   vim.diagnostic.jump({ count = 1 })
+    --   reset_vl()
+    -- end, { desc = 'LSP: Go to next [D]iagnostic message' })
+    -- vim.keymap.set('n', '[d', function()
+    --   vim.diagnostic.jump({ count = -1 })
+    --   reset_vl()
+    -- end, { desc = 'LSP: Go to prev [D]iagnostic message' })
     vim.keymap.set('n', ']e', function()
       vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
     end, { desc = 'LSP: Go to next [E]rror message', buffer = event.buf })
@@ -230,17 +230,17 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set(
       'n',
       'gre',
-      -- vim.diagnostic.open_float,
-      function()
-        vim.diagnostic.config({ virtual_lines = { current_line = true } })
-        vim.api.nvim_create_autocmd('CursorMoved', {
-          group = vim.api.nvim_create_augroup('line-diagnostics', { clear = true }),
-          callback = function()
-            vim.diagnostic.config({ virtual_lines = false })
-            return true
-          end,
-        })
-      end,
+      vim.diagnostic.open_float,
+      -- function()
+      --   vim.diagnostic.config({ virtual_lines = { current_line = true } })
+      --   vim.api.nvim_create_autocmd('CursorMoved', {
+      --     group = vim.api.nvim_create_augroup('line-diagnostics', { clear = true }),
+      --     callback = function()
+      --       vim.diagnostic.config({ virtual_lines = false })
+      --       return true
+      --     end,
+      --   })
+      -- end,
       { desc = 'LSP: Open Floating [E]rror Message', buffer = event.buf }
     )
     vim.keymap.set('n', 'grd', '<C-]>', { desc = 'LSP: [G]oto [D]efinition', buffer = event.buf })
