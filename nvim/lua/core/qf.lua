@@ -286,6 +286,51 @@ local GIT_STATUS_MAP = {
 local qfim_namespace = vim.api.nvim_create_namespace('qfim')
 local qfbufnr
 
+local function hl_line(items, i)
+  local item = table.remove(items, 1)
+  if not item then
+    return
+  end
+  vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { i, 1 }, { i, #item.name - item.lnum_length })
+  vim.hl.range(qfbufnr, qfim_namespace, 'Delimiter', { i, #item.name - item.lnum_length }, { i, #item.name })
+  vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { i, #item.name }, { i, item.separator_position })
+
+  if item.type ~= '' then
+    vim.hl.range(qfbufnr, qfim_namespace, highlights[item.type], { i, item.separator_position }, { i, vim.o.columns })
+  else
+    -- TS highlight
+    if not vim.api.nvim_buf_is_loaded(item.bufnr) then
+      vim.fn.bufload(item.bufnr)
+    end
+
+    local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
+    if src_line then
+      -- I trim spaces so I need to take that into account before comparing
+      -- (if the og line has spaces at the end it deserves to not be found)
+      local src_space = src_line:match('^%s*'):len()
+
+      -- Only add highlights if the text in the quickfix matches the source line
+      if item.text == src_line:sub(src_space + 1) then
+        local offset = item.separator_position + 3 - src_space
+        local ok, hls = pcall(buf_get_ts_highlights, item.bufnr, item.lnum)
+        if ok then
+          for _, hl in ipairs(hls) do
+            local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
+            if end_col == -1 then
+              end_col = src_line:len()
+            end
+            vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
+          end
+        end
+      end
+    end
+  end
+
+  vim.defer_fn(function()
+    hl_line(items, i + 1)
+  end, 10)
+end
+
 function _G.qftf(info)
   local ret = {}
   local listType = info.quickfix == 1 and 'c' or 'l'
@@ -368,46 +413,10 @@ function _G.qftf(info)
     local str = validFmt:format(path, whitespace, icon, item.text)
     table.insert(ret, str)
   end
-  vim.schedule(function()
+  vim.defer_fn(function()
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
-    for i, item in ipairs(items) do
-      i = i - 1
-      vim.hl.range(qfbufnr, qfim_namespace, 'Directory', { i, 1 }, { i, #item.name - item.lnum_length })
-      vim.hl.range(qfbufnr, qfim_namespace, 'Delimiter', { i, #item.name - item.lnum_length }, { i, #item.name })
-      vim.hl.range(qfbufnr, qfim_namespace, 'Comment', { i, #item.name }, { i, item.separator_position })
-
-      -- TS highlight
-      if not vim.api.nvim_buf_is_loaded(item.bufnr) then
-        vim.fn.bufload(item.bufnr)
-      end
-
-      local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
-      if src_line then
-        -- I trim spaces so I need to take that into account before comparing
-        -- (if the og line has spaces at the end it deserves to not be found)
-        local src_space = src_line:match('^%s*'):len()
-
-        -- Only add highlights if the text in the quickfix matches the source line
-        if item.text == src_line:sub(src_space + 1) then
-          local offset = item.separator_position + 3 - src_space
-          local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
-          for _, hl in ipairs(hls) do
-            local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
-            if end_col == -1 then
-              end_col = src_line:len()
-            end
-            vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
-          end
-          goto skip_default
-        end
-      end
-
-      local msg_hl = highlights[item.type] or 'CursorLineNr'
-      vim.hl.range(qfbufnr, qfim_namespace, msg_hl, { i, item.separator_position }, { i, vim.o.columns })
-
-      ::skip_default::
-    end
-  end)
+    hl_line(items, 0)
+  end, 10)
   return ret
 end
 
