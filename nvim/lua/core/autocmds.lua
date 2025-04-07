@@ -279,9 +279,13 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
 
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
-  local cmd = 'fd  --type file --full-path --color never "' .. cmdarg .. '"'
-  local result = vim.fn.systemlist(cmd)
-  return result
+  cmdarg = vim.fn.escape(cmdarg, '\\')
+  local cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg }
+  local files = vim.system(cmd, { text = true }):wait()
+  if not files.stdout then
+    return {}
+  end
+  return vim.split(vim.trim(files.stdout), '\n')
 end
 
 vim.api.nvim_create_autocmd({ 'UIEnter' }, {
