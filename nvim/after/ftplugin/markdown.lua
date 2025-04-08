@@ -16,6 +16,10 @@ vim.bo.wrapmargin = 0
 vim.wo.linebreak = true
 vim.wo.spell = true
 vim.bo.spelllang = 'es,en'
+-- automatically continue lists
+local formatopts = vim.bo.formatoptions
+vim.bo.formatoptions = formatopts .. 'cro'
+vim.bo.comments = 'b:-,b:+,b:*'
 
 local function show_toc()
   local bufname = vim.api.nvim_buf_get_name(0)
@@ -66,7 +70,7 @@ end, { desc = 'Toggle TODO' })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
-  .. 'setlocal tabstop< softtabstop< shiftwidth< expandtab< textwidth< colorcolumn< wrap< wrapmargin< linebreak< spell< spelllang< '
+  .. 'setlocal tabstop< softtabstop< shiftwidth< expandtab< textwidth< colorcolumn< wrap< wrapmargin< linebreak< spell< spelllang< comments< formatoptions< '
   .. ' | sil! nunmap <buffer> gO'
   .. ' | sil! nunmap <buffer> <leader>mt'
   .. ' | sil! nunmap <buffer> gl'
