@@ -134,20 +134,6 @@ local function on_attach(client_id, buf)
   vim.opt.completeopt = { 'menuone', 'popup', 'noselect', 'fuzzy' }
   vim.o.completeitemalign = 'kind,abbr,menu'
 
-  -- vim.keymap.set('s', '<C-l>', function()
-  --   if vim.snippet.active({ direction = 1 }) then
-  --     return '<cmd>lua vim.snippet.jump(1)<cr>'
-  --   else
-  --     return '<C-l>'
-  --   end
-  -- end, { desc = 'Jump Snippet Forwards', expr = true, buffer = buf })
-  -- vim.keymap.set('s', '<C-h>', function()
-  --   if vim.snippet.active({ direction = -1 }) then
-  --     return '<cmd>lua vim.snippet.jump(-1)<cr>'
-  --   else
-  --     return '<C-h>'
-  --   end
-  -- end, { desc = 'Jump Snippet Backwards', expr = true, buffer = buf })
   vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = buf })
   vim.keymap.set('i', '<C-n>', function()
     if vim.fn.pumvisible() ~= 0 then
@@ -375,13 +361,6 @@ local function on_attach(client_id, buf)
         end)
       end,
     })
-
-    -- -- When you move your cursor, the highlights will be cleared
-    -- vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-    --   group = highlight_augroup,
-    --   buffer = buf,
-    --   callback = vim.lsp.buf.clear_references,
-    -- })
 
     -- Clear highlight when detaching lsp (fix some lsp errors)
     vim.api.nvim_create_autocmd('LspDetach', {
