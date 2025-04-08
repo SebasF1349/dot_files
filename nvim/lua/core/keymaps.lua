@@ -83,10 +83,10 @@ vim.keymap.set('x', '.', ':normal .<CR>', { desc = 'Use . to repeat last change 
 vim.keymap.set('x', 'gci', ':normal gcc<CR>', { desc = 'Invert comments line by line' })
 
 vim.keymap.set('x', 'I', function()
-  return vim.fn.mode() == 'V' and '^<C-v>I' or 'I'
+  return vim.api.nvim_get_mode().mode == 'V' and '^<C-v>I' or 'I'
 end, { desc = 'Insert on multiple lines', expr = true })
 vim.keymap.set('x', 'A', function()
-  return vim.fn.mode() == 'V' and '$<C-v>A' or 'A'
+  return vim.api.nvim_get_mode().mode == 'V' and '$<C-v>A' or 'A'
 end, { desc = 'Append on multiple lines', expr = true })
 
 -- BASH-style movement in cmd and insert mode
@@ -184,7 +184,7 @@ end, {
   complete = function(ArgLead, _, _)
     -- https://vi.stackexchange.com/a/25005
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    local lines_str = vim.fn.join(lines, ' ')
+    local lines_str = table.concat(lines, ' ')
     local words = vim.fn.split(lines_str, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
     words = vim
       .iter(words)

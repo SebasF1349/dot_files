@@ -358,7 +358,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
         callback = function()
           vim.schedule(function()
             vim.lsp.buf.clear_references()
-            if vim.fn.mode() == 'n' then
+            if vim.api.nvim_get_mode().mode == 'n' then
               vim.lsp.buf.document_highlight()
             end
           end)

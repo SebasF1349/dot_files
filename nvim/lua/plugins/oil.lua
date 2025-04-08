@@ -4,7 +4,7 @@ return {
   -- stylua: ignore
   keys = {
     { '-', function() require('oil').open() end, { desc = 'Open parent directory' } },
-    { '_', function() require('oil').open(vim.fn.getcwd()) end, { desc = 'Open cwd' } },
+    { '_', function() require('oil').open(vim.uv.cwd()) end, { desc = 'Open cwd' } },
   },
   opts = {
     default_file_explorer = true,

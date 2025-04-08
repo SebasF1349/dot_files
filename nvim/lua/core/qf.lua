@@ -446,7 +446,7 @@ local function document_symbols(symbols)
         item.text = string.format('[%s] %s', item.kind, vim.fn.trim(vim.fn.getline(item.lnum)))
         return item
       end, items)
-      local title = vim.tbl_isempty(symbols) and 'All' or vim.fn.join(symbols, ', ')
+      local title = vim.tbl_isempty(symbols) and 'All' or table.concat(symbols, ', ')
       vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. title, items = items })
       vim.schedule(function()
         vim.cmd('lopen')
@@ -715,7 +715,7 @@ local function delete()
   local list = getList(listType)
   local qfitems = list.items
 
-  local mode = vim.fn.mode()
+  local mode = vim.api.nvim_get_mode().mode
   if mode == 'v' or mode == 'V' then
     local visual_start = vim.fn.getpos('v')
     local visual_end = vim.fn.getpos('.')

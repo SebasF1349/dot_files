@@ -39,7 +39,7 @@ function M.select(items, opts, on_choice)
   local current_cursor = vim.o.guicursor
   local cursor_hl = 'HiddenCursor'
   local function hide_cursor()
-    if vim.fn.hlexists(cursor_hl) == 0 then
+    if vim.tbl_isempty(vim.api.nvim_get_hl(0, { name = cursor_hl })) then
       vim.cmd(string.format('highlight %s gui=reverse blend=100', cursor_hl))
     end
     vim.o.guicursor = string.format('a:%s/lCursor', cursor_hl)

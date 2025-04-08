@@ -2,7 +2,8 @@ local scratch_buffer
 
 vim.api.nvim_create_user_command('Messages', function()
   scratch_buffer = vim.api.nvim_create_buf(false, true)
-  local messages = vim.split(vim.fn.execute('messages', 'silent'), '\n')
+  local output = vim.api.nvim_exec2('silent messages', { output = true }).output
+  local messages = vim.split(output, '\n')
   vim.api.nvim_buf_set_lines(scratch_buffer, 0, 0, true, messages)
   vim.api.nvim_open_win(scratch_buffer, true, { split = 'right' })
   vim.bo.filetype = 'vim'

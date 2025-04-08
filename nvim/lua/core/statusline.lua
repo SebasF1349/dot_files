@@ -59,7 +59,7 @@ vim.api.nvim_set_hl(0, 'SLDiff', { bg = curr_statusline_bg, fg = git_diff })
 
 ---- MODE ----
 local function mode()
-  local first_char = vim.fn.strtrans(vim.fn.mode()):upper():gsub('%W', '')
+  local first_char = vim.fn.strtrans(vim.api.nvim_get_mode().mode):upper():gsub('%W', '')
   return string.format('%%#SLMode%s#%s', first_char, first_char)
 end
 
@@ -119,7 +119,7 @@ local function file()
     local fname = vim.fn.fnamemodify(bufname, ':t')
     local is_svelte = vim.startswith(fname, '+')
     if is_svelte then
-      fname = vim.fn.joinpath(vim.fn.fnamemodify(bufname, ':h:t'), fname)
+      fname = vim.fs.joinpath(vim.fn.fnamemodify(bufname, ':h:t'), fname)
     end
     if fname == '' then
       fname = vim.fn.fnamemodify(vim.uv.cwd() or '', ':t')
@@ -296,7 +296,7 @@ local diagnostics_data = {
 local local_diagnostics = ''
 local workspace_diagnostics = ''
 local function custom_diagnostics()
-  if vim.fn.mode() ~= 'n' then
+  if vim.api.nvim_get_mode().mode ~= 'n' then
     return string.format('%s%s', local_diagnostics, workspace_diagnostics)
   end
 

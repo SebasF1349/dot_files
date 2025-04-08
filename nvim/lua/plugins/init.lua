@@ -10,7 +10,7 @@ return {
       local function diffModeMap(key, cmd, desc)
         vim.keymap.set({ 'n', 'x' }, key, function()
           return not vim.wo.diff and 'normal! ' .. key
-            or (vim.fn.mode() == 'n' and '?<<<<<<<<CR>V/>>>>>>><CR>' .. cmd or cmd)
+            or (vim.api.nvim_get_mode().mode == 'n' and '?<<<<<<<<CR>V/>>>>>>><CR>' .. cmd or cmd)
         end, { desc = desc, silent = true, expr = true })
       end
       diffModeMap('gh', ':diffget //2 <CR>', 'Git: get lhs of diff')
