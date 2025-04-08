@@ -21,18 +21,40 @@ return {
 
     lint.linters.shellcheck.args = { '-x' }
     -- exclude phpdocs lint
-    lint.linters.phpcs.args = {
-      '-q',
-      -- '--config-set php_version 70419',
-      '--exclude=PEAR.Commenting.FunctionComment,'
-        .. 'Generic.Files.LineLength,'
-        .. 'Generic.PHP.DisallowShortOpenTag,'
-        .. 'Squiz.Commenting.FunctionComment,'
-        .. 'Squiz.Commenting.LongConditionClosingComment,'
-        .. 'PEAR.Commenting.FileComment,'
-        .. 'PEAR.Commenting.ClassComment',
-      '--report=json',
-      '-',
+    local original_parse_phpcs = lint.linters.phpcs.parser
+    lint.linters.phpcs = {
+      name = 'phpcs',
+      cmd = 'phpcs',
+      stdin = true,
+      args = {
+        '-q',
+        '--exclude=PEAR.Commenting.FunctionComment,'
+          .. 'Generic.Files.LineLength,'
+          .. 'Generic.PHP.DisallowShortOpenTag,'
+          .. 'Squiz.Commenting.FunctionComment,'
+          .. 'Squiz.Commenting.LongConditionClosingComment,'
+          .. 'PEAR.Commenting.FileComment,'
+          .. 'PEAR.Commenting.ClassComment',
+        -- otherwise it shows error codes on every error/warnings
+        '--runtime-set',
+        'ignore_errors_on_exit',
+        '1',
+        -- '--config-set',
+        '--runtime-set',
+        'php_version',
+        '70033',
+        '--report=json',
+        '-',
+      },
+      parser = function(output, bufnr, linter_cwd)
+        local diagnostics = original_parse_phpcs(output, bufnr, linter_cwd)
+        for _, d in ipairs(diagnostics) do
+          if d.code == 'PEAR.WhiteSpace.ScopeIndent.IncorrectExact' then
+            d.severity = vim.diagnostic.severity.INFO
+          end
+        end
+        return diagnostics
+      end,
     }
 
     local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
