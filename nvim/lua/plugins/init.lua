@@ -5,6 +5,7 @@ return {
     keys = {
       { '<leader>gg', '<cmd>tab G<CR>]]', desc = 'Open fu[G]itive in a new tab', remap = true },
       { '<leader>gd', '<cmd>Gvdiffsplit<CR>', desc = '[D]iff Current File' },
+      { '<leader>gl', '<cmd>Git log -50 --oneline<cr>', desc = 'fu[G]itive [L]og' },
     },
     config = function()
       local function diffModeMap(key, cmd, desc)
