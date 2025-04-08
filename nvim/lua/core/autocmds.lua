@@ -207,7 +207,6 @@ vim.api.nvim_create_autocmd('CmdlineChanged', {
       return
     end
     local first_line, last_line = range[1] - 1, range[2] and range[2] - 1 or range[1] - 1
-    peek(first_line)
     vim.hl.range(0, cmd_range_ns, 'ColorColumn', { first_line, 0 }, { last_line, 0 }, { regtype = 'V' })
   end,
   group = general,
