@@ -135,12 +135,14 @@ local function getActiveList()
 end
 
 ---@param listType ListType
+---@param severity? vim.diagnostic.SeverityFilter
 ---@return qflist | nil
-local function getDiagList(listType)
+local function getDiagList(listType, severity)
+  severity = severity or 'HINT'
   local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
     local list = getList(listType, i)
-    if list.context ~= '' and list.context.qfim and list.context.qfim.type == listType .. 'diag' then
+    if list.context ~= '' and list.context.qfim and list.context.qfim.type == listType .. 'diag' .. severity then
       return list
     end
   end
@@ -457,30 +459,32 @@ end
 
 ---@param listType ListType
 ---@param diagnostics? boolean
-local function list_toggle(listType, diagnostics)
+---@param severity? vim.diagnostic.SeverityFilter
+local function list_toggle(listType, diagnostics, severity)
   local list = getList(listType)
   if list.winid ~= 0 then
     vim.cmd(listType .. 'close')
   elseif diagnostics then
-    local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
-    local items = vim.diagnostic.toqflist(diag_list)
-    if #items == 0 then
+    severity = severity or 'HINT'
+    local diag_where = listType == 'c' and nil or 0
+    local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
+    if #diag_list == 0 then
       vim.notify('List is Empty', vim.log.levels.INFO)
-    else
-      local qf_diag_list = getDiagList(listType)
-      if qf_diag_list then
-        -- NOTE: looks like a nvim bug that #chistory redraws the qf
-        vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
-      else
-        local title = listType == 'c' and 'All Diagnostics' or 'Local Diagnostics'
-        setList(listType, {
-          title = title,
-          items = items,
-          context = { qfim = { type = listType .. 'diag' } },
-        })
-      end
-      vim.cmd(listType .. 'open')
+      return
     end
+    local qf_diag_list = getDiagList(listType, severity)
+    if qf_diag_list then
+      -- NOTE: looks like a nvim bug that #chistory redraws the qf
+      vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
+    else
+      local title = ('%s Diagnostics (%s)').format(listType == 'c' and 'Workspace' or 'Local', severity)
+      setList(listType, {
+        title = title,
+        items = vim.diagnostic.toqflist(diag_list),
+        context = { qfim = { type = listType .. 'diag' .. severity } },
+      })
+    end
+    vim.cmd(listType .. 'open')
   elseif list.size == 0 then
     vim.notify('List is Empty', vim.log.levels.INFO)
   else
@@ -503,6 +507,9 @@ end, { desc = 'Toggle [Q]uickfix' })
 vim.keymap.set('n', '<leader>qd', function()
   list_toggle('c', true)
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
+vim.keymap.set('n', '<leader>qe', function()
+  list_toggle('c', true, 'ERROR')
+end, { desc = '[Q]uickfix [E]rror Toggle' })
 vim.keymap.set('n', '<leader>qr', vim.lsp.buf.references, { desc = '[Q]uickfix [R]eferences' })
 vim.keymap.set('n', '<leader>qi', vim.lsp.buf.implementation, { desc = '[Q]uickfix [I]mplementation' })
 vim.keymap.set('n', '<leader>qb', function()
@@ -610,19 +617,22 @@ vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
       return
     end
     for _, listType in ipairs({ 'c', 'l' }) do
-      local diag_qf = getDiagList(listType)
-      if diag_qf then
-        local diag_list = listType == 'c' and vim.diagnostic.get() or vim.diagnostic.get(0)
-        if #diag_list == 0 and diag_qf.winid ~= 0 then
-          vim.cmd(listType .. 'close')
+      for _, severity in ipairs({ 'ERROR', 'HINT' }) do
+        local diag_qf = getDiagList(listType, severity)
+        if diag_qf then
+          local diag_where = listType == 'c' and nil or 0
+          local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
+          if #diag_list == 0 and diag_qf.winid ~= 0 then
+            vim.cmd(listType .. 'close')
+          end
+          local qf_items = vim.diagnostic.toqflist(diag_list)
+          vim.schedule(function()
+            setList(listType, {
+              nr = diag_qf.nr,
+              items = qf_items,
+            }, 'r')
+          end)
         end
-        local qf_items = vim.diagnostic.toqflist(diag_list)
-        vim.schedule(function()
-          setList(listType, {
-            nr = diag_qf.nr,
-            items = qf_items,
-          }, 'r')
-        end)
       end
     end
   end,
