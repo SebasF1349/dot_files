@@ -466,7 +466,7 @@ local function list_toggle(listType, diagnostics, severity)
     vim.cmd(listType .. 'close')
   elseif diagnostics then
     severity = severity or 'HINT'
-    local diag_where = listType == 'c' and nil or 0
+    local diag_where = listType == 'l' and 0 or nil
     local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
     if #diag_list == 0 then
       vim.notify('List is Empty', vim.log.levels.INFO)
@@ -620,7 +620,7 @@ vim.api.nvim_create_autocmd({ 'DiagnosticChanged' }, {
       for _, severity in ipairs({ 'ERROR', 'HINT' }) do
         local diag_qf = getDiagList(listType, severity)
         if diag_qf then
-          local diag_where = listType == 'c' and nil or 0
+          local diag_where = listType == 'l' and 0 or nil
           local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
           if #diag_list == 0 and diag_qf.winid ~= 0 then
             vim.cmd(listType .. 'close')
