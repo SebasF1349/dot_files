@@ -105,10 +105,102 @@ end
 vim.keymap.set('n', 'L', 'f$', { desc = 'Next variable' })
 vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable' })
 
+local function find_buffer_by_name(name)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local buf_name = vim.api.nvim_buf_get_name(buf)
+    if buf_name:find(name) then
+      return buf
+    end
+  end
+  return -1
+end
+
+local function find_dir_space(fpath)
+  for _, dir in ipairs({ 'frontend', 'backend', 'common' }) do
+    if fpath:find(dir) then
+      return dir
+    end
+  end
+end
+
+-- YII2 keymaps
+vim.keymap.set('n', 'gf', function()
+  local fpath = vim.fn.expand('%:.')
+  local cfile = vim.fn.expand('<cfile>')
+  if fpath:find('controllers') and not cfile:find('/') then
+    local dirspace = find_dir_space(fpath) or ''
+    local controller = fpath:match('/(%a*)Controller.php')
+    local vname = dirspace .. '/views/' .. controller:lower() .. '/' .. cfile
+    local bufnr = find_buffer_by_name(vname)
+    if bufnr == -1 then
+      vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
+      return
+    end
+    vim.api.nvim_set_current_buf(bufnr)
+  elseif vim.startswith(cfile, '/') then
+    local dirspace = find_dir_space(fpath) or ''
+    local vname = dirspace .. '/views/' .. cfile:sub(2)
+    local bufnr = find_buffer_by_name(vname)
+    if bufnr == -1 then
+      vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
+      return
+    end
+    vim.api.nvim_set_current_buf(bufnr)
+  else
+    vim.api.nvim_feedkeys('gf', 'n', true)
+  end
+end, { desc = 'Improved gf to move to views' })
+
+vim.keymap.set('n', '<leader>aa', function()
+  local cfile = vim.fn.expand('<cfile>')
+  local split = {}
+  for str in string.gmatch(cfile, '([^/]+)') do
+    table.insert(split, str)
+  end
+
+  local fpath = vim.fn.expand('%:.')
+  local dirspace = find_dir_space(fpath) or ''
+  local cname = dirspace .. '/controllers/' .. split[1]:sub(1, 1):upper() .. split[1]:sub(2) .. 'Controller.php'
+  local bufnr = find_buffer_by_name(cname)
+  if bufnr == -1 then
+    vim.notify('Controller "' .. cname .. '" not found', vim.log.levels.INFO)
+    return
+  end
+  vim.api.nvim_set_current_buf(bufnr)
+
+  local action = split[2]:gsub('%u', function(c)
+    return '-' .. c:lower()
+  end)
+  action = 'action' .. action:sub(1, 1):upper() .. action:sub(2)
+  local linenr = vim.fn.search(action, 'nw')
+  if linenr == 0 then
+    vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
+    return
+  end
+  vim.api.nvim_win_set_cursor(0, { linenr, 0 })
+end, { desc = '[A]lternative: [A]ction' })
+
+vim.keymap.set('n', '<leader>ac', function()
+  local fpath = vim.fn.expand('%:.')
+  local dirspace = find_dir_space(fpath) or ''
+  local controller, fname = fpath:match('views/(%a*)/(.*).php')
+  local cpath = dirspace .. '/controllers/' .. controller:sub(1, 1):upper() .. controller:sub(2) .. 'Controller.php'
+  local bufnr = find_buffer_by_name(cpath)
+  if bufnr == -1 then
+    vim.notify('Controller "' .. cpath .. '" not found', vim.log.levels.INFO)
+    return
+  end
+  vim.fn.setreg('f', fname, 'v')
+  vim.api.nvim_set_current_buf(bufnr)
+end, { desc = '[A]lternative: [C]ontroller' })
+
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:friendlyManual b:surroundPair b:contextStatus'
   .. ' | setlocal commentstring< '
+  .. ' | sil! nunmap <buffer> gf'
+  .. ' | sil! nunmap <buffer> <leader>aa'
+  .. ' | sil! nunmap <buffer> <leader>ac'
   .. ' | sil! vunmap <buffer> i='
   .. ' | sil! ounmap <buffer> i='
   .. ' | sil! vunmap <buffer> a='
