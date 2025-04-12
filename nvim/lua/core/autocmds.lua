@@ -244,14 +244,6 @@ local function set_path()
     return ',,' .. table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
   end
 end
-vim.api.nvim_create_autocmd('CmdlineEnter', {
-  callback = function()
-    vim.o.path = set_path()
-  end,
-  once = true,
-  group = general,
-  desc = 'Lazyload setting path',
-})
 
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
@@ -266,6 +258,7 @@ end
 
 vim.api.nvim_create_autocmd({ 'UIEnter' }, {
   callback = function()
+    vim.o.path = set_path()
     vim.o.findfunc = 'v:lua.FindFunc'
   end,
   group = general,
