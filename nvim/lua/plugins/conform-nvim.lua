@@ -32,8 +32,6 @@ return {
         yaml = { 'yamlfmt' },
         toml = { 'taplo' },
         java = { 'google-java-format' },
-        -- work
-        -- php = { 'php_cs_fixer' },
       },
       format_on_save = function(bufnr)
         if slow_format_filetypes[vim.bo[bufnr].filetype] then

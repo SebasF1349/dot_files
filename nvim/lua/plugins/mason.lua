@@ -29,7 +29,6 @@ return {
         -- "sqlfluff", -- linter
         -- work
         'phpcs',
-        'php-cs-fixer',
         'php-debug-adapter',
       })
 
