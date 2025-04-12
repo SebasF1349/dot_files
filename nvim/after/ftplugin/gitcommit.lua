@@ -6,7 +6,4 @@ if #line == 0 then
   vim.cmd.startinsert()
 end
 
-vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
-  .. '\n '
-  .. 'setlocal spell< spelllang< '
-  .. ' | sil! nunmap <buffer> <leader>x'
+vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '') .. '\n ' .. 'setlocal spell< spelllang< '

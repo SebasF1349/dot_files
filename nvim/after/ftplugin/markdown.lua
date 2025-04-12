@@ -21,31 +21,12 @@ local formatopts = vim.bo.formatoptions
 vim.bo.formatoptions = formatopts .. 'cro'
 vim.bo.comments = 'b:-,b:+,b:*'
 
-local function show_toc()
-  local bufname = vim.api.nvim_buf_get_name(0)
-  local info = vim.fn.getloclist(0, { winid = 1 })
-  if vim.tbl_isempty(info) and vim.api.nvim_get_option_value('qf_toc', { win = info.winid }) == #bufname then
-    vim.cmd('lopen')
-    return
-  end
-  local list = vim
-    .iter(ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)))
-    :filter(function(_, line)
-      return line:match('^#+')
-    end)
-    :map(function(lnum, line)
-      return { bufnr = vim.fn.bufnr('%'), lnum = lnum, text = line }
-    end)
-    :totable()
-  vim.fn.setloclist(0, list, ' ')
-  vim.cmd('lopen')
-  vim.w.qf_toc = bufname
-end
-
--- NOTE: this may not be needed when https://github.com/neovim/neovim/pull/32282 gets merged
-vim.keymap.set('n', 'gO', show_toc, { desc = 'Show TOC', buffer = 0 })
-
-vim.keymap.set('n', '<leader>mt', 'i<!-- toc --><ESC><cmd>w<CR>', { desc = 'Add [M]arkdown [T]OC using markdown-toc' })
+vim.keymap.set(
+  'n',
+  '<leader>mt',
+  'i<!-- toc --><ESC><cmd>w<CR>',
+  { desc = 'Add [M]arkdown [T]OC using markdown-toc', buffer = 0 }
+)
 
 function _G.MakeList()
   local starting = vim.api.nvim_buf_get_mark(0, '[')
@@ -55,7 +36,12 @@ function _G.MakeList()
   vim.cmd(line_start .. ',' .. line_end .. [[s/\v^(\s*)[^a-zA-Z]*(.*)/\1- \2]])
 end
 
-vim.keymap.set({ 'n', 'v' }, 'gl', _G.opfunc('_G.MakeList'), { desc = 'Make [L]ist', silent = true, expr = true })
+vim.keymap.set(
+  { 'n', 'v' },
+  'gl',
+  _G.opfunc('_G.MakeList'),
+  { desc = 'Make [L]ist', silent = true, expr = true, buffer = 0 }
+)
 
 vim.keymap.set('n', '<leader>x', function()
   local line = vim.api.nvim_get_current_line()
@@ -66,7 +52,7 @@ vim.keymap.set('n', '<leader>x', function()
     local new_line = line:gsub('- %b[]', '- [ ]')
     vim.api.nvim_set_current_line(new_line)
   end
-end, { desc = 'Toggle TODO' })
+end, { desc = 'Toggle TODO', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '

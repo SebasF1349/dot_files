@@ -56,10 +56,10 @@ end
 
 vim.keymap.set({ 'x', 'o' }, 'i=', function()
   phpTextObject('i')
-end, { desc = 'PHP Block Text-Object', silent = true })
+end, { desc = 'PHP Block Text-Object', silent = true, buffer = 0 })
 vim.keymap.set({ 'x', 'o' }, 'a=', function()
   phpTextObject('a')
-end, { desc = 'PHP Block Text-Object', silent = true })
+end, { desc = 'PHP Block Text-Object', silent = true, buffer = 0 })
 
 local snippets = {
   fn = [[${1:public} function ${2:FunctionName}(${3:})
@@ -102,8 +102,8 @@ for key, snippet in pairs(snippets) do
   _G.addSnippet(key, snippet)
 end
 
-vim.keymap.set('n', 'L', 'f$', { desc = 'Next variable' })
-vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable' })
+vim.keymap.set('n', 'L', 'f$', { desc = 'Next variable', buffer = 0 })
+vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable', buffer = 0 })
 
 local function find_buffer_by_name(name)
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -149,7 +149,7 @@ vim.keymap.set('n', 'gf', function()
   else
     vim.api.nvim_feedkeys('gf', 'n', true)
   end
-end, { desc = 'Improved gf to move to views' })
+end, { desc = 'Improved gf to move to views', buffer = 0 })
 
 vim.keymap.set('n', '<leader>aa', function()
   local cfile = vim.fn.expand('<cfile>')
@@ -178,7 +178,7 @@ vim.keymap.set('n', '<leader>aa', function()
     return
   end
   vim.api.nvim_win_set_cursor(0, { linenr, 0 })
-end, { desc = '[A]lternative: [A]ction' })
+end, { desc = '[A]lternative: [A]ction', buffer = 0 })
 
 vim.keymap.set('n', '<leader>ac', function()
   local fpath = vim.fn.expand('%:.')
@@ -192,7 +192,7 @@ vim.keymap.set('n', '<leader>ac', function()
   end
   vim.fn.setreg('f', fname, 'v')
   vim.api.nvim_set_current_buf(bufnr)
-end, { desc = '[A]lternative: [C]ontroller' })
+end, { desc = '[A]lternative: [C]ontroller', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
