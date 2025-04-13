@@ -1,24 +1,4 @@
 return {
-  {
-    'tpope/vim-fugitive',
-    cmd = { 'G', 'Git', 'Gvdiffsplit', 'Gdiffsplit' },
-    keys = {
-      { '<leader>gg', '<cmd>tab G<CR>]]', desc = 'Open fu[G]itive in a new tab', remap = true },
-      { '<leader>gd', '<cmd>Gvdiffsplit<CR>', desc = '[D]iff Current File' },
-      { '<leader>gl', '<cmd>Git log -50 --oneline<cr>', desc = 'fu[G]itive [L]og' },
-    },
-    config = function()
-      local function diffModeMap(key, cmd, desc)
-        vim.keymap.set({ 'n', 'x' }, key, function()
-          return not vim.wo.diff and 'normal! ' .. key
-            or (vim.api.nvim_get_mode().mode == 'n' and '?<<<<<<<<CR>V/>>>>>>><CR>' .. cmd or cmd)
-        end, { desc = desc, silent = true, expr = true })
-      end
-      diffModeMap('gh', ':diffget //2 <CR>', 'Git: get lhs of diff')
-      diffModeMap('gl', ':diffget //3 <CR>', 'Git: get rhs of diff')
-    end,
-  },
-
   { 'NMAC427/guess-indent.nvim', event = 'InsertEnter', opts = {} },
 
   {
