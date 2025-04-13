@@ -24,7 +24,6 @@ return {
       workspace = {
         checkThirdParty = false,
         library = {
-          '${3rd}/luv/library',
           vim.env.VIMRUNTIME,
           vim.fn.stdpath('data') .. '/lazy', -- plugins types
         },
