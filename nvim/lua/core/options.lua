@@ -144,15 +144,12 @@ vim.diagnostic.config({
     severity_sort = true,
     source = false,
     header = '',
-    prefix = function(d)
-      local severity_name = get_diagnostic_hl(d.severity)
-      return '-' .. ' ', 'DiagnosticSign' .. severity_name
-    end,
+    prefix = '',
     format = function(d)
-      return d.message --.. ' '
+      return '- ' .. d.message
     end,
     suffix = function(d)
-      return string.format('[%s: %s]', d.source, d.code), 'Underlined'
+      return string.format('[%s: %s]', d.source, d.code), ''
     end,
   },
   jump = { float = true },
