@@ -13,8 +13,5 @@ return {
     },
   },
   filetypes = { 'bash', 'sh' },
-  root_dir = function(bufnr, cb)
-    local fname = vim.api.nvim_buf_get_name(bufnr)
-    cb(vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1]))
-  end,
+  root_markers = { '.git' },
 }
