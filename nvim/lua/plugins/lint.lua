@@ -19,6 +19,26 @@ return {
       -- ['yaml.ansible'] = { 'ansible-lint', },
     }
 
+
+    local phpcs_info = {
+      'Generic.Functions.FunctionCallArgumentSpacing.NoSpaceAfterComma',
+      'Generic.Commenting.DocComment.Empty',
+      'Generic.Commenting.DocComment.SpacingBeforeTags',
+      'Generic.Commenting.DocComment.MissingShort',
+      'Generic.PHP.LowerCaseConstant.Found',
+      'Squiz.Commenting.DocCommentAlignment.SpaceBeforeStar',
+      'PEAR.WhiteSpace.ScopeIndent.Incorrect',
+      'PEAR.WhiteSpace.ScopeIndent.IncorrectExact',
+      'PEAR.WhiteSpace.ObjectOperatorIndent.Incorrect',
+      'PEAR.WhiteSpace.ScopeClosingBrace.Line',
+      'PEAR.WhiteSpace.ScopeClosingBrace.Indent',
+      'PEAR.ControlStructures.ControlSignature.Found',
+      'PEAR.ControlStructures.MultiLineCondition.SpaceBeforeOpenBrace',
+      'PEAR.ControlStructures.MultiLineCondition.NewlineBeforeOpenBrace',
+      'PEAR.Functions.FunctionCallSignature.CloseBracketLine',
+      'PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket',
+      'PEAR.Functions.FunctionDeclaration.BraceOnSameLine',
+    }
     lint.linters.shellcheck.args = { '-x' }
     -- exclude phpdocs lint
     local original_parse_phpcs = lint.linters.phpcs.parser
@@ -49,7 +69,7 @@ return {
       parser = function(output, bufnr, linter_cwd)
         local diagnostics = original_parse_phpcs(output, bufnr, linter_cwd)
         for _, d in ipairs(diagnostics) do
-          if d.code == 'PEAR.WhiteSpace.ScopeIndent.IncorrectExact' then
+          if vim.list_contains(phpcs_info, d.code) then
             d.severity = vim.diagnostic.severity.INFO
           end
         end
