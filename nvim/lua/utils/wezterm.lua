@@ -42,7 +42,7 @@ function M.setup()
     desc = 'Set Wezterm var to true',
   })
 
-  vim.api.nvim_create_autocmd({ 'VimLeave' }, {
+  vim.api.nvim_create_autocmd({ 'VimLeavePre' }, {
     group = wezterm,
     callback = function()
       set_user_var('IS_NVIM', false)

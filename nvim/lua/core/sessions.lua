@@ -39,7 +39,7 @@ vim.api.nvim_create_user_command('SRemove', sessionRemove, { desc = 'Remove Sess
 
 local auSession = vim.api.nvim_create_augroup('Sessions', {})
 
-vim.api.nvim_create_autocmd('VimLeave', {
+vim.api.nvim_create_autocmd('VimLeavePre', {
   group = auSession,
   callback = function()
     local session_path = get_session_path()
