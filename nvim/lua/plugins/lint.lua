@@ -15,10 +15,17 @@ return {
       json = { 'jsonlint' },
       text = { 'vale' },
       -- work
-      php = { 'phpcs' },
+      php = { 'phpstan' },
+      -- php = { 'phpcs' },
       -- ['yaml.ansible'] = { 'ansible-lint', },
     }
 
+    lint.linters.phpstan.args = {
+      'analyze',
+      '--error-format=json',
+      '--no-progress',
+      '--memory-limit=256M',
+    }
 
     local phpcs_info = {
       'Generic.Functions.FunctionCallArgumentSpacing.NoSpaceAfterComma',

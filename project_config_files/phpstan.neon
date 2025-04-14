@@ -1,0 +1,20 @@
+parameters:
+    level: 4
+    phpversion: 70033
+    bootstrapFiles:
+        - vendor/yiisoft/yii2/Yii.php
+    excludePaths:
+        - 'runtime/*'
+        - 'vendor/*'
+        - 'tests/*'
+        - 'backend/*'
+        - 'frontend/web/*'
+    stubFiles:
+        - stubs/ActiveRecord.stub
+        - stubs/Yii.stub
+        - stubs/YiiRbac.stub
+        - stubs/YiiBase.stub
+        - stubs/YiiWeb.stub
+        - stubs/YiiConsole.stub
+    universalObjectCratesClasses:
+        - stdClass
