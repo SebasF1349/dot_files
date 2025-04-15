@@ -1,6 +1,7 @@
 vim.keymap.set('n', '<leader>gg', '<cmd>tab G<CR>]]', { desc = 'Open fu[G]itive in a new tab', remap = true })
 vim.keymap.set('n', '<leader>gd', '<cmd>Gvdiffsplit<CR>', { desc = '[D]iff Current File' })
-vim.keymap.set('n', '<leader>gl', '<cmd>Git log -50 --oneline<cr>', { desc = 'fu[G]itive [L]og' })
+vim.keymap.set('n', '<leader>gl', '<cmd>tab Git log -50 --oneline<cr>', { desc = 'fu[G]itive [L]og' })
+vim.keymap.set('n', '<leader>gL', '<cmd>tab Git log -50 --oneline %<cr>', { desc = 'fu[G]itive [L]og File' })
 
 return {
   'tpope/vim-fugitive',
