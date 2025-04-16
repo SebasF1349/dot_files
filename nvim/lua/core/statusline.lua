@@ -60,7 +60,7 @@ vim.api.nvim_set_hl(0, 'SLDiff', { bg = curr_statusline_bg, fg = git_diff })
 ---- MODE ----
 local function mode()
   -- NOTE: apparently it's not possible to get operator pending mode
-  local first_char = vim.fn.strtrans(vim.api.nvim_get_mode().mode):sub(1, 1):upper()
+  local first_char = vim.fn.strtrans(vim.api.nvim_get_mode().mode):gsub('%W', ''):sub(1, 1):upper()
   return string.format('%%#SLMode%s#%s', first_char, first_char)
 end
 
