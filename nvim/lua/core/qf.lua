@@ -460,7 +460,8 @@ end
 ---@param listType ListType
 ---@param diagnostics? boolean
 ---@param severity? vim.diagnostic.SeverityFilter
-local function list_toggle(listType, diagnostics, severity)
+---@param scope? string
+local function list_toggle(listType, diagnostics, severity, scope)
   local list = getList(listType)
   if list.winid ~= 0 then
     vim.cmd(listType .. 'close')
@@ -468,6 +469,14 @@ local function list_toggle(listType, diagnostics, severity)
     severity = severity or 'HINT'
     local diag_where = listType == 'l' and 0 or nil
     local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
+    if scope then
+      diag_list = vim
+        .iter(diag_list)
+        :filter(function(v)
+          return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
+        end)
+        :totable()
+    end
     if #diag_list == 0 then
       vim.notify('List is Empty', vim.log.levels.INFO)
       return
@@ -509,6 +518,9 @@ vim.keymap.set('n', '<leader>qd', function()
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
 vim.keymap.set('n', '<leader>qe', function()
   list_toggle('c', true, 'ERROR')
+end, { desc = '[Q]uickfix [E]rror Toggle' })
+vim.keymap.set('n', '<leader>qE', function()
+  list_toggle('c', true, 'ERROR', vim.fn.expand('%:p:h'))
 end, { desc = '[Q]uickfix [E]rror Toggle' })
 vim.keymap.set('n', '<leader>qr', vim.lsp.buf.references, { desc = '[Q]uickfix [R]eferences' })
 vim.keymap.set('n', '<leader>qi', vim.lsp.buf.implementation, { desc = '[Q]uickfix [I]mplementation' })
