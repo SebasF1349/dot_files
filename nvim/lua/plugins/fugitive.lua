@@ -18,7 +18,7 @@ vim.keymap.set(
 vim.keymap.set(
   'n',
   '<leader>gr',
-  '<cmd>tab Git log --graph --pretty=format:"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]" --decorate --numstat<cr>',
+  '<cmd>tab Git log -50 --graph --pretty=format:"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]" --decorate --numstat<cr>',
   { desc = 'fu[G]itive [R]eview Log' }
 )
 
