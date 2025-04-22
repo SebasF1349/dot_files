@@ -100,6 +100,9 @@ window_rules:
           - window_process: { equals: "Lively" }
             window_class: { regex: "HwndWrapper*" }
           - window_process: { equals: "KeePassXC" }
+    - commands: ["move --workspace 9", "focus --workspace 9"]
+      match:
+          - window_title: { equals: "Spotube" }
 binding_modes:
     # When enabled, the focused window can be resized via arrow keys or HJKL.
     - name: "resize"
@@ -142,10 +145,7 @@ keybindings:
               'shell-exec C:\Users\ratab\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ChessBase 17.lnk',
           ]
       bindings: ["lwin+c"]
-    - commands:
-          [
-              'shell-exec C:\Users\ratab\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Spotify.lnk',
-          ]
+    - commands: ['shell-exec C:\Program Files\Spotube\spotube.exe']
       bindings: ["lwin+s"]
     # Shift focus in a given direction.
     - commands: ["focus --direction left"]
