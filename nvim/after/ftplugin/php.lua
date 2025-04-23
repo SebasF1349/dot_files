@@ -1,6 +1,8 @@
 -- FIX: this seems to not be working: https://github.com/neovim/neovim/blob/master/runtime/ftplugin/php.vim#L76C7-L76C20
 -- try this? https://github.com/neovim/neovim/blob/master/runtime/ftplugin/lua.vim
 
+local separator = require('utils.os').dir_separator
+
 vim.bo.commentstring = '// %s'
 
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
@@ -105,16 +107,6 @@ end
 vim.keymap.set('n', 'L', 'f$', { desc = 'Next variable', buffer = 0 })
 vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable', buffer = 0 })
 
-local function find_buffer_by_name(name)
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    local buf_name = vim.api.nvim_buf_get_name(buf)
-    if buf_name:find(name) then
-      return buf
-    end
-  end
-  return -1
-end
-
 local function find_dir_space(fpath)
   for _, dir in ipairs({ 'frontend', 'backend', 'common' }) do
     if fpath:find(dir) then
@@ -129,23 +121,21 @@ vim.keymap.set('n', 'gf', function()
   local cfile = vim.fn.expand('<cfile>')
   if fpath:find('controllers') and not cfile:find('/') then
     local dirspace = find_dir_space(fpath) or ''
-    local controller = fpath:match('/(%a*)Controller.php')
-    local vname = dirspace .. '/views/' .. controller:lower() .. '/' .. cfile
-    local bufnr = find_buffer_by_name(vname)
-    if bufnr == -1 then
+    local controller = fpath:match(separator .. '(%a*)Controller.php')
+    local vname = dirspace .. '/views/' .. controller:lower() .. '/' .. cfile .. '.php'
+    if vim.fn.filereadable(vname) == 1 then
+      vim.cmd('edit ' .. vname)
+    else
       vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
-      return
     end
-    vim.api.nvim_set_current_buf(bufnr)
-  elseif vim.startswith(cfile, '/') then
+  elseif vim.startswith(cfile, separator) then
     local dirspace = find_dir_space(fpath) or ''
-    local vname = dirspace .. '/views/' .. cfile:sub(2)
-    local bufnr = find_buffer_by_name(vname)
-    if bufnr == -1 then
+    local vname = dirspace .. '/views/' .. cfile:sub(2) .. '.php'
+    if vim.fn.filereadable(vname) == 1 then
+      vim.cmd('edit ' .. vname)
+    else
       vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
-      return
     end
-    vim.api.nvim_set_current_buf(bufnr)
   else
     vim.api.nvim_feedkeys('gf', 'n', true)
   end
@@ -159,17 +149,16 @@ vim.keymap.set('n', '<leader>aa', function()
   end
 
   local fpath = vim.fn.expand('%:.')
-  local dirspace = find_dir_space(fpath) or ''
-  local cname = dirspace .. '/controllers/' .. split[1]:sub(1, 1):upper() .. split[1]:sub(2) .. 'Controller.php'
-  local bufnr = find_buffer_by_name(cname)
-  if bufnr == -1 then
+  local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
+  local cname = dirspace .. 'controllers/' .. split[1]:sub(1, 1):upper() .. split[1]:sub(2) .. 'Controller.php'
+  if vim.fn.filereadable(cname) == 0 then
     vim.notify('Controller "' .. cname .. '" not found', vim.log.levels.INFO)
     return
   end
-  vim.api.nvim_set_current_buf(bufnr)
+  vim.cmd('edit ' .. cname)
 
-  local action = split[2]:gsub('%u', function(c)
-    return '-' .. c:lower()
+  local action = split[2]:gsub('-.', function(c)
+    return c:sub(2, 2):upper()
   end)
   action = 'action' .. action:sub(1, 1):upper() .. action:sub(2)
   local linenr = vim.fn.search(action, 'nw')
@@ -182,16 +171,15 @@ end, { desc = '[A]lternative: [A]ction', buffer = 0 })
 
 vim.keymap.set('n', '<leader>ac', function()
   local fpath = vim.fn.expand('%:.')
-  local dirspace = find_dir_space(fpath) or ''
-  local controller, fname = fpath:match('views/(%a*)/(.*).php')
-  local cpath = dirspace .. '/controllers/' .. controller:sub(1, 1):upper() .. controller:sub(2) .. 'Controller.php'
-  local bufnr = find_buffer_by_name(cpath)
-  if bufnr == -1 then
+  local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
+  local controller, fname = fpath:match('views' .. separator .. '(%a*)' .. separator .. '(.*).php')
+  local cpath = dirspace .. 'controllers/' .. controller:sub(1, 1):upper() .. controller:sub(2) .. 'Controller.php'
+  if vim.fn.filereadable(cpath) == 1 then
+    vim.fn.setreg('f', fname, 'v')
+    vim.cmd('edit ' .. cpath)
+  else
     vim.notify('Controller "' .. cpath .. '" not found', vim.log.levels.INFO)
-    return
   end
-  vim.fn.setreg('f', fname, 'v')
-  vim.api.nvim_set_current_buf(bufnr)
 end, { desc = '[A]lternative: [C]ontroller', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
