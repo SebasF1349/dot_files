@@ -104,8 +104,8 @@ for key, snippet in pairs(snippets) do
   _G.addSnippet(key, snippet)
 end
 
-vim.keymap.set('n', 'L', 'f$', { desc = 'Next variable', buffer = 0 })
-vim.keymap.set('n', 'H', 'F$', { desc = 'Previous variable', buffer = 0 })
+vim.keymap.set('n', 'L', 'f$l', { desc = 'Next variable', buffer = 0 })
+vim.keymap.set('n', 'H', 'F$l', { desc = 'Previous variable', buffer = 0 })
 
 local function find_dir_space(fpath)
   for _, dir in ipairs({ 'frontend', 'backend', 'common' }) do
