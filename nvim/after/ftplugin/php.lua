@@ -4,6 +4,7 @@
 local separator = require('utils.os').dir_separator
 
 vim.bo.commentstring = '// %s'
+vim.cmd('setlocal iskeyword-=-')
 
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
@@ -185,7 +186,7 @@ end, { desc = '[A]lternative: [C]ontroller', buffer = 0 })
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:friendlyManual b:surroundPair b:contextStatus'
-  .. ' | setlocal commentstring< '
+  .. ' | setlocal commentstring< iskeyword< '
   .. ' | sil! nunmap <buffer> gf'
   .. ' | sil! nunmap <buffer> <leader>aa'
   .. ' | sil! nunmap <buffer> <leader>ac'
