@@ -346,6 +346,10 @@ local function on_attach(client_id, buf)
   --   vim.wo.foldexpr = 'v:lua.vim.lsp.foldexpr()'
   -- end
 
+  if client:supports_method('textDocument/documentColor') then
+    vim.lsp.document_color.enable(true, buf, { style = 'virtual' })
+  end
+
   if client.server_capabilities.documentHighlightProvider then
     local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
     -- Highlight references of the word under your cursor
