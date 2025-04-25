@@ -86,6 +86,11 @@ return {
           TelescopeBorder = { bg = float_bg },
 
           TerminalNormal = { bg = colors.base, fg = colors.text },
+
+          -- Checkhealth
+          ['@comment.note'] = { bg = 'none', fg = colors.teal }, -- healthSuccess
+          ['@comment.warning'] = { bg = 'none', fg = colors.yellow }, -- healthWarning
+          ['@comment.error'] = { bg = 'none', fg = colors.red }, -- healthError
         }
       end,
     })
