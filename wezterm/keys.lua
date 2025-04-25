@@ -22,6 +22,15 @@ end)
 function M.setup(config)
 	config.disable_default_key_bindings = true
 	config.keys = {
+		-- Dumb workaround to make C-space work in nvim
+		{
+			key = " ",
+			mods = "CTRL",
+			action = act.SendKey({
+				key = " ",
+				mods = "CTRL",
+			}),
+		},
 		-- Workspaces
 		{
 			mods = M.modWorkspace,
