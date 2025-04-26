@@ -25,10 +25,7 @@ end
 ---@param client_id integer
 ---@param buf integer
 local function on_attach(client_id, buf)
-  local client = vim.lsp.get_client_by_id(client_id)
-  if not client then
-    return
-  end
+  local client = assert(vim.lsp.get_client_by_id(client_id))
 
   local bufname = vim.api.nvim_buf_get_name(buf)
   if #bufname ~= 0 and not bufname_valid(bufname) then
@@ -138,7 +135,7 @@ local function on_attach(client_id, buf)
   vim.keymap.set('i', '<C-n>', function()
     if vim.fn.pumvisible() ~= 0 then
       vim.api.nvim_input('<C-n>')
-    elseif next(vim.lsp.get_clients({ bufnr = 0 })) then
+    elseif next(vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/completion' })) then
       vim.lsp.completion.get()
     elseif vim.bo.omnifunc == '' then
       vim.api.nvim_input('<C-x><C-n>')
@@ -318,7 +315,7 @@ local function on_attach(client_id, buf)
         if new_line then
           d.message = d.message:sub(1, new_line - 1)
         end
-        local bufname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
+        local bname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
         local lnum = d.lnum or d.end_lnum
         return string.format('%s%s (%s:%s)', signs[d.severity], d.message, bufname, lnum + 1)
       end,
@@ -382,8 +379,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
   ---@param args {buf:integer, data:{client_id:integer}}
   callback = function(args)
-    local buf = args.buf
-    on_attach(args.data.client_id, buf)
+    on_attach(args.data.client_id, args.buf)
   end,
 })
 local register_capability = vim.lsp.handlers[methods.client_registerCapability]
