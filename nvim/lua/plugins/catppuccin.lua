@@ -88,9 +88,9 @@ return {
           TerminalNormal = { bg = colors.base, fg = colors.text },
 
           -- Checkhealth
-          ['@comment.note'] = { bg = 'none', fg = colors.teal }, -- healthSuccess
-          ['@comment.warning'] = { bg = 'none', fg = colors.yellow }, -- healthWarning
-          ['@comment.error'] = { bg = 'none', fg = colors.red }, -- healthError
+          ['@health.success'] = { bg = 'none', fg = colors.teal, style = { 'bold', 'underline' } }, -- healthSuccess
+          ['@health.warning'] = { bg = 'none', fg = colors.yellow, style = { 'bold', 'underline' } }, -- healthWarning
+          ['@health.error'] = { bg = 'none', fg = colors.red, style = { 'bold', 'underline' } }, -- healthError
         }
       end,
     })

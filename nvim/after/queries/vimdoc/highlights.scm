@@ -1,10 +1,18 @@
 ;; extends
 
-((word) @comment.warning
-  (#any-of? @comment.warning "Warning" "WARNING"))
+((word) @health.success
+  (#any-of? @health.success "Ok" "OK"))
 
-((word) @comment.note
-  (#any-of? @comment.note "Ok" "OK"))
+((word) @health.warning
+        (#any-of? @health.warning "Warning" "WARNING"))
  
-((word) @comment.error
-  (#any-of? @comment.error "Error" "ERROR" "Deprecated" "DEPRECATED"))
+((word) @health.error
+  (#any-of? @health.error "Error" "ERROR" "Deprecated" "DEPRECATED"))
+
+(
+    (
+        (word) @health.icon
+        (#any-of? @health.icon "✅" "⚠️" "❌")
+    )
+    @conceal (#set! conceal "")
+)
