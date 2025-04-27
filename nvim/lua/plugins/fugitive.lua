@@ -1,25 +1,22 @@
 vim.keymap.set('n', '<leader>gg', '<cmd>tab Git<CR>]]', { desc = 'Open fu[G]itive in a new tab', remap = true })
 vim.keymap.set('n', '<leader>gd', '<cmd>Gvdiffsplit<CR>', { desc = '[D]iff Current File' })
 vim.keymap.set('n', '<leader>gb', '<cmd>Git blame<cr>', { desc = 'fu[G]itive [B]lame' })
-vim.keymap.set('n', '<leader>gl', '<cmd>tab Git log -50 --oneline<cr>', { desc = 'fu[G]itive [L]og' })
+
+local log_cmd = 'tab Git log -50 --graph --decorate --pretty=format:"%h %s [%cn - %ar]%d"'
+vim.keymap.set('n', '<leader>gl', '<cmd>' .. log_cmd .. '<cr>', { desc = 'fu[G]itive [L]og' })
 vim.keymap.set(
   'x',
   '<leader>gl',
   ":<C-u>execute 'Git log -L ' . line(\"'<\") . ',' . line(\"'>\") . ':%'<CR>",
   { desc = 'fu[G]itive [L]og' }
 )
-vim.keymap.set('n', '<leader>gL', '<cmd>tab Git log -50 --oneline %<cr>', { desc = 'fu[G]itive [L]og File' })
+vim.keymap.set('n', '<leader>gL', '<cmd>' .. log_cmd .. ' %<cr>', { desc = 'fu[G]itive [L]og File' })
+vim.keymap.set('n', '<leader>gr', '<cmd>' .. log_cmd .. ' --numstat<cr>', { desc = 'fu[G]itive [R]eview Log' })
 vim.keymap.set(
   'n',
   '<leader>gR',
   '<cmd>tab Git log -50 --oneline --patch<cr>',
   { desc = 'fu[G]itive Detailed [R]eview Log' }
-)
-vim.keymap.set(
-  'n',
-  '<leader>gr',
-  '<cmd>tab Git log -50 --graph --pretty=format:"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]" --decorate --numstat<cr>',
-  { desc = 'fu[G]itive [R]eview Log' }
 )
 
 return {
