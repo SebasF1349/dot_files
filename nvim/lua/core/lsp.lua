@@ -226,23 +226,16 @@ local function on_attach(client_id, buf)
   end, { desc = 'LSP: Go to previous [R]eference', buffer = buf })
 
   vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buffer = buf })
-  vim.keymap.set(
-    'n',
-    'gre',
-    vim.diagnostic.open_float,
-    -- function()
-    --   vim.diagnostic.config({ virtual_lines = { current_line = true } })
-    --   vim.api.nvim_create_autocmd('CursorMoved', {
-    --     group = vim.api.nvim_create_augroup('line-diagnostics', { clear = true }),
-    --     callback = function()
-    --       vim.diagnostic.config({ virtual_lines = false })
-    --       return true
-    --     end,
-    --   })
-    -- end,
-    { desc = 'LSP: Open Floating [E]rror Message', buffer = buf }
-  )
-  vim.keymap.set('n', 'grd', '<C-]>', { desc = 'LSP: [G]oto [D]efinition', buffer = buf })
+  vim.keymap.set('n', '<C-w><C-d>', '<C-w>d', { desc = 'Make <C-w><C-d> also trigger float', remap = true })
+  vim.keymap.set('n', '<C-w>d', function()
+    if
+      vim.diagnostic.open_float({ scope = 'c', header = 'Cursor Diagnostics:' })
+      or vim.diagnostic.open_float({ scope = 'l', header = 'Line Diagnostics:' })
+    then
+      return
+    end
+    vim.notify('No diagnostics found', vim.log.levels.INFO)
+  end, { desc = 'Floating Diagnostics' })
   vim.keymap.set('n', 'grt', vim.lsp.buf.type_definition, { desc = 'LSP: [G]oto [T]ype Definition', buffer = buf })
 
   local preview_namespace = vim.api.nvim_create_namespace('preview')
