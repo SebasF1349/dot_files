@@ -89,7 +89,7 @@ local snippets = {
 }]],
   this = [[\$this->$0;]],
   p = [[var_dump($0);]],
-  pe = [[var_dump($0);exit();]],
+  pe = [[echo '<pre>'; var_export($0); echo '</pre>';exit;]],
   ['-'] = [[<?php ${0} ?>]],
   ['_'] = [[<?php
     ${0}
