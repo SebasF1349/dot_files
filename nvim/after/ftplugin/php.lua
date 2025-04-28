@@ -172,8 +172,11 @@ end, { desc = '[A]lternative: [A]ction', buffer = 0 })
 
 vim.keymap.set('n', '<leader>ac', function()
   local fpath = vim.fn.expand('%:.')
-  local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
-  local controller, fname = fpath:match('views' .. separator .. '(%a*)' .. separator .. '(.*).php')
+  local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. separator or ''
+  local controller, fname = fpath:match('views' .. separator .. '(.*)' .. separator .. '(.*).php')
+  controller = controller:gsub('-.', function(c)
+    return c:sub(2, 2):upper()
+  end)
   local cpath = dirspace .. 'controllers/' .. controller:sub(1, 1):upper() .. controller:sub(2) .. 'Controller.php'
   if vim.fn.filereadable(cpath) == 1 then
     vim.fn.setreg('f', fname, 'v')
