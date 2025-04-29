@@ -123,7 +123,10 @@ vim.keymap.set('n', 'gf', function()
   if fpath:find('controllers') and not cfile:find('/') then
     local dirspace = find_dir_space(fpath) or ''
     local controller = fpath:match(separator .. '(%a*)Controller.php')
-    local vname = dirspace .. '/views/' .. controller:lower() .. '/' .. cfile .. '.php'
+    controller = controller:gsub('%u', function(c)
+      return '-' .. c:lower()
+    end)
+    local vname = dirspace .. '/views/' .. controller:sub(2) .. '/' .. cfile .. '.php'
     if vim.fn.filereadable(vname) == 1 then
       vim.cmd('edit ' .. vname)
     else
