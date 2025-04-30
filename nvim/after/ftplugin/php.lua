@@ -121,20 +121,20 @@ vim.keymap.set('n', 'gf', function()
   local fpath = vim.fn.expand('%:.')
   local cfile = vim.fn.expand('<cfile>')
   if fpath:find('controllers') and not cfile:find('/') then
-    local dirspace = find_dir_space(fpath) or ''
+    local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
     local controller = fpath:match(separator .. '(%a*)Controller.php')
     controller = controller:gsub('%u', function(c)
       return '-' .. c:lower()
     end)
-    local vname = dirspace .. '/views/' .. controller:sub(2) .. '/' .. cfile .. '.php'
+    local vname = dirspace .. 'views/' .. controller:sub(2) .. '/' .. cfile .. '.php'
     if vim.fn.filereadable(vname) == 1 then
       vim.cmd('edit ' .. vname)
     else
       vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
     end
   elseif vim.startswith(cfile, separator) then
-    local dirspace = find_dir_space(fpath) or ''
-    local vname = dirspace .. '/views/' .. cfile:sub(2) .. '.php'
+    local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
+    local vname = dirspace .. 'views/' .. cfile:sub(2) .. '.php'
     if vim.fn.filereadable(vname) == 1 then
       vim.cmd('edit ' .. vname)
     else
