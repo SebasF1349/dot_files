@@ -4,6 +4,14 @@ vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
 vim.bo.tabstop = 8
 
+vim.keymap.set('n', '<C-n>', 'jp', { buffer = 0, remap = true, silent = true })
+vim.keymap.set('n', '<C-p>', 'kp', { buffer = 0, remap = true, silent = true })
+
+vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = 0, silent = true })
+
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'setlocal tabstop< statuscolumn< signcolumn< buflisted< bufhidden< modifiable<'
+  .. ' | sil! nunmap <buffer> q'
+  .. ' | sil! nunmap <buffer> <C-n>'
+  .. ' | sil! nunmap <buffer> <C-p>'
