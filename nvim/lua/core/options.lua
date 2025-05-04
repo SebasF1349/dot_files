@@ -1,5 +1,3 @@
-local get_diagnostic_hl = require('utils.ui').get_diagnostic_hl
-
 -- Disable cursor blinking in terminal mode.
 -- Using the same cursor for terminal as in insert mode is more vimmish but less terminalish
 vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor'

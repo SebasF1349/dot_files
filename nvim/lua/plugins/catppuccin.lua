@@ -90,9 +90,9 @@ return {
           TerminalNormal = { bg = colors.base, fg = colors.text },
 
           -- Checkhealth
-          ['@health.success'] = { bg = 'none', fg = colors.teal, style = { 'bold', 'underline' } }, -- healthSuccess
-          ['@health.warning'] = { bg = 'none', fg = colors.yellow, style = { 'bold', 'underline' } }, -- healthWarning
-          ['@health.error'] = { bg = 'none', fg = colors.red, style = { 'bold', 'underline' } }, -- healthError
+          ['@health.success'] = { bg = colors.none, fg = colors.teal, style = { 'bold', 'underline' } }, -- healthSuccess
+          ['@health.warning'] = { bg = colors.none, fg = colors.yellow, style = { 'bold', 'underline' } }, -- healthWarning
+          ['@health.error'] = { bg = colors.none, fg = colors.red, style = { 'bold', 'underline' } }, -- healthError
         }
       end,
     })
