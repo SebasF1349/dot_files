@@ -59,9 +59,9 @@ vim.api.nvim_set_hl(0, 'SLDiff', { bg = curr_statusline_bg, fg = git_diff })
 
 ---- MODE ----
 local function mode()
-  -- NOTE: apparently it's not possible to get operator pending mode
+  -- NOTE: apparently it's not possible to get operator pending mode or it flickers with normal
   local mode_char = vim.api.nvim_get_mode().mode
-  mode_char = mode_char == '' and 'V' or mode_char:upper()
+  mode_char = mode_char == '' and 'V' or mode_char:sub(1, 1):upper()
   return string.format('%%#SLMode%s#%s', mode_char, mode_char)
 end
 
