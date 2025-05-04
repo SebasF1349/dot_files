@@ -50,9 +50,11 @@ return {
           MatchParen = { fg = colors.mauve, bg = colors.surface1, style = {} },
 
           -- make the references to the word under the cursor darker
-          LspReferenceText = { bg = 'none' }, -- colors.surface0 },
-          LspReferenceRead = { bg = 'none' }, -- colors.surface0 },
-          LspReferenceWrite = { bg = 'none' }, -- colors.surface0 },
+          LspReferenceText = { bg = colors.none },
+          LspReferenceRead = { bg = colors.none },
+          LspReferenceWrite = { bg = colors.none },
+
+          LspReferenceShow = { bg = colors.surface1 }, -- custom hl
 
           MasonNormal = { link = 'NormalFloat' },
 

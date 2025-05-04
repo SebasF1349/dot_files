@@ -225,6 +225,25 @@ local function on_attach(client_id, buf)
     move_reference(vim.v.count1, -1, true)
   end, { desc = 'LSP: Go to previous [R]eference', buffer = buf })
 
+  local ns_hl = vim.api.nvim_create_namespace('hlreferences')
+  local function hl_references()
+    local extmarks = {}
+    for i, extmark in ipairs(vim.api.nvim_buf_get_extmarks(0, ns, 0, -1, { details = true })) do
+      extmarks[i] = vim.api.nvim_buf_set_extmark(
+        0,
+        ns_hl,
+        extmark[2],
+        extmark[3],
+        { hl_group = 'LspReferenceShow', end_col = extmark[4].end_col, virt_text_pos = 'overlay' }
+      )
+      vim.defer_fn(function()
+        vim.api.nvim_buf_del_extmark(0, ns_hl, extmarks[i])
+      end, 10 * 1000)
+    end
+  end
+
+  vim.keymap.set('n', '<leader>8', hl_references, { desc = 'LSP: Go to previous [R]eference', buffer = buf })
+
   vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buffer = buf })
   vim.keymap.set('n', '<C-w><C-d>', '<C-w>d', { desc = 'Make <C-w><C-d> also trigger float', remap = true })
   vim.keymap.set('n', '<C-w>d', function()

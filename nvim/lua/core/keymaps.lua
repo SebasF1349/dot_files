@@ -201,8 +201,6 @@ vim.keymap.set('n', 'g/', ':GSearch ', { desc = 'Search with [G]lobal' })
 vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark' })
 vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark' })
 
-vim.keymap.set('n', '<leader>8', '*Nzz', { desc = 'Highlight other instances of the word' })
-
 local function add_magic(cmd_line, cmd_pos)
   local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
   if not ok then
