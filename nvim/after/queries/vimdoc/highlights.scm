@@ -8,11 +8,3 @@
  
 ((word) @health.error
   (#any-of? @health.error "Error" "ERROR" "Deprecated" "DEPRECATED"))
-
-(
-    (
-        (word) @health.icon
-        (#any-of? @health.icon "✅" "⚠️" "❌")
-    )
-    @conceal (#set! conceal "")
-)
