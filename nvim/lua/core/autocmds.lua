@@ -47,26 +47,6 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   desc = "Don't auto comment after pressing enter in comment",
 })
 
-vim.api.nvim_create_autocmd({ 'FileType' }, {
-  pattern = {
-    'query',
-    'checkhealth',
-    'git',
-    'help',
-    'tsplayground',
-    '',
-  },
-  callback = function(event)
-    vim.opt.statuscolumn = ' '
-    vim.opt.signcolumn = 'yes'
-    vim.bo.buflisted = false
-    vim.bo.bufhidden = 'wipe'
-    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = event.buf, silent = true })
-  end,
-  group = general,
-  desc = "Close with 'q' in some windows",
-})
-
 vim.api.nvim_create_autocmd({ 'VimResized' }, {
   callback = function()
     vim.cmd('tabdo wincmd =')

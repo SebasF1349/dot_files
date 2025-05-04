@@ -3,12 +3,9 @@ vim.wo.signcolumn = 'yes'
 vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
 
-vim.bo.modifiable = true
-vim.cmd('silent! %s/\\v-( ?[^\\x00-\\x7F])/-/')
-vim.cmd('silent! %s/\\v:\\s+[0-9]*( ?[^\\x00-\\x7F])/:/')
-vim.bo.modifiable = false
-vim.api.nvim_win_set_cursor(0, { 1, 0 })
+vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = 0, silent = true })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'setlocal statuscolumn< signcolumn< buflisted< bufhidden< modifiable<'
+  .. ' | sil! nunmap <buffer> q'

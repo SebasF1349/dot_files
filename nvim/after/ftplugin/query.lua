@@ -2,8 +2,7 @@ vim.wo.statuscolumn = ' '
 vim.wo.signcolumn = 'yes'
 vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
-vim.bo.tabstop = 8
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
-  .. 'setlocal tabstop< statuscolumn< signcolumn< buflisted< bufhidden< modifiable<'
+  .. 'setlocal statuscolumn< signcolumn< buflisted< bufhidden< modifiable<'
