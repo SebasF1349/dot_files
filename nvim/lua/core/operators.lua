@@ -69,7 +69,7 @@ vim.keymap.set(
 -- Surround
 --------------------------------------------------
 
--- TODO: accept input data from ui.input (like for tags or function names)
+-- TODO: add 'surround with function' with fn.input to input the function name
 
 -- FIX: try to reduce boilerplate
 local surround = {
@@ -91,6 +91,10 @@ local surround = {
 
 local function get_pair()
   local char = vim.fn.getcharstr()
+  if char == 't' then
+    local tag = vim.fn.input('Enter tag: ')
+    return { { '<' .. tag .. '>' }, { '</' .. tag .. '>' } }
+  end
   if vim.b.surroundPair then
     local _, item = vim.iter(vim.b.surroundPair):find(function(t, _)
       return char == t
