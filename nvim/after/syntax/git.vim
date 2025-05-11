@@ -6,7 +6,7 @@ syntax match gitGraphReviewAuthor /\[[^[]*\]/ contained containedin=gitGraphRevi
 
 syntax match gitGraphReviewFiles /^[|\/\\_* ]\{-\}[|\/\\_ ]\{-\}\s\zs\d\{1,\}\s\d\{1,\}\s.*[\\\/].*/ contains=@NoSpell
 syntax match gitGraphReviewFilesDiffs /\d\{1,\}\s\d\{1,\}\s/ contained containedin=gitGraphReviewFiles contains=@NoSpell
-syntax match gitGraphReviewFilesFile /.*[\\\/]\zs\S*\.\S*/ contained containedin=gitGraphReviewFiles contains=@NoSpell
+syntax match gitGraphReviewFilesFile /.*[\\\/]\zs.*/ contained containedin=gitGraphReviewFiles contains=@NoSpell
 
 hi def link gitGraphReviewHash Keyword
 hi def link gitGraphReviewLabel Label
