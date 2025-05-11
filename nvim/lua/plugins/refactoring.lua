@@ -1,3 +1,6 @@
+vim.keymap.set('n', '<leader>rs', ':%s/\\v', { desc = '[R]efactor [S]ubstitute' })
+vim.keymap.set('x', '<leader>rs', ':s/\\v', { desc = '[R]efactor [S]ubstitute' })
+
 return {
   'ThePrimeagen/refactoring.nvim',
   cmd = 'Refactor',
