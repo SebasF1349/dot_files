@@ -329,7 +329,7 @@ local function on_attach(client_id, buf)
         end
         local bname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
         local lnum = d.lnum or d.end_lnum
-        return string.format('%s%s (%s:%s)', signs[d.severity], d.message, bufname, lnum + 1)
+        return string.format('%s%s (%s:%s)', signs[d.severity], d.message, bname, lnum + 1)
       end,
     }
     local win = vim.api.nvim_get_current_win()
