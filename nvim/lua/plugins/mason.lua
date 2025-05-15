@@ -2,7 +2,7 @@ local servers = require('core.lsp').servers
 
 return {
   {
-    'williamboman/mason.nvim',
+    'mason-org/mason.nvim',
     cmd = { 'Mason', 'MasonInstall', 'MasonInstallAll', 'MasonInstallNew', 'MasonUpdate', 'MasonUninstallNotEnsured' },
     config = function()
       local ensure_installed = vim.tbl_keys(servers or {})
