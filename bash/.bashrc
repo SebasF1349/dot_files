@@ -214,8 +214,8 @@ alias gp="git pull"
 alias gpull="git pull"
 alias gst="git stash"
 alias gu="git reset HEAD~1 --mixed"
-alias gl="git log --graph --pretty=format:\"%C(yellow)%h %ad%Cred%d %Creset%s%Cblue [%cn]\" --decorate --date=relative"
-alias gll="git log --graph --pretty=format:\"%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]\" --decorate --numstat" #with files changed
+alias gl="git log --graph --pretty=format:\"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]\" --decorate"
+alias gll="git log --graph --pretty=format:\"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]\" --decorate --numstat" #with files changed
 
 alias nv='${EDITOR}'
 alias nv.='${EDITOR} .'
