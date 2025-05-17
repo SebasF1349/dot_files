@@ -1,5 +1,10 @@
 -- FIX: this seems to not be working: https://github.com/neovim/neovim/blob/master/runtime/ftplugin/php.vim#L76C7-L76C20
 -- try this? https://github.com/neovim/neovim/blob/master/runtime/ftplugin/lua.vim
+-- Tools to try:
+--- pest (only for 7.3+)
+--- phpmd (too harsh - for example all elses are errors)
+--- rector (to update php)
+--- php-cs-fixer or phpcbf (formatting - if it's even introduced at work)
 
 local separator = require('utils.os').dir_separator
 
