@@ -553,7 +553,7 @@ vim.keymap.set('n', "g'", function()
   end
 end, { desc = 'Add tilde to letters', expr = true })
 
-vim.keymap.set('n', '<leader>;', 'mzA;`z', { desc = 'Add [;] at the end of the line' })
+vim.keymap.set('n', '<C-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' })
 
 --------------------------------------------------
 -- Toggler
