@@ -431,17 +431,16 @@ local function document_symbols(symbols)
           return vim.tbl_contains(symbols, string.lower(item.kind))
         end, items)
         if vim.tbl_isempty(items) then
-          ---@diagnostic disable-next-line: param-type-mismatch
           vim.notify('No Symbols in the Document', vim.lsp.log_levels.WARN)
           return
         end
       end
       items = vim.tbl_map(function(item)
-        item.text = string.format('[%s] %s', item.kind, vim.fn.trim(vim.fn.getline(item.lnum)))
+        item.text = vim.fn.trim(vim.fn.getline(item.lnum))
         return item
       end, items)
       local title = vim.tbl_isempty(symbols) and 'All' or table.concat(symbols, ', ')
-      vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. title, items = items })
+      vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. title:upper(), items = items })
       vim.schedule(function()
         vim.cmd('lopen')
       end)
