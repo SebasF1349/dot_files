@@ -114,6 +114,13 @@ if [ "$DISTRO" = "debian" ]; then
     export FZF_DEFAULT_OPTS='--height 50% --layout=reverse --border'
 elif [ "$DISTRO" = "arch" ]; then
     export FZF_DEFAULT_OPTS='--height ~50% --layout=reverse --border'
+
+    wifi_info=$(ip -4 -o addr show wlan0)
+    if [ -z "$wifi_info" ]; then
+        nmcli radio wifi off &
+        sleep 1 &
+        nmcli radio wifi on
+    fi
 fi
 # Options to fzf command
 export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
