@@ -45,8 +45,6 @@ return {
         local float_bg = utils.darken(colors.blue, 0.10, colors.base)
 
         return {
-          CursorLineNr = { fg = colors.lavender, style = { 'bold', 'italic' } },
-
           MatchParen = { fg = colors.mauve, bg = colors.surface1, style = {} },
 
           -- make the references to the word under the cursor darker
