@@ -75,14 +75,14 @@ vim.opt.wildmode = 'longest:full,full'
 vim.opt.smoothscroll = true
 
 -- https://new.reddit.com/r/neovim/comments/1fzn1zt/custom_fold_text_function_with_treesitter_syntax/
-local function fold_virt_text(result, s, lnum, coloff)
-  if not coloff then
-    coloff = 0
-  end
+local function fold_virt_text(result, lnum, trim)
+  local str = vim.fn.getline(lnum + 1):gsub('\t', string.rep(' ', vim.o.tabstop))
+  local coloff = trim and #(str:match('^(%s+)') or '') or 0
+  str = trim and vim.trim(str) or str
   local text = ''
   local hl
-  for i = 1, #s do
-    local char = s:sub(i, i)
+  for i = 1, #str do
+    local char = str:sub(i, i)
     local hls = vim.treesitter.get_captures_at_pos(0, lnum, coloff + i - 1)
     local _hl = hls[#hls]
     if _hl then
@@ -102,15 +102,12 @@ local function fold_virt_text(result, s, lnum, coloff)
 end
 
 function _G.custom_foldtext()
-  local start = vim.fn.getline(vim.v.foldstart):gsub('\t', string.rep(' ', vim.o.tabstop))
-  local end_str = vim.fn.getline(vim.v.foldend)
-  local end_ = vim.trim(end_str)
   local result = {}
-  fold_virt_text(result, start, vim.v.foldstart - 1)
+  fold_virt_text(result, vim.v.foldstart - 1)
   local number_lines = vim.v.foldend - vim.v.foldstart
   table.insert(result, { ' [ ' .. number_lines .. ' lines ] ', 'Delimiter' })
   if vim.o.filetype ~= 'markdown' then
-    fold_virt_text(result, end_, vim.v.foldend - 1, #(end_str:match('^(%s+)') or ''))
+    fold_virt_text(result, vim.v.foldend - 1, true)
   end
   return result
 end
