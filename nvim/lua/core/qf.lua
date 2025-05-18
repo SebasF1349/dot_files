@@ -514,8 +514,6 @@ end, { desc = '[Q]uickfix [E]rror Toggle' })
 vim.keymap.set('n', '<leader>qE', function()
   list_toggle('c', true, 'ERROR', vim.fn.expand('%:p:h'))
 end, { desc = '[Q]uickfix [E]rror Toggle' })
-vim.keymap.set('n', '<leader>qr', vim.lsp.buf.references, { desc = '[Q]uickfix [R]eferences' })
-vim.keymap.set('n', '<leader>qi', vim.lsp.buf.implementation, { desc = '[Q]uickfix [I]mplementation' })
 vim.keymap.set('n', '<leader>qb', function()
   moveToList('c')
 end, { desc = 'Move to [Q]uickfix [B]uffer' })
@@ -532,50 +530,6 @@ end, { desc = '[L]ocation List [S]ymbols' })
 vim.keymap.set('n', '<leader>lb', function()
   moveToList('l')
 end, { desc = 'Move to [L]ocation List [B]uffer' })
-
----@param listType ListType
----@param direction 'next' | 'previous'
----@param file boolean
-local function move(listType, direction, file)
-  local list = getList(listType)
-  if #list.items == 0 then
-    vim.notify('List is Empty', vim.log.levels.WARN)
-    return
-  end
-  ---@diagnostic disable-next-line: param-type-mismatch
-  local ok, _ = pcall(vim.cmd, file and listType .. direction .. 'f' or listType .. direction)
-  if not ok then
-    vim.cmd(listType .. (direction == 'n' and 'first' or 'last'))
-  end
-end
-
-vim.keymap.set('n', ']q', function()
-  move('c', 'next', false)
-end, { desc = 'Next [Q]uickfix Item Wrapping' })
-vim.keymap.set('n', '[q', function()
-  move('c', 'previous', false)
-end, { desc = 'Previous [Q]uickfix Item Wrapping' })
-
-vim.keymap.set('n', ']Q', function()
-  move('c', 'next', true)
-end, { desc = 'Next [Q]uickfix File Wrapping' })
-vim.keymap.set('n', '[Q', function()
-  move('c', 'previous', true)
-end, { desc = 'Previous [Q]uickfix File Wrapping' })
-
-vim.keymap.set('n', ']l', function()
-  move('l', 'next', false)
-end, { desc = 'Next [L]ocation List Item Wrapping' })
-vim.keymap.set('n', '[l', function()
-  move('l', 'previous', false)
-end, { desc = 'Previous [L]ocation List Item Wrapping' })
-
-vim.keymap.set('n', ']L', function()
-  move('l', 'next', true)
-end, { desc = 'Next [L]ocation List File Wrapping' })
-vim.keymap.set('n', '[L', function()
-  move('l', 'previous', true)
-end, { desc = 'Previous [L]ocation List File Wrapping' })
 
 ---@param listType? ListType
 local function addToQuickfix(listType)
