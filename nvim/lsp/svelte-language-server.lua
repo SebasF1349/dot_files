@@ -3,10 +3,7 @@ return {
   filetypes = { 'svelte' },
   root_markers = { 'package.json', '.git' },
   on_attach = function()
-    local clients = vim.lsp.get_clients({
-      bufnr = 0,
-      name = 'svelte',
-    })
+    local clients = vim.lsp.get_clients({ bufnr = 0, name = 'svelte' })
 
     vim.api.nvim_buf_create_user_command(0, 'MigrateToSvelte5', function()
       for _, client in ipairs(clients) do
