@@ -84,10 +84,12 @@ wezterm.on("update-status", function(window, _)
 end)
 
 wezterm.on("gui-startup", function(cmd)
-	local sessions = require("sessions")
-	sessions.setup()
 	local _, pane, window = wezterm.mux.spawn_window(cmd or {})
-	sessions.select_workspace(window:gui_window(), pane, true)
+	if not pane:get_domain_name():find("SSH") then
+		local sessions = require("sessions")
+		sessions.setup()
+		sessions.select_workspace(window:gui_window(), pane, true)
+	end
 end)
 
 return config
