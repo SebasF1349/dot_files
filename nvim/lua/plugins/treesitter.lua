@@ -110,24 +110,4 @@ return {
       })
     end,
   },
-  {
-    'aaronik/treewalker.nvim',
-    event = { 'BufReadPost', 'BufNewFile' },
-    config = function()
-      local treewalker = require('treewalker')
-      treewalker.setup({
-        highlight = true, -- Whether to briefly highlight the node after jumping to it
-        highlight_duration = 250, -- How long should above highlight last (in ms)
-      })
-
-      vim.keymap.set({ 'n', 'v' }, '<A-k>', '<cmd>Treewalker Up<cr>zz', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<A-j>', '<cmd>Treewalker Down<cr>zz', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<A-l>', '<cmd>Treewalker Right<cr>zz', { silent = true })
-      vim.keymap.set({ 'n', 'v' }, '<A-h>', '<cmd>Treewalker Left<cr>zz', { silent = true })
-      vim.keymap.set('n', '<A-K>', '<cmd>Treewalker SwapUp<cr>zz', { silent = true })
-      vim.keymap.set('n', '<A-J>', '<cmd>Treewalker SwapDown<cr>zz', { silent = true })
-      vim.keymap.set('n', '<A-L>', '<cmd>Treewalker SwapRight<CR>zz', { silent = true })
-      vim.keymap.set('n', '<A-H>', '<cmd>Treewalker SwapLeft<CR>zz', { silent = true })
-    end,
-  },
 }
