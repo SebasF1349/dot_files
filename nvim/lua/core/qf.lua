@@ -6,6 +6,7 @@ local qfbufnr
 local qfim_namespace = vim.api.nvim_create_namespace('qfim')
 local qfim_file_namespace = vim.api.nvim_create_namespace('qfim-file')
 local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
+local last_cmd = ''
 
 --------------------------------------------------
 -- Types
@@ -169,11 +170,13 @@ vim.opt.grepformat = '%f:%l:%c:%m'
 vim.cmd([[packadd cfilter]])
 
 vim.api.nvim_create_user_command('Rg', function(opts)
-  vim.cmd('silent! grep! ' .. opts.args)
+  last_cmd = 'silent! grep! ' .. opts.args
+  vim.cmd(last_cmd)
 end, { nargs = 1 })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
-  vim.cmd('silent lgrep! "' .. opts.args .. '" %')
+  last_cmd = 'silent lgrep! "' .. opts.args .. '" %'
+  vim.cmd(last_cmd)
 end, { nargs = 1 })
 
 --------------------------------------------------
@@ -372,6 +375,11 @@ end
 function _G.quickfixtextfunc(info)
   local listType = info.quickfix == 1 and 'c' or 'l'
   local list = getList(listType, nil, info.winid)
+  if list.context == '' and last_cmd ~= '' then
+    setList(listType, {
+      context = { last_cmd = last_cmd },
+    }, 'a')
+  end
   qfbufnr = list.qfbufnr
   local diffs
   local isDiff = isDiffTool(list)
@@ -457,6 +465,7 @@ local function list_toggle(listType, diagnostics, severity, scope)
   if list.winid ~= 0 then
     vim.cmd(listType .. 'close')
   elseif diagnostics then
+    last_cmd = ''
     severity = severity or 'HINT'
     local diag_where = listType == 'l' and 0 or nil
     local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
@@ -943,7 +952,10 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
         return
       end
       local list = getList(listType)
-      if list.context ~= '' and list.context.qfim_diag and list.context.qfim_diag.type == listType then
+      if list.context == '' then
+        return
+      end
+      if list.context.qfim_diag and list.context.qfim_diag.type == listType then
         local diag_where = listType == 'l' and 0 or nil
         local severity = list.context.qfim_diag.severity
         local scope = list.context.qfim_diag.scope
@@ -959,8 +971,10 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
         setList(listType, {
           items = vim.diagnostic.toqflist(diag_list),
         }, 'r')
+      elseif list.context.last_cmd then
+        vim.cmd(list.context.last_cmd)
       end
-    end, { buffer = 0, desc = 'Refresh Diagnostics List' })
+    end, { buffer = 0, desc = '[R]eload List' })
   end,
   desc = 'Keymaps inside quickfix window',
 })
