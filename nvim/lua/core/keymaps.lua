@@ -33,50 +33,14 @@
 -- Basics
 --------------------------------------------------
 
-vim.keymap.set({ 'i', 'v', 'c' }, 'jk', function()
-  if vim.snippet then
-    vim.snippet.stop()
-  end
-  return '<ESC>'
-end, { desc = 'Return to normal mode in every mode', expr = true })
-
-vim.keymap.set('n', '<CR>', '<cmd>update<CR>', { desc = 'Save' })
-vim.keymap.set('n', '<BS>', '<cmd>close<CR>', { desc = 'Close' })
-
 vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
-vim.keymap.set('x', 'J', ":m '>+1<CR>gv=gv")
-vim.keymap.set('x', 'K', ":m '<-2<CR>gv=gv")
-
 vim.keymap.set('n', 'U', '<C-r>', { desc = 'Redo' })
 
--- Center buffer while navigating
-vim.keymap.set('n', 'n', 'nzzzv')
-vim.keymap.set('n', 'N', 'Nzzzv')
-vim.keymap.set('n', '<C-u>', '<C-u>zz')
-vim.keymap.set('n', '<C-d>', '<C-d>zz')
-vim.keymap.set('n', '{', '{zz')
-vim.keymap.set('n', '}', '}zz')
-vim.keymap.set('n', 'G', 'Gzz')
-vim.keymap.set('n', 'gg', 'ggzz')
-vim.keymap.set('n', '<C-i>', '<C-i>zz')
-vim.keymap.set('n', '<C-o>', '<C-o>zz')
-vim.keymap.set('n', '*', '*zz')
-vim.keymap.set('n', '#', '#zz')
-
 -- Stay in indent mode
-vim.keymap.set('x', '<', '<gv')
-vim.keymap.set('x', '>', '>gv')
-
--- better default movements
--- based on https://www.reddit.com/r/neovim/comments/181bsu8/comment/kadbhj9
-vim.keymap.set('n', 'w', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]*\zs.\|\<')<CR>]], { desc = 'Next Word' })
-vim.keymap.set('n', 'b', [[<cmd>call search('^[''" ]*\zs.\|\s\+[''"]*\zs.\|\<', 'b')<CR>]], { desc = 'Previous Word' })
-vim.keymap.set('n', 'e', [[<cmd>call search('.\ze\>')<CR>]], { desc = 'End Next word' })
-vim.keymap.set('n', 'ge', [[<cmd>call search('.\ze\>', 'b')<CR>]], { desc = 'End Previous word' })
-vim.keymap.set('n', '{', [[<cmd>call search('\(\n\n\|\%^\)\s*\zs\S', 'b')<CR>]], { desc = 'Start Previous Paragraph' })
-vim.keymap.set('n', '}', [[<cmd>call search('\n\n\s*\zs\S')<CR>]], { desc = 'Start Next Paragraph' })
+vim.keymap.set('x', '<', '<gv', { desc = 'Stay in visual mode after indenting' })
+vim.keymap.set('x', '>', '>gv', { desc = 'Stay in visual mode after indenting' })
 
 vim.keymap.set('n', "'", '`', { desc = "Swap ` with ' because is a better way to jump to marks" })
 vim.keymap.set('n', '`', "'", { desc = "Swap ` with ' because is a better way to jump to marks" })
@@ -92,33 +56,6 @@ vim.keymap.set('x', 'A', function()
   return vim.api.nvim_get_mode().mode == 'V' and '$<C-v>A' or 'A'
 end, { desc = 'Append on multiple lines', expr = true })
 
--- BASH-style movement in cmd and insert mode
-vim.keymap.set({ 'i', 'c' }, '<C-a>', '<Home>', { desc = 'Move to start of line' })
-vim.keymap.set({ 'i' }, '<C-e>', function()
-  if vim.fn.pumvisible() ~= 0 then
-    return '<C-e>'
-  else
-    return '<End>'
-  end
-end, { desc = 'Move to end of line when no pum', expr = true })
-vim.keymap.set({ 'i', 'c' }, '<C-b>', '<Left>', { desc = 'Move to the left' })
-vim.keymap.set({ 'c' }, '<C-f>', function()
-  local c = vim.fn.getcmdpos()
-  return vim.fn.getcmdline():sub(c, c) == '' and '<C-f>' or '<Right>'
-end, { desc = 'Move to the right if not in last column', expr = true })
-vim.keymap.set({ 'i', 'c' }, '<C-h>', '<BS>', { desc = 'Delete char before' })
-vim.keymap.set({ 'i' }, '<C-d>', function()
-  local cur = vim.api.nvim_win_get_cursor(0)
-  local line = vim.api.nvim_get_current_line()
-  if cur[2] >= #line then
-    return '<C-d>'
-  else
-    return '<Delete>'
-  end
-end, { desc = 'Delete char after if not in last columne', expr = true })
-vim.keymap.set({ 'c' }, '<C-d>', '<Delete>', { desc = 'Delete char after' })
-vim.keymap.set({ 'i', 'c' }, '<A-b>', '<S-Left>', { desc = 'Move one word to the left' })
-vim.keymap.set({ 'i', 'c' }, '<A-f>', '<S-Right>', { desc = 'Move one word to the right' })
 
 vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
 
@@ -160,43 +97,6 @@ end, { desc = 'Escape TS Node in Insert Mode' })
 --------------------------------------------------
 -- Searching
 --------------------------------------------------
-
--- NOTE: doesn't work if search results count are larger than screen (but who searches that way?)
-vim.api.nvim_create_user_command('GSearch', function(opts)
-  vim.api.nvim_input(':g<C-v>/\\V' .. opts.args .. '/#<CR>: ')
-end, {
-  nargs = '*',
-  complete = function(ArgLead, _, _)
-    -- https://vi.stackexchange.com/a/25005
-    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    local lines_str = table.concat(lines, ' ')
-    local words = vim.fn.split(lines_str, "[ \t~!@#$%^&*+=()<>{}[\\];:|,?\"\\\\/'']\\+")
-    words = vim
-      .iter(words)
-      :filter(function(v)
-        return v:find(ArgLead, 1, true)
-      end)
-      :map(function(v)
-        if not v:find('%.') then
-          return v
-        end
-        local variations = {}
-        local parts = vim.split(v, '%.')
-        for i = 1, #parts do
-          local part = table.concat(parts, '.', 1, i)
-          if part:find(ArgLead, 1, true) then
-            table.insert(variations, part)
-          end
-        end
-        return variations
-      end)
-      :flatten()
-      :totable()
-    table.sort(words)
-    return vim.fn.uniq(words)
-  end,
-})
-vim.keymap.set('n', 'g/', ':GSearch ', { desc = 'Search with [G]lobal' })
 
 vim.keymap.set({ 'n', 'x' }, '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark' })
 vim.keymap.set({ 'n', 'x' }, '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark' })
@@ -303,25 +203,6 @@ end, { desc = 'Expand %% to File Directory', expr = true })
 
 vim.keymap.set('n', '<C-q>', '<cmd>close<CR>', { desc = 'Window [Q]uit' })
 vim.keymap.set('n', '<C-r>', '<C-w><C-w>', { desc = 'Move A[R]ound Windows' })
-
-vim.keymap.set(
-  'n',
-  '<C-w>\\',
-  [[<cmd>exe min([winheight('%'),line('$')]).'wincmd _'<CR>]],
-  { desc = 'Set Height Equal to Buffer Height' }
-)
-vim.keymap.set(
-  'x',
-  '<C-w>\\',
-  [[<esc><cmd>exe (line("'>") - line("'<") + 1).'wincmd _'<CR>]],
-  { desc = 'Set Height Equal to Selection Height' }
-)
-vim.keymap.set(
-  'n',
-  '<C-w>|',
-  [[<cmd>exe (col('$') + 7).'wincmd |'<bar>setlocal winfixwidth<CR>]],
-  { desc = 'Set Width Equal to Line Width' }
-)
 
 local nav = {
   h = 'Left',
@@ -554,76 +435,6 @@ vim.keymap.set('n', "g'", function()
 end, { desc = 'Add tilde to letters', expr = true })
 
 vim.keymap.set('n', '<C-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' })
-
---------------------------------------------------
--- Toggler
---------------------------------------------------
-
--- Based on https://github.com/Wansmer/nvim-config/blob/main/lua/modules/toggler.lua
--- Every key and value should be in lowercase
-local opposites = {
-  ['true'] = 'false',
-  ['false'] = 'true',
-  ['const'] = 'let',
-  ['let'] = 'const',
-  ['global'] = 'local',
-  ['local'] = 'global',
-  ['==='] = '!==',
-  ['!=='] = '===',
-  ['=='] = '!=',
-  ['!='] = '<=',
-  ['<='] = '<',
-  ['<'] = '>',
-  ['>'] = '>=',
-  ['>='] = '==',
-  ['&&'] = '||',
-  ['||'] = '&&',
-  ['and'] = 'or',
-  ['or'] = 'and',
-}
-
----Convert string's chars to same case like base string
----If base string length less than target string, other chars will convert to case
----like last char in base string.
----@param base string Base string
----@param str string String to convert
----@return string
-local function to_same_register(base, str)
-  local base_list = vim.split(base, '', { plain = true })
-  local target_list = vim.split(str, '', { plain = true })
-
-  for i, ch in ipairs(target_list) do
-    local base_char = base_list[i] or base_list[#base_list]
-    target_list[i] = base_char == base_char:lower() and string.lower(ch) or string.upper(ch)
-  end
-
-  return table.concat(target_list)
-end
-
-local function toggle_word()
-  local ikw_orig = vim.opt.iskeyword:get()
-  vim.opt.iskeyword:append({ '!', '=', '<', '>', '&', '|' })
-
-  local text = vim.fn.expand('<cword>')
-
-  -- Checking if the symbol under cursor is a part of received word
-  -- (required to prevent wrong inserting, when cursor at punctuation and whitespace before the target word)
-  local col = vim.api.nvim_win_get_cursor(0)[2] + 1
-  local char = vim.api.nvim_get_current_line():sub(col, col)
-  local contains = string.find(tostring(text), char, 1, true) and true or false
-
-  local opp = text and contains and opposites[string.lower(tostring(text))]
-
-  if opp then
-    vim.cmd('normal! "_ciw' .. to_same_register(tostring(text), opp))
-  else
-    vim.cmd('normal! ')
-  end
-
-  vim.opt.iskeyword = ikw_orig
-end
-
-vim.keymap.set('n', '<C-a>', toggle_word, { desc = 'Toggle keywords' })
 
 --------------------------------------------------
 -- Abbreviations
