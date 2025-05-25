@@ -21,7 +21,7 @@ if utils.is_windows() then
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland and my windows notebook?
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"
-	local scheme = wezterm.color.get_builtin_schemes()["Catppuccin Mocha"]
+	local scheme = wezterm.color.get_builtin_schemes()[config.color_scheme]
 	config.background = {
 		{
 			source = { File = background_image },
@@ -67,7 +67,17 @@ config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0cell", bo
 
 config.enable_wayland = false
 
-wezterm.on("update-status", function(window, _)
+wezterm.on("update-status", function(window, pane)
+	local domain = pane:get_domain_name()
+	if domain:find("SSH") then
+		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), domain)
+
+		local overrides = window:get_config_overrides() or {}
+		overrides.color_scheme = "Catppuccin Frappe"
+		overrides.background = {}
+		window:set_config_overrides(overrides)
+	end
+
 	local workspace = window:active_workspace()
 
 	local color_scheme = window:effective_config().resolved_palette
