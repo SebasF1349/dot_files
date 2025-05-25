@@ -24,7 +24,7 @@ local M = {}
 ---@alias workspace_state {name: string, window_state: window_state}
 ---@alias window_state {title: string, tabs: tab_state[]}
 ---@alias tab_state {title: string, pane: pane_state, is_active: boolean}
----@alias pane_state {left: integer, top: integer, height: integer, width: integer, cwd: string, domain: string, is_active: boolean, is_zoomed: boolean}
+---@alias pane_state {left: integer, top: integer, height: integer, width: integer, cwd: string, domain: string, is_active: boolean, is_zoomed: boolean, cmd: string|nil}
 
 --------------------------------------------------
 -- Setup
@@ -155,12 +155,15 @@ local function load_workspace(state, win)
 
 	local tab_active
 	for i, tab in ipairs(tabs) do
-		local t, _, _ = win:spawn_tab({
+		local t, p, _ = win:spawn_tab({
 			domain = { DomainName = tab.pane.domain },
 			cwd = tab.pane.cwd,
 		})
 		if i == 1 then
 			close_all_other_tabs(t, win)
+		end
+		if tab.pane.cmd then
+			p:send_text(tab.pane.cmd)
 		end
 		t:set_title(tab.title)
 		if tab.is_active then
