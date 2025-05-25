@@ -33,7 +33,7 @@ end
 -- Keymaps
 --------------------------------------------------
 
-vim.keymap.set('t', 'jk', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
+vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
 vim.keymap.set({ 'n', 't' }, '<leader>tb', function()
   local win = vim.api.nvim_win_is_valid(terms[1].winid) and terms[1].winid or terms[2].winid
