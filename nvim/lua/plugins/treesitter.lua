@@ -85,7 +85,7 @@ return {
       end, {})
 
       vim.api.nvim_create_user_command('TSInstallNew', function()
-        local already_installed = require('nvim-treesitter.config').installed_parsers()
+        local already_installed = require('nvim-treesitter').get_installed()
         local isnt_installed = function(parser)
           return not vim.tbl_contains(already_installed, parser)
         end
