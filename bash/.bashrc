@@ -153,12 +153,14 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-if [ -d ~/.cargo ] && [ -f ~/.cargo/env ]; then
-    # shellcheck disable=SC1091
-    source "$HOME/.cargo/env"
+if [ -d ~/.cargo ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+    if [ -f ~/.cargo/env ]; then
+        # shellcheck disable=SC1091
+        source "$HOME/.cargo/env"
+    fi
 fi
 
-export PATH="$HOME/.local/share/bob/nvim-bin/:$PATH"
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 export EDITOR=nvim
 export MANPAGER='nvim +Man!'
