@@ -347,19 +347,19 @@ local function open_notes()
       os.execute('touch ' .. note_file_path)
     end
     local note_buf = vim.api.nvim_create_buf(false, false)
-    vim.api.nvim_open_win(note_buf, true, { split = 'right' })
+    local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
     vim.cmd.edit(note_file_path)
-    notes_cache = { buf = note_buf, is_open = true, file_path = note_file_path }
+    notes_cache = { buf = note_buf, win = note_win, is_open = true, file_path = note_file_path }
   elseif notes_cache.is_open then
     vim.cmd('w')
-    vim.api.nvim_buf_delete(notes_cache.buf, {})
+    vim.api.nvim_win_hide(notes_cache.win)
     notes_cache.is_open = false
   else
-    local note_buf = vim.api.nvim_create_buf(true, false)
-    vim.api.nvim_open_win(note_buf, true, { split = 'right' })
+    local note_buf = vim.api.nvim_buf_is_valid(notes_cache.buf) and notes_cache.buf
+      or vim.api.nvim_create_buf(true, false)
+    local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
     vim.cmd.edit(notes_cache.file_path)
-    notes_cache.buf = note_buf
-    notes_cache.is_open = true
+    notes_cache = { buf = note_buf, win = note_win, is_open = true, file_path = notes_cache.file_path }
   end
 end
 vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
