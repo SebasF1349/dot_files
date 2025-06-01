@@ -1,11 +1,16 @@
-local servers = require('core.lsp').servers
-
 return {
   {
     'mason-org/mason.nvim',
     cmd = { 'Mason', 'MasonInstall', 'MasonInstallAll', 'MasonInstallNew', 'MasonUpdate', 'MasonUninstallNotEnsured' },
     config = function()
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local servers = require('core.lsp').servers
+      local ensure_installed = {}
+      -- install rust-analyzer with `rustup component add rust-analyzer`
+      for _, server in ipairs(servers) do
+        if server ~= 'rust-analyzer' then
+          table.insert(ensure_installed, server)
+        end
+      end
 
       vim.list_extend(ensure_installed, {
         -- web
