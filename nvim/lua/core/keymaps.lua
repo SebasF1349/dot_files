@@ -333,7 +333,8 @@ vim.keymap.set('n', '+', zoom_toggle, { desc = 'Toggle Window Zoom' })
 local notes_cache = {}
 local function open_notes()
   if not notes_cache.file_path then
-    local projects_notes_directory = vim.env.HOME .. '/notes/projects'
+    local oss = require('utils.os')
+    local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'projects')
     if vim.fn.isdirectory(projects_notes_directory) == 0 then
       os.execute('mkdir -p ' .. projects_notes_directory)
     end
@@ -341,8 +342,13 @@ local function open_notes()
     if project_dir:match('fatal:') then
       project_dir = vim.fn.getcwd()
     end
-    local project_file_name = project_dir:gsub('%s+', ''):gsub(vim.env.HOME, ''):gsub('/', '__') .. '.md'
-    local note_file_path = vim.fs.normalize(projects_notes_directory .. '/' .. project_file_name)
+    local project_file_name = project_dir
+      :gsub('%s+', '') -- remove spaces in the name
+      :gsub(vim.env.HOME, '')
+      :gsub('^%w:', '') -- remove disk name in windows
+      :gsub('/', '__') -- it can be any separator because windows is a mess
+      :gsub('\\', '__') .. '.md'
+    local note_file_path = vim.fs.normalize(oss.joinpath(projects_notes_directory, project_file_name))
     if vim.tbl_isempty(vim.fs.find(project_file_name, { type = 'file', path = projects_notes_directory })) then
       os.execute('touch ' .. note_file_path)
     end
