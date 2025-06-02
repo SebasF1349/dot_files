@@ -103,6 +103,8 @@ vim.keymap.set('x', '/', 'ms<Esc>/\\%V', { desc = 'Search on Selection with Forw
 vim.keymap.set('n', '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark' })
 vim.keymap.set('x', '?', 'ms<Esc>?\\%V', { desc = 'Search on Selection with Backward Search and add s Mark' })
 
+vim.keymap.set('o', '*', '"<esc>*g``".v:operator."gn"', { desc = 'Repeteable word text-object edit', expr = true })
+
 local function add_magic(cmd_line, cmd_pos)
   local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
   if not ok then
