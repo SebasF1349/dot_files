@@ -377,10 +377,12 @@ local function open_notes(index)
     notes_cache[project_dir].win = note_win
   end
 end
-vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
-vim.keymap.set('n', '<leader>tN', function()
+
+vim.keymap.set('n', '<leader>on', open_notes, { desc = '[O]pen [N]otes' })
+vim.print(notes_cache)
+vim.keymap.set('n', '<leader>oi', function()
   open_notes(true)
-end, { desc = '[T]oggle [N]otes Index' })
+end, { desc = '[O]pen Notes [I]ndex' })
 
 --------------------------------------------------
 -- Spell
