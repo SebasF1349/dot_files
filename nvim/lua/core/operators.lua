@@ -106,7 +106,7 @@ local function get_pair()
   local _, item = vim.iter(surround):find(function(t, _)
     return char == t
   end)
-  return item
+  return item or { { char }, { char } }
 end
 
 -- https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
