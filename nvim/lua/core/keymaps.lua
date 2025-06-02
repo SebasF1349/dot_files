@@ -331,45 +331,55 @@ vim.keymap.set('n', '+', zoom_toggle, { desc = 'Toggle Window Zoom' })
 --------------------------------------------------
 
 local notes_cache = {}
-local function open_notes()
-  local project_dir = vim.fn.getcwd()
-  if not notes_cache[project_dir] then
+---@param index boolean -- use index or project local
+local function open_notes(index)
+  local project_dir = index and 'index' or vim.fn.getcwd()
+  local curr_project = notes_cache[project_dir]
+  if not curr_project then
     local oss = require('utils.os')
     local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'dev')
     if vim.fn.isdirectory(projects_notes_directory) == 0 then
       os.execute('mkdir -p ' .. projects_notes_directory)
     end
-    local project_file_name = vim.fn.system('git rev-parse --show-toplevel')
-    if project_file_name:match('fatal:') then
-      project_file_name = project_dir
+    local project_file_name
+    if index then
+      project_file_name = 'index.md'
+    else
+      project_file_name = vim.fn.system('git rev-parse --show-toplevel')
+      if project_file_name:match('fatal:') then
+        project_file_name = project_dir
+      end
+      project_file_name = project_file_name
+        :gsub('%s+', '') -- remove spaces in the name
+        :gsub(vim.env.HOME, '')
+        :gsub('^%w:', '') -- remove disk name in windows
+        :gsub('/', '__') -- it can be any separator because windows is a mess
+        :gsub('\\', '__') .. '.md'
     end
-    project_file_name = project_file_name
-      :gsub('%s+', '') -- remove spaces in the name
-      :gsub(vim.env.HOME, '')
-      :gsub('^%w:', '') -- remove disk name in windows
-      :gsub('/', '__') -- it can be any separator because windows is a mess
-      :gsub('\\', '__') .. '.md'
     local note_file_path = vim.fs.normalize(oss.joinpath(projects_notes_directory, project_file_name))
     if vim.tbl_isempty(vim.fs.find(project_file_name, { type = 'file', path = projects_notes_directory })) then
       os.execute('touch ' .. note_file_path)
     end
-    local note_buf = vim.api.nvim_create_buf(false, false)
+    local note_buf = vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
     vim.cmd.edit(note_file_path)
     notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = note_file_path }
-  elseif notes_cache[project_dir].is_open then
+  elseif curr_project.is_open then
     vim.cmd('w')
-    vim.api.nvim_win_hide(notes_cache[project_dir].win)
+    vim.api.nvim_win_hide(curr_project.win)
     notes_cache[project_dir].is_open = false
   else
-    local note_buf = vim.api.nvim_buf_is_valid(notes_cache[project_dir].buf) and notes_cache[project_dir].buf
+    local note_buf = vim.api.nvim_buf_is_valid(curr_project.buf) and curr_project.buf
       or vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
-    vim.cmd.edit(notes_cache[project_dir].file_path)
-    notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = notes_cache.file_path }
+    vim.cmd.edit(curr_project.file_path)
+    notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = curr_project.file_path }
   end
 end
 vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
+vim.keymap.set('n', '<leader>tN', function()
+  open_notes(true)
+end, { desc = '[T]oggle [N]otes Index' })
 
 --------------------------------------------------
 -- Spell
