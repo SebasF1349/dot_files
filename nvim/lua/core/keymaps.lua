@@ -363,17 +363,18 @@ local function open_notes(index)
     local note_buf = vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
     vim.cmd.edit(note_file_path)
-    notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = note_file_path }
-  elseif curr_project.is_open then
+    notes_cache[project_dir] = { buf = note_buf, win = note_win, file_path = note_file_path }
+  elseif curr_project.win then
     vim.cmd('w')
     vim.api.nvim_win_hide(curr_project.win)
-    notes_cache[project_dir].is_open = false
+    notes_cache[project_dir].win = nil
   else
     local note_buf = vim.api.nvim_buf_is_valid(curr_project.buf) and curr_project.buf
       or vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
     vim.cmd.edit(curr_project.file_path)
-    notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = curr_project.file_path }
+    notes_cache[project_dir].buf = note_buf
+    notes_cache[project_dir].win = note_win
   end
 end
 vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
