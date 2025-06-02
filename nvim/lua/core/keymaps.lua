@@ -72,7 +72,7 @@ vim.keymap.set('n', 'dd', function()
 end, { desc = 'Send blank lines to black hole', expr = true })
 
 vim.keymap.set('n', 'yc', '"yy".v:count1."gcc\']p"', { desc = 'Make a Copy Commentted out', remap = true, expr = true })
-vim.keymap.set('v', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', remap = true })
+vim.keymap.set('x', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', remap = true })
 
 -- better cmdline history
 vim.keymap.set('c', '<C-n>', function()
