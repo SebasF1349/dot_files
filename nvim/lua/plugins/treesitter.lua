@@ -59,6 +59,7 @@ return {
         'php',
         'php_only',
         'phpdoc',
+        'angular',
       }
 
       vim.api.nvim_create_autocmd('FileType', {
