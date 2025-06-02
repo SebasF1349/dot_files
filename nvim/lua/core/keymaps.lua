@@ -379,7 +379,6 @@ local function open_notes(index)
 end
 
 vim.keymap.set('n', '<leader>on', open_notes, { desc = '[O]pen [N]otes' })
-vim.print(notes_cache)
 vim.keymap.set('n', '<leader>oi', function()
   open_notes(true)
 end, { desc = '[O]pen Notes [I]ndex' })
