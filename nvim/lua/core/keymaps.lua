@@ -334,7 +334,7 @@ local notes_cache = {}
 local function open_notes()
   if not notes_cache.file_path then
     local oss = require('utils.os')
-    local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'projects')
+    local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'dev')
     if vim.fn.isdirectory(projects_notes_directory) == 0 then
       os.execute('mkdir -p ' .. projects_notes_directory)
     end
