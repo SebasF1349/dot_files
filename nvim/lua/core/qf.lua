@@ -1002,7 +1002,7 @@ vim.api.nvim_create_autocmd('QuickFixCmdPost', {
 vim.api.nvim_create_autocmd('WinEnter', {
   group = qf_group,
   callback = function()
-    if vim.bo.filetype == 'qf' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+    if vim.bo.filetype == 'qf' and vim.fn.winnr('$') == 1 then
       vim.cmd('quit')
     end
   end,

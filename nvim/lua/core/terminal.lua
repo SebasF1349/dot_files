@@ -156,7 +156,7 @@ end, { desc = '[C]ode [T]est' })
 
 vim.api.nvim_create_autocmd('WinEnter', {
   callback = function()
-    if vim.bo.filetype == 'terminal' and vim.tbl_count(vim.api.nvim_list_wins()) == 1 then
+    if vim.bo.filetype == 'terminal' and vim.fn.winnr('$') == 1 then
       vim.cmd('quit')
     end
   end,
