@@ -332,17 +332,18 @@ vim.keymap.set('n', '+', zoom_toggle, { desc = 'Toggle Window Zoom' })
 
 local notes_cache = {}
 local function open_notes()
-  if not notes_cache.file_path then
+  local project_dir = vim.fn.getcwd()
+  if not notes_cache[project_dir] then
     local oss = require('utils.os')
     local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'dev')
     if vim.fn.isdirectory(projects_notes_directory) == 0 then
       os.execute('mkdir -p ' .. projects_notes_directory)
     end
-    local project_dir = vim.fn.system('git rev-parse --show-toplevel')
-    if project_dir:match('fatal:') then
-      project_dir = vim.fn.getcwd()
+    local project_file_name = vim.fn.system('git rev-parse --show-toplevel')
+    if project_file_name:match('fatal:') then
+      project_file_name = project_dir
     end
-    local project_file_name = project_dir
+    project_file_name = project_file_name
       :gsub('%s+', '') -- remove spaces in the name
       :gsub(vim.env.HOME, '')
       :gsub('^%w:', '') -- remove disk name in windows
@@ -355,17 +356,17 @@ local function open_notes()
     local note_buf = vim.api.nvim_create_buf(false, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
     vim.cmd.edit(note_file_path)
-    notes_cache = { buf = note_buf, win = note_win, is_open = true, file_path = note_file_path }
-  elseif notes_cache.is_open then
+    notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = note_file_path }
+  elseif notes_cache[project_dir].is_open then
     vim.cmd('w')
-    vim.api.nvim_win_hide(notes_cache.win)
-    notes_cache.is_open = false
+    vim.api.nvim_win_hide(notes_cache[project_dir].win)
+    notes_cache[project_dir].is_open = false
   else
-    local note_buf = vim.api.nvim_buf_is_valid(notes_cache.buf) and notes_cache.buf
+    local note_buf = vim.api.nvim_buf_is_valid(notes_cache[project_dir].buf) and notes_cache[project_dir].buf
       or vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
-    vim.cmd.edit(notes_cache.file_path)
-    notes_cache = { buf = note_buf, win = note_win, is_open = true, file_path = notes_cache.file_path }
+    vim.cmd.edit(notes_cache[project_dir].file_path)
+    notes_cache[project_dir] = { buf = note_buf, win = note_win, is_open = true, file_path = notes_cache.file_path }
   end
 end
 vim.keymap.set('n', '<leader>tn', open_notes, { desc = '[T]oggle [N]otes' })
