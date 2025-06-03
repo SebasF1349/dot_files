@@ -59,8 +59,7 @@ local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
 local curr_buf = vim.api.nvim_buf_get_name(0)
 
 if vim.startswith(curr_buf, notes_path) then
-  vim.keymap.set({ 'n', 'i' }, '<leader>ml', function()
-    vim.cmd.stopinsert()
+  local function select_link(text)
     local notes = vim.split(vim.fn.glob(notes_path .. '/*'), '\n', { trimempty = true })
     notes = vim.tbl_filter(function(note_buf)
       return note_buf ~= curr_buf
@@ -73,11 +72,34 @@ if vim.startswith(curr_buf, notes_path) then
       end,
     }, function(choice)
       if not choice then
+        if text then
+          vim.api.nvim_put({ text }, 'c', true, true)
+        end
         return
       end
-      vim.api.nvim_put({ '[](' .. choice .. ')' }, 'c', true, true)
-      vim.api.nvim_input('cil[')
+      if text then
+        vim.api.nvim_put({ '[' .. text .. '](' .. choice .. ')' }, 'c', true, true)
+      else
+        vim.api.nvim_put({ '[](' .. choice .. ')' }, 'c', true, true)
+        vim.api.nvim_input('cil[')
+      end
     end)
+  end
+
+  vim.keymap.set({ 'n', 'i' }, '<C-L>', function()
+    vim.cmd.stopinsert()
+    select_link()
+  end, { desc = 'Add [L]ink', buffer = 0 })
+
+  vim.keymap.set({ 'x' }, '<C-L>', function()
+    local starting = vim.fn.getpos('v')
+    local ending = vim.fn.getpos('.')
+    if starting[2] > ending[2] or (starting[2] == ending[2] and starting[3] > ending[3]) then
+      starting, ending = ending, starting
+    end
+    local text = vim.api.nvim_buf_get_text(0, starting[2] - 1, starting[3] - 1, ending[2] - 1, ending[3], {})
+    vim.api.nvim_buf_set_text(0, starting[2] - 1, starting[3] - 1, ending[2] - 1, ending[3], { '' })
+    select_link(text[1])
   end, { desc = 'Add [L]ink', buffer = 0 })
 
   vim.keymap.set('n', 'gf', function()
