@@ -90,7 +90,7 @@ local snippets = {
     ${0}
 }]],
   fore = [[foreach (\$${1:variable} as \$${2:key} ${3:key => value}) {
-    "${0}",
+    ${0},
 }]],
   this = [[\$this->$0;]],
   p = [[var_dump($0);]],
