@@ -54,6 +54,68 @@ vim.keymap.set('n', '<leader>x', function()
   end
 end, { desc = 'Toggle TODO', buffer = 0 })
 
+local oss = require('utils.os')
+local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
+local curr_buf = vim.api.nvim_buf_get_name(0)
+
+if vim.startswith(curr_buf, notes_path) then
+  vim.keymap.set({ 'n', 'i' }, '<leader>ml', function()
+    vim.cmd.stopinsert()
+    local notes = vim.split(vim.fn.glob(notes_path .. '/*'), '\n', { trimempty = true })
+    notes = vim.tbl_filter(function(note_buf)
+      return note_buf ~= curr_buf
+    end, notes)
+
+    vim.ui.select(notes, {
+      prompt = 'Select notes file:',
+      format_item = function(item)
+        return item
+      end,
+    }, function(choice)
+      if not choice then
+        return
+      end
+      vim.api.nvim_put({ '[](' .. choice .. ')' }, 'c', true, true)
+      vim.api.nvim_input('cil[')
+    end)
+  end, { desc = 'Add [L]ink', buffer = 0 })
+
+  vim.keymap.set('n', 'gf', function()
+    local link_node
+    local curr_node = vim.treesitter.get_node({ ignore_injections = false })
+    if not curr_node then
+      return
+    end
+    if curr_node:type() == 'link_text' then
+      local next_node = curr_node:next_named_sibling()
+      if not next_node then
+        return
+      end
+      if next_node:type() == 'link_destination' then
+        link_node = next_node
+      end
+    elseif curr_node:type() == 'link_destination' then
+      link_node = curr_node
+    elseif curr_node:type() == 'inline_link' then
+      link_node = curr_node:named_child(1)
+    end
+    if not link_node then
+      vim.notify('Not a valid file path', vim.log.levels.INFO)
+      return
+    end
+    local link = vim.treesitter.get_node_text(link_node, 0, {})
+    if not vim.startswith(link, '/') and not link:find('^%w:') then
+      link = vim.fn.expand('%:p:h') .. [[/]] .. link
+    end
+    vim.cmd.edit(link)
+  end, { desc = 'Open link under the cursor', buffer = 0 })
+
+  vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
+    .. '\n '
+    .. 'sil! nunmap <buffer> <leader>ml'
+    .. ' | sil! nunmap <buffer> gf'
+end
+
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'setlocal tabstop< softtabstop< shiftwidth< expandtab< textwidth< colorcolumn< wrap< wrapmargin< linebreak< spell< spelllang< comments< formatoptions< '
