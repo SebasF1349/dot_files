@@ -103,29 +103,20 @@ if vim.startswith(curr_buf, notes_path) then
   end, { desc = 'Add [L]ink', buffer = 0 })
 
   vim.keymap.set('n', 'gf', function()
-    local link_node
-    local curr_node = vim.treesitter.get_node({ ignore_injections = false })
-    if not curr_node then
+    local node = vim.treesitter.get_node({ ignore_injections = false })
+    if not node then
       return
     end
-    if curr_node:type() == 'link_text' then
-      local next_node = curr_node:next_named_sibling()
-      if not next_node then
-        return
-      end
-      if next_node:type() == 'link_destination' then
-        link_node = next_node
-      end
-    elseif curr_node:type() == 'link_destination' then
-      link_node = curr_node
-    elseif curr_node:type() == 'inline_link' then
-      link_node = curr_node:named_child(1)
+    if node:type() == 'link_text' then
+      node = node:next_named_sibling()
+    elseif node:type() == 'inline_link' then
+      node = node:named_child(1)
     end
-    if not link_node then
+    if not node or node:type() ~= 'link_destination' then
       vim.notify('Not a valid file path', vim.log.levels.INFO)
       return
     end
-    local link = vim.treesitter.get_node_text(link_node, 0, {})
+    local link = vim.treesitter.get_node_text(node, 0, {})
     if not vim.startswith(link, '/') and not link:find('^%w:') then
       link = vim.fn.expand('%:p:h') .. [[/]] .. link
     end
