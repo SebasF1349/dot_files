@@ -56,7 +56,7 @@ end, { desc = 'Toggle TODO', buffer = 0 })
 
 local oss = require('utils.os')
 local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
-local curr_buf = vim.api.nvim_buf_get_name(0)
+local curr_buf = oss.correct_separator(vim.api.nvim_buf_get_name(0))
 
 if vim.startswith(curr_buf, notes_path) then
   local function select_link(text)
