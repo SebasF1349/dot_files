@@ -86,12 +86,12 @@ if vim.startswith(curr_buf, notes_path) then
     end)
   end
 
-  vim.keymap.set({ 'n', 'i' }, '<C-L>', function()
+  vim.keymap.set({ 'n', 'i' }, '<C-l>', function()
     vim.cmd.stopinsert()
     select_link()
   end, { desc = 'Add [L]ink', buffer = 0 })
 
-  vim.keymap.set({ 'x' }, '<C-L>', function()
+  vim.keymap.set({ 'x' }, '<C-l>', function()
     local starting = vim.fn.getpos('v')
     local ending = vim.fn.getpos('.')
     if starting[2] > ending[2] or (starting[2] == ending[2] and starting[3] > ending[3]) then
@@ -125,7 +125,9 @@ if vim.startswith(curr_buf, notes_path) then
 
   vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
     .. '\n '
-    .. 'sil! nunmap <buffer> <leader>ml'
+    .. 'sil! nunmap <buffer> <C-l>'
+    .. ' | sil! xunmap <buffer> <C-l>'
+    .. ' | sil! iunmap <buffer> <C-l>'
     .. ' | sil! nunmap <buffer> gf'
 end
 
