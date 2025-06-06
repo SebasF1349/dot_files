@@ -13,21 +13,6 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
   desc = 'Open file at the last position it was edited earlier',
 })
 
-vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusGained' }, {
-  callback = function(args)
-    if vim.bo.filetype ~= '' and vim.bo.buftype == '' and vim.bo.modified and not vim.bo.readonly then
-      require('conform').format({ bufnr = args.buf })
-      -- idk why the auto-sort command doesn't work, even with `:w`
-      if vim.fn.exists(':TailwindSort') > 0 then
-        vim.cmd('TailwindSort')
-      end
-      vim.cmd('silent! wa')
-    end
-  end,
-  group = general,
-  desc = 'Auto Save',
-})
-
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
     vim.hl.on_yank()
