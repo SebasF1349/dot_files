@@ -17,8 +17,7 @@ vim.wo.linebreak = true
 vim.wo.spell = true
 vim.bo.spelllang = 'es,en'
 -- automatically continue lists
-local formatopts = vim.bo.formatoptions
-vim.bo.formatoptions = formatopts .. 'cro'
+vim.bo.formatoptions = vim.bo.formatoptions .. 'ro'
 vim.bo.comments = 'b:-,b:+,b:*'
 
 vim.keymap.set(
