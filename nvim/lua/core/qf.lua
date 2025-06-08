@@ -148,7 +148,7 @@ local function getDiagList(listType, severity)
   local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
     local list = getList(listType, i)
-    if list.context ~= '' and list.context.qfim_diag and list.context.qfim_diag.type == listType then
+    if list.context ~= '' and list.context.qfim_diag and list.context.qfim_diag.type == listType and list.context.qfim_diag.severity == severity then
       return list
     end
   end
