@@ -194,20 +194,15 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
 })
 
 local function set_path()
-  local is_git = require('utils.is-git')()
-  if not is_git then
-    return '.,,'
-      .. table
-        .concat(
-          vim.fn.systemlist(
-            'fd . --type d --hidden --exclude .git --exclude node_modules --exclude target --absolute-path'
-          ),
-          ','
-        )
-        :gsub('%./', '')
-  else
-    return ',,' .. table.concat(vim.fn.systemlist('fd . --type d --absolute-path'), ',')
-  end
+  return '.,,'
+    .. table
+      .concat(
+        vim.fn.systemlist(
+          'fd . --type d --hidden --absolute-path --exclude .git --exclude node_modules --exclude target --exclude vendor'
+        ),
+        ','
+      )
+      :gsub('%./', '')
 end
 
 ---@param cmdarg string
