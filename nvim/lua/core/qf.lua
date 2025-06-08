@@ -144,7 +144,7 @@ end
 ---@param severity? vim.diagnostic.SeverityFilter
 ---@return qflist | nil
 local function getDiagList(listType, severity)
-  severity = severity or 'HINT'
+  severity = severity or vim.diagnostic.severity.HINT
   local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
     local list = getList(listType, i)
@@ -466,7 +466,7 @@ local function list_toggle(listType, diagnostics, severity, scope)
     vim.cmd(listType .. 'close')
   elseif diagnostics then
     last_cmd = ''
-    severity = severity or 'HINT'
+    severity = severity or vim.diagnostic.severity.HINT
     local diag_where = listType == 'l' and 0 or nil
     local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
     if scope then
@@ -518,10 +518,10 @@ vim.keymap.set('n', '<leader>qd', function()
   list_toggle('c', true)
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
 vim.keymap.set('n', '<leader>qe', function()
-  list_toggle('c', true, 'ERROR')
+  list_toggle('c', true, vim.diagnostic.severity.ERROR)
 end, { desc = '[Q]uickfix [E]rror Toggle' })
 vim.keymap.set('n', '<leader>qE', function()
-  list_toggle('c', true, 'ERROR', vim.fn.expand('%:p:h'))
+  list_toggle('c', true, vim.diagnostic.severity.ERROR, vim.fn.expand('%:p:h'))
 end, { desc = '[Q]uickfix [E]rror Toggle' })
 vim.keymap.set('n', '<leader>qb', function()
   moveToList('c')
