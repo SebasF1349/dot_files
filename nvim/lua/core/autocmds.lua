@@ -208,6 +208,9 @@ end
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
   cmdarg = vim.fn.escape(cmdarg, '\\')
+  if cmdarg:sub(1,1) == '*' then
+      cmdarg = cmdarg:gsub('.', '.*%0')..'.*'
+  end
   local cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg }
   local files = vim.system(cmd, { text = true }):wait()
   if not files.stdout then
