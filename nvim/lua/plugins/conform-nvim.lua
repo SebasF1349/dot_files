@@ -1,10 +1,10 @@
 return {
   'stevearc/conform.nvim',
-  event = { 'BufWritePre' },
-  cmd = { 'ConformInfo' },
   -- stylua: ignore
   keys = {
-    { "<leader>cf", function() require("conform").format({ bufnr = 0, async = true, lsp_format = "fallback" }) end, desc = "[C]ode [F]ormat current file", }
+    { '<leader>cf', function() require('conform').format({ bufnr = 0, async = true, lsp_format = 'fallback' }) end, desc = '[C]ode [F]ormat current file', },
+    { 'gqp', 'mfgqap`f', desc = 'Format Paragraph', },
+    { 'gqg', 'mfgqag`f', desc = 'Format File', remap = true }
   },
   config = function()
     local conform = require('conform')
