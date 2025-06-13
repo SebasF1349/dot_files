@@ -93,6 +93,12 @@ wezterm.on("update-status", function(window, pane)
 	window:set_right_status(wezterm.format(elements))
 end)
 
+wezterm.on("format-window-title", function(tab, pane, tabs, panes, config)
+	local muxtab = wezterm.mux.get_tab(tab.tab_id)
+    local muxwin = muxtab:window()
+	return muxwin:get_workspace()
+end)
+
 wezterm.on("gui-startup", function(cmd)
 	local _, pane, window = wezterm.mux.spawn_window(cmd or {})
 	if not pane:get_domain_name():find("SSH") then
