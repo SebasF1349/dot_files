@@ -6,6 +6,7 @@
 
 $dot_files = Write-Output (Get-Item $PROFILE).ResolveLinkTarget('true').Directory.Parent.FullName
 Import-Module $dot_files\install_scripts\install-neovim.ps1
+$env:PATH += ";C:\scripts"
 
 # Utils
 
