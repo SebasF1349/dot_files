@@ -1,8 +1,5 @@
 vim.b.contextStatus = { 'function_declaration' }
 
-vim.bo.keywordprg = ':help'
-vim.bo.omnifunc = 'v:lua.vim.lua_omnifunc'
-
 local snippets = {
   fn = [[local function ${1:FunctionName}(${2:})
 {
