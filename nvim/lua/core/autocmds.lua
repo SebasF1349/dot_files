@@ -226,7 +226,7 @@ function FindFunc(cmdarg, _)
   return vim.split(vim.trim(files.stdout), '\n')
 end
 
-vim.api.nvim_create_autocmd({ 'UIEnter' }, {
+vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   callback = function()
     vim.o.path = set_path()
     vim.o.findfunc = 'v:lua.FindFunc'
