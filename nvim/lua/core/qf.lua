@@ -894,6 +894,7 @@ local function listHistory(direction)
   local listCount = getList(listType, '$').nr
   if listCount == 1 then
     vim.notify('There is only one list in the history', vim.log.levels.WARN)
+    return
   end
   local listNr = getList(listType).nr
   if listNr == 1 and direction == 'older' then
