@@ -211,7 +211,14 @@ function FindFunc(cmdarg, _)
   if cmdarg:sub(1,1) == '*' then
       cmdarg = cmdarg:gsub('.', '.*%0')..'.*'
   end
-  local cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg }
+
+  local cmd
+  if vim.o.filetype == 'oil' then
+    local dir = require('oil').get_current_dir()
+    cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg, dir }
+  else
+    cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg }
+  end
   local files = vim.system(cmd, { text = true }):wait()
   if not files.stdout then
     return {}

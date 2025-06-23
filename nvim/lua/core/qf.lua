@@ -170,7 +170,12 @@ vim.opt.grepformat = '%f:%l:%c:%m'
 vim.cmd([[packadd cfilter]])
 
 vim.api.nvim_create_user_command('Rg', function(opts)
-  last_cmd = 'silent! grep! ' .. opts.args
+  if vim.o.filetype == 'oil' then
+    local dir = require('oil').get_current_dir()
+    last_cmd = 'silent! grep! ' .. opts.args .. ' ' .. dir
+  else
+    last_cmd = 'silent! grep! ' .. opts.args
+  end
   vim.cmd(last_cmd)
 end, { nargs = 1 })
 
