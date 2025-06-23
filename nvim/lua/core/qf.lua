@@ -177,7 +177,7 @@ vim.api.nvim_create_user_command('Rg', function(opts)
     last_cmd = 'silent! grep! ' .. opts.args
   end
   vim.cmd(last_cmd)
-end, { nargs = 1 })
+end, { nargs = 1, complete = 'dir' })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
   last_cmd = 'silent lgrep! "' .. opts.args .. '" %'
