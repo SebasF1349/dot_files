@@ -662,7 +662,8 @@ local function getMessage(line)
 end
 
 -- NOTE: take into account that this messes up with the error numbers
-local function delete()
+---@param file boolean remove all items in file
+local function delete(file)
   local listType = getListType()
   if not listType then
     return
@@ -684,9 +685,17 @@ local function delete()
     vim.api.nvim_input('<Esc>')
   else
     local line = vim.api.nvim_win_get_cursor(0)
-    table.remove(qfitems, line[1])
+    local line = line[1]
+    if file then
+      local bufnr = qfitems[line].bufnr
+      qfitems = vim.iter(qfitems):filter(function(item)
+        return item.bufnr ~= bufnr
+      end):totable()
+    else
+      table.remove(qfitems, line)
+    end
     setList(listType, { items = qfitems }, 'r', list.filewinid)
-    local new_pos = line[1] > #qfitems and #qfitems or line[1]
+    local new_pos = line > #qfitems and #qfitems or line
     vim.api.nvim_win_set_cursor(0, { new_pos, 0 })
   end
 end
@@ -943,6 +952,9 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
     vim.keymap.set('n', 'K', previewHover, { buffer = 0, desc = 'Show Message on Hover' })
     vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
+    vim.keymap.set('n', 'D', function()
+      delete(true)
+    end, { buffer = 0, desc = 'Delete QF Items in Same Buffer' })
     vim.keymap.set({ 'x' }, 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
     vim.keymap.set('n', 'yf', function()
       yank('file')
