@@ -2,7 +2,7 @@ vim.keymap.set('n', '<leader>gg', '<cmd>tab Git<CR>]]', { desc = 'Open fu[G]itiv
 vim.keymap.set('n', '<leader>gd', '<cmd>Gvdiffsplit<CR>', { desc = '[D]iff Current File' })
 vim.keymap.set('n', '<leader>gb', '<cmd>Git blame<cr>', { desc = 'fu[G]itive [B]lame' })
 
-local log_cmd = 'tab Git log -50 --graph --decorate --pretty=format:"%h %s [%cn - %ar]%d"'
+local log_cmd = 'tab Git log -50 --graph --decorate --pretty=pf'
 vim.keymap.set('n', '<leader>gl', '<cmd>' .. log_cmd .. '<cr>', { desc = 'fu[G]itive [L]og' })
 vim.keymap.set(
   'x',
