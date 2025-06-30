@@ -194,15 +194,8 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
 })
 
 local function set_path()
-  return '.,,'
-    .. table
-      .concat(
-        vim.fn.systemlist(
-          'fd . --type d --hidden --absolute-path --exclude .git --exclude node_modules --exclude target --exclude vendor'
-        ),
-        ','
-      )
-      :gsub('%./', '')
+  local dirs = vim.system({'fd', '.', '--type', 'd', '--hidden', '--absolute-path', '--exclude', '.git', '--exclude', 'node_modules', '--exclude', 'target', '--exclude', 'vendor'}):wait()
+  return '.,,' .. dirs.stdout:gsub('\n', ','):gsub('%./', '')
 end
 
 ---@param cmdarg string

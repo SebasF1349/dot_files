@@ -349,8 +349,10 @@ local function open_notes(index)
     if index then
       project_file_name = 'index.md'
     else
-      project_file_name = vim.fn.system('git rev-parse --show-toplevel')
-      if project_file_name:match('fatal:') then
+      local git_cmd = vim.system({ 'git', 'rev-parse', '--show-toplevel' }):wait()
+      if git_cmd.code == 0 then
+        project_file_name = git_cmd.stdout or project_dir
+      else
         project_file_name = project_dir
       end
       project_file_name = project_file_name
