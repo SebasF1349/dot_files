@@ -300,7 +300,6 @@ local function on_attach(client_id, buf)
   vim.keymap.set('n', '<leader>8', hl_references, { desc = 'LSP: Go to previous [R]eference', buffer = buf })
 
   vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buffer = buf })
-  vim.keymap.set('n', '<C-w><C-d>', '<C-w>d', { desc = 'Make <C-w><C-d> also trigger float', remap = true })
   vim.keymap.set('n', '<C-w>d', function()
     if
       vim.diagnostic.open_float({ scope = 'c', header = 'Cursor Diagnostics:' })
@@ -310,7 +309,6 @@ local function on_attach(client_id, buf)
     end
     vim.notify('No diagnostics found', vim.log.levels.INFO)
   end, { desc = 'Floating Diagnostics' })
-  vim.keymap.set('n', 'grt', vim.lsp.buf.type_definition, { desc = 'LSP: [G]oto [T]ype Definition', buffer = buf })
 
   local preview_namespace = vim.api.nvim_create_namespace('preview')
   vim.keymap.set('n', 'grp', function()
