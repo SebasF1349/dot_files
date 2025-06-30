@@ -14,11 +14,7 @@ return {
     intelephense = {
       environment = { phpVersion = '7.0.33' },
       telemetry = { enabled = false },
-      format = {
-        enable = (vim.uv.cwd():find('telesalud') or vim.uv.cwd():find('xampp_plataforma') or vim.uv
-          .cwd()
-          :find('pasantia')) ~= nil,
-      },
+      format = { enable = false },
       completion = {
         triggerParameterHints = true,
         insertUseDeclaration = true,

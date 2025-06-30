@@ -31,6 +31,7 @@ return {
         yaml = { 'yamlfmt' },
         toml = { 'taplo' },
         java = { 'google-java-format' },
+        php = { 'php_cs_fixer' },
       },
       notify_on_error = false,
     }

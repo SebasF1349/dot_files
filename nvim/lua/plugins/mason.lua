@@ -36,6 +36,7 @@ return {
         'phpcs',
         'phpstan',
         'php-debug-adapter',
+        'php-cs-fixer',
       })
 
       vim.api.nvim_create_user_command('MasonInstallNew', function()
