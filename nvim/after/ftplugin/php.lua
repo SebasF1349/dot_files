@@ -23,21 +23,33 @@ vim.b.surroundPair = {
   ['p'] = { { 'var_dump(' }, { ');exit;' } },
 }
 
+local function is_inside_php_block(cursor_pos)
+  local found_start = vim.fn.search('<?php\\|\\(<?=\\)', 'bcW')
+  local start_pos = vim.api.nvim_win_get_cursor(0)
+  local found_end = vim.fn.search('?>', 'ceW')
+  local end_pos = vim.api.nvim_win_get_cursor(0)
+  vim.api.nvim_win_set_cursor(0, cursor_pos)
+
+  if found_start == 0 or found_end == 0 then
+    return false
+  end
+
+  return (cursor_pos[1] > start_pos[1] or (cursor_pos[1] == start_pos[1] and cursor_pos[2] >= start_pos[2]))
+    and (cursor_pos[1] < end_pos[1] or (cursor_pos[1] == end_pos[1] and cursor_pos[2] <= end_pos[2]))
+end
+
 --- Text-object for php blocks (<?= and <?php)
 ---@param type 'a' | 'i'
 local function phpTextObject(type)
   local curr = vim.api.nvim_win_get_cursor(0)
-  local o = vim.fn.search('<?', 'bWc')
+  local flag = is_inside_php_block(curr) and 'bcp' or 'cpW'
+  local o = vim.fn.search('<?php\\|\\(<?=\\)', flag)
   if o == 0 then
     return
   end
   local opening = vim.api.nvim_win_get_cursor(0)
   local e = vim.fn.search('?>', 'eWc')
   local _end = vim.api.nvim_win_get_cursor(0)
-  if e ~= 0 and (_end[1] < curr[1] or (_end[1] == curr[1] and _end[2] < curr[2])) then
-    vim.api.nvim_win_set_cursor(0, curr)
-    return
-  end
   -- <?php blocks may have no ending if it ends at the end of the file
   if e == 0 then
     local last_line = vim.fn.getpos('$')[2]
@@ -47,8 +59,8 @@ local function phpTextObject(type)
 
   vim.api.nvim_win_set_cursor(0, opening)
   if type == 'i' then
-    vim.cmd.normal({ 'E', bang = true })
-    vim.fn.search('\\_.')
+    local block_start = o == 1 and '<?php' or '<?='
+    vim.cmd.normal({ block_start:len() .. 'l', bang = true })
   end
   if vim.api.nvim_get_mode().mode:find('v') then
     vim.cmd.normal({ 'o', bang = true })
@@ -57,8 +69,7 @@ local function phpTextObject(type)
   end
   vim.api.nvim_win_set_cursor(0, _end)
   if type == 'i' and e ~= 0 then
-    vim.cmd.normal({ 'B', bang = true })
-    vim.fn.search('\\_.', 'b')
+    vim.cmd.normal({ '2h', bang = true })
   end
 end
 
