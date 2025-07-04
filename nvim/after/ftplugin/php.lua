@@ -57,20 +57,30 @@ local function phpTextObject(type)
     _end = { last_line, last_col }
   end
 
-  vim.api.nvim_win_set_cursor(0, opening)
   if type == 'i' then
     local block_start = o == 1 and '<?php' or '<?='
-    vim.cmd.normal({ block_start:len() .. 'l', bang = true })
+    if opening[2] + #block_start == #vim.api.nvim_buf_get_lines(0, opening[1], opening[1] + 1, false)[1] then
+      opening[1] = opening[1] + 1
+      opening[2] = 1
+    else
+      opening[2] = opening[2] + #block_start
+    end
+
+    if _end[2] == 1 then
+      _end[1] = _end[1] - 1
+      _end[2] = #vim.api.nvim_buf_get_lines(0, _end[1] - 1, _end[1], false)[1]
+    else
+      _end[2] = _end[2] - 2
+    end
   end
+
+  vim.api.nvim_win_set_cursor(0, opening)
   if vim.api.nvim_get_mode().mode:find('v') then
     vim.cmd.normal({ 'o', bang = true })
   else
     vim.cmd.normal({ 'v', bang = true })
   end
   vim.api.nvim_win_set_cursor(0, _end)
-  if type == 'i' and e ~= 0 then
-    vim.cmd.normal({ '2h', bang = true })
-  end
 end
 
 vim.keymap.set({ 'x', 'o' }, 'i=', function()
