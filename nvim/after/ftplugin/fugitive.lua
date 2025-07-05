@@ -3,7 +3,7 @@ vim.wo.signcolumn = 'yes'
 vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
 
-vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = 0, silent = true })
+vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = 0 })
 
 vim.keymap.set(
   'n',

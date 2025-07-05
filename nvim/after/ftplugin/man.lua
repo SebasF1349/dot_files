@@ -3,7 +3,7 @@ vim.wo.signcolumn = 'yes'
 vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
 
-vim.keymap.set('n', 'q', '<cmd>q!<cr>', { buffer = 0, silent = true })
+vim.keymap.set('n', 'q', '<cmd>q!<cr>', { buffer = 0 })
 
 vim.keymap.set('n', 'N', '/^[A-Z]<CR>:noh<CR>', { desc = '[N]ext Section', buffer = 0 })
 vim.keymap.set('n', 'P', '?^[A-Z]<CR>:noh<CR>', { desc = '[P]revious Section', buffer = 0 })

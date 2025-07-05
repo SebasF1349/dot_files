@@ -62,7 +62,7 @@ local function set_term_opts(opts)
   vim.wo.statuscolumn = ''
   vim.wo.winfixheight = true
   vim.wo.winfixwidth = true
-  vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = opts.bufnr, silent = true })
+  vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = opts.bufnr })
   vim.api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
 end
 
