@@ -684,8 +684,8 @@ local function delete(file)
     setList(listType, { items = qfitems }, 'r', list.filewinid)
     vim.api.nvim_input('<Esc>')
   else
-    local line = vim.api.nvim_win_get_cursor(0)
-    local line = line[1]
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    local line = cursor[1]
     if file then
       local bufnr = qfitems[line].bufnr
       qfitems = vim.iter(qfitems):filter(function(item)
