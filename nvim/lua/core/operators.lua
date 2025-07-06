@@ -91,6 +91,9 @@ local surround = {
 
 local function get_pair()
   local char = vim.fn.getcharstr()
+  if char == '\r' then
+    return { { '', '' }, { '', '' } }
+  end
   if char == 't' then
     local tag = vim.fn.input('Enter tag: ')
     return { { '<' .. tag .. '>' }, { '</' .. tag .. '>' } }
