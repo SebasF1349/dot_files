@@ -134,94 +134,102 @@ end
 vim.keymap.set('n', 'L', 'f$l', { desc = 'Next variable', buffer = 0 })
 vim.keymap.set('n', 'H', 'F$l', { desc = 'Previous variable', buffer = 0 })
 
-local function find_dir_space(fpath)
-  for _, dir in ipairs({ 'frontend', 'backend', 'common' }) do
-    if fpath:find(dir) then
-      return dir
-    end
+-- YII2 keymaps
+local function PascalToKebab(pascal)
+  local res = pascal:gsub('%u', function(c)
+    return '-' .. c:lower()
+  end)
+  return res:gsub('^%-', '')
+end
+
+local function kebab_to_pascal(kebab)
+  return (kebab
+    :gsub('(%-)(%a)', function(_, c)
+      return c:upper()
+    end)
+    :gsub('^%l', string.upper))
+end
+
+local file_structure = { base_dir = nil, type = nil, controller = nil }
+local function get_file_structure()
+  if file_structure.base_dir then
+    return
+  end
+
+  file_structure.base_dir = vim.fs.root(0, 'controllers') .. '/' or ''
+
+  local fpath = vim.fn.expand('%:.')
+  if fpath:find('controllers') then
+    file_structure.type = 'controller'
+    local controller = fpath:match(separator .. '(%a*)Controller.php')
+    file_structure.controller = PascalToKebab(controller)
+  elseif fpath:find('views') then
+    file_structure.type = 'view'
+    local escaped_view_path = (file_structure.base_dir .. 'views/'):gsub('([^%w])', '%%%1')
+    local controller = (vim.fn.expand('%:p:h')):gsub(escaped_view_path, '')
+    file_structure.controller = kebab_to_pascal(controller)
   end
 end
 
--- YII2 keymaps
 vim.keymap.set('n', 'gf', function()
-  local fpath = vim.fn.expand('%:.')
-  local cfile = vim.fn.expand('<cfile>')
-  if fpath:find('controllers') and not cfile:find('/') then
-    local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
-    local controller = fpath:match(separator .. '(%a*)Controller.php')
-    controller = controller:gsub('%u', function(c)
-      return '-' .. c:lower()
-    end)
-    local vname = dirspace .. 'views/' .. controller:sub(2) .. '/' .. cfile .. '.php'
-    if vim.fn.filereadable(vname) == 1 then
-      vim.cmd('edit ' .. vname)
-    else
-      vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
+  get_file_structure()
+  local target, action, method, arg
+  if file_structure.type == 'controller' then
+    local line = vim.api.nvim_get_current_line()
+    method, arg = line:match("%$this%->(render)%(%s*['\"]([^']+)['\"]")
+    if not method then
+      method, arg = line:match("%$this%->(redirect)%(%s*['\"]([^']+)['\"]")
+      if not method then
+        arg = vim.fn.expand('<cfile>')
+      end
     end
-  elseif vim.startswith(cfile, separator) then
-    local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
-    local vname = dirspace .. 'views/' .. cfile:sub(2) .. '.php'
-    if vim.fn.filereadable(vname) == 1 then
-      vim.cmd('edit ' .. vname)
-    else
-      vim.notify('View "' .. vname .. '" not found', vim.log.levels.INFO)
+    if not arg then
+      return
     end
-  else
-    vim.api.nvim_feedkeys('gf', 'n', true)
-  end
-end, { desc = 'Improved gf to move to views', buffer = 0 })
 
-vim.keymap.set('n', '<leader>aa', function()
-  local cfile = vim.fn.expand('<cfile>')
-  local split = {}
-  for str in string.gmatch(cfile, '([^/]+)') do
-    table.insert(split, str)
+    local controller, file = arg:match('^([^/]+)/(.+)$')
+    if not controller then
+      controller, file = file_structure.controller, arg
+    end
+
+    if method == 'render' then
+      target = file_structure.base_dir .. 'views/' .. controller .. '/' .. file .. '.php'
+    elseif method == 'redirect' or not method then
+      target = file_structure.base_dir .. 'controllers/' .. kebab_to_pascal(controller) .. 'Controller.php'
+      action = 'action' .. kebab_to_pascal(file)
+    end
+  elseif file_structure.type == 'view' then
+    local cfile = vim.fn.expand('<cfile>')
+    local controller, file = cfile:match('([^/]+)/([^/]+)')
+    if not controller then
+      controller, file = file_structure.controller, cfile
+    end
+    controller = controller or file_structure.controller
+    target = file_structure.base_dir .. 'controllers/' .. kebab_to_pascal(controller) .. 'Controller.php'
+    action = 'action' .. kebab_to_pascal(file)
   end
 
-  local fpath = vim.fn.expand('%:.')
-  local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. '/' or ''
-  local cname = dirspace .. 'controllers/' .. split[1]:sub(1, 1):upper() .. split[1]:sub(2) .. 'Controller.php'
-  if vim.fn.filereadable(cname) == 0 then
-    vim.notify('Controller "' .. cname .. '" not found', vim.log.levels.INFO)
+  if vim.fn.filereadable(target) ~= 1 then
+    vim.notify('"' .. target .. '" not found', vim.log.levels.INFO)
     return
   end
-  vim.cmd('edit ' .. cname)
 
-  local action = split[2]:gsub('-.', function(c)
-    return c:sub(2, 2):upper()
-  end)
-  action = 'action' .. action:sub(1, 1):upper() .. action:sub(2)
-  local linenr = vim.fn.search(action, 'nw')
-  if linenr == 0 then
-    vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
-    return
+  vim.cmd('edit ' .. target)
+  if action then
+    local linenr = vim.fn.search(action, 'nw')
+    if linenr == 0 then
+      vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
+      return
+    end
+    vim.api.nvim_win_set_cursor(0, { linenr, 0 })
   end
-  vim.api.nvim_win_set_cursor(0, { linenr, 0 })
-end, { desc = '[A]lternative: [A]ction', buffer = 0 })
-
-vim.keymap.set('n', '<leader>ac', function()
-  local fpath = vim.fn.expand('%:.')
-  local dirspace = find_dir_space(fpath) and find_dir_space(fpath) .. separator or ''
-  local controller, fname = fpath:match('views' .. separator .. '(.*)' .. separator .. '(.*).php')
-  controller = controller:gsub('-.', function(c)
-    return c:sub(2, 2):upper()
-  end)
-  local cpath = dirspace .. 'controllers/' .. controller:sub(1, 1):upper() .. controller:sub(2) .. 'Controller.php'
-  if vim.fn.filereadable(cpath) == 1 then
-    vim.fn.setreg('f', fname, 'v')
-    vim.cmd('edit ' .. cpath)
-  else
-    vim.notify('Controller "' .. cpath .. '" not found', vim.log.levels.INFO)
-  end
-end, { desc = '[A]lternative: [C]ontroller', buffer = 0 })
+end, { desc = 'Improved gf', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:friendlyManual b:surroundPair b:contextStatus'
   .. ' | setlocal commentstring< iskeyword< '
   .. ' | sil! nunmap <buffer> gf'
-  .. ' | sil! nunmap <buffer> <leader>aa'
-  .. ' | sil! nunmap <buffer> <leader>ac'
   .. ' | sil! vunmap <buffer> i='
   .. ' | sil! ounmap <buffer> i='
   .. ' | sil! vunmap <buffer> a='
