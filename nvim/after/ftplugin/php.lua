@@ -23,6 +23,49 @@ vim.b.surroundPair = {
   ['p'] = { { 'var_dump(' }, { ');exit;' } },
 }
 
+if _G.addSnippet then
+  local snippets = {
+    fn = [[${1:public} function ${2:FunctionName}(${3:})
+{
+    ${0}
+}]],
+    ['if'] = [[if (${1:condition}) {
+    ${0}
+}]],
+    ife = [[if (${1:condition}) {
+    ${2}
+} else {
+    ${0}
+}]],
+    ['if?'] = [[${1} ? ${3:a} : ${4:b} ;]],
+    ['else'] = [[else {
+    ${0}
+}]],
+    ['elseif'] = [[elseif (${1}) {
+    ${0}
+}]],
+    fore = [[foreach (\$${1:variable} as \$${2:key} ${3:key => value}) {
+    ${0},
+}]],
+    this = [[\$this->$0;]],
+    p = [[var_dump($0);]],
+    pe = [[echo '<pre>'; var_export($0); echo '</pre>';exit;]],
+    ['-'] = [[<?php ${0} ?>]],
+    ['_'] = [[<?php
+    ${0}
+?>]],
+    ['='] = [[<?= ${0} ?>]],
+    ['+'] = [[<?=
+    ${0}
+?>]],
+  }
+
+  -- NOTE: snippets are not added to the undo (maybe :una ?)
+  for key, snippet in pairs(snippets) do
+    _G.addSnippet(key, snippet)
+  end
+end
+
 local function is_inside_php_block(cursor_pos)
   local found_start = vim.fn.search('<?php\\|\\(<?=\\)', 'bcW')
   local start_pos = vim.api.nvim_win_get_cursor(0)
@@ -89,47 +132,6 @@ end, { desc = 'PHP Block Text-Object', silent = true, buffer = 0 })
 vim.keymap.set({ 'x', 'o' }, 'a=', function()
   phpTextObject('a')
 end, { desc = 'PHP Block Text-Object', silent = true, buffer = 0 })
-
-local snippets = {
-  fn = [[${1:public} function ${2:FunctionName}(${3:})
-{
-    ${0}
-}]],
-  ['if'] = [[if (${1:condition}) {
-    ${0}
-}]],
-  ife = [[if (${1:condition}) {
-    ${2}
-} else {
-    ${0}
-}]],
-  ['if?'] = [[${1} ? ${3:a} : ${4:b} ;]],
-  ['else'] = [[else {
-    ${0}
-}]],
-  ['elseif'] = [[elseif (${1}) {
-    ${0}
-}]],
-  fore = [[foreach (\$${1:variable} as \$${2:key} ${3:key => value}) {
-    ${0},
-}]],
-  this = [[\$this->$0;]],
-  p = [[var_dump($0);]],
-  pe = [[echo '<pre>'; var_export($0); echo '</pre>';exit;]],
-  ['-'] = [[<?php ${0} ?>]],
-  ['_'] = [[<?php
-    ${0}
-?>]],
-  ['='] = [[<?= ${0} ?>]],
-  ['+'] = [[<?=
-    ${0}
-?>]],
-}
-
--- NOTE: snippets are not added to the undo (maybe :una ?)
-for key, snippet in pairs(snippets) do
-  _G.addSnippet(key, snippet)
-end
 
 vim.keymap.set('n', 'L', 'f$l', { desc = 'Next variable', buffer = 0 })
 vim.keymap.set('n', 'H', 'F$l', { desc = 'Previous variable', buffer = 0 })
