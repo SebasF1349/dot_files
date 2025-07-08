@@ -6,11 +6,13 @@ return {
     ai.setup({
       n_lines = 500,
       mappings = {
+        around_next = '',
+        inside_next = '',
         goto_left = '[g',
         goto_right = ']g',
       },
       custom_textobjects = {
-        t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags (why not builtin?)
+        t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags
         d = { '%f[%d%._][%d%._]+' }, -- digits with _ separator
         s = { -- subword (breaks sentence, but I never use it) https://github.com/echasnovski/mini.nvim/discussions/1434
           {
