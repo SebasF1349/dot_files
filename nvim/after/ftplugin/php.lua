@@ -175,7 +175,7 @@ end
 
 vim.keymap.set('n', 'gf', function()
   get_file_structure()
-  local target, action, method, arg
+  local target, action, action2, method, arg
   if file_structure.type == 'controller' then
     local line = vim.api.nvim_get_current_line()
     method, arg = line:match("%$this%->(render)%(%s*['\"]([^']+)['\"]")
@@ -209,6 +209,7 @@ vim.keymap.set('n', 'gf', function()
     controller = controller or file_structure.controller
     target = file_structure.base_dir .. 'controllers/' .. kebab_to_pascal(controller) .. 'Controller.php'
     action = 'action' .. kebab_to_pascal(file)
+    action2 = 'action' .. kebab_to_pascal(vim.fn.expand('%:t:r'))
   end
 
   if vim.fn.filereadable(target) ~= 1 then
@@ -218,14 +219,17 @@ vim.keymap.set('n', 'gf', function()
 
   vim.cmd('edit ' .. target)
   if action then
-    local linenr = vim.fn.search(action, 'nw')
+    local linenr = vim.fn.search('\\<' .. action .. '\\>', 'nw')
+    if action2 and linenr == 0 then
+        linenr = vim.fn.search('\\<' .. action2 .. '\\>', 'nw')
+    end
     if linenr == 0 then
       vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
       return
     end
     vim.api.nvim_win_set_cursor(0, { linenr, 0 })
   end
-end, { desc = 'Improved gf', buffer = 0 })
+end, { desc = 'Improved gf for Yii2', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
