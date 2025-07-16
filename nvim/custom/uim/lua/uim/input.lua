@@ -91,8 +91,12 @@ function M.input(opts, on_confirm)
 
   local input_win = shared.create_win(win_opts)
 
-  vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
-  vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
+  if opts.default then
+    vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
+    vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
+  else
+    vim.cmd.startinsert()
+  end
   vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
   if config.input.position == 'cmdline' then
