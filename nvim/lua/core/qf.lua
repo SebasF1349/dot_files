@@ -919,6 +919,30 @@ local function yank(what)
   vim.fn.setreg('', text)
 end
 
+local file_name
+local function searchFileName(search)
+  local curr_pos = vim.api.nvim_win_get_cursor(0)
+  local extmarks =
+    vim.api.nvim_buf_get_extmarks(0, qfim_file_namespace, curr_pos, -1, { details = true, type = 'virt_lines' })
+  for _, extmark in ipairs(extmarks) do
+    local text = extmark[4].virt_lines[1]
+    for _, e in ipairs(text) do
+      if e[1]:find(search) then
+        vim.api.nvim_win_set_cursor(0, { extmark[2] + 1, 0 })
+        file_name = search
+        return
+      end
+    end
+  end
+  file_name = nil
+end
+local function repeatSearchFileName()
+  if not file_name then
+    vim.notify('No text to search', vim.log.levels.INFO)
+  end
+  searchFileName(file_name)
+end
+
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
@@ -996,6 +1020,15 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
         vim.cmd(list.context.last_cmd)
       end
     end, { buffer = 0, desc = '[R]eload List' })
+    vim.keymap.set('n', 'g/', function()
+      vim.ui.input({ prompt = 'File Search: ' }, function(input)
+        if not input then
+          return
+        end
+        searchFileName(input)
+      end)
+    end, { buffer = 0, desc = 'Search File Names' })
+    vim.keymap.set('n', 'gn', repeatSearchFileName, { buffer = 0, desc = 'Search File Names Again' })
   end,
   desc = 'Keymaps inside quickfix window',
 })
