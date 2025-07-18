@@ -19,7 +19,7 @@ vim.bo.spelllang = 'es,en'
 -- automatically continue lists
 vim.bo.formatoptions = vim.bo.formatoptions .. 'ro'
 vim.opt_local.formatoptions:remove('c')
-vim.bo.comments = 'b:-,b:+,b:*'
+vim.bo.comments = 'b:- [ ],b:-,b:+,b:*'
 
 vim.keymap.set(
   'n',
