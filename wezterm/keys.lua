@@ -2,6 +2,7 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
 local sessions = require("sessions")
+local ssh = require("ssh")
 local utils = require("utils")
 
 local M = {}
@@ -115,6 +116,13 @@ function M.setup(config)
 			}),
 		},
 		{ mods = M.modTab, key = "q", action = act.CloseCurrentTab({ confirm = false }) },
+		{
+		    mods = M.modTab,
+		    key = "s",
+			action = wezterm.action_callback(function(win, pane)
+				ssh.select_ssh(win, pane)
+			end),
+		},
 		-- Move Tabs
 		{ mods = M.modTab, key = ".", action = act.MoveTabRelative(1) },
 		{ mods = M.modTab, key = ",", action = act.MoveTabRelative(-1) },
@@ -129,7 +137,7 @@ function M.setup(config)
 		{ mods = M.modTab, key = "c", action = act.CopyTo("Clipboard") },
 		{ mods = M.modTab, key = "v", action = act.PasteFrom("Clipboard") },
 		{ mods = M.modTab, key = "y", action = act.ActivateCopyMode },
-		{ mods = M.modTab, key = "s", action = act.QuickSelect },
+		-- { mods = M.modTab, key = "s", action = act.QuickSelect },
 		{ mods = M.modTab, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
 		-- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
 		-- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },

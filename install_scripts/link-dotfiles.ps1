@@ -18,6 +18,7 @@ $file_links = @{
     "$env:Programfiles\WezTerm\keys.lua" = "..\wezterm\keys.lua"
     "$env:Programfiles\WezTerm\utils.lua" = "..\wezterm\utils.lua"
     "$env:Programfiles\WezTerm\sessions.lua" = "..\wezterm\sessions.lua"
+    "$env:Programfiles\WezTerm\ssh.lua" = "..\wezterm\ssh.lua"
     "$env:Programfiles\WezTerm\wallpaper_clean_mini.jpeg" = "..\wallpaper\wallpaper_clean_mini.jpeg"
     "$env:LocalAppData\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json" = "..\windows_terminal\settings.json"
     "$env:USERPROFILE\.gitconfig" = "..\git\.gitconfig"
