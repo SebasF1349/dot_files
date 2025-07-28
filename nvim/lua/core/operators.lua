@@ -166,7 +166,6 @@ local function operateSurround(pairDelete, pairAdd)
   end
 
   local lines = vim.api.nvim_buf_get_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, {})
-  vim.print(lines)
   lines[1] = lines[1]:sub(#pairDelete[1][1] + 1, -1)
   if #lines[1] == 0 then
     table.remove(lines, 1)
