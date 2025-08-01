@@ -200,32 +200,6 @@ local function on_attach(client_id, buf)
   end, { desc = 'Trigger And Select Next Completion' })
   -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
-  -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-  --   require('inlay-hint').setup()
-  --   vim.lsp.inlay_hint.enable(true)
-  --   vim.keymap.set('n', '<leader>ti', function()
-  --     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }))
-  --   end, { desc = 'LSP: [T]oggle [I]nlay Hints', buffer = buf })
-  -- end
-
-  -- local reset_vl = vim.schedule_wrap(function()
-  --   vim.diagnostic.config({ virtual_lines = { current_line = true } })
-  --   vim.api.nvim_create_autocmd('CursorMoved', {
-  --     once = true,
-  --     callback = function()
-  --       vim.diagnostic.config({ virtual_lines = false })
-  --     end,
-  --   })
-  -- end)
-
-  -- vim.keymap.set('n', ']d', function()
-  --   vim.diagnostic.jump({ count = 1 })
-  --   reset_vl()
-  -- end, { desc = 'LSP: Go to next [D]iagnostic message' })
-  -- vim.keymap.set('n', '[d', function()
-  --   vim.diagnostic.jump({ count = -1 })
-  --   reset_vl()
-  -- end, { desc = 'LSP: Go to prev [D]iagnostic message' })
   vim.keymap.set('n', ']e', function()
     vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
   end, { desc = 'LSP: Go to next [E]rror message', buffer = buf })
