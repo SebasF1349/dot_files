@@ -408,7 +408,15 @@ local function on_attach(client_id, buf)
   --   vim.wo.foldexpr = 'v:lua.vim.lsp.foldexpr()'
   -- end
 
-  vim.lsp.document_color.enable(true, buf, { style = 'virtual' })
+  if client.server_capabilities.colorProvider then
+    vim.lsp.document_color.enable(true, buf, { style = 'virtual' })
+  end
+
+  -- NOTE: only works on html, not in intelephense
+  if client.server_capabilities.linkedEditingRangeProvider then
+      vim.lsp.linked_editing_range.enable(true, { client_id = client_id })
+  end
+
 
   if client.server_capabilities.documentHighlightProvider then
     local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
