@@ -9,6 +9,7 @@ end
 -- Surround
 --------------------------------------------------
 
+-- TODO: to work well with tags, I need to be able to use .{-}, but that will break at line 170 as I need the correct lenght
 -- TODO: add 'surround with function' with fn.input to input the function name
 -- TODO: try to reduce boilerplate
 
