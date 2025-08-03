@@ -309,7 +309,7 @@ local function add_virt_lines(list)
       })
     end
   end
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'm', true)
+  vim.api.nvim_feedkeys(vim.keycode('<C-u>'), 'm', true)
 end
 
 -- workaround for cannot scroll to see virtual line before first line - see https://github.com/neovim/neovim/issues/16166
@@ -321,7 +321,7 @@ vim.api.nvim_create_autocmd('CursorMoved', {
     end
     local row = unpack(vim.api.nvim_win_get_cursor(0))
     if row == 1 then
-      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-u>', true, false, true), 'm', true)
+      vim.api.nvim_feedkeys(vim.keycode('<C-u>'), 'm', true)
     end
   end,
   desc = 'Show first virtual line',

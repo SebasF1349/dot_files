@@ -323,8 +323,7 @@ local function on_attach(client_id, buf)
     vim.keymap.set({ 'n', 'i' }, key, function()
       local winnr = vim.b.lsp_floating_preview
       if not winnr or not vim.api.nvim_win_is_valid(winnr) then
-        local keys = vim.api.nvim_replace_termcodes(key, true, false, true)
-        vim.api.nvim_feedkeys(keys, 'n', true)
+        vim.api.nvim_feedkeys(vim.keycode(key), 'n', true)
         return
       end
       local cursor_pos = vim.api.nvim_win_get_cursor(winnr)
@@ -332,8 +331,7 @@ local function on_attach(client_id, buf)
       local bufnr = vim.api.nvim_win_get_buf(winnr)
       local buflns = vim.api.nvim_buf_line_count(bufnr)
       if win_config.height >= buflns then
-        local keys = vim.api.nvim_replace_termcodes(key, true, false, true)
-        vim.api.nvim_feedkeys(keys, 'n', true)
+        vim.api.nvim_feedkeys(vim.keycode(key), 'n', true)
         return
       end
       local new_row = key == '<C-u>' and math.max(cursor_pos[1] - win_config.height + 1, 1)
