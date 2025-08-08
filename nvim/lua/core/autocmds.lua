@@ -200,7 +200,7 @@ end
 
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
-  cmdarg = vim.fn.escape(cmdarg, '\\')
+  cmdarg = vim.fn.escape(cmdarg, '\\()+[]')
   if cmdarg:sub(1,1) == '*' then
       cmdarg = cmdarg:gsub('.', '.*%0')..'.*'
   end
