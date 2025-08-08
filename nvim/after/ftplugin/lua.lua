@@ -1,18 +1,19 @@
+local snip = require('utils.snippets')
+
 vim.b.contextStatus = { 'function_declaration' }
 
-if _G.addSnippet then
-  local snippets = {
-    fn = [[local function ${1:FunctionName}(${2:})
+local snippets = {
+  fn = [[local function ${1:FunctionName}(${2:})
 {
-    ${0}
+  ${0}
 }]],
-    p = [[vim.print($0);]],
-  }
- 
-  for key, snippet in pairs(snippets) do
-    _G.addSnippet(key, snippet)
-  end
+  p = [[vim.print($0);]],
+}
+
+for key, snippet in pairs(snippets) do
+  snip.addSnippet(key, snippet)
 end
+
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
