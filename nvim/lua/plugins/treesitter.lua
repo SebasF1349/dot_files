@@ -9,7 +9,6 @@ return {
         extension = { rasi = 'rasi' },
         pattern = {
           ['.*/hypr/.*%.conf'] = 'hyprlang',
-          ['.*/waybar/config'] = 'jsonc',
           ['%.env%.[%w_.-]+'] = 'sh',
         },
       })
