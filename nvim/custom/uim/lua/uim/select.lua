@@ -110,7 +110,7 @@ function M.select(items, opts, on_choice)
       return
     end
     for char in item:lower():gmatch('.') do
-      if not key:find(char) then
+      if char:match('%a') and not key:find(char) then
         local returned = choose_key(item, key .. char)
         if returned then
           return returned
