@@ -8,13 +8,10 @@ vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (oss.is_win and ';' or 
 
 local M = {}
 
--- Diagnostics
 vim.diagnostic.config({
   underline = false,
   float = {
-    scope = 'cursor',
     severity_sort = true,
-    source = false,
     header = '',
     prefix = '',
     format = function(d)
@@ -24,7 +21,10 @@ vim.diagnostic.config({
       return string.format('[%s: %s]', d.source, d.code), ''
     end,
   },
-  jump = { float = true },
+  jump = { on_jump = function(diagnostic, bufnr)
+    if not diagnostic then return end
+    vim.diagnostic.open_float({ bufnr = bufnr, scope = 'cursor', focus = false, header = 'Cursor Diagnostics:' })
+  end },
   severity_sort = true,
   signs = {
     text = {
