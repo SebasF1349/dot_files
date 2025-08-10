@@ -195,9 +195,9 @@ vim.keymap.set('n', 'gf', function()
   local target, action, action2, method, arg
   if fileObj:getType() == 'controller' then
     local line = vim.api.nvim_get_current_line()
-    method, arg = line:match("%$this%->(render)%(%s*['\"]([^']+)['\"]")
+    method, arg = line:match("%$this%->(render)%(%s*%[?%s*['\"]([^'\"]+)['\"]")
     if not method then
-      method, arg = line:match("%$this%->(redirect)%(%s*['\"]([^']+)['\"]")
+        method, arg = line:match("%$this%->(redirect)%(%s*%[?%s*['\"]([^'\"]+)['\"]")
       if not method then
         arg = vim.fn.expand('<cfile>')
       end
