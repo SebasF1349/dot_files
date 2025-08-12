@@ -74,6 +74,15 @@ end, { desc = 'Send blank lines to black hole', expr = true })
 vim.keymap.set('n', 'yc', '"yy".v:count1."gcc\']p"', { desc = 'Make a Copy Commentted out', remap = true, expr = true })
 vim.keymap.set('x', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', remap = true })
 
+vim.keymap.set({ 'n', 'x' }, '<leader>x', function()
+  local esc = vim.keycode('<esc>')
+  vim.api.nvim_feedkeys(esc, 'n', false)
+  local is_visual = vim.fn.mode():match('[vV\22]')
+  local range = is_visual and "'<,'>" or "%"
+  vim.cmd(string.format('%ss/\\r//ge | %ss/\\s\\+$//ge | %ss/\\n\\n\\n\\+/\\r\\r/ge', range, range, range))
+  if is_visual then vim.api.nvim_feedkeys(esc, 'n', false) end -- \27 is ESC
+end, { desc = "Cleaning" })
+
 -- better cmdline history
 vim.keymap.set('c', '<C-n>', function()
   return vim.fn.wildmenumode() == 1 and '<C-n>' or '<down>'
