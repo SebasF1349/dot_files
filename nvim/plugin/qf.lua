@@ -1015,6 +1015,7 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
         }, 'r')
         if #diag_list == 0 then
           vim.notify('List is now Empty', vim.log.levels.INFO)
+          vim.cmd(listType .. 'close')
         end
       elseif list.context.last_cmd then
         vim.cmd(list.context.last_cmd)
