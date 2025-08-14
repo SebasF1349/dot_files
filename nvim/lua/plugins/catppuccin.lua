@@ -18,13 +18,7 @@ return {
         treesitter = true,
       },
       custom_highlights = function(colors)
-        local utils = require('catppuccin.utils.colors')
-
-        local float_bg = utils.darken(colors.blue, 0.10, colors.base)
-
         return {
-          MatchParen = { fg = colors.mauve, bg = colors.surface1, style = {} },
-
           -- make the references to the word under the cursor darker
           LspReferenceText = { bg = colors.none },
           LspReferenceRead = { bg = colors.none },
@@ -32,36 +26,17 @@ return {
 
           LspReferenceShow = { bg = colors.surface1 }, -- custom hl
 
-          MasonNormal = { link = 'NormalFloat' },
-
-          PanelHeading = { fg = colors.lavender, bg = colors.none, style = { 'bold', 'italic' } },
-
           LazyH1 = { bg = colors.none, fg = colors.lavender, style = { 'bold' } },
           LazyButton = { bg = colors.none, fg = colors.overlay0 },
           LazyButtonActive = { bg = colors.none, fg = colors.lavender, style = { 'bold' } },
           LazySpecial = { fg = colors.green },
 
-          Pmenu = { bg = float_bg, fg = colors.lavender },
-          PmenuKind = { bg = float_bg, fg = colors.mauve, style = { 'bold' } },
-          PmenuSbar = { bg = colors.surface0 },
-          PmenuThumb = { bg = colors.overlay2 },
-          NormalFloat = { bg = float_bg, fg = colors.lavender },
-          FloatBorder = { bg = float_bg, fg = colors.blue },
-          FloatTitle = { bg = float_bg, fg = colors.lavender },
+          Pmenu = { bg = colors.surface0, fg = colors.text },
+          PmenuSel = { bg = colors.surface1, style = { "bold" } },
+          PmenuSbar = { bg = colors.surface1 },
 
-          CmpItemAbbrMatch = { fg = colors.blue, style = { 'bold' } },
-          CmpItemMenu = { fg = colors.surface0 },
-          CmpDoc = { link = 'NormalFloat' },
-          CmpDocBorder = { fg = colors.surface1, bg = colors.none },
-
-          TelescopeNormal = { bg = float_bg, fg = colors.lavender },
-          TelescopeMatching = { bg = float_bg, fg = colors.green },
-          TelescopeSelection = { bg = float_bg, fg = colors.green },
-          TelescopePromptNormal = { bg = float_bg, fg = colors.lavender },
-          TelescopeResultsDiffAdd = { bg = float_bg, fg = colors.green },
-          TelescopeResultsDiffChange = { bg = float_bg, fg = colors.yellow },
-          TelescopeResultsDiffDelete = { bg = float_bg, fg = colors.red },
-          TelescopeBorder = { bg = float_bg },
+          NormalFloat = { bg = colors.surface0, fg = colors.text },
+          FloatBorder = { bg = colors.surface0, fg = colors.text },
 
           TerminalNormal = { bg = colors.base, fg = colors.text },
 
