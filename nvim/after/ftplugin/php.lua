@@ -65,42 +65,30 @@ for key, snippet in pairs(snippets) do
   snip.addSnippet(key, snippet)
 end
 
-local function is_inside_php_block(cursor_pos)
-  local found_start = vim.fn.search('<?php\\|\\(<?=\\)', 'bcW')
-  local start_pos = vim.api.nvim_win_get_cursor(0)
-  local found_end = vim.fn.search('?>', 'ceW')
-  local end_pos = vim.api.nvim_win_get_cursor(0)
-  vim.api.nvim_win_set_cursor(0, cursor_pos)
-
-  if found_start == 0 or found_end == 0 then
-    return false
-  end
-
-  return (cursor_pos[1] > start_pos[1] or (cursor_pos[1] == start_pos[1] and cursor_pos[2] >= start_pos[2]))
-    and (cursor_pos[1] < end_pos[1] or (cursor_pos[1] == end_pos[1] and cursor_pos[2] <= end_pos[2]))
-end
-
 --- Text-object for php blocks (<?= and <?php)
+-- NOTE: it doesn't handle blocks at the end of the file
 ---@param type 'a' | 'i'
 local function phpTextObject(type)
   local curr = vim.api.nvim_win_get_cursor(0)
-  local flag = is_inside_php_block(curr) and 'bcp' or 'cpW'
-  local o = vim.fn.search('<?php\\|\\(<?=\\)', flag)
-  if o == 0 then
+
+  local _end = vim.fn.searchpos('?>', 'eWc')
+  if _end[1] == 0 and _end[2]  == 0 then
+    vim.api.nvim_win_set_cursor(0, curr)
     return
   end
-  local opening = vim.api.nvim_win_get_cursor(0)
-  local e = vim.fn.search('?>', 'eWc')
-  local _end = vim.api.nvim_win_get_cursor(0)
-  -- <?php blocks may have no ending if it ends at the end of the file
-  if e == 0 then
-    local last_line = vim.fn.getpos('$')[2]
-    local last_col = vim.fn.col({ last_line, '$' })
-    _end = { last_line, last_col }
+
+  local opening = vim.fn.searchpos('\\(<?php\\)\\|\\(<?=\\)', 'bcp')
+  if opening[1] == 0 and opening[2]  == 0 then
+    vim.api.nvim_win_set_cursor(0, curr)
+    return
   end
 
+  -- normalization
+  opening[2] = opening[2] - 1
+  _end[2] = _end[2] - 1
+
   if type == 'i' then
-    local block_start = o == 1 and '<?php' or '<?='
+    local block_start = opening[3] == 2 and '<?php' or '<?='
     if opening[2] + #block_start == #vim.api.nvim_buf_get_lines(0, opening[1], opening[1] + 1, false)[1] then
       opening[1] = opening[1] + 1
       opening[2] = 1
@@ -116,7 +104,7 @@ local function phpTextObject(type)
     end
   end
 
-  vim.api.nvim_win_set_cursor(0, opening)
+  vim.api.nvim_win_set_cursor(0, { opening[1], opening[2] })
   if vim.api.nvim_get_mode().mode:find('v') then
     vim.cmd.normal({ 'o', bang = true })
   else
