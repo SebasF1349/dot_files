@@ -31,12 +31,10 @@ return {
           LazyButtonActive = { bg = colors.none, fg = colors.lavender, style = { 'bold' } },
           LazySpecial = { fg = colors.green },
 
-          Pmenu = { bg = colors.surface0, fg = colors.text },
-          PmenuSel = { bg = colors.surface1, style = { "bold" } },
-          PmenuSbar = { bg = colors.surface1 },
+          Pmenu = { bg = colors.base, fg = colors.overlay2 },
 
-          NormalFloat = { bg = colors.surface0, fg = colors.text },
-          FloatBorder = { bg = colors.surface0, fg = colors.text },
+          NormalFloat = { bg = colors.base, fg = colors.text },
+          FloatBorder = { bg = colors.base, fg = colors.text },
 
           TerminalNormal = { bg = colors.base, fg = colors.text },
 
