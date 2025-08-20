@@ -324,6 +324,26 @@ local function custom_diagnostics()
   return string.format('%s%s', local_diagnostics, workspace_diagnostics)
 end
 
+---- LS PROGRESS
+local spinner = { '•◦', '◦•' }
+local progress = 1
+local ls_progress = ''
+
+vim.lsp.handlers['$/progress'] = function(_, p, _)
+  if p.value.kind == 'end' then
+    ls_progress = ''
+    _G.LsProgress_timer:stop()
+    vim.api.nvim__redraw({ statusline = true })
+  elseif _G.LsProgress_timer == nil then
+    _G.LsProgress_timer = vim.uv.new_timer()
+    _G.LsProgress_timer:start(0, 500, vim.schedule_wrap(function()
+      progress = (progress == 1) and 2 or 1
+      ls_progress = string.format('%%#SLSeparator# %s', spinner[progress])
+      vim.api.nvim__redraw({ statusline = true })
+    end))
+  end
+end
+
 ---- STATUSLINE ----
 Statusline = {
   active = function()
@@ -334,6 +354,7 @@ Statusline = {
         file(),
         '%=',
         get_context(),
+        ls_progress,
         ' ',
         custom_diagnostics(),
         git(),

@@ -42,27 +42,6 @@ vim.diagnostic.config({
   },
 })
 
--- LSP progress messages on cmdline
----@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.handlers['$/progress'] = function(_, progress, ctx)
-  local msg = progress.value
-
-  if msg.kind ~= 'end' and msg.kind ~= 'begin' then
-    return
-  end
-
-  local client = vim.lsp.get_client_by_id(ctx.client_id)
-  local client_name = client and client.name and '[' .. client.name .. ']' or ''
-
-  local title = msg.title and ' ' .. msg.title or ''
-
-  local kind = msg.kind == 'end' and 'done' or 'starting...'
-
-  local out = string.format('%s%s %s', client_name, title, kind)
-
-  vim.notify(out, vim.log.levels.INFO)
-end
-
 -- copied from https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/util.lua#L23C1-L28C4
 -- until https://github.com/neovim/neovim/issues/33225 gets resolved
 local function bufname_valid(bufname)
