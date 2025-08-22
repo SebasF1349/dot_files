@@ -263,29 +263,6 @@ local function on_attach(client_id, buf)
     vim.notify('No diagnostics found', vim.log.levels.INFO)
   end, { desc = 'Floating Diagnostics' })
 
-  local preview_namespace = vim.api.nvim_create_namespace('preview')
-  vim.keymap.set('n', 'grp', function()
-    local diag = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
-    if #diag == 0 then
-      return
-    end
-    local hls = {}
-    diag = vim
-      .iter(diag)
-      :map(function(d)
-        table.insert(hls, get_diagnostic_hl(d.severity))
-        return signs[d.severity] .. ' ' .. d.code .. ': ' .. d.message
-      end)
-      :totable()
-    local bufnr = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_buf_set_lines(bufnr, 0, #diag, false, diag)
-    vim.o.previewheight = math.min(#diag + 1, 5)
-    for line, hl in ipairs(hls) do
-      vim.hl.range(bufnr, preview_namespace, hl, { line - 1, 0 }, { line - 1, vim.o.columns })
-    end
-    vim.cmd('pbuffer ' .. bufnr)
-  end, { desc = 'Open Diagnostics Preview' })
-
   vim.keymap.set('n', 'gro', function()
     if vim.fn.exists(':OrganizeImports') > 0 then
       vim.cmd('OrganizeImports')
@@ -318,36 +295,6 @@ local function on_attach(client_id, buf)
       vim.api.nvim_win_set_cursor(winnr, { new_row, cursor_pos[2] })
     end, { desc = 'Scroll Docs' })
   end
-
-  -- based on https://github.com/mfussenegger/nvim-qwahl/blob/main/lua/qwahl.lua#L446C1-L468C4
-  ---@param bufnr? integer 0 for current buffer; nil for all diagnostic
-  ---@param opts? {lnum?: integer, severity?: vim.diagnostic.Severity} See vim.diagnostic.get
-  local function select_diagnostic(bufnr, opts)
-    local diagnostics = vim.diagnostic.get(bufnr, opts)
-    local ui_opts = {
-      prompt = 'Diagnostic: ',
-      format_item = function(d)
-        local new_line = d.message:find('\n')
-        if new_line then
-          d.message = d.message:sub(1, new_line - 1)
-        end
-        local bname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(d.bufnr), ':p:.')
-        local lnum = d.lnum or d.end_lnum
-        return string.format('%s%s (%s:%s)', signs[d.severity], d.message, bname, lnum + 1)
-      end,
-    }
-    local win = vim.api.nvim_get_current_win()
-    vim.ui.select(diagnostics, ui_opts, function(d)
-      if d then
-        vim.api.nvim_set_current_buf(d.bufnr)
-        vim.api.nvim_win_set_cursor(win, { d.lnum + 1, d.col })
-        vim.api.nvim_win_call(win, function()
-          vim.cmd('normal! zvzz')
-        end)
-      end
-    end)
-  end
-  vim.keymap.set('n', 'grl', select_diagnostic, { desc = '[L]ist Diagnostics', buffer = buf })
 
   local ok_wd, wd = pcall(require, 'workspace-diagnostics', function()
     local cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', vim.uv.cwd() }
