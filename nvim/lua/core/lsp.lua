@@ -1,6 +1,3 @@
-local ui = require('utils.ui')
-local signs = ui.diagnostic_icons_num
-local get_diagnostic_hl = ui.get_diagnostic_hl
 local methods = vim.lsp.protocol.Methods
 
 local oss = require('utils.os')
@@ -186,71 +183,70 @@ local function on_attach(client_id, buf)
     vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
   end, { desc = 'LSP: Go to prev [E]rror message', buffer = buf })
 
-  -- replaced my own implementation with Folke's which is more performant: https://github.com/folke/snacks.nvim/blob/main/lua/snacks/words.lua#L117
-  local ns = vim.api.nvim_create_namespace('nvim.lsp.references')
+  local function jump_to_reference(direction)
+    return function()
+      vim.cmd('normal! eb')
 
-  ---@alias LspWord {from:{[1]:number, [2]:number}, to:{[1]:number, [2]:number}} 1-0 indexed
+      vim.lsp.buf.references(nil, {
+        on_list = function(options)
+          if not options or not options.items or #options.items == 0 then
+            vim.notify('No references found', vim.log.levels.WARN)
+            return
+          end
 
-  ---@return LspWord[] words, number? current
-  local function get_lsp_word()
-    local cursor = vim.api.nvim_win_get_cursor(0)
-    local current, ret = nil, {} ---@type number?, LspWord[]
-    for _, extmark in ipairs(vim.api.nvim_buf_get_extmarks(0, ns, 0, -1, { details = true })) do
-      local w = {
-        from = { extmark[2] + 1, extmark[3] },
-        to = { extmark[4].end_row + 1, extmark[4].end_col },
-      }
-      ret[#ret + 1] = w
-      if cursor[1] >= w.from[1] and cursor[1] <= w.to[1] and cursor[2] >= w.from[2] and cursor[2] <= w.to[2] then
-        current = #ret
-      end
-    end
-    return ret, current
-  end
+          local next_location = 1
+          local lnum = vim.fn.line('.')
+          local col = vim.fn.col('.')
+          for i, item in ipairs(options.items) do
+            if item.lnum == lnum and item.col == col then
+              next_location = i + direction
+              break
+            end
+          end
 
-  ---@param count number
-  ---@param direction 1 | -1
-  ---@param cycle? boolean
-  local function move_reference(count, direction, cycle)
-    local words, idx = get_lsp_word()
-    if not idx then
-      return
-    end
-    idx = idx + count * direction
-    if cycle then
-      idx = (idx - 1) % #words + 1
-    end
-    local target = words[idx]
-    if target then
-      vim.api.nvim_win_set_cursor(0, target.from)
+          if next_location == 0 then
+            next_location = #options.items
+          elseif next_location > #options.items then
+            next_location = 1
+          end
+
+          local item = options.items[next_location]
+          vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
+        end,
+      })
     end
   end
 
-  vim.keymap.set('n', ']r', function()
-    move_reference(vim.v.count1, 1, true)
-  end, { desc = 'LSP: Go to next [R]eference', buffer = buf })
-  vim.keymap.set('n', '[r', function()
-    move_reference(vim.v.count1, -1, true)
-  end, { desc = 'LSP: Go to previous [R]eference', buffer = buf })
+  vim.keymap.set('n', '[r', jump_to_reference(-1), { desc = 'Jump to previous reference' })
+  vim.keymap.set('n', ']r', jump_to_reference(1), { desc = 'Jump to next reference' })
 
   local ns_hl = vim.api.nvim_create_namespace('hlreferences')
   local function hl_references()
-    local extmarks = {}
-    for i, extmark in ipairs(vim.api.nvim_buf_get_extmarks(0, ns, 0, -1, { details = true })) do
-      extmarks[i] = vim.api.nvim_buf_set_extmark(
-        0,
-        ns_hl,
-        extmark[2],
-        extmark[3],
-        { hl_group = 'LspReferenceShow', end_col = extmark[4].end_col, virt_text_pos = 'overlay' }
-      )
-      vim.defer_fn(function()
-        vim.api.nvim_buf_del_extmark(0, ns_hl, extmarks[i])
-      end, 10 * 1000)
-    end
+    vim.lsp.buf.references(nil, {
+      on_list = function(options)
+        if not options or not options.items or #options.items == 0 then
+          vim.notify('No references found', vim.log.levels.WARN)
+          return
+        end
+
+        local extmarks = {}
+        for i, item in ipairs(options.items) do
+          extmarks[i] = vim.api.nvim_buf_set_extmark(
+            0,
+            ns_hl,
+            item.lnum - 1,
+            item.col - 1,
+            { hl_group = 'LspReferenceShow', end_col = item.end_col - 1, virt_text_pos = 'overlay' }
+          )
+          vim.defer_fn(function()
+            vim.api.nvim_buf_del_extmark(0, ns_hl, extmarks[i])
+          end, 10 * 1000)
+        end
+      end,
+    })
   end
 
-  vim.keymap.set('n', '<leader>8', hl_references, { desc = 'LSP: Go to previous [R]eference', buffer = buf })
+  vim.keymap.set('n', '<leader>8', hl_references, { desc = 'LSP: Select all references', buffer = buf })
 
   vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buffer = buf })
   vim.keymap.set('n', '<C-w>d', function()
@@ -373,34 +369,6 @@ local function on_attach(client_id, buf)
   -- NOTE: only works on html, not in intelephense
   if client.server_capabilities.linkedEditingRangeProvider then
       vim.lsp.linked_editing_range.enable(true, { client_id = client_id })
-  end
-
-
-  if client.server_capabilities.documentHighlightProvider then
-    local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
-    -- Highlight references of the word under your cursor
-    vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI', 'ModeChanged' }, {
-      group = highlight_augroup,
-      buffer = buf,
-      callback = function()
-        vim.schedule(function()
-          vim.lsp.buf.clear_references()
-          if vim.api.nvim_get_mode().mode == 'n' then
-            vim.lsp.buf.document_highlight()
-          end
-        end)
-      end,
-    })
-
-    -- Clear highlight when detaching lsp (fix some lsp errors)
-    vim.api.nvim_create_autocmd('LspDetach', {
-      group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
-      buffer = buf,
-      callback = function(local_event)
-        vim.lsp.buf.clear_references()
-        vim.api.nvim_clear_autocmds({ group = 'lsp-highlight', buffer = local_event.buf })
-      end,
-    })
   end
 end
 

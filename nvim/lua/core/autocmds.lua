@@ -73,7 +73,6 @@ vim.api.nvim_create_autocmd({ 'WinEnter' }, {
 })
 vim.api.nvim_create_autocmd({ 'WinLeave' }, {
   callback = function()
-    vim.lsp.buf.clear_references()
     vim.wo.cursorline = false
   end,
   group = general,

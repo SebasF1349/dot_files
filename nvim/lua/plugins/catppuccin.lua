@@ -19,11 +19,6 @@ return {
       },
       custom_highlights = function(colors)
         return {
-          -- make the references to the word under the cursor darker
-          LspReferenceText = { bg = colors.none },
-          LspReferenceRead = { bg = colors.none },
-          LspReferenceWrite = { bg = colors.none },
-
           LspReferenceShow = { bg = colors.surface1 }, -- custom hl
 
           LazyH1 = { bg = colors.none, fg = colors.lavender, style = { 'bold' } },
