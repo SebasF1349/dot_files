@@ -189,8 +189,6 @@ local function on_attach(client_id, buf)
 
   local function jump_to_reference(direction)
     return function()
-      vim.cmd('normal! eb')
-
       vim.lsp.buf.references(nil, {
         on_list = function(options)
           if not options or not options.items or #options.items == 0 then
@@ -202,7 +200,7 @@ local function on_attach(client_id, buf)
           local lnum = vim.fn.line('.')
           local col = vim.fn.col('.')
           for i, item in ipairs(options.items) do
-            if item.lnum == lnum and item.col == col then
+            if item.lnum == lnum and col >= item.col and col <= item.end_col then
               next_location = i + direction
               break
             end
