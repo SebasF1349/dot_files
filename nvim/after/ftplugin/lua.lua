@@ -1,5 +1,9 @@
 local snip = require('utils.snippets')
 
+vim.bo.tabstop = 2
+vim.bo.softtabstop = 2
+vim.bo.shiftwidth = 2
+
 vim.b.contextStatus = { 'function_declaration' }
 
 local snippets = {
@@ -18,4 +22,4 @@ end
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:contextStatus'
-  .. ' | setlocal keywordprg< omnifunc<'
+  .. ' | setlocal tabstop< softtabstop< shiftwidth< '
