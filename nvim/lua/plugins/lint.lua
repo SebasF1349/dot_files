@@ -20,12 +20,16 @@ return {
       -- ['yaml.ansible'] = { 'ansible-lint', },
     }
 
-    lint.linters.phpstan.args = {
-      'analyze',
-      '--error-format=json',
-      '--no-progress',
-      '--memory-limit=256M',
-    }
+    local phpstanDir = vim.fs.root(0, 'phpstan.neon')
+    if phpstanDir then
+      lint.linters.phpstan.args = {
+        'analyse',
+        '--error-format=json',
+        '--no-progress',
+        '-c', phpstanDir .. '/phpstan.neon',
+        '--memory-limit=256M',
+      }
+    end
 
     local phpcs_info = {
       'Generic.Functions.FunctionCallArgumentSpacing.NoSpaceAfterComma',
