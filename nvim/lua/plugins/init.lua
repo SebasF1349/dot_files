@@ -10,7 +10,7 @@ return {
   { 'artemave/workspace-diagnostics.nvim' },
 
   {
-    'echasnovski/mini.splitjoin',
+    'nvim-mini/mini.splitjoin',
     keys = { '<leader>j' },
     opts = { mappings = { toggle = '<leader>j', split = '', join = '' } },
   },
