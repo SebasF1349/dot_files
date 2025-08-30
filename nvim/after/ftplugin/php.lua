@@ -14,7 +14,7 @@ vim.cmd('setlocal iskeyword-=-')
 
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
-vim.b.contextStatus = { 'method_declaration', 'class_declaration', 'function_declaration', 'function_definition' }
+vim.b.contextStatus = { method_declaration = 'name' , class_declaration = 'name', function_definition = 'name' }
 
 vim.b.surroundPair = {
   ['-'] = { { '<?php ' }, { ' ?>' } },

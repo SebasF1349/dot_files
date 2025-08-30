@@ -184,21 +184,6 @@ local function file()
 end
 
 ---- Context ----
-local function clean_node(line)
-  line = line:gsub('local%s+', '')
-  line = line:gsub('class%s+', '')
-  line = line:gsub('public%s+', '')
-  line = line:gsub('private%s+', '')
-  line = line:gsub('static%s+', '')
-  line = line:gsub('function%s+', '')
-  line = line:gsub('fn%s+', '')
-  line = line:gsub('extends%s+.*', '')
-  line = line:gsub('implements%s+.*', '')
-  line = line:gsub('impl%s+', '')
-  line = vim.trim(line)
-  return line:gsub('%s*[%(%{%[].*[%]%}%)]*%s*$', '')
-end
-
 local function get_context()
   local nodes = vim.b.contextStatus
   if not nodes then
@@ -208,10 +193,11 @@ local function get_context()
   local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
   local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank } })
   while curr_node do
-    if vim.list_contains(nodes, curr_node:type()) then
-      local line = curr_node:range()
-      local context = vim.api.nvim_buf_get_lines(0, line, line + 1, false)
-      return '%#SLContext#[' .. clean_node(context[1]) .. ']'
+    local name = nodes[curr_node:type()]
+    if name then
+      local name_nodes = curr_node:field(name)
+      local context = name_nodes[1] and vim.treesitter.get_node_text(name_nodes[1], 0) or 'FAILED'
+      return '%#SLContext#[' .. context .. ']'
     end
     curr_node = curr_node:parent()
   end

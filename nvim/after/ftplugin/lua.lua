@@ -4,7 +4,7 @@ vim.bo.tabstop = 2
 vim.bo.softtabstop = 2
 vim.bo.shiftwidth = 2
 
-vim.b.contextStatus = { 'function_declaration' }
+vim.b.contextStatus = { function_declaration = 'name' }
 
 local snippets = {
   fn = [[local function ${1:FunctionName}(${2:})
