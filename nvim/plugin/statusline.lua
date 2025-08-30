@@ -206,7 +206,7 @@ local function get_context()
   end
   local curr_line = vim.api.nvim_win_get_cursor(0)
   local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
-  local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank }, ignore_injections = false })
+  local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank } })
   while curr_node do
     if vim.list_contains(nodes, curr_node:type()) then
       local line = curr_node:range()
