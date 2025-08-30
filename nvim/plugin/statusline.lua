@@ -205,7 +205,8 @@ local function get_context()
 end
 
 ---- GIT ----
-local gstatus = { head = '', ahead = '0', behind = '0', modified = false }
+local gstatus_last_commit = ''
+local gstatus = ''
 
 -- improved my implementation stealing from https://github.com/pynappo/git-notify.nvim/blob/main/lua/git-notify/init.lua
 local function git_command(args)
@@ -223,24 +224,32 @@ end
 local function update_git()
   vim.system(git_command({ 'fetch' }), {}, function()
     vim.system(git_command({ 'status', '--porcelain=v2', '--branch' }), {}, function(branch_status_output)
-      if branch_status_output.code ~= 0 then
-        return
-      end
-      local lines = vim.split(branch_status_output.stdout, '\n', { plain = true })
-      if #lines < 3 then
-        return
-      end
-      local upstream_branch = lines[2]:sub(1 + #'# branch.head ')
-      gstatus.head = upstream_branch
-      local has_upstream = lines[3]:sub(1, 1) == '#'
-      if not has_upstream then
+      local output = branch_status_output.stdout
+      if branch_status_output.code ~= 0 or not output then
         return
       end
 
-      local _, _, commits_ahead, commits_behind = lines[4]:find('%+(%d+) %-(%d+)')
-      gstatus.ahead = commits_ahead
-      gstatus.behind = commits_behind
-      gstatus.modified = not vim.startswith(lines[#lines - 1], '#')
+      local hash = output:match('# branch%.oid%s+([%w%(%)]+)')
+      if hash == gstatus_last_commit then
+        return
+      end
+      gstatus_last_commit = hash
+
+      local branch = output:match('# branch%.head%s+([%w%-%._%(%)]+)')
+      local ahead, behind = output:match('# branch%.ab%s+%+([0-9]+)%s+%-([0-9]+)')
+      if not ahead or not behind then
+        gstatus = ''
+        return
+      end
+
+      ahead = ahead ~= '0' and '' or ''
+      behind = behind ~= '0' and '' or ''
+
+      if ahead == '' and behind == '' then
+        gstatus = string.format('%%#SLBranch#%s', branch)
+      else
+        gstatus = string.format('%%#SLBranch#%s%%#SLDiff#[%s%s]', branch, ahead, behind)
+      end
     end)
   end)
 end
@@ -252,25 +261,7 @@ if is_git then
   else
     _G.Gstatus_timer:stop()
   end
-  _G.Gstatus_timer:start(0, 2000, vim.schedule_wrap(update_git))
-end
-
-local head = ''
-local function git()
-  if not is_git then
-    return ''
-  end
-  local git_info = vim.b.gitsigns_status_dict
-  if git_info then
-    head = git_info.head
-  end
-  local ahead = gstatus.ahead ~= '0' and '' or ''
-  local behind = gstatus.behind ~= '0' and '' or ''
-  local modified = (gstatus.modified or vim.o.modified) and '~' or ''
-  if ahead == '' and behind == '' and modified == '' then
-    return string.format('%%#SLBranch#%s', head)
-  end
-  return string.format('%%#SLBranch#%s%%#SLDiff#[%s%s%s]', head, ahead, behind, modified)
+  _G.Gstatus_timer:start(0, 300000, vim.schedule_wrap(update_git))
 end
 
 ---- DIAGNOSTICS ----
@@ -343,7 +334,7 @@ Statusline = {
         ls_progress,
         ' ',
         custom_diagnostics(),
-        git(),
+        gstatus,
         ' ',
       })
     else
@@ -353,7 +344,7 @@ Statusline = {
         file(),
         '%=',
         custom_diagnostics(),
-        git(),
+        gstatus,
         ' ',
       })
     end
