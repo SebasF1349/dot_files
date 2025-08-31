@@ -3,9 +3,10 @@
 --------------------------------------------------
 
 --- Get normalized filename
----@param bufnr integer
+---@param bufnr? integer
 ---@return string
 local function getBufName(bufnr)
+  bufnr = bufnr or 0
   local buf = vim.api.nvim_buf_get_name(bufnr)
   return vim.fs.normalize(vim.fn.fnamemodify(buf, ':.'))
 end
@@ -72,7 +73,6 @@ end
 
 ---@param bufnr? number
 local function insert(bufnr)
-  bufnr = bufnr or 0
   local buf = getBufName(bufnr)
   vim.cmd('argedit ' .. buf .. ' | argdedupe')
 end
