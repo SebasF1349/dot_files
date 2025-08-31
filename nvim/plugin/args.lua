@@ -99,19 +99,9 @@ local function remove_select()
   end)
 end
 
----@param exclude? boolean don't delete current
-local function remove_all(exclude)
-  if exclude then
-    local buf = getBufName(0)
-    vim.cmd('silent! args ' .. buf)
-  else
-    vim.cmd('silent! %argdelete')
-  end
-  if #vim.api.nvim_list_wins() > 1 then
-    vim.api.nvim_win_close(0, false)
-  elseif vim.fn.argc() ~= 0 then
-    move()
-  end
+local function only()
+  local buf = getBufName(0)
+  vim.cmd('silent! args ' .. buf)
 end
 
 vim.keymap.set('n', ']a', cycle_next, { desc = 'Next [A]rg' })
@@ -128,10 +118,8 @@ vim.keymap.set('n', 'gai', insert, { desc = '[A]rg [I]nsert' })
 vim.keymap.set('n', 'gad', ':argdo ', { desc = '[A]rg[D]o' })
 vim.keymap.set('n', 'gar', remove, { desc = '[A]rg [R]emove' })
 vim.keymap.set('n', 'gaR', remove_select, { desc = '[A]rg [R]emove Selected' })
-vim.keymap.set('n', 'gao', function()
-  remove_all(true)
-end, { desc = '[A]rg [O]nly' })
-vim.keymap.set('n', 'gac', remove_all, { desc = '[A]arglist [C]lean' })
+vim.keymap.set('n', 'gao', only, { desc = '[A]rg [O]nly' })
+vim.keymap.set('n', 'gac', '<cmd>%argdelete<CR>', { desc = '[A]arglist [C]lean', silent = true })
 
 --------------------------------------------------
 -- Opening Buffers
