@@ -215,7 +215,6 @@ local function get_context()
 end
 
 ---- GIT ----
-local gstatus_last_commit = ''
 local gstatus = ''
 
 -- improved my implementation stealing from https://github.com/pynappo/git-notify.nvim/blob/main/lua/git-notify/init.lua
@@ -232,34 +231,27 @@ local function git_command(args)
 end
 
 local function update_git()
-  vim.system(git_command({ 'fetch' }), {}, function()
+  vim.system(git_command({ 'fetch' }), {}, function(o)
     vim.system(git_command({ 'status', '--porcelain=v2', '--branch' }), {}, function(branch_status_output)
       local output = branch_status_output.stdout
       if branch_status_output.code ~= 0 or not output then
         return
       end
 
-      local hash = output:match('# branch%.oid%s+([%w%(%)]+)')
-      if hash == gstatus_last_commit then
-        return
-      end
-      gstatus_last_commit = hash
-
       local branch = output:match('# branch%.head%s+([%w%-%._%(%)]+)')
+      local modified = (output:find("\n[^#\n]%S") ~= nil or output:match("^[^#\n]%S")) and '~' or ''
       local ahead, behind = output:match('# branch%.ab%s+%+([0-9]+)%s+%-([0-9]+)')
-      if not ahead or not behind then
-        gstatus = ''
-        return
-      end
-
       ahead = ahead ~= '0' and '' or ''
       behind = behind ~= '0' and '' or ''
 
-      if ahead == '' and behind == '' then
+      if ahead == '' and behind == '' and modified == '' then
         gstatus = string.format('%%#SLBranch#%s', branch)
       else
-        gstatus = string.format('%%#SLBranch#%s%%#SLDiff#[%s%s]', branch, ahead, behind)
+        gstatus = string.format('%%#SLBranch#%s%%#SLDiff#[%s%s%s]', branch, ahead, behind, modified)
       end
+      vim.defer_fn(function()
+        vim.api.nvim__redraw({ statusline = true })
+      end, 0)
     end)
   end)
 end
