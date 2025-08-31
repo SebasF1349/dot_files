@@ -183,16 +183,6 @@ local function file()
   end
 end
 
-local buffer_list = ''
-vim.api.nvim_create_autocmd('BufEnter', {
-  pattern = '*',
-  callback = function()
-    buffer_list = file()
-  end,
-  group = vim.api.nvim_create_augroup('SLFile', { clear = true }),
-  desc = 'Change Buffer List in StatusLine',
-})
-
 ---- Context ----
 local function get_context()
   local nodes = vim.b.contextStatus
@@ -330,7 +320,7 @@ Statusline = {
       return table.concat({
         '%#SLNormal# ',
         mode(),
-        buffer_list,
+        file(),
         '%=',
         get_context(),
         ls_progress,
@@ -343,7 +333,7 @@ Statusline = {
       return table.concat({
         '%#SLNormal# ',
         mode(),
-        buffer_list,
+        file(),
         '%=',
         custom_diagnostics(),
         gstatus,
