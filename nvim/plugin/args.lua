@@ -25,7 +25,7 @@ end
 
 ---@param argnr number?
 local function move(argnr)
-  vim.cmd.write()
+  vim.cmd('silent! write')
   argnr = argnr or vim.fn.argidx() + 1
   if argnr < 1 or argnr > vim.fn.argc() then
     argnr = math.fmod(argnr, vim.fn.argc())
@@ -33,7 +33,7 @@ local function move(argnr)
   if argnr <= 0 then
     argnr = argnr + vim.fn.argc()
   end
-  vim.cmd({ cmd = 'argument', count = argnr })
+  vim.cmd({ cmd = 'argument', count = argnr, bang = true, mods = { silent = true } })
 end
 
 local function select()
@@ -74,7 +74,7 @@ end
 ---@param bufnr? number
 local function insert(bufnr)
   local buf = getBufName(bufnr)
-  vim.cmd('argedit ' .. buf .. ' | argdedupe')
+  vim.cmd('silent! argedit ' .. buf .. ' | argdedupe')
 end
 
 ---@param argnr? number
