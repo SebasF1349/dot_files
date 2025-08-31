@@ -81,7 +81,7 @@ end
 local function remove(argnr)
   local arg = argnr and vim.fn.argv(argnr) or '%'
   vim.cmd('silent! argdelete ' .. arg)
-  if #vim.api.nvim_list_wins() > 1 then
+  if vim.fn.winnr('$') > 1 then
     vim.api.nvim_win_close(0, false)
   elseif vim.fn.argc() ~= 0 then
     move()
