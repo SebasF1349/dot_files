@@ -221,7 +221,7 @@ local function git_command(args)
 end
 
 local function update_git()
-  vim.system(git_command({ 'fetch' }), {}, function(o)
+  vim.system(git_command({ 'fetch' }), {}, function()
     vim.system(git_command({ 'status', '--porcelain=v2', '--branch' }), {}, function(branch_status_output)
       local output = branch_status_output.stdout
       if branch_status_output.code ~= 0 or not output then
@@ -305,11 +305,15 @@ vim.lsp.handlers['$/progress'] = function(_, p, _)
     vim.api.nvim__redraw({ statusline = true })
   elseif _G.LsProgress_timer == nil then
     _G.LsProgress_timer = vim.uv.new_timer()
-    _G.LsProgress_timer:start(0, 500, vim.schedule_wrap(function()
-      progress = (progress == 1) and 2 or 1
-      ls_progress = string.format('%%#SLSeparator# %s', spinner[progress])
-      vim.api.nvim__redraw({ statusline = true })
-    end))
+    _G.LsProgress_timer:start(
+      0,
+      500,
+      vim.schedule_wrap(function()
+        progress = (progress == 1) and 2 or 1
+        ls_progress = string.format('%%#SLSeparator# %s', spinner[progress])
+        vim.api.nvim__redraw({ statusline = true })
+      end)
+    )
   end
 end
 
