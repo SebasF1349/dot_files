@@ -71,13 +71,13 @@ local function cycle_prev()
   move(moves)
 end
 
----@param bufnr? number
+---@param bufnr? integer
 local function insert(bufnr)
   local buf = getBufName(bufnr)
   vim.cmd('silent! argedit ' .. buf .. ' | argdedupe')
 end
 
----@param argnr? number
+---@param argnr? integer
 local function remove(argnr)
   local arg = argnr and vim.fn.argv(argnr) or '%'
   vim.cmd('silent! argdelete ' .. arg)

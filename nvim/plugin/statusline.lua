@@ -351,4 +351,3 @@ vim.g.qf_disable_statusline = true
 vim.opt.statusline = '%!v:lua.Statusline.active()'
 vim.opt.laststatus = 3
 vim.opt.ruler = false
--- TODO: should I have cmdheigth = 0? (and increase waybar height)

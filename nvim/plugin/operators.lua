@@ -61,13 +61,13 @@ end
 ---@return string, string, string
 local function get_whitespace(line, side)
   side = side or 'both'
-  local is_left = side == 'both' and true or side == 'left'
-  local is_right = side == 'both' and true or side == 'right'
+  local is_left = side == 'both' or side == 'left'
+  local is_right = side == 'both' or side == 'right'
   local pad_left, pad_right = '', ''
 
   if is_left then
     local start, end_ = line:find('^%s+')
-    if start then
+    if start and end_ then
       pad_left = line:sub(start, end_)
       line = line:sub(end_ + 1)
     end
@@ -86,9 +86,10 @@ end
 
 --- Add pair around text
 ---@param text string[]
----@param pair string[]
+---@param pair string[][]
 ---@return string[]
 local function add_pair(text, pair)
+  assert(#pair == 2, "There must be 2 pairs")
   local left_pad, first_line = get_whitespace(text[1], 'left')
   local newText = {}
   for i = 1, #pair[1] do
@@ -106,7 +107,7 @@ local function add_pair(text, pair)
 end
 
 --- Add surround to a block of lines
----@param pair string[]
+---@param pair string[][]
 ---@param start_row integer
 ---@param start_col integer
 ---@param end_row integer
@@ -142,17 +143,17 @@ vim.keymap.set('x', 's', _G.opfunc('_G.Surround'), { desc = '[S]urround', silent
 
 vim.keymap.set('n', 'gs', function()
   local char = vim.fn.getcharstr()
-  if char then
-    return 'ysiw' .. char
-  end
+  return 'ysiw' .. char
 end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 
 -- FIX: doesn't work with multiline pairs
 -- only deletes first pairDelete[1] and last pairDelete[2]
 --- Remove (or replace) surrounding pairs
----@param pairDelete string[]
----@param pairAdd? string[]
+---@param pairDelete string[][]
+---@param pairAdd? string[][]
 local function operateSurround(pairDelete, pairAdd)
+  assert(#pairDelete == 2, "There must be 2 pairs to delete")
+  assert(#pairAdd == 2, "There must be 2 pairs to add")
   local curr = vim.api.nvim_win_get_cursor(0)
   local o = vim.fn.search(pairDelete[1][1], 'bW')
   if o == 0 then

@@ -96,7 +96,7 @@ vim.api.nvim_create_autocmd('FocusGained', {
 
 local cmd_range_ns = vim.api.nvim_create_namespace('cmd-range')
 local win_state = nil
-local peek_cursor = nil
+local peek_cursor = nil ---@type [integer, integer] | nil
 
 -- https://github.com/nacro90/numb.nvim/blob/7f564e638d3ba367abf1ec91181965b9882dd509/lua/numb/init.lua#L110
 local function parse_num_str(str)
@@ -169,7 +169,7 @@ vim.api.nvim_create_autocmd('CmdlineChanged', {
       return
     end
     local range = cmd.range
-    if not range or vim.tbl_isempty(range) then
+    if not range or vim.tbl_isempty(range) or #range ~= 2 then
       return
     end
     local first_line, last_line = range[1] - 1, range[2] and range[2] - 1 or range[1] - 1
@@ -194,7 +194,11 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
 
 local function set_path()
   local dirs = vim.system({'fd', '.', '--type', 'd', '--hidden', '--absolute-path', '--exclude', '.git', '--exclude', 'node_modules', '--exclude', 'target', '--exclude', 'vendor'}):wait()
-  return '.,,' .. dirs.stdout:gsub('\n', ','):gsub('%./', '')
+  if not dirs.stdout then
+    return '.,,**'
+  else
+    return '.,,' .. dirs.stdout:gsub('\n', ','):gsub('%./', '')
+  end
 end
 
 ---@param cmdarg string

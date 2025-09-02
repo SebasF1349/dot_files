@@ -3,8 +3,8 @@
 --------------------------------------------------
 
 ---@class term
----@field bufnr number
----@field winid number
+---@field bufnr integer
+---@field winid integer
 
 ---@type term[]
 local terms = {}
@@ -66,7 +66,7 @@ local function set_term_opts(opts)
   vim.api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
 end
 
----@param bufnr number
+---@param bufnr integer
 ---@return term
 local function create_term(bufnr)
   local buf = vim.api.nvim_buf_is_valid(bufnr) and bufnr or vim.api.nvim_create_buf(false, true)
@@ -106,8 +106,8 @@ end, { desc = '[T]oggle [T]erminal 1' })
 --------------------------------------------------
 
 --- Move to end of file
----@param bufnr number
----@param winid number
+---@param bufnr integer
+---@param winid integer
 local function scroll_to_end(bufnr, winid)
   vim.api.nvim_buf_call(bufnr, function()
     local target_line = vim.tbl_count(vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
