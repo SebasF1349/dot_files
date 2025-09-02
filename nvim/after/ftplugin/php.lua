@@ -148,12 +148,11 @@ function File:new()
   local fpath = vim.fn.expand('%:.')
   if fpath:find('controllers') then
     File.__type = 'controller'
-    local controller = fpath:match(separator .. '(%a*)Controller.php')
+    local controller = fpath:match('[\\/](%a*)Controller.php')
     File.__controller = PascalToKebab(controller)
   elseif fpath:find('views') then
     File.__type = 'view'
-    local escaped_view_path = (File.__base_dir .. 'views' .. separator):gsub('([^%w])', '%%%1')
-    local controller = (vim.fn.expand('%:p:h')):gsub(escaped_view_path, '')
+    local controller = vim.fn.expand('%:p:h'):match("([^\\/]+)$")
     File.__controller = kebab_to_pascal(controller)
   end
 
@@ -194,7 +193,7 @@ vim.keymap.set('n', 'gf', function()
       return
     end
 
-    local controller, file = arg:match('^([^/]+)/(.+)$')
+    local controller, file = arg:match('^([^/\\]+)[/\\](.+)$')
     if not controller then
       controller, file = fileObj:getController(), arg
     end
@@ -207,11 +206,10 @@ vim.keymap.set('n', 'gf', function()
     end
   elseif fileObj:getType() == 'view' then
     local cfile = vim.fn.expand('<cfile>')
-    local controller, file = cfile:match('([^/]+)/([^/]+)')
+    local controller, file = cfile:match('([^/\\]+)[/\\]([^/\\]+)')
     if not controller then
       controller, file = fileObj:getController(), cfile
     end
-    controller = controller or fileObj:getController()
     target = fileObj:getControllerPath(controller)
     action = 'action' .. kebab_to_pascal(file)
     action2 = 'action' .. kebab_to_pascal(vim.fn.expand('%:t:r'))
