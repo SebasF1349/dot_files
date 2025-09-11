@@ -153,7 +153,9 @@ end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 ---@param pairAdd? string[][]
 local function operateSurround(pairDelete, pairAdd)
   assert(#pairDelete == 2, "There must be 2 pairs to delete")
-  assert(#pairAdd == 2, "There must be 2 pairs to add")
+  if pairAdd then
+    assert(#pairAdd == 2, "There must be 2 pairs to add")
+  end
   local curr = vim.api.nvim_win_get_cursor(0)
   local o = vim.fn.search(pairDelete[1][1], 'bW')
   if o == 0 then
