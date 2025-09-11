@@ -52,7 +52,18 @@ vim.keymap.set('n', '<leader>x', function()
     local new_line = line:gsub('- %b[]', '- [ ]')
     vim.api.nvim_set_current_line(new_line)
   end
-end, { desc = 'Toggle TODO', buffer = 0 })
+end, { desc = 'Toggle TODO Completed', buffer = 0 })
+
+vim.keymap.set('n', '<leader>-', function()
+  local line = vim.api.nvim_get_current_line()
+  if line:find('- [ ]', 1, true) then
+    local new_line = line:gsub('- %b[]', '- [-]')
+    vim.api.nvim_set_current_line(new_line)
+  elseif line:find('- [-]', 1, true) then
+    local new_line = line:gsub('- %b[]', '- [ ]')
+    vim.api.nvim_set_current_line(new_line)
+  end
+end, { desc = 'Toggle TODO Incompleted', buffer = 0 })
 
 local oss = require('utils.os')
 local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
@@ -139,3 +150,4 @@ vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. ' | sil! nunmap <buffer> gl'
   .. ' | sil! vunmap <buffer> gl'
   .. ' | sil! nunmap <buffer> <leader>x'
+  .. ' | sil! nunmap <buffer> <leader>-'
