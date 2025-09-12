@@ -143,7 +143,9 @@ local File = {}
 File.__index = File
 
 function File:new()
-  File.__base_dir = (vim.fs.root(0, 'controllers'):gsub('[/\\]', separator) .. separator) or ''
+  local root = vim.fs.root(0, 'controllers')
+  if not root then return end
+  File.__base_dir = (root:gsub('[/\\]', separator) .. separator) or ''
 
   local fpath = vim.fn.expand('%:.')
   if fpath:find('controllers') then
@@ -176,34 +178,150 @@ function File:getViewPath(controller, file)
   return ('%sviews%s%s%s%s.php'):format(self.__base_dir, separator, controller, separator, file)
 end
 
+local function contains_return(list, candidate)
+  for _, v in ipairs(list) do
+    if v.args == candidate.args and v.method == candidate.method then
+      return true
+    end
+  end
+  return false
+end
+
+local function get_returns()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local curr_line = vim.api.nvim_win_get_cursor(0)
+  local method_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, 0 } })
+  while method_node and method_node:type() ~= 'method_declaration' do
+    method_node = method_node:parent()
+  end
+  if not method_node then
+    return
+  end
+
+  local q = [[
+(
+  return_statement
+    (member_call_expression
+      object: (variable_name) @obj
+      name: (name) @method
+      arguments: (arguments
+        (argument)) @args
+    ) @call
+)
+(#eq? @obj "$this")
+(#match? @method "^(redirect|render)$")
+]]
+  local query = vim.treesitter.query.parse('php', q)
+  local str_query = vim.treesitter.query.parse('php', '(string_content) @str_content')
+  local return_nodes = {}
+  for _, match, _ in query:iter_matches(method_node, bufnr) do
+    local rn = {}
+    for id, n in ipairs(match) do
+      local name = query.captures[id]
+      local text = ''
+      local node = n[1]
+      if name == 'args' then
+        local arg_node = nil
+        for i = 0, node:child_count() - 1 do
+          local child = node:child(i)
+          if child and child:type() == 'argument' then
+            arg_node = child
+            break
+          end
+        end
+        if arg_node then
+          for _, argn in str_query:iter_captures(arg_node, bufnr) do
+            text = vim.trim(vim.treesitter.get_node_text(argn, bufnr))
+          end
+        end
+      else
+        text = vim.trim(vim.treesitter.get_node_text(node, bufnr))
+      end
+      rn[name] = text
+    end
+    if next(match) ~= nil and not contains_return(return_nodes, rn) then
+      table.insert(return_nodes, rn)
+    end
+  end
+  return return_nodes
+end
+
+---@param target string
+---@param action string
+---@param action2? string
+local function move(target, action, action2)
+  if vim.fn.filereadable(target) ~= 1 then
+    vim.notify('"' .. target .. '" not found', vim.log.levels.INFO)
+    return
+  end
+
+  vim.cmd('edit ' .. target)
+  if not action then return end
+
+  action2 = action2 or ''
+  local action_query = string.format([[
+(
+method_declaration
+  (visibility_modifier)?
+  name: (name) @method_name
+)
+(#match? @method_name "^(%s|%s)$")
+]], action, action2)
+
+  local parser = vim.treesitter.get_parser(0, 'php')
+  if not parser then return end
+  local tree = parser:parse()[1]
+  local root = tree:root()
+  local query = vim.treesitter.query.parse('php', action_query)
+  for _, match, _ in query:iter_matches(root, 0) do
+    if match[1] then
+      local method_node = match[1][1]
+      local start_row, start_col = method_node:range()
+      local bufnr = vim.api.nvim_get_current_buf()
+      local text = vim.trim(vim.treesitter.get_node_text(method_node, bufnr))
+      if text == action or text == action2 then
+        vim.api.nvim_win_set_cursor(0, {start_row + 1, start_col})
+        return
+      end
+    end
+  end
+  vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
+end
 
 vim.keymap.set('n', 'gf', function()
   local fileObj = File:new()
-  local target, action, action2, method, arg
+  if not fileObj then
+    vim.notify('Controller directory not found', vim.log.levels.INFO)
+    return
+  end
+  local target, action, action2, method
   if fileObj:getType() == 'controller' then
-    local line = vim.api.nvim_get_current_line()
-    method, arg = line:match("%$this%->(render)%(%s*%[?%s*['\"]([^'\"]+)['\"]")
-    if not method then
-        method, arg = line:match("%$this%->(redirect)%(%s*%[?%s*['\"]([^'\"]+)['\"]")
-      if not method then
-        arg = vim.fn.expand('<cfile>')
+    local returns = get_returns()
+    if not returns then
+      vim.notify('No target to jump to', vim.log.levels.INFO)
+    end
+    vim.ui.select(returns, {
+        prompt = 'Returns: ',
+        format_item = function(item)
+            return ('%s -> %s'):format(item.method, item.args)
+        end,
+    }, function(choice)
+      if not choice then return end
+      local controller, file = choice.args:match('^([^/\\]+)[/\\](.+)$')
+      if not controller then
+        controller, file = fileObj:getController(), choice.args
       end
-    end
-    if not arg then
-      return
-    end
 
-    local controller, file = arg:match('^([^/\\]+)[/\\](.+)$')
-    if not controller then
-      controller, file = fileObj:getController(), arg
-    end
-
-    if method == 'render' then
-      target = fileObj:getViewPath(controller, file)
-    elseif method == 'redirect' or not method then
-      target = fileObj:getControllerPath(controller)
-      action = 'action' .. kebab_to_pascal(file)
-    end
+      if choice.method == 'render' then
+        target = fileObj:getViewPath(controller, file)
+      elseif choice.method == 'redirect' or not method then
+        target = fileObj:getControllerPath(controller)
+        action = 'action' .. kebab_to_pascal(file)
+      end
+      if target then
+        move(target, action)
+      end
+    end)
   elseif fileObj:getType() == 'view' then
     local cfile = vim.fn.expand('<cfile>')
     local controller, file = cfile:match('([^/\\]+)[/\\]([^/\\]+)')
@@ -213,25 +331,9 @@ vim.keymap.set('n', 'gf', function()
     target = fileObj:getControllerPath(controller)
     action = 'action' .. kebab_to_pascal(file)
     action2 = 'action' .. kebab_to_pascal(vim.fn.expand('%:t:r'))
+    move(target, action, action2)
   end
 
-  if vim.fn.filereadable(target) ~= 1 then
-    vim.notify('"' .. target .. '" not found', vim.log.levels.INFO)
-    return
-  end
-
-  vim.cmd('edit ' .. target)
-  if action then
-    local linenr = vim.fn.search('\\<' .. action .. '\\>', 'nw')
-    if action2 and linenr == 0 then
-        linenr = vim.fn.search('\\<' .. action2 .. '\\>', 'nw')
-    end
-    if linenr == 0 then
-      vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
-      return
-    end
-    vim.api.nvim_win_set_cursor(0, { linenr, 0 })
-  end
 end, { desc = 'Improved gf for Yii2', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
