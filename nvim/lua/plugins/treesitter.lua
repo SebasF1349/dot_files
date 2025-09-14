@@ -96,9 +96,9 @@ return {
       end, {})
 
       -- more robust option (do I want the if/else behaviour?) : https://vimways.org/2018/transactions-pending/
-      vim.keymap.set('v', 'iz', ':<C-U>silent! normal! [zV]zkoj<CR>', { desc = 'Fold Text-Object', silent = true })
+      vim.keymap.set('x', 'iz', ':<C-U>silent! normal! [zV]zkoj<CR>', { desc = 'Fold Text-Object', silent = true })
       vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false })
-      vim.keymap.set('v', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object', silent = true })
+      vim.keymap.set('x', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object', silent = true })
       vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', remap = false })
 
       vim.api.nvim_set_hl(0, '@lsp.type.comment', {})
