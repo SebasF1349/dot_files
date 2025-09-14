@@ -201,25 +201,18 @@ local function set_path()
   end
 end
 
+local files_list
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
-  cmdarg = vim.fn.escape(cmdarg, '\\()+[]')
-  if cmdarg:sub(1,1) == '*' then
-      cmdarg = cmdarg:gsub('.', '.*%0')..'.*'
+  if not files_list then
+    local cmd = { 'fd', '--type', 'file', '--relative-path', '--color', 'never', '--hidden', '.'}
+    local files = vim.system(cmd, { text = true }):wait()
+    if not files.stdout then
+      return {}
+    end
+    files_list = vim.split(vim.trim(files.stdout), '\n')
   end
-
-  local cmd
-  if vim.o.filetype == 'oil' then
-    local dir = require('oil').get_current_dir()
-    cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg, dir }
-  else
-    cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', cmdarg }
-  end
-  local files = vim.system(cmd, { text = true }):wait()
-  if not files.stdout then
-    return {}
-  end
-  return vim.split(vim.trim(files.stdout), '\n')
+  return vim.fn.matchfuzzy(files_list, cmdarg)
 end
 
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
