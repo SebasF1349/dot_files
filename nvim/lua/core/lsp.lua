@@ -306,18 +306,9 @@ local function on_attach(client_id, buf)
     wd.populate_workspace_diagnostics(client, buf)
   end
 
-  -- if client:supports_method('textDocument/foldingRange') then
-  --   vim.wo.foldmethod = 'expr'
-  --   vim.wo.foldexpr = 'v:lua.vim.lsp.foldexpr()'
-  -- end
-
-  if client.server_capabilities.colorProvider then
-    vim.lsp.document_color.enable(true, buf, { style = 'virtual' })
-  end
-
   -- NOTE: only works on html, not in intelephense
   if client.server_capabilities.linkedEditingRangeProvider then
-      vim.lsp.linked_editing_range.enable(true, { client_id = client_id })
+    vim.lsp.linked_editing_range.enable(true, { client_id = client_id })
   end
 end
 
@@ -353,15 +344,6 @@ local signature_help = vim.lsp.buf.signature_help
 vim.lsp.buf.signature_help = function()
   signature_help(float_config())
 end
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-capabilities.textDocument.semanticTokens.multilineTokenSupport = true
-
-vim.lsp.config('*', {
-  capabilities = capabilities,
-  root_markers = { '.git' },
-})
 
 M.servers = {}
 for _, v in ipairs(vim.api.nvim_get_runtime_file('lsp/*', true)) do
