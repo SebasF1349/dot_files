@@ -192,6 +192,14 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
   desc = 'Remove ranges highlights and unpeek',
 })
 
+vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
+  pattern = { '*' },
+  callback = function()
+    vim.fn.wildtrigger()
+  end,
+  group = general,
+})
+
 local function set_path()
   local dirs = vim.system({'fd', '.', '--type', 'd', '--hidden', '--absolute-path', '--exclude', '.git', '--exclude', 'node_modules', '--exclude', 'target', '--exclude', 'vendor'}):wait()
   if not dirs.stdout then
