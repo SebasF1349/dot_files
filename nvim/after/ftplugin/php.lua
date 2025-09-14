@@ -71,12 +71,14 @@ end
 local function phpTextObject(type)
   local curr = vim.api.nvim_win_get_cursor(0)
 
+  ---@type [integer,integer]
   local _end = vim.fn.searchpos('?>', 'eWc')
   if _end[1] == 0 and _end[2]  == 0 then
     vim.api.nvim_win_set_cursor(0, curr)
     return
   end
 
+  ---@type [integer,integer,integer]
   local opening = vim.fn.searchpos('\\(<?php\\)\\|\\(<?=\\)', 'bcp')
   if opening[1] == 0 and opening[2]  == 0 then
     vim.api.nvim_win_set_cursor(0, curr)
@@ -147,8 +149,9 @@ function File:new()
   if not root then return end
   File.__base_dir = (root:gsub('[/\\]', separator) .. separator) or ''
 
+  ---@type string
   local fpath = vim.fn.expand('%:.')
-  if fpath:find('controllers') then
+  if string.find(fpath, 'controllers') then
     File.__type = 'controller'
     local controller = fpath:match('[\\/](%a*)Controller.php')
     File.__controller = PascalToKebab(controller)

@@ -289,6 +289,7 @@ local GIT_STATUS_MAP = {
 }
 
 -- from https://www.reddit.com/r/neovim/comments/1klka38/tinkering_quickfix_ui/
+--- @param list qfitem[]
 local function add_virt_lines(list)
   vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_file_namespace, 0, -1)
   local lastfname = ''
