@@ -1,12 +1,4 @@
 return {
-  {
-    'danymat/neogen',
-    keys = {
-      { 'gd', "<cmd>lua require('neogen').generate()<CR>", desc = 'Add [D]ocs' },
-    },
-    opts = { snippet_engine = 'nvim' },
-  },
-
   { 'artemave/workspace-diagnostics.nvim' },
 
   {
