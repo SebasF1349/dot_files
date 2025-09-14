@@ -164,10 +164,8 @@ end
 -- Better Grep
 --------------------------------------------------
 
-vim.opt.grepprg = 'rg --vimgrep --smart-case'
+vim.opt.grepprg = 'rg --vimgrep --smart-case --hidden'
 vim.opt.grepformat = '%f:%l:%c:%m'
-
-vim.cmd([[packadd cfilter]])
 
 vim.api.nvim_create_user_command('Rg', function(opts)
   if vim.o.filetype == 'oil' then
@@ -183,6 +181,8 @@ vim.api.nvim_create_user_command('LRg', function(opts)
   last_cmd = 'silent lgrep! "' .. opts.args .. '" %'
   vim.cmd(last_cmd)
 end, { nargs = 1 })
+
+vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
 
 --------------------------------------------------
 -- Treesitter highlighting
