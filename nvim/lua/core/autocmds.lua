@@ -195,7 +195,9 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
 vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
   pattern = { '*' },
   callback = function()
-    vim.fn.wildtrigger()
+    if vim.fn.getcmdtype() == ':' then
+      vim.fn.wildtrigger()
+    end
   end,
   group = general,
 })
