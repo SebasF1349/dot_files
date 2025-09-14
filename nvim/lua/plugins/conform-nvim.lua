@@ -1,3 +1,5 @@
+vim.keymap.set('x', '=', ':s/\\s\\+$//e<CR>gv=', { desc = 'Indent and Remove Trailing Whitespace' })
+
 return {
   'stevearc/conform.nvim',
   -- stylua: ignore
