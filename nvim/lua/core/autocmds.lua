@@ -2,7 +2,6 @@ local general = vim.api.nvim_create_augroup('General Settings', { clear = true }
 
 vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
   pattern = '*',
-  -- command = 'silent! normal! g`"zv',
   callback = function()
     local mark = vim.api.nvim_buf_get_mark(0, '"')
     if mark[1] > 1 and mark[1] <= vim.api.nvim_buf_line_count(0) and not vim.wo.diff then
@@ -30,14 +29,6 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   end,
   group = general,
   desc = "Don't auto comment after pressing enter in comment",
-})
-
-vim.api.nvim_create_autocmd({ 'VimResized' }, {
-  callback = function()
-    vim.cmd('tabdo wincmd =')
-  end,
-  group = general,
-  desc = 'Resize splits after resizing nvim',
 })
 
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
@@ -79,119 +70,6 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
   desc = 'Hide cursorline when leaving window',
 })
 
--- https://www.reddit.com/r/neovim/comments/1fbxxuo/comment/lm4scjx/
-vim.api.nvim_create_autocmd('FocusGained', {
-  pattern = '*',
-  callback = function()
-    vim.o.cursorlineopt = 'both'
-    vim.cmd('redraw')
-    vim.defer_fn(function()
-      vim.o.cursorlineopt = 'number'
-      vim.cmd('redraw')
-    end, 300)
-  end,
-  group = general,
-  desc = 'Show where the cursor is',
-})
-
-local cmd_range_ns = vim.api.nvim_create_namespace('cmd-range')
-local win_state = nil
-local peek_cursor = nil ---@type [integer, integer] | nil
-
--- https://github.com/nacro90/numb.nvim/blob/7f564e638d3ba367abf1ec91181965b9882dd509/lua/numb/init.lua#L110
-local function parse_num_str(str)
-  str = str:gsub('([%+%-])([%+%-])', '%11%2') -- turn input into a mathematical equation by adding a 1 between a plus or minus
-  str = str:gsub('([%+%-])([%+%-])', '%11%2') -- a sign that was matched as $2 was not yet matched as $1
-  if str:find('[%+%-]$') then -- also catch last character
-    str = str .. 1
-  end
-  if str:find('^[%+%-]') then
-    local current_line, _ = unpack(vim.api.nvim_win_get_cursor(0))
-    str = current_line .. str
-  end
-  return load('return ' .. str)()
-end
-
-local function unpeek(stay)
-  if not win_state then
-    return
-  end
-
-  vim.api.nvim_win_set_cursor(0, win_state.cursor)
-
-  if stay then
-    if peek_cursor ~= nil then
-      vim.api.nvim_win_set_cursor(0, peek_cursor)
-      peek_cursor = nil
-    end
-    vim.cmd('normal! zz')
-  else
-    vim.fn.winrestview({ topline = win_state.topline })
-  end
-  vim.o.cursorlineopt = 'number'
-  win_state = nil
-end
-
-local function peek(linenr)
-  local bufnr = vim.api.nvim_win_get_buf(0)
-  local n_buf_lines = vim.api.nvim_buf_line_count(bufnr)
-  linenr = math.min(linenr, n_buf_lines)
-  linenr = math.max(linenr, 1)
-
-  if not win_state then
-    vim.o.cursorlineopt = 'both'
-    win_state = {
-      cursor = vim.api.nvim_win_get_cursor(0),
-      topline = vim.fn.winsaveview().topline,
-    }
-  end
-
-  peek_cursor = { linenr, win_state.cursor[2] }
-  vim.api.nvim_win_set_cursor(0, peek_cursor)
-  vim.cmd('normal! zt')
-end
-
-vim.api.nvim_create_autocmd('CmdlineChanged', {
-  callback = function()
-    if vim.fn.getcmdtype() ~= ':' then
-      return
-    end
-    vim.api.nvim_buf_clear_namespace(0, cmd_range_ns, 0, -1)
-    local cmd_line = vim.fn.getcmdline()
-    local ok, cmd = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
-    if not ok then
-      local num_str = cmd_line:match('^([%+%-%d]+)')
-      if num_str then
-        unpeek(false)
-        peek(parse_num_str(num_str))
-        vim.cmd('redraw')
-      end
-      return
-    end
-    local range = cmd.range
-    if not range or vim.tbl_isempty(range) or #range ~= 2 then
-      return
-    end
-    local first_line, last_line = range[1] - 1, range[2] and range[2] - 1 or range[1] - 1
-    vim.hl.range(0, cmd_range_ns, 'ColorColumn', { first_line, 0 }, { last_line, 0 }, { regtype = 'V' })
-  end,
-  group = general,
-  desc = 'Peek or show cmdline ranges',
-})
-vim.api.nvim_create_autocmd('CmdlineLeave', {
-  callback = function()
-    vim.api.nvim_buf_clear_namespace(0, cmd_range_ns, 0, -1)
-    if not win_state then
-      return
-    end
-    local event = vim.api.nvim_get_vvar('event')
-    local stay = not event.abort
-    unpeek(stay)
-  end,
-  group = general,
-  desc = 'Remove ranges highlights and unpeek',
-})
-
 vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
   pattern = { '*' },
   callback = function()
@@ -200,6 +78,7 @@ vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
     end
   end,
   group = general,
+  desc = 'Autocompletion in cmdline `:`',
 })
 
 local function set_path()
