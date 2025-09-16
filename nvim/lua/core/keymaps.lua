@@ -474,12 +474,12 @@ vim.keymap.set('n', '<C-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line
 -- Abbreviations
 --------------------------------------------------
 
-local cmds_typos = { 'W', 'Wa', 'WA', 'X', 'Xa', 'XA', 'H' }
+local cmds_typos = { 'W', 'Wa', 'WA', 'X', 'Xa', 'XA', 'H', 'Mes', 'Mess' }
 for _, cmd in ipairs(cmds_typos) do
   vim.keymap.set('ca', cmd, cmd:lower())
 end
 
-local custom_cmds_typos = { 'ME', 'MEss', 'RG', 'LA', 'MAson' }
+local custom_cmds_typos = { 'RG', 'LA', 'MAson' }
 for _, cmd in ipairs(custom_cmds_typos) do
   vim.keymap.set('ca', cmd, cmd:sub(1, 1):upper() .. cmd:sub(2):lower())
 end

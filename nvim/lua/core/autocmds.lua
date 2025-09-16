@@ -112,22 +112,6 @@ vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   group = general,
 })
 
-vim.opt.messagesopt = 'wait:500,history:1000'
-vim.api.nvim_create_autocmd({ 'CmdlineEnter' }, {
-  callback = function()
-    vim.opt.messagesopt = 'hit-enter,history:1000'
-    vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorMoved' }, {
-      callback = function()
-        vim.opt.messagesopt = 'wait:500,history:1000'
-      end,
-      once = true,
-      group = general,
-    })
-  end,
-  group = general,
-  desc = 'Only show Cmdline message when triggered',
-})
-
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
   local fn = vim.fn.expand('%:p')

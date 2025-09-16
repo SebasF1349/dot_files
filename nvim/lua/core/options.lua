@@ -25,6 +25,8 @@ vim.o.helpheight = 0
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
+require('vim._extui').enable({})
+
 vim.opt.shortmess = 'aoOstTWIcCF'
 vim.o.formatoptions = 'qjl1'
 
