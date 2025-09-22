@@ -23,7 +23,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- This is needed as the formatoptions are set in ft files in neovim core
 vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   callback = function()
-    if vim.o.filetype ~= 'markdown' then
+    if vim.o.filetype ~= 'markdown' and vim.o.filetype ~= 'gitcommit' then
       vim.opt.formatoptions:remove({ 'c', 'r', 'o' })
     end
   end,
