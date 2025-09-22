@@ -1,5 +1,6 @@
 vim.wo.spell = true
 vim.bo.spelllang = 'es,en'
+vim.bo.comments = 'b:#,b:-'
 
 local line = vim.api.nvim_get_current_line()
 if #line == 0 then
