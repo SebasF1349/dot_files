@@ -22,7 +22,6 @@ return {
         'gowork',
         'gosum',
         'lua',
-        'python',
         'rust',
         -- web
         'javascript',
