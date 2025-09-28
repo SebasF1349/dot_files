@@ -112,6 +112,13 @@ vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   group = general,
 })
 
+vim.api.nvim_create_autocmd({ 'CmdlineLeave' }, {
+  callback = function()
+    files_list = nil
+  end,
+  group = general,
+})
+
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
   local fn = vim.fn.expand('%:p')
