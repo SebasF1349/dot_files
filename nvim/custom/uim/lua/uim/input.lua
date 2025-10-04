@@ -12,85 +12,44 @@ local M = {}
 --               user inputs.
 
 ---@generic T
----@param opts { prompt: string|nil, default: string|nil, completion: string|nil, highlight: fun(item: T): string } Additional options
----@param on_confirm fun(input: string|nil)
+---@param opts vim.ui.input.Opts
+---@param on_confirm fun(input?: string)
 function M.input(opts, on_confirm)
-  local config = require('uim.config').opts
   local shared = require('uim.shared')
 
-  vim.validate({
-    opts = { opts, 'table', true },
-    on_confirm = { on_confirm, 'function', false },
-  })
+  vim.validate('opts', opts, 'table', true)
+  vim.validate('on_confirm', on_confirm, 'function')
 
-  opts = (opts and not vim.tbl_isempty(opts)) and opts or vim.empty_dict()
+  opts = (opts and not vim.tbl_isempty(opts)) and opts or { prompt = '', default = '' }
 
   local current_win = vim.api.nvim_get_current_win()
 
-  local column = 0
-  local row = vim.o.lines - 1 - vim.o.cmdheight - (vim.o.laststatus ~= 0 and 1 or 0)
-  local title_win
+  local title_bufnr = vim.api.nvim_create_buf(false, true)
+  local title_win = shared.create_win(title_bufnr, {
+    relative = 'laststatus',
+    height = 1,
+    width = #opts.prompt,
+    border = 'none',
+    row = 1,
+    col = 0,
+  })
+  vim.api.nvim_buf_set_lines(title_bufnr, 0, 1, false, { opts.prompt .. ' ' })
+  vim.api.nvim_set_option_value('filetype', 'uiinputtitle', { buf = title_bufnr })
+  vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = title_bufnr })
+  vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = title_win })
+  vim.api.nvim_set_option_value('winblend', 0, { win = title_win })
 
   local input_bufnr = vim.api.nvim_create_buf(false, true)
-  ---@type WinOpts
-  local win_opts = {
-    bufnr = input_bufnr,
+  local input_win = shared.create_win(input_bufnr, {
+    relative = 'laststatus',
     height = 1,
-    width = vim.o.columns - column,
-    border = config.input.border,
+    width = vim.o.columns - #opts.prompt,
+    border = 'none',
     title = opts.prompt,
-    title_pos = config.input.title_pos,
-    row = row,
-    col = column,
-  }
-  if config.input.position == 'cmdline' then
-    local title_bufnr = vim.api.nvim_create_buf(false, true)
-    title_win = shared.create_win({
-      bufnr = title_bufnr,
-      height = 1,
-      width = #opts.prompt,
-      border = 'none',
-      row = vim.o.lines,
-      col = 0,
-    })
-    vim.api.nvim_buf_set_lines(title_bufnr, 0, 1, false, { opts.prompt .. ' ' })
-    vim.api.nvim_set_option_value('filetype', 'uiinputtitle', { buf = title_bufnr })
-    vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = title_bufnr })
-    vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = title_win })
-    vim.api.nvim_set_option_value('winblend', 0, { win = title_win })
-    win_opts.col = #opts.prompt
-    win_opts.row = vim.o.lines
-    win_opts.width = vim.o.columns - win_opts.col
-    win_opts.border = 'none'
-  elseif config.input.position == 'bottom' then
-    win_opts.width = vim.o.columns
-    win_opts.row = vim.o.lines
-      - win_opts.height
-      - vim.o.cmdheight
-      - (vim.o.laststatus ~= 0 and 1 or 0)
-      - (win_opts.border ~= 'none' and 2 or 0)
-    win_opts.col = 0
-  elseif config.input.position == 'right' then
-    win_opts.width = math.floor(vim.o.columns / 3)
-    win_opts.row = vim.o.lines
-      - win_opts.height
-      - vim.o.cmdheight
-      - (vim.o.laststatus ~= 0 and 1 or 0)
-      - (win_opts.border ~= 'none' and 2 or 0)
-    win_opts.col = vim.o.columns - win_opts.width
-  elseif config.input.position == 'center' then
-    win_opts.width = math.floor(vim.o.columns / 3)
-    win_opts.row = vim.o.lines / 4
-    win_opts.col = (vim.o.columns - win_opts.width) / 2
-  elseif config.input.position == 'cursor' then
-    win_opts.relative = 'cursor'
-    win_opts.width = math.floor(vim.o.columns / 4)
-    win_opts.row = 1
-    win_opts.col = 0
-  end
-
-  local input_win = shared.create_win(win_opts)
-
+    title_pos = 'left',
+    row = 1,
+    col = #opts.prompt,
+  })
   if opts.default then
     vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
     vim.api.nvim_win_set_cursor(input_win, { 1, #opts.default + 1 })
@@ -99,10 +58,8 @@ function M.input(opts, on_confirm)
   end
   vim.api.nvim_set_option_value('filetype', 'uiinput', { buf = input_bufnr })
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
-  if config.input.position == 'cmdline' then
-    vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = input_win })
-    vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
-  end
+  vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = input_win })
+  vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
 
   local function select_and_close(input)
     vim.api.nvim_del_autocmd(shared.autocmd_id)
@@ -120,7 +77,8 @@ function M.input(opts, on_confirm)
     select_and_close(line)
   end, { buffer = input_bufnr })
 
-  shared.close_mappings(input_bufnr, select_and_close, config.input.closing_keys)
+  local closing_keys = { { 'q', modes = { 'n', 'v' } }, '<C-c>' }
+  shared.close_mappings(input_bufnr, select_and_close, closing_keys)
 end
 
 return M

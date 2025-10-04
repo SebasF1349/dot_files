@@ -4,17 +4,16 @@ local select_ns = vim.api.nvim_create_namespace('select_ui')
 
 ---@generic T
 ---@param items T[] Arbitrary items
----@param opts { prompt: string|nil, kind: string|nil, format_item: fun(item: T): string } Additional options
+---@param opts vim.ui.select.Opts
 ---@param on_choice fun(item: T|nil, idx: integer|nil)
 function M.select(items, opts, on_choice)
-  local config = require('uim.config')
   local shared = require('uim.shared')
 
-  vim.validate({
-    items = { items, 'table', false },
-    on_choice = { on_choice, 'function', false },
-  })
+  vim.validate('items', items, 'table')
+  vim.validate('on_choice', on_choice, 'function')
+
   opts = opts or {}
+
   local format_item = opts.format_item or tostring
 
   if #items == 0 then
@@ -23,18 +22,8 @@ function M.select(items, opts, on_choice)
     return
   end
 
-  local curr_conf = vim.deepcopy(config.opts.select) or {}
-  if config.opts.kind and config.opts.kind[opts.kind] then
-    curr_conf = vim.tbl_deep_extend('force', {}, curr_conf, config.opts.kind[opts.kind])
-  end
-
-  if #items == 1 and curr_conf.autoselect then
-    on_choice(nil, nil)
-    return
-  end
-
   local current_win = vim.api.nvim_get_current_win()
-  local title = curr_conf.title or opts.prompt or 'Select one of:'
+  local title = opts.prompt or 'Select one of:'
 
   local current_cursor = vim.o.guicursor
   local cursor_hl = 'HiddenCursor'
@@ -60,20 +49,25 @@ function M.select(items, opts, on_choice)
   local max_length = -1
   local selected = {}
 
-  if curr_conf.closing_keys then
-    for _, key in ipairs(curr_conf.closing_keys) do
-      if type(key) == 'string' then
-        table.insert(curr_conf.ignore_chars, key)
-      elseif type(key) == 'table' then
-        table.insert(curr_conf.ignore_chars, key[1])
-      end
+  local code_action_chars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' }
+  local default_chars = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
+  local possible_chars = opts.kind == 'codeaction' and code_action_chars or default_chars
+  local keys_method = opts.kind == 'codeaction' and 'intelligent' or 'list'
+
+  local closing_keys = { 'q', '<C-c>', '<ESC>' }
+  local ignore_chars = {}
+  for _, key in ipairs(closing_keys) do
+    if type(key) == 'string' then
+      table.insert(ignore_chars, key)
+    elseif type(key) == 'table' then
+      table.insert(ignore_chars, key[1])
     end
   end
 
   local posible_chars = vim
-    .iter(curr_conf.possible_chars)
+    .iter(possible_chars)
     :filter(function(item)
-      return not vim.list_contains(curr_conf.ignore_chars, item)
+      return not vim.list_contains(ignore_chars, item)
     end)
     :totable()
 
@@ -127,7 +121,7 @@ function M.select(items, opts, on_choice)
       item = item:sub(1, new_line - 1)
     end
     local option
-    if curr_conf.keys_method == 'intelligent' then
+    if keys_method == 'intelligent' then
       option = choose_key(item, '')
       table.insert(selected, option)
       if not option then
@@ -151,71 +145,23 @@ function M.select(items, opts, on_choice)
   end
 
   local whitespace = 3
-  local footer = curr_conf.keys_method == 'intelligent' and ''
+  local number_columns = math.max(math.floor(vim.o.columns / (max_length + whitespace)), 1)
+  local number_lines = math.ceil(#choices / number_columns)
+
+  local footer = keys_method == 'intelligent' and ''
     or string.format('(%s, %s)', choices[1].option, choices[#choices].option)
-  ---@type WinOpts
-  local win_opts = {
-    bufnr = select_bufnr,
-    border = curr_conf.border,
+  local height = math.max(math.min(vim.o.lines - vim.fn.screenrow() - 1 - vim.o.cmdheight, number_lines + 1), 1)
+  local select_win = shared.create_win(select_bufnr, {
+    relative = 'laststatus',
+    border = 'none',
     title = title,
-    title_pos = curr_conf.title_pos,
-    footer = curr_conf.footer_labels and footer or nil,
-    height = -1,
-    width = -1,
-    row = -1,
-    col = -1,
-  }
-  local number_columns = 0
-  local number_lines = 0
-
-  -- TODO: make height minimum 2 if there is no border
-  if curr_conf.position == 'bottom' then
-    -- TODO: change all this logic with `relative: laststatus` once 0.11 gets released
-    number_columns = math.max(math.floor(vim.o.columns / (max_length + whitespace)), 1)
-    number_lines = math.ceil(#choices / number_columns)
-    win_opts.height = math.max(
-      math.min(
-        vim.o.lines - vim.fn.screenrow() - 1 - vim.o.cmdheight,
-        curr_conf.border == 'none' and number_lines + 1 or number_lines
-      ),
-      1
-    )
-    win_opts.width = vim.o.columns
-    win_opts.row = vim.o.lines
-      - win_opts.height
-      - vim.o.cmdheight
-      - (vim.o.laststatus ~= 0 and 1 or 0)
-      - (win_opts.border ~= 'none' and 2 or 0)
-    win_opts.col = 0
-  elseif curr_conf.position == 'right' then
-    number_columns = 1
-    number_lines = #choices
-    win_opts.height = curr_conf.border == 'none' and #choices + 1 or #choices
-    win_opts.width = max_length + whitespace
-    win_opts.row = vim.o.lines
-      - win_opts.height
-      - vim.o.cmdheight
-      - (vim.o.laststatus ~= 0 and 1 or 0)
-      - (win_opts.border ~= 'none' and 2 or 0)
-    win_opts.col = vim.o.columns - win_opts.width
-  elseif curr_conf.position == 'center' then
-    number_columns = math.max(math.floor((vim.o.columns / 2) / (max_length + whitespace)), 1)
-    number_lines = math.ceil(#choices / number_columns)
-    win_opts.height = math.min(curr_conf.border == 'none' and number_lines + 1 or number_lines, vim.o.columns / 2)
-    win_opts.width = max_length * number_columns + whitespace
-    win_opts.row = vim.o.lines / 4
-    win_opts.col = (vim.o.columns - win_opts.width) / 2
-  elseif curr_conf.position == 'cursor' then
-    number_columns = math.max(math.floor((vim.o.columns / 2) / (max_length + whitespace)), 1)
-    number_lines = math.ceil(#choices / number_columns)
-    win_opts.relative = 'cursor'
-    win_opts.height = math.min(curr_conf.border == 'none' and number_lines + 1 or number_lines, vim.o.columns / 2)
-    win_opts.width = max_length * number_columns + whitespace
-    win_opts.row = 1
-    win_opts.col = 0
-  end
-
-  local select_win = shared.create_win(win_opts)
+    title_pos = 'left',
+    footer = footer,
+    height = height,
+    width = vim.o.columns,
+    row = 0,
+    col = 0,
+  })
 
   local function select_and_close(i)
     vim.api.nvim_del_autocmd(shared.autocmd_id)
@@ -244,11 +190,10 @@ function M.select(items, opts, on_choice)
       local col = #(text[j] or '') + item_whitespace + 1
       table.insert(hl[j], { col, col + 1 + #choices[pos].option })
       text[j] = string.format(
-        '%s%s %s%s%s ',
+        '%s%s %s: %s ',
         text[j] or '',
         (' '):rep(item_whitespace),
         choices[pos].option,
-        curr_conf.label_separator,
         choices[pos].item
       )
       if choices[pos].option ~= '-' then
@@ -259,14 +204,12 @@ function M.select(items, opts, on_choice)
       end
     end
   end
-  if curr_conf.border == 'none' then
-    text = vim.list_extend({ title .. ' ' .. footer }, text)
-    hl = vim.list_extend({ { { #title + 1, #title + 1 + #footer } } }, hl)
-  end
+  text = vim.list_extend({ title .. ' ' .. footer }, text)
+  hl = vim.list_extend({ { { #title + 1, #title + 1 + #footer } } }, hl)
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
   for line, cols in ipairs(hl) do
     for _, col in ipairs(cols) do
-      vim.highlight.range(select_bufnr, select_ns, 'UimSelectLabels', { line - 1, col[1] }, { line - 1, col[2] })
+      vim.highlight.range(select_bufnr, select_ns, 'Title', { line - 1, col[1] }, { line - 1, col[2] })
     end
   end
 
@@ -274,7 +217,7 @@ function M.select(items, opts, on_choice)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = select_bufnr })
   vim.api.nvim_set_option_value('modifiable', false, { buf = select_bufnr })
 
-  shared.close_mappings(select_bufnr, select_and_close, curr_conf.closing_keys)
+  shared.close_mappings(select_bufnr, select_and_close, closing_keys)
 end
 
 return M

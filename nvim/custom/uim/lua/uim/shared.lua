@@ -1,21 +1,10 @@
 local M = {}
 
----@class WinOpts
----@field bufnr number
----@field height number
----@field width number
----@field border string
----@field row number
----@field col number
----@field title? string
----@field title_pos? string
----@field footer? string
----@field relative? string
-
----@param winOpts WinOpts
+---@param bufnr number
+---@param winOpts vim.api.keyset.win_config
 ---@return integer
-function M.create_win(winOpts)
-  local winnr = vim.api.nvim_open_win(winOpts.bufnr, true, {
+function M.create_win(bufnr, winOpts)
+  local winnr = vim.api.nvim_open_win(bufnr, true, {
     relative = winOpts.relative or 'editor',
     width = winOpts.width,
     height = winOpts.height,
@@ -24,16 +13,19 @@ function M.create_win(winOpts)
     zindex = 1000,
     style = 'minimal',
     border = winOpts.border,
-    title = winOpts.title and { { winOpts.title, 'UimTitle' } },
+    title = winOpts.title and { { winOpts.title, 'Title' } },
     title_pos = winOpts.title_pos,
-    footer = winOpts.footer and { { winOpts.footer, 'UimFooter' } },
+    footer = winOpts.footer and { { winOpts.footer, 'Title' } },
     noautocmd = true,
   })
-  vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:UimNormal,FloatBorder:UimBorder', { win = winnr })
   return winnr
 end
 
 M.autocmd_id = nil
+
+---@class uim.OptsClosingKeys
+---@field [1] string
+---@field modes string[]
 
 ---@param bufnr number
 ---@param on_close function
@@ -41,7 +33,7 @@ M.autocmd_id = nil
 function M.close_mappings(bufnr, on_close, closing_keys)
   for _, key in ipairs(closing_keys) do
     if type(key) == 'string' then
-      vim.keymap.set({ 'n', 'i', 'v' }, key, function()
+      vim.keymap.set({ 'n', 'i', 'x' }, key, function()
         vim.cmd.stopinsert()
         on_close(nil)
       end, { buffer = bufnr })
