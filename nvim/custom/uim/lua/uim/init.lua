@@ -1,11 +1,11 @@
 local M = {}
 
 function M.select()
-  return require('uim.select').select
+  return require('uim.uim').select
 end
 
 function M.input()
-  return require('uim.input').input
+  return require('uim.uim').input
 end
 
 return M
