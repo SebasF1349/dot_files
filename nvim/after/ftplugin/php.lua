@@ -300,8 +300,9 @@ vim.keymap.set('n', 'gf', function()
   local target, action, action2, method
   if fileObj:getType() == 'controller' then
     local returns = get_returns()
-    if not returns then
+    if not returns or #returns == 0 then
       vim.notify('No target to jump to', vim.log.levels.INFO)
+      return
     end
     vim.ui.select(returns, {
         prompt = 'Returns: ',
