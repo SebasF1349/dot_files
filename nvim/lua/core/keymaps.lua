@@ -376,7 +376,7 @@ local function open_notes(index)
       os.execute('touch ' .. note_file_path)
     end
     local note_buf = vim.api.nvim_create_buf(true, false)
-    local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
+    local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right', width = math.floor(vim.o.columns / 2) })
     vim.cmd.edit(note_file_path)
     notes_cache[project_dir] = { buf = note_buf, win = note_win, file_path = note_file_path }
   elseif curr_project.win and vim.api.nvim_win_is_valid(curr_project.win) then
@@ -386,7 +386,7 @@ local function open_notes(index)
   else
     local note_buf = vim.api.nvim_buf_is_valid(curr_project.buf) and curr_project.buf
       or vim.api.nvim_create_buf(true, false)
-    local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right' })
+    local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right', width = math.floor(vim.o.columns / 2) })
     vim.cmd.edit(curr_project.file_path)
     notes_cache[project_dir].buf = note_buf
     notes_cache[project_dir].win = note_win
