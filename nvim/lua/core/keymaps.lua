@@ -359,11 +359,7 @@ local function open_notes(index)
       project_file_name = 'index.md'
     else
       local git_cmd = vim.system({ 'git', 'rev-parse', '--show-toplevel' }):wait()
-      if git_cmd.code == 0 then
-        project_file_name = git_cmd.stdout or project_dir
-      else
-        project_file_name = project_dir
-      end
+      project_file_name = git_cmd.code == 0 and git_cmd.stdout or project_dir
       project_file_name = project_file_name
         :gsub('%s+', '') -- remove spaces in the name
         :gsub(vim.env.HOME, '')
