@@ -270,7 +270,7 @@ function M.select(items, opts, on_choice)
     local option
     if keys_method == 'intelligent' then
       option = choose_key(item, '')
-      table.insert(selected, option)
+      table.insert(selected, option) -- FIX: it's ok to insert option even if it's nil?
       if not option then
         for j = #options, 1, -1 do
           if not vim.list_contains(selected, options[j]) then
@@ -322,19 +322,20 @@ function M.select(items, opts, on_choice)
       if pos > #choices then
         break
       end
+      local choice = choices[pos]
       local item_whitespace = col_start - vim.fn.strchars(text[j] or '')
       local col = #(text[j] or '') + item_whitespace + 1
-      table.insert(hl[j], { col, col + 1 + #choices[pos].option })
+      table.insert(hl[j], { col, col + 1 + #choice.option })
       text[j] = string.format(
         '%s%s %s: %s ',
         text[j] or '',
         (' '):rep(item_whitespace),
-        choices[pos].option,
-        choices[pos].item
+        choice.option,
+        choice.item
       )
-      if choices[pos].option ~= '-' then
+      if choice.option ~= '-' then
         -- TODO: maybe use vim.fn.getcharstr() instead of keymaps?
-        vim.keymap.set('n', choices[pos].option, function()
+        vim.keymap.set('n', choice.option, function()
           select_and_close({ select_win }, current_win, function()
             restore_cursor()
             on_choice(items[pos], pos)
