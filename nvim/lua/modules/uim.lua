@@ -335,10 +335,9 @@ function M.select(items, opts, on_choice)
       if choices[pos].option ~= '-' then
         -- TODO: maybe use vim.fn.getcharstr() instead of keymaps?
         vim.keymap.set('n', choices[pos].option, function()
-          local item = i and items[i] or nil
           select_and_close({ select_win }, current_win, function()
             restore_cursor()
-            on_choice(item, i)
+            on_choice(items[pos], pos)
           end)
         end, { buffer = select_bufnr })
       end
