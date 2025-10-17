@@ -206,13 +206,13 @@ local function get_returns()
   return_statement
     (member_call_expression
       object: (variable_name) @obj
+        (#eq? @obj "$this")
       name: (name) @method
+        (#any-of? @method "redirect" "render")
       arguments: (arguments
         (argument)) @args
     ) @call
 )
-(#eq? @obj "$this")
-(#match? @method "^(redirect|render)$")
 ]]
   local query = vim.treesitter.query.parse('php', q)
   local str_query = vim.treesitter.query.parse('php', '(string_content) @str_content')
@@ -234,11 +234,14 @@ local function get_returns()
         end
         if arg_node then
           for _, argn in str_query:iter_captures(arg_node, bufnr) do
-            text = vim.trim(vim.treesitter.get_node_text(argn, bufnr))
+            text = vim.treesitter.get_node_text(argn, bufnr)
+          end
+          if text == '' then
+            text = vim.treesitter.get_node_text(arg_node, bufnr)
           end
         end
       else
-        text = vim.trim(vim.treesitter.get_node_text(node, bufnr))
+        text = vim.treesitter.get_node_text(node, bufnr)
       end
       rn[name] = text
     end
@@ -250,7 +253,7 @@ local function get_returns()
 end
 
 ---@param target string
----@param action string
+---@param action? string
 ---@param action2? string
 local function move(target, action, action2)
   if vim.fn.filereadable(target) ~= 1 then
@@ -267,8 +270,8 @@ local function move(target, action, action2)
 method_declaration
   (visibility_modifier)?
   name: (name) @method_name
+    (#any-of? @method_name %s %s)
 )
-(#match? @method_name "^(%s|%s)$")
 ]], action, action2)
 
   local parser = vim.treesitter.get_parser(0, 'php')
@@ -281,7 +284,7 @@ method_declaration
       local method_node = match[1][1]
       local start_row, start_col = method_node:range()
       local bufnr = vim.api.nvim_get_current_buf()
-      local text = vim.trim(vim.treesitter.get_node_text(method_node, bufnr))
+      local text = vim.treesitter.get_node_text(method_node, bufnr)
       if text == action or text == action2 then
         vim.api.nvim_win_set_cursor(0, {start_row + 1, start_col})
         return
