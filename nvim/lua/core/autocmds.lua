@@ -71,9 +71,14 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
 })
 
 vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
-  pattern = { '*' },
+  pattern = ':',
   callback = function()
-    if vim.fn.getcmdtype() == ':' then
+    local ok1, cmdline = pcall(vim.fn.getcmdline, {})
+    if not ok1 then return end
+    local ok, cmd = pcall(vim.api.nvim_parse_cmd, cmdline, {})
+    if not ok then return end
+    if #cmd.args == 0 then return end
+    if cmd.cmd == 'find' or cmd.cmd == 'sfind' then
       vim.fn.wildtrigger()
     end
   end,
