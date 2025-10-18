@@ -16,31 +16,14 @@ local last_cmd = ''
 ---| '"c"' # quickfix list
 ---| '"l"' # location list
 
----@class qfitem
----@field bufnr number
----@field filename string
----@field module string
----@field lnum number
----@field end_lnum number
----@field col number
----@field end_col number
----@field vcol 0 | 1
----@field nr number
----@field pattern string
----@field text string
----@field type string
----@field valid boolean
----@field user_data any
-
 ---@class qflist
 ---@field changedtick number
 ---@field context table | string
 ---@field id number
 ---@field idx number
----@field items qfitem[]
+---@field items vim.quickfix.entry[]
 ---@field nr number
 ---@field qfbufnr number
----@field quickfixtextfunc string
 ---@field size number
 ---@field title string
 ---@field winid number
@@ -289,7 +272,7 @@ local GIT_STATUS_MAP = {
 }
 
 -- from https://www.reddit.com/r/neovim/comments/1klka38/tinkering_quickfix_ui/
---- @param list qfitem[]
+--- @param list vim.quickfix.entry[]
 local function add_virt_lines(list)
   vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_file_namespace, 0, -1)
   local lastfname = ''
