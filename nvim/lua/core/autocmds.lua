@@ -73,7 +73,7 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
 vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
   pattern = ':',
   callback = function()
-    local ok1, cmdline = pcall(vim.fn.getcmdline, {})
+    local ok1, cmdline = pcall(vim.fn.getcmdline)
     if not ok1 then return end
     local ok, cmd = pcall(vim.api.nvim_parse_cmd, cmdline, {})
     if not ok then return end
