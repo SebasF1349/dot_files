@@ -67,11 +67,9 @@ return {
         },
       },
       check = {
-        command = { 'cargo', 'clippy' },
-      },
-      checkOnSave = {
         command = 'clippy',
       },
+      checkOnSave = true,
     },
   },
 }
