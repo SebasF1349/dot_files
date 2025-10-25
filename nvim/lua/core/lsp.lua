@@ -123,39 +123,21 @@ local function on_attach(client_id, buf)
     Variable = '󰀫',
   }
 
-  -- TODO: more languages: https://github.com/xzbdmw/colorful-menu.nvim/blob/master/lua/colorful-menu/languages/lua.lua
-  ---@param completion_item lsp.CompletionItem
-  local function intelephense(completion_item)
-    local label = completion_item.label
-    local detail = completion_item.labelDetails and completion_item.labelDetails.detail or completion_item.detail
-    local kind = completion_item.kind
-
-    if (kind == Kind.Function or kind == Kind.Method) and detail and #detail > 0 then
-      local signature = detail:sub(#label + 1)
-      return string.format('%s fn %s {}', label, signature)
-    elseif kind == Kind.EnumMember and detail and #detail > 0 then
-      return string.format('%s %s', label, detail)
-    elseif (kind == Kind.Property or kind == Kind.Variable) and detail and #detail > 0 then
-      detail = string.gsub(detail, '.*\\(.)', '%1')
-      return string.format('%s %s', label, detail)
-    elseif kind == Kind.Constant and detail and #detail > 0 then
-      return string.format('%s %s', label, detail)
-    else
-      return label
-    end
-  end
-
   vim.lsp.completion.enable(true, client_id, buf, {
     autotrigger = true,
     convert = function(item)
-      local label = intelephense(item)
-      if #label > 60 then
-        label = label:sub(1, 60) .. '…'
+      local label = item.label
+      if vim.o.filetype == 'php' then
+        label = label:gsub('%s*%b[]', '')
       end
       local kind = Kind[item.kind]
+      local detail = item.labelDetails and item.labelDetails.detail or item.detail
+      if detail and #detail > 40 then
+        detail = detail:sub(1, 40) .. '…'
+      end
       return {
         abbr = label,
-        menu = '',
+        menu = detail,
         kind = completion_kinds[kind],
         kind_hlgroup = kind and 'CmpItemKind' .. kind or 'CmpItemKindUnit',
       }
