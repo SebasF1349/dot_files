@@ -65,6 +65,23 @@ vim.keymap.set('n', '<leader>-', function()
   end
 end, { desc = 'Toggle TODO Incompleted', buffer = 0 })
 
+vim.keymap.set('n', '<leader>r', function()
+  local line = vim.api.nvim_get_current_line()
+  local output = vim.fn.system(line)
+  output = output:gsub('\r\n', '\n'):gsub('\r', '\n')
+  local lines = vim.split(output, '\n')
+
+  local buf = vim.api.nvim_create_buf(false, true)
+
+  vim.api.nvim_open_win(buf, true, { split = 'below', win = 0 })
+
+  vim.bo[buf].buftype = 'nofile'
+  vim.bo[buf].bufhidden = 'wipe'
+  vim.bo[buf].swapfile = false
+
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+end, { desc = 'Run cmd in a new buffer', buffer = 0 })
+
 local oss = require('utils.os')
 local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
 local curr_buf = oss.correct_separator(vim.api.nvim_buf_get_name(0))
@@ -151,3 +168,4 @@ vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. ' | sil! vunmap <buffer> gl'
   .. ' | sil! nunmap <buffer> <leader>x'
   .. ' | sil! nunmap <buffer> <leader>-'
+  .. ' | sil! nunmap <buffer> <leader>r'
