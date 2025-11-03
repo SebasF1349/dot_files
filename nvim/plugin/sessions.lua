@@ -68,9 +68,7 @@ if vim.v.vim_did_enter then
   elseif vim.uv.fs_stat(session_path) and vim.fn.argc() == 0 then
     sessionLoad()
   elseif vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
-    vim.schedule(function()
-      local dir = vim.fn.argc() == 1 and vim.fn.expand('%') or vim.uv.cwd()
-      vim.cmd.Oil(dir)
-    end)
+    local dir = vim.fn.argc() == 1 and vim.fn.expand('%:p') or vim.uv.cwd()
+    vim.cmd.Oil(dir)
   end
 end

@@ -1,0 +1,73 @@
+{
+  "plugins": {
+    "catppuccin": {
+      "rev": "234fc04",
+      "src": "https://github.com/catppuccin/nvim"
+    },
+    "conform.nvim": {
+      "rev": "02736cf",
+      "src": "https://github.com/stevearc/conform.nvim"
+    },
+    "gitsigns.nvim": {
+      "rev": "20ad441",
+      "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
+    "mason.nvim": {
+      "rev": "ad7146a",
+      "src": "https://github.com/mason-org/mason.nvim"
+    },
+    "mini.ai": {
+      "rev": "11c5718",
+      "src": "https://github.com/nvim-mini/mini.ai"
+    },
+    "mini.splitjoin": {
+      "rev": "b0d57bb",
+      "src": "https://github.com/nvim-mini/mini.splitjoin"
+    },
+    "nvim-dap": {
+      "rev": "e97dc47",
+      "src": "https://github.com/mfussenegger/nvim-dap"
+    },
+    "nvim-dap-view": {
+      "rev": "8f50aca",
+      "src": "https://github.com/igorlfs/nvim-dap-view"
+    },
+    "nvim-dap-virtual-text": {
+      "rev": "fbdb48c",
+      "src": "https://github.com/theHamsta/nvim-dap-virtual-text"
+    },
+    "nvim-lint": {
+      "rev": "8c694e1",
+      "src": "https://github.com/mfussenegger/nvim-lint"
+    },
+    "nvim-treesitter": {
+      "rev": "55820833",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'main'"
+    },
+    "nvim-ts-autotag": {
+      "rev": "c4ca798",
+      "src": "https://github.com/windwp/nvim-ts-autotag"
+    },
+    "oil.nvim": {
+      "rev": "7e1cd77",
+      "src": "https://github.com/stevearc/oil.nvim"
+    },
+    "plenary.nvim": {
+      "rev": "b9fd522",
+      "src": "https://github.com/nvim-lua/plenary.nvim"
+    },
+    "refactoring.nvim": {
+      "rev": "6784b54",
+      "src": "https://github.com/ThePrimeagen/refactoring.nvim"
+    },
+    "vim-fugitive": {
+      "rev": "61b51c0",
+      "src": "https://github.com/tpope/vim-fugitive"
+    },
+    "workspace-diagnostics.nvim": {
+      "rev": "60f9175",
+      "src": "https://github.com/artemave/workspace-diagnostics.nvim"
+    }
+  }
+}
