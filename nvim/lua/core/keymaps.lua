@@ -343,11 +343,20 @@ vim.keymap.set('n', '+', zoom_toggle, { desc = 'Toggle Window Zoom' })
 -- Notetaking
 --------------------------------------------------
 
+---@class notes
+---@field index? boolean
+---@field extension? 'md'|'curl'
+
 local notes_cache = {}
----@param index boolean -- use index or project local
-local function open_notes(index)
-  local project_dir = index and 'index' or vim.fn.getcwd()
-  local curr_project = notes_cache[project_dir]
+---@param params? notes -- use index or project local
+local function open_notes(params)
+  params = params or {}
+  local project_dir = params.index and 'index' or vim.fn.getcwd()
+  local ext = params.extension or 'md'
+  if not notes_cache[project_dir] then
+    notes_cache[project_dir] = {}
+  end
+  local curr_project = notes_cache[project_dir][ext]
   if not curr_project then
     local oss = require('utils.os')
     local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'dev')
@@ -355,7 +364,7 @@ local function open_notes(index)
       os.execute('mkdir -p ' .. projects_notes_directory)
     end
     local project_file_name
-    if index then
+    if params.index then
       project_file_name = 'index.md'
     else
       local git_cmd = vim.system({ 'git', 'rev-parse', '--show-toplevel' }):wait()
@@ -365,7 +374,7 @@ local function open_notes(index)
         :gsub(vim.env.HOME, '')
         :gsub('^%w:', '') -- remove disk name in windows
         :gsub('/', '__') -- it can be any separator because windows is a mess
-        :gsub('\\', '__') .. '.md'
+        :gsub('\\', '__') .. '.' .. ext
     end
     local note_file_path = vim.fs.normalize(oss.joinpath(projects_notes_directory, project_file_name))
     if vim.tbl_isempty(vim.fs.find(project_file_name, { type = 'file', path = projects_notes_directory })) then
@@ -374,25 +383,28 @@ local function open_notes(index)
     local note_buf = vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right', width = math.floor(vim.o.columns / 2) })
     vim.cmd.edit(note_file_path)
-    notes_cache[project_dir] = { buf = note_buf, win = note_win, file_path = note_file_path }
+    notes_cache[project_dir][ext] = { buf = note_buf, win = note_win, file_path = note_file_path }
   elseif curr_project.win and vim.api.nvim_win_is_valid(curr_project.win) then
     vim.cmd('w')
     vim.api.nvim_win_hide(curr_project.win)
-    notes_cache[project_dir].win = nil
+    notes_cache[project_dir][ext].win = nil
   else
     local note_buf = vim.api.nvim_buf_is_valid(curr_project.buf) and curr_project.buf
       or vim.api.nvim_create_buf(true, false)
     local note_win = vim.api.nvim_open_win(note_buf, true, { split = 'right', width = math.floor(vim.o.columns / 2) })
     vim.cmd.edit(curr_project.file_path)
-    notes_cache[project_dir].buf = note_buf
-    notes_cache[project_dir].win = note_win
+    notes_cache[project_dir][ext].buf = note_buf
+    notes_cache[project_dir][ext].win = note_win
   end
 end
 
 vim.keymap.set('n', '<leader>on', open_notes, { desc = '[O]pen [N]otes' })
 vim.keymap.set('n', '<leader>oi', function()
-  open_notes(true)
+  open_notes({ index = true })
 end, { desc = '[O]pen Notes [I]ndex' })
+vim.keymap.set('n', '<leader>oc', function()
+  open_notes({ extension = 'curl' })
+end, { desc = '[O]pen Notes [C]url' })
 
 --------------------------------------------------
 -- Spell
