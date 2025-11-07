@@ -68,8 +68,8 @@ vim.opt.fileencoding = 'utf-8'
 vim.opt.iskeyword:append('-')
 
 -- vim.opt.wildchar = (''):byte()
-vim.opt.wildoptions = 'pum,tagfile,fuzzy'
-vim.opt.wildmode = 'noselect:lastused,full'
+vim.o.wildoptions = 'pum,tagfile,fuzzy'
+vim.o.wildmode = 'noselect:lastused,full'
 -- vim.opt.wildignore:append({ '*/.git/*' }) -- git
 -- vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
 -- vim.opt.wildignore:append({ '*/target/*' }) -- java

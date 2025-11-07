@@ -1,4 +1,3 @@
--- based on https://nuxsh.is-a.dev/blog/custom-nvim-statusline.html#orgbd5fcc4
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local signs = require('utils.ui').diagnostic_icons_num
 

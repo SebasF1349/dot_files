@@ -162,7 +162,6 @@ local function on_attach(client_id, buf)
       vim.api.nvim_input('<C-x><C-o>')
     end
   end, { desc = 'Trigger And Select Next Completion' })
-  -- NOTE: nice pum styling https://github.com/neovim/neovim/pull/25541
 
   vim.keymap.set('n', ']e', function()
     vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
