@@ -81,10 +81,7 @@ lint.linters_by_ft = {
   sh = { 'shellcheck' },
   json = { 'jsonlint' },
   text = { 'vale' },
-  -- work
   php = { 'phpstan' },
-  -- php = { 'phpcs' },
-  -- ['yaml.ansible'] = { 'ansible-lint', },
 }
 
 local phpstanDir = vim.fs.root(0, 'phpstan.neon')
@@ -98,62 +95,7 @@ if phpstanDir then
   }
 end
 
-local phpcs_info = {
-  'Generic.Functions.FunctionCallArgumentSpacing.NoSpaceAfterComma',
-  'Generic.Commenting.DocComment.Empty',
-  'Generic.Commenting.DocComment.SpacingBeforeTags',
-  'Generic.Commenting.DocComment.MissingShort',
-  'Generic.PHP.LowerCaseConstant.Found',
-  'Squiz.Commenting.DocCommentAlignment.SpaceBeforeStar',
-  'PEAR.WhiteSpace.ScopeIndent.Incorrect',
-  'PEAR.WhiteSpace.ScopeIndent.IncorrectExact',
-  'PEAR.WhiteSpace.ObjectOperatorIndent.Incorrect',
-  'PEAR.WhiteSpace.ScopeClosingBrace.Line',
-  'PEAR.WhiteSpace.ScopeClosingBrace.Indent',
-  'PEAR.ControlStructures.ControlSignature.Found',
-  'PEAR.ControlStructures.MultiLineCondition.SpaceBeforeOpenBrace',
-  'PEAR.ControlStructures.MultiLineCondition.NewlineBeforeOpenBrace',
-  'PEAR.Functions.FunctionCallSignature.CloseBracketLine',
-  'PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket',
-  'PEAR.Functions.FunctionDeclaration.BraceOnSameLine',
-}
 lint.linters.shellcheck.args = { '-x' }
--- exclude phpdocs lint
-local original_parse_phpcs = lint.linters.phpcs.parser
-lint.linters.phpcs = {
-  name = 'phpcs',
-  cmd = 'phpcs',
-  stdin = true,
-  args = {
-    '-q',
-    '--exclude=PEAR.Commenting.FunctionComment,'
-    .. 'Generic.Files.LineLength,'
-    .. 'Generic.PHP.DisallowShortOpenTag,'
-    .. 'Squiz.Commenting.FunctionComment,'
-    .. 'Squiz.Commenting.LongConditionClosingComment,'
-    .. 'PEAR.Commenting.FileComment,'
-    .. 'PEAR.Commenting.ClassComment',
-    -- otherwise it shows error codes on every error/warnings
-    '--runtime-set',
-    'ignore_errors_on_exit',
-    '1',
-    -- '--config-set',
-    '--runtime-set',
-    'php_version',
-    '70033',
-    '--report=json',
-    '-',
-  },
-  parser = function(output, bufnr, linter_cwd)
-    local diagnostics = original_parse_phpcs(output, bufnr, linter_cwd)
-    for _, d in ipairs(diagnostics) do
-      if vim.list_contains(phpcs_info, d.code) then
-        d.severity = vim.diagnostic.severity.INFO
-      end
-    end
-    return diagnostics
-  end,
-}
 
 local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
@@ -193,15 +135,14 @@ require('conform').setup({
     sh = { 'shfmt' },
     rust = { 'rustfmt' },
     yaml = { 'yamlfmt' },
-    php = { 'php_cs_fixer' },
   },
   notify_on_error = false,
 })
+
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
 vim.keymap.set('n', '<leader>cf', function() require('conform').format({ bufnr = 0, async = true, lsp_format = 'fallback' }) end, { desc = '[C]ode [F]ormat current file', })
 vim.keymap.set('x',  'gqp', 'mfgqap`f', { desc = 'Format Paragraph', })
 vim.keymap.set('x',  'gqg', 'mfgqag`f', { desc = 'Format File', remap = true })
-vim.keymap.set('x', '=', ':s/\\s\\+$//e<CR>gv=', { desc = 'Indent and Remove Trailing Whitespace' })
 
 --------------------------------------------------
 -- Debug
@@ -360,7 +301,6 @@ require('gitsigns').setup({
   on_attach = function()
     local gitsigns = require('gitsigns')
 
-    -- Navigation
     vim.keymap.set('n', ']h', function()
       if vim.wo.diff then
         vim.cmd.normal({ ']c', bang = true })
@@ -376,7 +316,6 @@ require('gitsigns').setup({
       end
     end, { desc = 'Jump to previous Hunk' })
 
-    -- Visual mode
     vim.keymap.set('x', '<leader>hs', function()
       gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
     end, { desc = '[H]unk [S]tage' })
@@ -384,15 +323,12 @@ require('gitsigns').setup({
       gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
     end, { desc = '[H]unk [R]eset' })
 
-    -- Text object
     vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = '[I]nside [H]unk TextObject' })
 
-    -- Normal mode
     vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage' })
     vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset' })
     vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = '[H]unk [P]review' })
 
-    -- Buffer
     vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage' })
     vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset' })
     vim.keymap.set('n', '<leader>bd', gitsigns.diffthis, { desc = '[B]uffer [D]iff' })
@@ -433,10 +369,8 @@ vim.list_extend(ensure_installed, {
   -- sql
   -- "sqlfluff", -- linter
   -- work
-  'phpcs',
   'phpstan',
   'php-debug-adapter',
-  'php-cs-fixer',
 })
 
 vim.api.nvim_create_user_command('MasonInstallNew', function()
@@ -691,7 +625,6 @@ local parsers = {
   'vimdoc',
   -- misc
   'diff',
-  -- 'comment',
   'regex',
   'sql',
   -- work
@@ -703,9 +636,6 @@ local parsers = {
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { '*' },
   callback = function(args)
-    -- if vim.api.nvim_buf_line_count(args.buf) > 40000 then
-    --   return
-    -- end
     local lang = vim.treesitter.language.get_lang(args.match)
     if lang and vim.treesitter.language.add(lang) then
       vim.treesitter.start(args.buf)
@@ -714,7 +644,6 @@ vim.api.nvim_create_autocmd('FileType', {
         vim.wo[0][0].foldmethod = 'expr'
         vim.cmd.normal('zx')
       end)
-      -- vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end
   end,
 })
@@ -739,8 +668,6 @@ vim.keymap.set('x', 'iz', ':<C-U>silent! normal! [zV]zkoj<CR>', { desc = 'Fold T
 vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false })
 vim.keymap.set('x', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object', silent = true })
 vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', remap = false })
-
--- vim.api.nvim_set_hl(0, '@lsp.type.comment', {})
 
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
