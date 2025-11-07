@@ -1,12 +1,27 @@
+vim.o.updatetime = 2000
+vim.o.timeoutlen = 300
+
+vim.o.scrolloff = 8
+vim.o.sidescrolloff = 20
+
+vim.o.cursorline = true
+vim.o.cursorlineopt = 'number'
+
 -- Disable cursor blinking in terminal mode.
 -- Using the same cursor for terminal as in insert mode is more vimmish but less terminalish
 vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor'
 
-vim.opt.number = true
-vim.opt.relativenumber = true
+vim.o.number = true
+vim.o.relativenumber = true
 
-vim.opt.showmode = false
-vim.opt.showcmd = false
+vim.o.signcolumn = 'yes'
+vim.o.numberwidth = 3
+vim.o.statuscolumn = '%=%{% v:virtnum > 0 ? "" : v:lnum %}%=%s'
+
+require('vim._extui').enable({})
+vim.o.showmode = false
+vim.o.showcmd = false
+vim.o.shortmess = 'aoOstTWIcCF'
 
 vim.o.mouse = ''
 vim.keymap.set('', '<up>', '<nop>', { noremap = true })
@@ -14,67 +29,47 @@ vim.keymap.set('', '<down>', '<nop>', { noremap = true })
 vim.keymap.set('i', '<up>', '<nop>', { noremap = true })
 vim.keymap.set('i', '<down>', '<nop>', { noremap = true })
 
-vim.o.breakindent = true
+vim.o.fileencoding = 'utf-8'
+vim.opt.iskeyword:append('-')
 
 vim.o.undofile = true
 vim.o.backup = false
 vim.o.writebackup = false
 vim.o.autoread = true
-vim.o.helpheight = 0
 
-vim.o.ignorecase = true
-vim.o.smartcase = true
+vim.o.tabstop = 4
+vim.o.softtabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
 
-require('vim._extui').enable({})
-
-vim.opt.shortmess = 'aoOstTWIcCF'
 vim.o.formatoptions = 'qjl1'
+vim.o.wrap = false
+vim.o.linebreak = true
+vim.o.textwidth = 0
+vim.o.smoothscroll = true
+
+vim.o.smartindent = true
+vim.o.breakindent = true
+
+vim.o.helpheight = 0
 
 vim.o.winborder = 'solid'
 
--- vim.o.completeopt = 'menu,menuone,noselect,fuzzy,popup'
-
-vim.o.pumheight = 10
-
 vim.cmd('packadd nohlsearch')
-vim.opt.updatetime = 2000
-vim.opt.timeoutlen = 300
+vim.o.incsearch = true
+vim.o.inccommand = 'split'
+vim.o.ignorecase = true
+vim.o.smartcase = true
 
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-
-vim.opt.smartindent = true
-
-vim.opt.wrap = false
-vim.opt.linebreak = true
-vim.opt.textwidth = 0
-
-vim.opt.incsearch = true
-vim.opt.inccommand = 'split'
-
-vim.opt.scrolloff = 8
-vim.opt.sidescrolloff = 20
-vim.opt.signcolumn = 'yes'
-
-vim.opt.splitright = true
-vim.opt.splitbelow = true
+vim.o.splitright = true
+vim.o.splitbelow = true
 
 vim.o.diffopt = 'internal,filler,closeoff,indent-heuristic,inline:char,linematch:60,algorithm:histogram'
 
-vim.opt.fileencoding = 'utf-8'
+vim.o.pumheight = 10
 
-vim.opt.iskeyword:append('-')
-
--- vim.opt.wildchar = (''):byte()
 vim.o.wildoptions = 'pum,tagfile,fuzzy'
 vim.o.wildmode = 'noselect:lastused,full'
--- vim.opt.wildignore:append({ '*/.git/*' }) -- git
--- vim.opt.wildignore:append({ '*/node_modules/*' }) -- web
--- vim.opt.wildignore:append({ '*/target/*' }) -- java
-
-vim.opt.smoothscroll = true
 
 -- https://new.reddit.com/r/neovim/comments/1fzn1zt/custom_fold_text_function_with_treesitter_syntax/
 local function fold_virt_text(result, lnum, trim)
@@ -114,8 +109,8 @@ function _G.custom_foldtext()
   return result
 end
 
-vim.opt.foldtext = 'v:lua.custom_foldtext()'
-vim.opt.foldlevelstart = 99
+vim.o.foldtext = 'v:lua.custom_foldtext()'
+vim.o.foldlevelstart = 99
 
 vim.opt.fillchars = {
   eob = ' ',
@@ -125,15 +120,6 @@ vim.opt.fillchars = {
   foldsep = ' ',
 }
 
-vim.opt.signcolumn = 'yes'
--- vim.opt.statuscolumn = '%s%=%{% v:virtnum > 0 ? "" : v:relnum ? v:relnum : v:lnum %} '
-vim.opt.numberwidth = 3
-vim.opt.statuscolumn = '%=%{% v:virtnum > 0 ? "" : v:lnum %}%=%s'
-
-vim.opt.cursorline = true
-vim.opt.cursorlineopt = 'number'
-
--- Disable health checks for these providers.
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
