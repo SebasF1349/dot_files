@@ -1,35 +1,4 @@
 --------------------------------------------------
--- Index
---------------------------------------------------
-
--- LEADER
---- a (alternative files)
---- b (buffer-git)
---- c (code)
----- cf (format)
----- cl (lint)
----- cb (build)
----- ct (test)
---- d (debug)
---- f (telescope)
---- h (hunks)
---- j (splitjoin)
---- l (location list)
---- m (markdown)
---- n (neotest-java)
---- q (quickfix)
---- r (refactoring)
---- s (open in split)
---- t (terminal)
---- v (open in vertical split)
---- w (open in window)
-
--- g
---- a (arglist)
---- d (generate docs/annotations)
---- r (lsp)
-
---------------------------------------------------
 -- Basics
 --------------------------------------------------
 
@@ -56,16 +25,9 @@ vim.keymap.set('x', 'A', function()
   return vim.api.nvim_get_mode().mode == 'V' and '$<C-v>A' or 'A'
 end, { desc = 'Append on multiple lines', expr = true })
 
-
 vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
 
 vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
-vim.keymap.set('n', 'gp', '"+p', { desc = 'Paste from system clipboard' })
-vim.keymap.set('x', 'gp', '"+P', { desc = 'Paste from system clipboard' })
-
-vim.keymap.set('i', '<C-=>', '<C-r>+', { desc = 'Paste from system clipboard in insert mode' })
-vim.keymap.set('i', "<C-'>", '<C-r>"', { desc = 'Paste in insertmode' })
-vim.keymap.set('i', '<C-0>', '<C-r>0', { desc = 'Paste yanked text in insertmode' })
 
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
@@ -170,11 +132,8 @@ local function fuzzy_find(cmd_line, cmd_pos)
     return fuzzy_find(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
   end
   local edit_cmds = { 'edit', 'split', 'vsplit' }
-  local find_cmds = { 'find', 'sfind' }
   if vim.list_contains(edit_cmds, cmd_parsed.cmd) then
     return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
-  elseif vim.list_contains(find_cmds, cmd_parsed.cmd) then
-    return '.*'
   elseif cmd_parsed.cmd == 'help' then
     return '*'
   else
@@ -197,7 +156,6 @@ end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
 
 vim.keymap.set('c', '<C-space>', '<space>', { desc = 'Easier Space' })
 
--- NOTE: maybe use these two instead of ge and gE?
 vim.keymap.set('c', '*', function()
   local cmd_line = vim.fn.getcmdline()
   local cmd_pos = vim.fn.getcmdpos()
@@ -463,7 +421,7 @@ vim.keymap.set('n', '[s', function()
 end, { desc = 'Shows previous spelling suggestions' })
 
 local replace_chars =
-  { a = 'á', e = 'é', i = 'í', o = 'ó', u = 'ú', A = 'Á', E = 'É', I = 'Í', O = 'Ó', U = 'Ú' }
+  { a = 'á', e = 'é', i = 'í', o = 'ó', u = 'ú', A = 'Á', E = 'É', I = 'Í', O = 'Ó', U = 'Ú', n = 'ñ', N = 'Ñ' }
 vim.keymap.set('n', "g'", function()
   local line, col = vim.api.nvim_get_current_line(), vim.fn.col('.')
   local char = line:sub(col, col + vim.str_utf_end(line, col))
@@ -476,7 +434,7 @@ vim.keymap.set('n', "g'", function()
   end
 end, { desc = 'Add tilde to letters', expr = true })
 
-vim.keymap.set('n', '<C-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' })
+vim.keymap.set('n', '<A-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' });
 
 --------------------------------------------------
 -- Abbreviations
