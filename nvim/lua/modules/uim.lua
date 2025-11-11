@@ -75,12 +75,6 @@ local function select_and_close(wins, current_win, on_end)
 end
 
 -- TODO: Implement ->
---     - completion (string|nil)
---               Specifies type of completion supported
---               for input. Supported types are the same
---               that can be supplied to a user-defined
---               command using the "-complete=" argument.
---               See |:command-completion|
 --     - highlight (function)
 --               Function that will be used for highlighting
 --               user inputs.
@@ -132,6 +126,21 @@ function M.input(opts, on_confirm)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = input_bufnr })
   vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = input_win })
   vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
+
+  if opts.completion then
+
+    ---@param findstart number
+    ---@param base string
+    function _G.uim_complete(findstart, base)
+      if findstart == 1 then
+        return 0
+      end
+      return vim.fn.getcompletion(base, opts.completion)
+    end
+
+    vim.api.nvim_set_option_value('completefunc', 'v:lua._G.uim_complete', { buf = input_bufnr })
+    vim.api.nvim_set_option_value('omnifunc', 'v:lua._G.uim_complete', { buf = input_bufnr })
+  end
 
   vim.keymap.set({ 'n', 'i', 'x' }, '<CR>', function()
     vim.api.nvim_input('<ESC>')
