@@ -311,7 +311,11 @@ vim.api.nvim_create_autocmd('CursorMoved', {
   desc = 'Show first virtual line',
 })
 
-local function hl_line(items, i)
+---@param items vim.quickfix.entry[]
+---@param i integer
+---@param stop boolean
+local function hl_line(items, i, stop)
+  if stop and i == 100 then return end
   local item = table.remove(items, 1)
   if not item then
     return
@@ -321,7 +325,6 @@ local function hl_line(items, i)
   if item.lnum > 0 then
     text_space = #tostring(item.lnum) + 4
     vim.hl.range(qfbufnr, qfim_namespace, 'CursorLineNr', { i, 0 }, { i, text_space })
-    -- vim.hl.range(qfbufnr, qfim_namespace, 'qfLineNr', { i, 0 }, { i, text_space })
   end
   local default_hl = 'CursorLineNr'
   if item.type ~= '' then
@@ -350,7 +353,7 @@ local function hl_line(items, i)
             vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
           end
           vim.defer_fn(function()
-            hl_line(items, i + 1)
+            hl_line(items, i + 1, stop)
           end, 10)
           return
         end
@@ -358,7 +361,7 @@ local function hl_line(items, i)
     end
   end
   vim.hl.range(qfbufnr, qfim_namespace, default_hl, { i, text_space }, { i, vim.o.columns })
-  hl_line(items, i + 1)
+  hl_line(items, i + 1, stop)
 end
 
 function _G.quickfixtextfunc(info)
@@ -406,7 +409,7 @@ function _G.quickfixtextfunc(info)
   vim.defer_fn(function()
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
     add_virt_lines(list)
-    hl_line(list, 0)
+    hl_line(list, 0, vim.fn.has('win32') == 1)
   end, 10)
   return ret
 end
