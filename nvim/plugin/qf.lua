@@ -47,23 +47,6 @@ local function getListType(winid)
   end
 end
 
--- ---@return number[], number[]
--- local function getListsWin()
---   local current_win = vim.api.nvim_get_current_win()
---   local current_tab = vim.fn.getwininfo(current_win)[1].tabnr
---   local qfwin, llwin = {}, {}
---   for _, win_data in ipairs(vim.fn.getwininfo()) do
---     if win_data.tabnr == current_tab and win_data.quickfix == 1 then
---       if win_data.loclist == 1 then
---         table.insert(qfwin, win_data.winid)
---       else
---         table.insert(llwin, win_data.winid)
---       end
---     end
---   end
---   return qfwin, llwin
--- end
-
 ---@param listType ListType
 ---@param what table
 ---@param action? " " | "a" | "r"
@@ -656,12 +639,6 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
 -- Keymaps inside Quickfix
 --------------------------------------------------
 
----@param line string
-local function getMessage(line)
-  local path, _ = line:gsub('^.*│', '')
-  return path
-end
-
 -- NOTE: take into account that this messes up with the error numbers
 ---@param file boolean remove all items in file
 local function delete(file)
@@ -728,29 +705,6 @@ local function openPreview()
   end
   local preview_buf = vim.api.nvim_win_get_buf(preview_win)
   vim.api.nvim_set_option_value('buflisted', false, { buf = preview_buf })
-end
-
--- NOTE: Should show lines or diagnostics in diagnostics qf?
-local function previewHover()
-  local line = vim.fn.getpos('.')
-  local list = getActiveList().items[line[2]]
-  if not vim.api.nvim_buf_is_loaded(list.bufnr) then
-    vim.fn.bufload(list.bufnr)
-  end
-  -- NOTE: Take into account it doesn't show more lines that space has in the window
-  local message = vim.api.nvim_buf_get_lines(list.bufnr, list.lnum - 2, list.lnum + 2, false)
-  if #message == 0 then
-    -- NOTE: I don't think this is necessary now, there should be always a message
-    message = vim.split(vim.trim(getMessage(vim.fn.getline('.'))), '\n')
-  end
-  -- NOTE: idk what syntax to use, for example svelte files are tricky, markdown is easiest, filetype is nicer
-  --      Can I get the real syntax?
-  local filetype = vim.api.nvim_get_option_value('filetype', { buf = list.bufnr })
-  vim.lsp.util.open_floating_preview(
-    message,
-    filetype,
-    { title = vim.fn.bufname(list.bufnr), border = 'rounded', height = 10, focusable = true }
-  )
 end
 
 ---@param direction 1 | -1
@@ -835,40 +789,6 @@ local function selectItem(selectItemOpts)
   end)
 end
 
----@param selectItemOpts SelectItemOpts
-local function openSelectedWin(selectItemOpts)
-  ---@type { opt: number, win: number }[]
-  local wins = {}
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local bufnr = vim.api.nvim_win_get_buf(win)
-    if vim.api.nvim_win_get_config(win).relative == '' and vim.bo[bufnr].filetype ~= 'qf' then
-      local position = vim.api.nvim_win_get_position(win)
-      local name = vim.api.nvim_buf_get_name(bufnr)
-      name = vim.fn.fnamemodify(name, ':p:~:.')
-      local opt = string.format('[%s,%s] %s', position[1], position[2], name ~= '' and name or vim.o.filetype)
-      table.insert(wins, { opt = opt, win = win })
-    end
-  end
-  if #wins == 1 then
-    selectItem(selectItemOpts)
-    return
-  end
-  vim.ui.select(wins, {
-    prompt = 'Replace buffer:',
-    format_item = function(item)
-      return item.opt
-    end,
-  }, function(item, idx)
-    if not idx or not item then
-      return
-    end
-    local curr_win = vim.api.nvim_get_current_win()
-    vim.api.nvim_set_current_win(item.win)
-    vim.api.nvim_set_current_win(curr_win)
-    selectItem(selectItemOpts)
-  end)
-end
-
 local function closeList()
   local listType = getListType()
   if not listType then
@@ -920,6 +840,40 @@ local function yank(what)
   vim.fn.setreg('', text)
 end
 
+local function refresh()
+  local listType = getListType()
+  if not listType then
+    return
+  end
+  local list = getList(listType)
+  if list.context == '' then
+    return
+  end
+  if list.context.qfim_diag and list.context.qfim_diag.type == listType then
+    local diag_where = listType == 'l' and 0 or nil
+    local severity = list.context.qfim_diag.severity
+    local scope = list.context.qfim_diag.scope
+    local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
+    if scope then
+      diag_list = vim
+        .iter(diag_list)
+        :filter(function(v)
+          return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
+        end)
+        :totable()
+    end
+    setList(listType, {
+      items = vim.diagnostic.toqflist(diag_list),
+    }, 'r')
+    if #diag_list == 0 then
+      vim.notify('List is now Empty', vim.log.levels.INFO)
+      vim.cmd(listType .. 'close')
+    end
+  elseif list.context.last_cmd then
+    vim.cmd(list.context.last_cmd)
+  end
+end
+
 local file_name
 local function searchFileName(search)
   local curr_pos = vim.api.nvim_win_get_cursor(0)
@@ -937,6 +891,16 @@ local function searchFileName(search)
   end
   file_name = nil
 end
+
+local function search_file()
+  vim.ui.input({ prompt = 'File Search: ' }, function(input)
+    if not input then
+      return
+    end
+    searchFileName(input)
+  end)
+end
+
 local function repeatSearchFileName()
   if not file_name then
     vim.notify('No text to search', vim.log.levels.INFO)
@@ -950,7 +914,6 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   callback = function()
     vim.keymap.set('n', 'q', closeList, { buffer = 0, desc = 'Close QF list' })
     vim.keymap.set('n', '<CR>', selectItem, { buffer = 0, desc = 'Open QF item' })
-    vim.keymap.set('n', '<A-CR>', openSelectedWin, { buffer = 0, desc = 'Open QF item in selected window' })
     vim.keymap.set('n', '<C-s>', function()
       selectItem({ split = 'h' })
     end, { buffer = 0, desc = 'Open QF Item in Horizontal [S]plit' })
@@ -976,12 +939,11 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
       listHistory('newer')
     end, { buffer = 0, desc = 'Open Newer List' })
     vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
-    vim.keymap.set('n', 'K', previewHover, { buffer = 0, desc = 'Show Message on Hover' })
     vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
     vim.keymap.set('n', 'D', function()
       delete(true)
     end, { buffer = 0, desc = 'Delete QF Items in Same Buffer' })
-    vim.keymap.set({ 'x' }, 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
+    vim.keymap.set('x', 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
     vim.keymap.set('n', 'yf', function()
       yank('file')
     end, { buffer = 0, desc = 'Yank Item File' })
@@ -989,47 +951,8 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
       yank('message')
     end, { buffer = 0, desc = 'Yank Item Message' })
     vim.keymap.set('n', 'gd', openAsDiff, { buffer = 0, desc = '[G]it [D]iff' })
-    vim.keymap.set('n', 'r', function()
-      local listType = getListType()
-      if not listType then
-        return
-      end
-      local list = getList(listType)
-      if list.context == '' then
-        return
-      end
-      if list.context.qfim_diag and list.context.qfim_diag.type == listType then
-        local diag_where = listType == 'l' and 0 or nil
-        local severity = list.context.qfim_diag.severity
-        local scope = list.context.qfim_diag.scope
-        local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
-        if scope then
-          diag_list = vim
-            .iter(diag_list)
-            :filter(function(v)
-              return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
-            end)
-            :totable()
-        end
-        setList(listType, {
-          items = vim.diagnostic.toqflist(diag_list),
-        }, 'r')
-        if #diag_list == 0 then
-          vim.notify('List is now Empty', vim.log.levels.INFO)
-          vim.cmd(listType .. 'close')
-        end
-      elseif list.context.last_cmd then
-        vim.cmd(list.context.last_cmd)
-      end
-    end, { buffer = 0, desc = '[R]eload List' })
-    vim.keymap.set('n', 'g/', function()
-      vim.ui.input({ prompt = 'File Search: ' }, function(input)
-        if not input then
-          return
-        end
-        searchFileName(input)
-      end)
-    end, { buffer = 0, desc = 'Search File Names' })
+    vim.keymap.set('n', 'r', refresh, { buffer = 0, desc = '[R]eload List' })
+    vim.keymap.set('n', 'g/', search_file, { buffer = 0, desc = 'Search File Names' })
     vim.keymap.set('n', 'gn', repeatSearchFileName, { buffer = 0, desc = 'Search File Names Again' })
   end,
   desc = 'Keymaps inside quickfix window',
