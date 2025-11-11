@@ -417,29 +417,45 @@ vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
 -- Keymaps
 --------------------------------------------------
 
---- @param symbols? string[]
-local function document_symbols(symbols)
-  symbols = symbols or {}
+local function document_symbols()
   vim.lsp.buf.document_symbol({
     on_list = function(options)
       local items = options.items
-      if not vim.tbl_isempty(symbols) then
-        items = vim.tbl_filter(function(item)
-          return vim.tbl_contains(symbols, string.lower(item.kind))
-        end, items)
-        if vim.tbl_isempty(items) then
-          vim.notify('No Symbols in the Document', vim.lsp.log_levels.WARN)
-          return
+
+      local seen = {}
+      local out = {}
+      for _, item in ipairs(items) do
+        local v = item.kind
+        if v ~= nil and not seen[v] then
+          seen[v] = true
+          table.insert(out, v:lower())
         end
       end
-      items = vim.tbl_map(function(item)
-        item.text = vim.fn.trim(vim.fn.getline(item.lnum))
-        return item
-      end, items)
-      local title = vim.tbl_isempty(symbols) and 'All' or table.concat(symbols, ', ')
-      vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. title:upper(), items = items })
-      vim.schedule(function()
-        vim.cmd('lopen')
+
+      ---@diagnostic disable-next-line: unused-local
+      function _G.qf_symbols_completion(cmdarg)
+        return out
+      end
+
+      vim.ui.input({ prompt = 'File Search: ', completion = 'customlist,v:lua._G.qf_symbols_completion' }, function(input)
+        if not input then
+          return
+        end
+        items = vim.tbl_filter(function(item)
+          return input == string.lower(item.kind)
+        end, items)
+        if vim.tbl_isempty(items) then
+          vim.notify('No ' .. input .. ' Symbols in the Document', vim.lsp.log_levels.WARN)
+          return
+        end
+        items = vim.tbl_map(function(item)
+          item.text = vim.fn.trim(vim.fn.getline(item.lnum))
+          return item
+        end, items)
+        vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
+        vim.schedule(function()
+          vim.cmd('lopen')
+        end)
       end)
     end,
   })
@@ -522,9 +538,7 @@ end, { desc = 'Toggle [L]ocation List' })
 vim.keymap.set('n', '<leader>ld', function()
   list_toggle('l', true)
 end, { desc = '[L]ocation List [D]iagnostics Toggle' })
-vim.keymap.set('n', '<leader>ls', function()
-  document_symbols({ 'function' })
-end, { desc = '[L]ocation List [S]ymbols' })
+vim.keymap.set('n', '<leader>ls', document_symbols, { desc = '[L]ocation List [S]ymbols' })
 vim.keymap.set('n', '<leader>lb', function()
   moveToList('l')
 end, { desc = 'Move to [L]ocation List [B]uffer' })
