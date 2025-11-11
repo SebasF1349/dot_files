@@ -147,8 +147,6 @@ local function on_attach(client_id, buf)
   vim.o.pumheight = 6
   vim.opt.completeopt = { 'menuone', 'popup', 'noselect', 'fuzzy' }
   vim.o.completeitemalign = 'kind,abbr,menu'
-  vim.o.complete = 'o'
-  vim.o.autocomplete = true
 
   vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = buf })
   vim.keymap.set('i', '<C-n>', function()
