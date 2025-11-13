@@ -351,7 +351,7 @@ require('mason').setup({
 local servers = require('core.lsp').servers
 local ensure_installed = {}
 -- install rust-analyzer with `rustup component add rust-analyzer`
-for _, server in ipairs(servers) do
+for server, _ in pairs(servers) do
   if server ~= 'rust-analyzer' then
     table.insert(ensure_installed, server)
   end
