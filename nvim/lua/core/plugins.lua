@@ -297,8 +297,7 @@ require('gitsigns').setup({
     changedelete = { text = '└' },
     untracked = { text = '┆' },
   },
-  preview_config = { border = 'solid' },
-  on_attach = function()
+  on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
 
     vim.keymap.set('n', ']h', function()
@@ -307,31 +306,30 @@ require('gitsigns').setup({
       else
         gitsigns.nav_hunk('next')
       end
-    end, { desc = 'Jump to next Hunk' })
+    end, { desc = 'Jump to next Hunk', buffer = bufnr })
     vim.keymap.set('n', '[h', function()
       if vim.wo.diff then
         vim.cmd.normal({ '[c', bang = true })
       else
         gitsigns.nav_hunk('prev')
       end
-    end, { desc = 'Jump to previous Hunk' })
+    end, { desc = 'Jump to previous Hunk', buffer = bufnr })
 
     vim.keymap.set('x', '<leader>hs', function()
       gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
-    end, { desc = '[H]unk [S]tage' })
+    end, { desc = '[H]unk [S]tage', buffer = bufnr })
     vim.keymap.set('x', '<leader>hr', function()
       gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
-    end, { desc = '[H]unk [R]eset' })
+    end, { desc = '[H]unk [R]eset', buffer = bufnr })
 
-    vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = '[I]nside [H]unk TextObject' })
+    vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = '[I]nside [H]unk TextObject', buffer = bufnr })
 
-    vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage' })
-    vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset' })
-    vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = '[H]unk [P]review' })
+    vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage', buffer = bufnr })
+    vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset', buffer = bufnr })
+    vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk_inline, { desc = '[H]unk [P]review', buffer = bufnr })
 
-    vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage' })
-    vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset' })
-    vim.keymap.set('n', '<leader>bd', gitsigns.diffthis, { desc = '[B]uffer [D]iff' })
+    vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage', buffer = bufnr })
+    vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset', buffer = bufnr })
   end,
 })
 
