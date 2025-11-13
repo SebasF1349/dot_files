@@ -652,17 +652,6 @@ vim.api.nvim_create_user_command('TSInstallAll', function()
   require('nvim-treesitter').install(parsers)
 end, {})
 
-vim.api.nvim_create_user_command('TSInstallNew', function()
-  local already_installed = require('nvim-treesitter').get_installed()
-  local isnt_installed = function(parser)
-    return not vim.tbl_contains(already_installed, parser)
-  end
-  local to_install = vim.tbl_filter(isnt_installed, parsers)
-  if #to_install > 0 then
-    require('nvim-treesitter').install(to_install)
-  end
-end, {})
-
 -- more robust option (do I want the if/else behaviour?) : https://vimways.org/2018/transactions-pending/
 vim.keymap.set('x', 'iz', ':<C-U>silent! normal! [zV]zkoj<CR>', { desc = 'Fold Text-Object', silent = true })
 vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false })
@@ -671,10 +660,14 @@ vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', re
 
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
-    if ev.data.kind ~= 'update' then return end
-
-    if ev.data.spec.name == 'nvim-treesitter' then
-      require('nvim-treesitter').update()
+    if ev.data.kind == 'install' then
+      if ev.data.spec.name == 'nvim-treesitter' then
+        require('nvim-treesitter').install(parsers)
+      end
+    else
+      if ev.data.spec.name == 'nvim-treesitter' then
+        require('nvim-treesitter').update()
+      end
     end
   end
 })
