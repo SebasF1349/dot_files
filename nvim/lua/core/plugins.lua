@@ -431,30 +431,12 @@ ai.setup({
     d = { '%f[%d%._][%d%._]+' }, -- digits with _ separator
     s = { -- subword (breaks sentence, but I never use it) https://github.com/echasnovski/mini.nvim/discussions/1434
       {
-        -- Matches a single uppercase letter followed by 1+ lowercase letters.
-        -- This covers:
-        -- - PascalCaseWords (or the latter part of camelCaseWords)
-        '%u[%l%d]+%f[^%l%d]', -- An uppercase letter, 1+ lowercase letters, to end of lowercase letters
-
-        -- Matches lowercase letters up until not lowercase letter.
-        -- This covers:
-        -- - start of camelCaseWords (just the `camel`)
-        -- - snake_case_words in lowercase
-        -- - regular lowercase words
-        '%f[^%s%p][%l%d]+%f[^%l%d]', -- after whitespace/punctuation, 1+ lowercase letters, to end of lowercase letters
-        '^[%l%d]+%f[^%l%d]', -- after beginning of line, 1+ lowercase letters, to end of lowercase letters
-
-        -- Matches uppercase or lowercase letters up until not letters.
-        -- This covers:
-        -- - SNAKE_CASE_WORDS in uppercase
-        -- - Snake_Case_Words in titlecase
-        -- - regular UPPERCASE words
-        -- (it must be both uppercase and lowercase otherwise it will
-        -- match just the first letter of PascalCaseWords)
-        '%f[^%s%p][%a%d]+%f[^%a%d]', -- after whitespace/punctuation, 1+ letters, to end of letters
-        '^[%a%d]+%f[^%a%d]', -- after beginning of line, 1+ letters, to end of letters
+        "%f[%a]%l+%d*",
+        "%f[%w]%d+",
+        "%f[%u]%u%f[%A]%d*",
+        "%f[%u]%u%l+%d*",
+        "%f[%u]%u%u+%d*",
       },
-      '^().*()$',
     },
     u = ai.gen_spec.function_call(), -- u for "Usage"
     U = ai.gen_spec.function_call({ name_pattern = '[%w_]' }), -- without dot in function name
@@ -470,10 +452,6 @@ ai.setup({
       '\n()%s*().-()\n()',
       '^()%s*().-()\n()',
     } },
-    o = { -- chunk (as in from vim-textobj-chunk) ??
-      '\n.-%b{}.-\n',
-      '\n().-()%{\n.*\n.*%}().-\n()',
-    },
     e = function()
       local diagnostics = vim.diagnostic.get(0)
       diagnostics = vim.tbl_map(function(diagnostic)
@@ -491,6 +469,27 @@ ai.setup({
   },
 })
 
+local around_subword = function(reg)
+  reg = vim.deepcopy(reg)
+  local SEP = "[_%-]+"
+  local line = vim.fn.getline(reg.from.line)
+  local left = line:sub(1, reg.from.col - 1):find(SEP .. "$")
+  local _, right = line:find("^" .. SEP, reg.to.col + 1)
+  if left then
+    reg.from.col = left
+  elseif right then
+    reg.to.col = right
+  end
+  return reg
+end
+vim.keymap.set({ "x", "o" }, "as", function()
+  local reg = MiniAi.find_textobject("i", "s")
+  if reg then
+    ---@diagnostic disable-next-line: inject-field
+    MiniAi.config.custom_textobjects._Virt = around_subword(reg)
+    MiniAi.select_textobject("i", "_Virt")
+  end
+end)
 
 local function refactoring_run()
   if package.loaded['refactoring'] then
