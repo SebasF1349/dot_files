@@ -337,6 +337,17 @@ require('gitsigns').setup({
 -- Mason
 --------------------------------------------------
 
+require('mason').setup({
+  ui = {
+    icons = {
+      package_installed = '✓',
+      package_pending = '➜',
+      package_uninstalled = '✗',
+    },
+    height = 0.8,
+  },
+})
+
 local servers = require('core.lsp').servers
 local ensure_installed = {}
 -- install rust-analyzer with `rustup component add rust-analyzer`
@@ -392,21 +403,6 @@ vim.api.nvim_create_user_command('MasonUninstallNotEnsured', function()
       vim.cmd('MasonUninstall ' .. package)
     end
   end
-end, {})
-
-vim.api.nvim_create_user_command('Mason', function()
-  vim.api.nvim_del_user_command('Mason')
-  require('mason').setup({
-    ui = {
-      icons = {
-        package_installed = '✓',
-        package_pending = '➜',
-        package_uninstalled = '✗',
-      },
-      height = 0.8,
-    },
-  })
-  vim.cmd('Mason')
 end, {})
 
 --------------------------------------------------
