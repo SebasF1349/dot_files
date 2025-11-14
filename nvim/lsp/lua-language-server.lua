@@ -21,7 +21,7 @@ return {
         checkThirdParty = false,
         library = {
           vim.env.VIMRUNTIME,
-          vim.fn.stdpath('data') .. '/lazy', -- plugins types
+          vim.fn.stdpath('data') .. '/site/pack/core/opt', -- plugins types
         },
       },
     },
