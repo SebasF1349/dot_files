@@ -298,15 +298,16 @@ local progress = 1
 local ls_progress = ''
 
 vim.lsp.handlers['$/progress'] = function(_, p, _)
-  if p.value.kind == 'end' then
+  if p.value.kind == 'end' and _G.ls_progress_timer:is_active() then
     ls_progress = ''
-    _G.LsProgress_timer:stop()
+    _G.ls_progress_timer:stop()
+    _G.ls_progress_timer:close()
     vim.api.nvim__redraw({ statusline = true })
-  elseif _G.LsProgress_timer == nil then
-    _G.LsProgress_timer = vim.uv.new_timer()
-    _G.LsProgress_timer:start(
+  elseif not _G.ls_progress_timer or not _G.ls_progress_timer:is_active() then
+    _G.ls_progress_timer = vim.uv.new_timer()
+    _G.ls_progress_timer:start(
       0,
-      500,
+      200,
       vim.schedule_wrap(function()
         progress = (progress == 1) and 2 or 1
         ls_progress = string.format('%%#SLSeparator# %s', spinner[progress])
