@@ -228,7 +228,7 @@ local function update_git()
       end
 
       local branch = output:match('# branch%.head%s+([%w%-%._%(%)]+)')
-      local modified = (output:find("\n[^#\n]%S") ~= nil or output:match("^[^#\n]%S")) and '~' or ''
+      local modified = (output:find('\n[^#\n]%S') ~= nil or output:match('^[^#\n]%S')) and '~' or ''
       local ahead, behind = output:match('# branch%.ab%s+%+([0-9]+)%s+%-([0-9]+)')
       ahead = ahead ~= '0' and '' or ''
       behind = behind ~= '0' and '' or ''
