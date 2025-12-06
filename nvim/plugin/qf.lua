@@ -114,7 +114,12 @@ local function getDiagList(listType, severity)
   local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
     local list = getList(listType, i)
-    if list.context ~= '' and list.context.qfim_diag and list.context.qfim_diag.type == listType and list.context.qfim_diag.severity == severity then
+    if
+      list.context ~= ''
+      and list.context.qfim_diag
+      and list.context.qfim_diag.type == listType
+      and list.context.qfim_diag.severity == severity
+    then
       return list
     end
   end
@@ -423,26 +428,29 @@ local function document_symbols()
         return out
       end
 
-      vim.ui.input({ prompt = 'File Search: ', completion = 'customlist,v:lua._G.qf_symbols_completion' }, function(input)
-        if not input then
-          return
+      vim.ui.input(
+        { prompt = 'File Search: ', completion = 'customlist,v:lua._G.qf_symbols_completion' },
+        function(input)
+          if not input then
+            return
+          end
+          items = vim.tbl_filter(function(item)
+            return input == string.lower(item.kind)
+          end, items)
+          if vim.tbl_isempty(items) then
+            vim.notify('No ' .. input .. ' Symbols in the Document', vim.lsp.log_levels.WARN)
+            return
+          end
+          items = vim.tbl_map(function(item)
+            item.text = vim.fn.trim(vim.fn.getline(item.lnum))
+            return item
+          end, items)
+          vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
+          vim.schedule(function()
+            vim.cmd('lopen')
+          end)
         end
-        items = vim.tbl_filter(function(item)
-          return input == string.lower(item.kind)
-        end, items)
-        if vim.tbl_isempty(items) then
-          vim.notify('No ' .. input .. ' Symbols in the Document', vim.lsp.log_levels.WARN)
-          return
-        end
-        items = vim.tbl_map(function(item)
-          item.text = vim.fn.trim(vim.fn.getline(item.lnum))
-          return item
-        end, items)
-        vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
-        vim.schedule(function()
-          vim.cmd('lopen')
-        end)
-      end)
+      )
     end,
   })
 end
@@ -666,9 +674,12 @@ local function delete(file)
     local line = cursor[1]
     if file then
       local bufnr = qfitems[line].bufnr
-      qfitems = vim.iter(qfitems):filter(function(item)
-        return item.bufnr ~= bufnr
-      end):totable()
+      qfitems = vim
+        .iter(qfitems)
+        :filter(function(item)
+          return item.bufnr ~= bufnr
+        end)
+        :totable()
     else
       table.remove(qfitems, line)
     end
@@ -892,7 +903,7 @@ local function searchFileName(search)
   file_name = nil
 end
 
-local function search_file()
+local function searchFile()
   vim.ui.input({ prompt = 'File Search: ' }, function(input)
     if not input then
       return
@@ -952,7 +963,7 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     end, { buffer = 0, desc = 'Yank Item Message' })
     vim.keymap.set('n', 'gd', openAsDiff, { buffer = 0, desc = '[G]it [D]iff' })
     vim.keymap.set('n', 'r', refresh, { buffer = 0, desc = '[R]eload List' })
-    vim.keymap.set('n', 'g/', search_file, { buffer = 0, desc = 'Search File Names' })
+    vim.keymap.set('n', 'g/', searchFile, { buffer = 0, desc = 'Search File Names' })
     vim.keymap.set('n', 'gn', repeatSearchFileName, { buffer = 0, desc = 'Search File Names Again' })
   end,
   desc = 'Keymaps inside quickfix window',
