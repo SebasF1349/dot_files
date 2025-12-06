@@ -1,3 +1,5 @@
+local ui = vim.ui
+
 local function select()
   return require('modules.uim').select
 end
@@ -6,9 +8,9 @@ local function input()
   return require('modules.uim').input
 end
 
-vim.ui.select = select()
-vim.ui.input = input()
-vim.ui.open = (function(overridden)
+ui.select = select()
+ui.input = input()
+ui.open = (function(overridden)
   return function(path, opt)
     vim.validate({
       path = { path, 'string' },
@@ -30,5 +32,5 @@ vim.ui.open = (function(overridden)
     end
     overridden(path, opt)
   end
-end)(vim.ui.open)
+end)(ui.open)
 

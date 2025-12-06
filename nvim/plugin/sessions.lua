@@ -1,10 +1,11 @@
+local api, fn, fs, cmd = vim.api, vim.fn, vim.fs, vim.cmd
 local oss = require('utils.os')
 
 vim.o.sessionoptions = 'curdir,winsize'
-local sessions_path = oss.joinpath(vim.fn.stdpath('data'), 'sessions')
+local sessions_path = oss.joinpath(fn.stdpath('data'), 'sessions')
 
 local function get_session_path()
-  if vim.fn.isdirectory(sessions_path) == 0 then
+  if fn.isdirectory(sessions_path) == 0 then
     os.execute('mkdir ' .. sessions_path)
   end
   local session_name =
@@ -17,37 +18,37 @@ end
 
 local function sessionSave()
   local session_path = get_session_path()
-  vim.cmd('mksession! ' .. session_path)
-  vim.cmd.qa()
+  cmd('mksession! ' .. session_path)
+  cmd.qa()
 end
 
 local function sessionLoad()
-  vim.cmd('silent! %bwipeout!')
+  cmd('silent! %bwipeout!')
   local session_path = get_session_path()
-  vim.cmd('source ' .. session_path)
+  cmd('source ' .. session_path)
 end
 
 local function sessionRemove()
   local session_path = get_session_path()
-  vim.fs.rm(session_path, { force = true })
-  vim.fs.rm(session_path .. '.json', { force = true })
+  fs.rm(session_path, { force = true })
+  fs.rm(session_path .. '.json', { force = true })
 end
 
-vim.api.nvim_create_user_command('SSave', sessionSave, { desc = 'Save Session And Quit' })
-vim.api.nvim_create_user_command('SLoad', sessionLoad, { desc = 'Load Session' })
-vim.api.nvim_create_user_command('SRemove', sessionRemove, { desc = 'Remove Session' })
+api.nvim_create_user_command('SSave', sessionSave, { desc = 'Save Session And Quit' })
+api.nvim_create_user_command('SLoad', sessionLoad, { desc = 'Load Session' })
+api.nvim_create_user_command('SRemove', sessionRemove, { desc = 'Remove Session' })
 
-local auSession = vim.api.nvim_create_augroup('Sessions', {})
+local auSession = api.nvim_create_augroup('Sessions', {})
 
-vim.api.nvim_create_autocmd('VimLeavePre', {
+api.nvim_create_autocmd('VimLeavePre', {
   group = auSession,
   callback = function()
     local session_path = get_session_path()
     local has_opt = vim.iter(vim.v.argv):any(function(v)
       return v:find('+')
     end)
-    local has_code_bufs = vim.iter(vim.api.nvim_list_wins()):any(function(win)
-      local bufnr = vim.api.nvim_win_get_buf(win)
+    local has_code_bufs = vim.iter(api.nvim_list_wins()):any(function(win)
+      local bufnr = api.nvim_win_get_buf(win)
       return vim.bo[bufnr].buftype == ''
     end)
     if not vim.uv.fs_stat(session_path) or has_opt or not has_code_bufs then
@@ -65,10 +66,10 @@ if vim.v.vim_did_enter then
     return v:find('+')
   end)
   if has_opt then
-  elseif vim.uv.fs_stat(session_path) and vim.fn.argc() == 0 then
+  elseif vim.uv.fs_stat(session_path) and fn.argc() == 0 then
     sessionLoad()
-  elseif vim.fn.argc() == 0 or (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.expand('%')) == 1) then
-    local dir = vim.fn.argc() == 1 and vim.fn.expand('%:p') or vim.uv.cwd()
-    vim.cmd.Oil(dir)
+  elseif fn.argc() == 0 or (fn.argc() == 1 and fn.isdirectory(fn.expand('%')) == 1) then
+    local dir = fn.argc() == 1 and fn.expand('%:p') or vim.uv.cwd()
+    cmd.Oil(dir)
   end
 end

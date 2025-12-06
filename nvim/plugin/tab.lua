@@ -1,9 +1,9 @@
 -- https://github.com/TheLeoP/nvim-config/blob/master/plugin/tab.lua
-local api = vim.api
+local api, fn = vim.api, vim.fn
 
 function _G._personal_tab()
-  local last = vim.fn.tabpagenr('$')
-  local current = vim.fn.tabpagenr()
+  local last = fn.tabpagenr('$')
+  local current = fn.tabpagenr()
 
   local out = {} ---@type string[]
   for i = 1, last do
@@ -17,8 +17,8 @@ end
 
 ---@param i integer
 function _G._personal_tab_label(i)
-  local buflist = vim.fn.tabpagebuflist(i) ---@type integer[]
-  local winnr = vim.fn.tabpagewinnr(i)
+  local buflist = fn.tabpagebuflist(i) ---@type integer[]
+  local winnr = fn.tabpagewinnr(i)
   local buf = buflist[winnr]
   if not buf then return end
   local name = api.nvim_buf_get_name(buf)
@@ -29,10 +29,10 @@ function _G._personal_tab_label(i)
     return protocol .. '://'
   elseif vim.endswith(name, '/') or vim.endswith(name, '\\') then
     local dirname = name:sub(1, -2)
-    local tail = vim.fn.fnamemodify(dirname, ':t')
+    local tail = fn.fnamemodify(dirname, ':t')
     return tail .. '/'
   end
-  local tail = vim.fn.fnamemodify(name, ':t')
+  local tail = fn.fnamemodify(name, ':t')
   return tail
 end
 

@@ -1,3 +1,5 @@
+local fn, api, map = vim.fn, vim.api, vim.keymap.set
+
 function _G.opfunc(func_name)
   return function()
     vim.o.operatorfunc = 'v:lua.' .. func_name
@@ -31,12 +33,12 @@ local surround = {
 }
 
 local function get_pair()
-  local char = vim.fn.getcharstr()
+  local char = fn.getcharstr()
   if char == '\r' then
     return { { '', '' }, { '', '' } }
   end
   if char == 't' then
-    local tag = vim.fn.input('Enter tag: ')
+    local tag = fn.input('Enter tag: ')
     return { { '<' .. tag .. '>' }, { '</' .. tag .. '>' } }
   end
   if vim.b.surroundPair then
@@ -113,9 +115,9 @@ end
 ---@param end_row integer
 ---@param end_col integer
 local function add_surround(pair, start_row, start_col, end_row, end_col)
-  local text = vim.api.nvim_buf_get_text(0, start_row, start_col, end_row, end_col, {})
+  local text = api.nvim_buf_get_text(0, start_row, start_col, end_row, end_col, {})
   text = add_pair(text, pair)
-  vim.api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, text)
+  api.nvim_buf_set_text(0, start_row, start_col, end_row, end_col, text)
 end
 
 ---@param mode "char"|"line"|"block"
@@ -124,12 +126,12 @@ function _G.Surround(mode)
   if not pair then
     return
   end
-  local starting = vim.api.nvim_buf_get_mark(0, '[')
-  local ending = vim.api.nvim_buf_get_mark(0, ']')
+  local starting = api.nvim_buf_get_mark(0, '[')
+  local ending = api.nvim_buf_get_mark(0, ']')
   if mode == 'char' then
     add_surround(pair, starting[1] - 1, starting[2], ending[1] - 1, ending[2] + 1)
   elseif mode == 'line' then
-    local len_last_line = #vim.fn.getline(ending[1])
+    local len_last_line = #fn.getline(ending[1])
     add_surround(pair, starting[1] - 1, 0, ending[1] - 1, len_last_line)
   elseif mode == 'block' then
     for i = starting[1] - 1, ending[1] - 1 do
@@ -138,11 +140,11 @@ function _G.Surround(mode)
   end
 end
 
-vim.keymap.set('n', 'ys', _G.opfunc('_G.Surround'), { desc = '[Y]ou [S]urround', silent = true, expr = true })
-vim.keymap.set('x', 's', _G.opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
+map('n', 'ys', _G.opfunc('_G.Surround'), { desc = '[Y]ou [S]urround', silent = true, expr = true })
+map('x', 's', _G.opfunc('_G.Surround'), { desc = '[S]urround', silent = true, expr = true })
 
-vim.keymap.set('n', 'gs', function()
-  local char = vim.fn.getcharstr()
+map('n', 'gs', function()
+  local char = fn.getcharstr()
   return 'ysiw' .. char
 end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 
@@ -156,20 +158,20 @@ local function operateSurround(pairDelete, pairAdd)
   if pairAdd then
     assert(#pairAdd == 2, "There must be 2 pairs to add")
   end
-  local curr = vim.api.nvim_win_get_cursor(0)
-  local o = vim.fn.search(pairDelete[1][1], 'bW')
+  local curr = api.nvim_win_get_cursor(0)
+  local o = fn.search(pairDelete[1][1], 'bW')
   if o == 0 then
     return
   end
-  local opening = vim.api.nvim_win_get_cursor(0)
-  local e = vim.fn.search(pairDelete[2][#pairDelete[2]], 'eW')
-  local ending = vim.api.nvim_win_get_cursor(0)
+  local opening = api.nvim_win_get_cursor(0)
+  local e = fn.search(pairDelete[2][#pairDelete[2]], 'eW')
+  local ending = api.nvim_win_get_cursor(0)
   if e == 0 or ending[1] < curr[1] or (ending[1] == curr[1] and ending[2] < curr[2]) then
-    vim.api.nvim_win_set_cursor(0, curr)
+    api.nvim_win_set_cursor(0, curr)
     return
   end
 
-  local lines = vim.api.nvim_buf_get_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, {})
+  local lines = api.nvim_buf_get_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, {})
   lines[1] = lines[1]:sub(#pairDelete[1][1] + 1, -1)
   if #lines[1] == 0 then
     table.remove(lines, 1)
@@ -181,17 +183,17 @@ local function operateSurround(pairDelete, pairAdd)
   if pairAdd then
     lines = add_pair(lines, pairAdd)
   end
-  vim.api.nvim_buf_set_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, lines)
+  api.nvim_buf_set_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, lines)
 end
 
-vim.keymap.set('n', 'ds', function()
+map('n', 'ds', function()
   local pair = get_pair()
   if pair then
     operateSurround(pair)
   end
 end, { desc = '[D]elete [S]urround' })
 
-vim.keymap.set('n', 'cs', function()
+map('n', 'cs', function()
   local pair, replace = get_pair(), get_pair()
   if pair and replace then
     operateSurround(pair, replace)
@@ -205,22 +207,22 @@ end, { desc = '[C]hange [S]urround' })
 -- based on https://www.reddit.com/r/neovim/comments/xrwo05/comment/ja7oyqy/
 ---@param mode "char"|"line"|"block"
 function _G.Substitute(mode)
-  local reg = vim.fn.getreg()
+  local reg = fn.getreg()
   local text = vim.split(reg, '\n')
   if text[text] == '' then
     table.remove(text)
   end
-  local starting = vim.api.nvim_buf_get_mark(0, '[')
-  local ending = vim.api.nvim_buf_get_mark(0, ']')
+  local starting = api.nvim_buf_get_mark(0, '[')
+  local ending = api.nvim_buf_get_mark(0, ']')
   if mode == 'char' then
-    vim.api.nvim_buf_set_text(0, starting[1] - 1, starting[2], ending[1] - 1, ending[2] + 1, text)
+    api.nvim_buf_set_text(0, starting[1] - 1, starting[2], ending[1] - 1, ending[2] + 1, text)
   elseif mode == 'line' then
-    vim.api.nvim_buf_set_lines(0, starting[1] - 1, ending[1], true, text)
+    api.nvim_buf_set_lines(0, starting[1] - 1, ending[1], true, text)
   elseif mode == 'block' then
     for i = starting[1] - 1, ending[1] - 1 do
-      vim.api.nvim_buf_set_text(0, i, starting[2], i, ending[2] + 1, text)
+      api.nvim_buf_set_text(0, i, starting[2], i, ending[2] + 1, text)
     end
   end
 end
 
-vim.keymap.set({ 'n', 'v' }, 'S', _G.opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })
+map({ 'n', 'v' }, 'S', _G.opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })

@@ -1,3 +1,5 @@
+local api, normalize, fn, cmd, map, uiSelect = vim.api, vim.fs.normalize, vim.fn, vim.cmd, vim.keymap.set, vim.ui.select
+
 --------------------------------------------------
 -- Utils
 --------------------------------------------------
@@ -7,14 +9,14 @@
 ---@return string
 local function getBufName(bufnr)
   bufnr = bufnr or 0
-  local buf = vim.api.nvim_buf_get_name(bufnr)
-  return vim.fs.normalize(vim.fn.fnamemodify(buf, ':.'))
+  local buf = api.nvim_buf_get_name(bufnr)
+  return normalize(fn.fnamemodify(buf, ':.'))
 end
 
 local function getArgs()
-  local args = vim.fn.argv() --[[@as string[] ]]
+  local args = fn.argv() --[[@as string[] ]]
   for i, arg in ipairs(args) do
-    args[i] = vim.fs.normalize(vim.fn.fnamemodify(arg, ':.'))
+    args[i] = normalize(fn.fnamemodify(arg, ':.'))
   end
   return args
 end
@@ -25,25 +27,25 @@ end
 
 ---@param argnr number?
 local function move(argnr)
-  vim.cmd('silent! write')
-  argnr = argnr or vim.fn.argidx() + 1
-  if argnr < 1 or argnr > vim.fn.argc() then
-    argnr = math.fmod(argnr, vim.fn.argc())
+  cmd('silent! write')
+  argnr = argnr or fn.argidx() + 1
+  if argnr < 1 or argnr > fn.argc() then
+    argnr = math.fmod(argnr, fn.argc())
   end
   if argnr <= 0 then
-    argnr = argnr + vim.fn.argc()
+    argnr = argnr + fn.argc()
   end
-  vim.cmd({ cmd = 'argument', count = argnr, bang = true, mods = { silent = true } })
+  cmd({ cmd = 'argument', count = argnr, bang = true, mods = { silent = true } })
 end
 
 local function select()
-  if vim.fn.argc() == 0 then
+  if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  vim.ui.select(getArgs(), {
+  uiSelect(getArgs(), {
     prompt = 'Select buffer:',
     format_item = function(item)
-      return item == vim.fn.argv(vim.fn.argidx()) and '[' .. item .. ']' or item
+      return item == fn.argv(fn.argidx()) and '[' .. item .. ']' or item
     end,
   }, function(_, selected)
     if selected then
@@ -53,18 +55,18 @@ local function select()
 end
 
 local function cycle_next()
-  if vim.fn.argc() == 0 then
+  if fn.argc() == 0 then
     return
   end
-  move(vim.fn.argidx() + vim.v.count1 + 1)
+  move(fn.argidx() + vim.v.count1 + 1)
 end
 
 local function cycle_prev()
-  if vim.fn.argc() == 0 then
+  if fn.argc() == 0 then
     return
   end
   local bufname = getBufName(0)
-  local moves = vim.fn.argidx() + 1 - vim.v.count1
+  local moves = fn.argidx() + 1 - vim.v.count1
   if not vim.list_contains(getArgs(), bufname) then
     moves = moves + 1
   end
@@ -74,25 +76,25 @@ end
 ---@param bufnr? integer
 local function insert(bufnr)
   local buf = getBufName(bufnr)
-  vim.cmd('silent! argedit ' .. buf .. ' | argdedupe')
+  cmd('silent! argedit ' .. buf .. ' | argdedupe')
 end
 
 ---@param argnr? integer
 local function remove(argnr)
-  local arg = argnr and vim.fn.argv(argnr) or '%'
-  vim.cmd('silent! argdelete ' .. arg)
-  if vim.fn.winnr('$') > 1 then
-    vim.api.nvim_win_close(0, false)
-  elseif vim.fn.argc() ~= 0 then
+  local arg = argnr and fn.argv(argnr) or '%'
+  cmd('silent! argdelete ' .. arg)
+  if fn.winnr('$') > 1 then
+    api.nvim_win_close(0, false)
+  elseif fn.argc() ~= 0 then
     move()
   end
 end
 
 local function remove_select()
-  if vim.fn.argc() == 0 then
+  if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  vim.ui.select(getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
+  uiSelect(getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
     if selected then
       remove(selected)
     end
@@ -101,25 +103,25 @@ end
 
 local function only()
   local buf = getBufName(0)
-  vim.cmd('silent! args ' .. buf)
+  cmd('silent! args ' .. buf)
 end
 
-vim.keymap.set('n', ']a', cycle_next, { desc = 'Next [A]rg' })
-vim.keymap.set('n', '[a', cycle_prev, { desc = 'Previous [A]rg' })
-vim.keymap.set('n', 'gaa', function()
+map('n', ']a', cycle_next, { desc = 'Next [A]rg' })
+map('n', '[a', cycle_prev, { desc = 'Previous [A]rg' })
+map('n', 'gaa', function()
   local count = vim.v.count
-  if count ~= 0 and count <= vim.fn.argc() then
+  if count ~= 0 and count <= fn.argc() then
     move(count)
   else
     select()
   end
 end, { desc = 'Select [A]rg Buffer' })
-vim.keymap.set('n', 'gai', insert, { desc = '[A]rg [I]nsert' })
-vim.keymap.set('n', 'gad', ':argdo ', { desc = '[A]rg[D]o' })
-vim.keymap.set('n', 'gar', remove, { desc = '[A]rg [R]emove' })
-vim.keymap.set('n', 'gaR', remove_select, { desc = '[A]rg [R]emove Selected' })
-vim.keymap.set('n', 'gao', only, { desc = '[A]rg [O]nly' })
-vim.keymap.set('n', 'gac', '<cmd>%argdelete<CR>', { desc = '[A]arglist [C]lean', silent = true })
+map('n', 'gai', insert, { desc = '[A]rg [I]nsert' })
+map('n', 'gad', ':argdo ', { desc = '[A]rg[D]o' })
+map('n', 'gar', remove, { desc = '[A]rg [R]emove' })
+map('n', 'gaR', remove_select, { desc = '[A]rg [R]emove Selected' })
+map('n', 'gao', only, { desc = '[A]rg [O]nly' })
+map('n', 'gac', '<cmd>%argdelete<CR>', { desc = '[A]arglist [C]lean', silent = true })
 
 --------------------------------------------------
 -- Opening Buffers
@@ -132,11 +134,11 @@ local edit_buffer = {
 }
 
 for key, opts in pairs(edit_buffer) do
-  vim.keymap.set('n', '<leader>' .. key:upper(), function()
-    return opts.cmd .. vim.fn.expand('%:p:h') .. '/'
+  map('n', '<leader>' .. key:upper(), function()
+    return opts.cmd .. fn.expand('%:p:h') .. '/'
   end, { desc = 'Edit Buffer in Current Directory in ' .. opts.desc, expr = true })
-  vim.keymap.set('n', '<leader>a' .. key, function()
-    local current_path = vim.fn.expand('%:p')
+  map('n', '<leader>a' .. key, function()
+    local current_path = fn.expand('%:p')
     local alternative_path
     if vim.o.filetype == 'java' then
       if current_path:find('test') then
@@ -158,16 +160,16 @@ local find_buffer = {
 }
 
 for key, opts in pairs(find_buffer) do
-  vim.keymap.set('n', '<leader>' .. key, opts.cmd, { desc = 'Edit Buffer in ' .. opts.desc })
+  map('n', '<leader>' .. key, opts.cmd, { desc = 'Edit Buffer in ' .. opts.desc })
 end
 
-local args_augroup = vim.api.nvim_create_augroup('Arglist', { clear = true })
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+local args_augroup = api.nvim_create_augroup('Arglist', { clear = true })
+api.nvim_create_autocmd({ 'BufEnter' }, {
   group = args_augroup,
   callback = function()
     local buf = getBufName(0)
     for i, a in ipairs(getArgs()) do
-      if a == buf and i ~= vim.fn.argidx() + 1 then
+      if a == buf and i ~= fn.argidx() + 1 then
         move(i)
       end
     end

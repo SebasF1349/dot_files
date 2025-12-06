@@ -1,3 +1,5 @@
+local api, fn, map, cmd = vim.api, vim.fn, vim.keymap.set, vim.cmd
+
 --------------------------------------------------
 -- Globals
 --------------------------------------------------
@@ -9,7 +11,7 @@
 ---@type term[]
 local terms = {}
 
-local terminal_autocmds = vim.api.nvim_create_augroup('Terminal Autocmds', { clear = true })
+local terminal_autocmds = api.nvim_create_augroup('Terminal Autocmds', { clear = true })
 
 --------------------------------------------------
 -- Options
@@ -33,20 +35,20 @@ end
 -- Keymaps
 --------------------------------------------------
 
-vim.keymap.set('t', '<ESC>', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
+map('t', '<ESC>', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
-vim.keymap.set({ 'n', 't' }, '<leader>tb', function()
-  local win = vim.api.nvim_win_is_valid(terms[1].winid) and terms[1].winid or terms[2].winid
-  if vim.api.nvim_win_is_valid(win) then
-    vim.api.nvim_set_current_win(win)
+map({ 'n', 't' }, '<leader>tb', function()
+  local win = api.nvim_win_is_valid(terms[1].winid) and terms[1].winid or terms[2].winid
+  if api.nvim_win_is_valid(win) then
+    api.nvim_set_current_win(win)
   end
 end, { desc = 'Move to [T]erminal [B]uffer ' })
 
-vim.keymap.set('t', 'gf', function()
-  local file = vim.fn.expand('<cfile>')
+map('t', 'gf', function()
+  local file = fn.expand('<cfile>')
   if file ~= '' then
-    vim.cmd('wincmd p')
-    vim.cmd('sfind ' .. file)
+    cmd('wincmd p')
+    cmd('sfind ' .. file)
   end
 end, { desc = 'Open file under the cursor' })
 
@@ -56,24 +58,24 @@ end, { desc = 'Open file under the cursor' })
 
 ---@param opts term
 local function set_term_opts(opts)
-  vim.cmd.startinsert()
+  cmd.startinsert()
   vim.bo.filetype = 'terminal'
   vim.bo.buflisted = false
   vim.wo.statuscolumn = ''
   vim.wo.winfixheight = true
   vim.wo.winfixwidth = true
-  vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = opts.bufnr })
-  vim.api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
+  map('n', 'q', '<cmd>close<cr>', { buffer = opts.bufnr })
+  api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
 end
 
 ---@param bufnr integer
 ---@return term
 local function create_term(bufnr)
-  local buf = vim.api.nvim_buf_is_valid(bufnr) and bufnr or vim.api.nvim_create_buf(false, true)
-  local win = vim.api.nvim_open_win(buf, true, { split = 'right', win = 0, width = 50 })
+  local buf = api.nvim_buf_is_valid(bufnr) and bufnr or api.nvim_create_buf(false, true)
+  local win = api.nvim_open_win(buf, true, { split = 'right', win = 0, width = 50 })
   local term = { bufnr = buf, winid = win }
   if vim.bo[buf].buftype ~= 'terminal' then
-    vim.cmd.terminal()
+    cmd.terminal()
     set_term_opts(term)
   end
   return term
@@ -82,10 +84,10 @@ end
 ---@param num 1|2
 local function toggle_term(num)
   local bufnr, winid = terms[num].bufnr, terms[num].winid
-  if not vim.api.nvim_win_is_valid(winid) then
+  if not api.nvim_win_is_valid(winid) then
     terms[num] = create_term(bufnr)
   else
-    vim.api.nvim_win_hide(winid)
+    api.nvim_win_hide(winid)
   end
 end
 
@@ -93,11 +95,11 @@ local TERMINALS_COUNT = 2
 
 for pos = 1, TERMINALS_COUNT do
   terms[pos] = { bufnr = -1, winid = -1 }
-  vim.keymap.set({ 'n', 't' }, '<leader>t' .. pos, function()
+  map({ 'n', 't' }, '<leader>t' .. pos, function()
     toggle_term(pos)
   end, { desc = 'Toggle [T]erminal [' .. pos .. ']' })
 end
-vim.keymap.set({ 'n', 't' }, '<leader>tt', function()
+map({ 'n', 't' }, '<leader>tt', function()
   toggle_term(1)
 end, { desc = '[T]oggle [T]erminal 1' })
 
@@ -109,26 +111,26 @@ end, { desc = '[T]oggle [T]erminal 1' })
 ---@param bufnr integer
 ---@param winid integer
 local function scroll_to_end(bufnr, winid)
-  vim.api.nvim_buf_call(bufnr, function()
-    local target_line = vim.tbl_count(vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
-    vim.api.nvim_win_set_cursor(winid, { target_line, 0 })
+  api.nvim_buf_call(bufnr, function()
+    local target_line = vim.tbl_count(api.nvim_buf_get_lines(bufnr, 0, -1, true))
+    api.nvim_win_set_cursor(winid, { target_line, 0 })
   end)
 end
 
----@param cmd string
-local function run_term_command(cmd)
-  vim.cmd('wa')
-  if not vim.api.nvim_win_is_valid(terms[1].winid) then
+---@param command string
+local function run_term_command(command)
+  cmd('wa')
+  if not api.nvim_win_is_valid(terms[1].winid) then
     terms[1] = create_term(terms[1].bufnr)
   end
   scroll_to_end(terms[1].bufnr, terms[1].winid)
-  local terminal_job_id = (vim.api.nvim_buf_get_var(terms[1].bufnr, 'terminal_job_id'))
-  vim.api.nvim_chan_send(terminal_job_id, '\n')
-  vim.api.nvim_chan_send(terminal_job_id, cmd .. '\n')
+  local terminal_job_id = (api.nvim_buf_get_var(terms[1].bufnr, 'terminal_job_id'))
+  api.nvim_chan_send(terminal_job_id, '\n')
+  api.nvim_chan_send(terminal_job_id, command .. '\n')
 end
 
 -- NOTE: improve keymaps checking this plugin code: https://github.com/samharju/yeet.nvim/blob/master/lua/yeet/buffer.lua
-vim.keymap.set('n', '<leader>cb', function()
+map('n', '<leader>cb', function()
   local build = { jdtls = 'mvn spring-boot:run' }
   for _, client in ipairs(vim.lsp.get_clients()) do
     if build[client.name] then
@@ -139,7 +141,7 @@ vim.keymap.set('n', '<leader>cb', function()
   vim.notify('No Build command for attached lsps', vim.log.levels.INFO)
 end, { desc = '[C]ode [B]uild' })
 
-vim.keymap.set('n', '<leader>ct', function()
+map('n', '<leader>ct', function()
   local test = { jdtls = 'mvn test' }
   for _, client in ipairs(vim.lsp.get_clients()) do
     if test[client.name] then
@@ -154,21 +156,21 @@ end, { desc = '[C]ode [T]est' })
 -- Autocmds
 --------------------------------------------------
 
-vim.api.nvim_create_autocmd('WinEnter', {
+api.nvim_create_autocmd('WinEnter', {
   callback = function()
-    if vim.bo.filetype == 'terminal' and vim.fn.winnr('$') == 1 then
-      vim.cmd('quit')
+    if vim.bo.filetype == 'terminal' and fn.winnr('$') == 1 then
+      cmd('quit')
     end
   end,
   group = terminal_autocmds,
   desc = 'Close Neovim if the last window is a terminal window',
 })
 
-vim.api.nvim_create_autocmd('ExitPre', {
+api.nvim_create_autocmd('ExitPre', {
   callback = function()
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    for _, buf in ipairs(api.nvim_list_bufs()) do
       if vim.bo[buf].buftype == 'terminal' then
-        vim.api.nvim_buf_delete(buf, { force = true })
+        api.nvim_buf_delete(buf, { force = true })
       end
     end
   end,
