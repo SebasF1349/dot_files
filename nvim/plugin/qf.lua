@@ -785,9 +785,11 @@ local function selectItem(selectItemOpts)
     local prev_win = qflist.filewinid or get_prev_win(qflist.winid)
     if prev_win and prev_win > 0 and vim.fn.win_gettype(prev_win) == '' then
       local item = qflist.items[qfitempos[2]]
-      local split =
-        vim.api.nvim_open_win(item.bufnr, not opts.keep_cursor, { win = prev_win, vertical = opts.split == 'v' })
-      vim.api.nvim_win_set_cursor(split, { math.max(item.lnum, 1), math.max(item.col, 0) })
+      local split = vim.api.nvim_open_win(item.bufnr, false, { win = prev_win, vertical = opts.split == 'v' })
+      vim.cmd('.' .. qftype .. qftype)
+      if opts.keep_cursor then
+        vim.api.nvim_set_current_win(qflist.winid)
+      end
     end
   end
   vim.schedule(function()
