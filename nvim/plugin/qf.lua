@@ -921,6 +921,16 @@ local function repeatSearchFileName()
   searchFileName(file_name)
 end
 
+---@param direction 'next'|'prev'
+local function moveAdyacentFile(direction)
+  local curr_pos = vim.api.nvim_win_get_cursor(0)
+  local start = direction == 'next' and curr_pos or 0
+  local end_ = direction == 'next' and -1 or curr_pos
+  local extmarks = vim.api.nvim_buf_get_extmarks(0, qfim_file_namespace, start, end_, { type = 'virt_lines' })
+  local extmarkPos = direction == 'next' and 1 or #extmarks - 1
+  vim.api.nvim_win_set_cursor(0, { extmarks[extmarkPos][2] + 1, 0 })
+end
+
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
@@ -945,6 +955,12 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     vim.keymap.set('n', '<C-p>', function()
       moveWithPreview(-1)
     end, { buffer = 0, desc = 'Move and Preview Previous QF Item' })
+    vim.keymap.set('n', ']]', function()
+      moveAdyacentFile('next')
+    end, { buffer = 0, desc = 'Move to QF Item in Next File' })
+    vim.keymap.set('n', '[[', function()
+      moveAdyacentFile('prev')
+    end, { buffer = 0, desc = 'Move to QF Item in Previous File' })
     vim.keymap.set('n', '<C-o>', function()
       listHistory('older')
     end, { buffer = 0, desc = 'Open Older List' })
