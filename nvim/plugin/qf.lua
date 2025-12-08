@@ -138,20 +138,80 @@ end
 vim.opt.grepprg = 'rg --vimgrep --smart-case --hidden'
 vim.opt.grepformat = '%f:%l:%c:%m'
 
+---@param listType 'c' | 'l'
+---@param args table
+local function grep(listType, args)
+  local async = require('vim._async')
+
+  async.run(function()
+    local grepprg = vim.o.grepprg
+    local cmd = vim.split(grepprg, '%s+', { trimempty = true })
+
+    for _, arg in ipairs(args) do
+      if arg:match("^['\"].*['\"]$") then
+        arg = arg:sub(2, -2)
+      end
+      table.insert(cmd, arg)
+    end
+    table.insert(cmd, '--fixed-strings')
+
+    local batch_size = 500
+    local chunk = {}
+    local action = ' '
+
+    local result = async.await(3, vim.system, cmd, {
+      text = true,
+      stdout = function(err, data)
+        assert(not err)
+        if data then
+          local lines = vim.split(data, '\n', { trimempty = true })
+          if #lines > 0 then
+            for _, line in ipairs(lines) do
+              table.insert(chunk, line)
+            end
+          end
+        end
+
+        local process = {}
+        for i = 1, batch_size do
+          process[i] = chunk[i]
+        end
+
+        if #chunk >= batch_size then
+          local new_chunk = {}
+          for i = batch_size + 1, #chunk do
+            table.insert(new_chunk, chunk[i])
+          end
+          chunk = new_chunk
+        else
+          chunk = {}
+        end
+
+        vim.schedule(function()
+          if #process > 0 or data ~= nil then
+            setList(listType, {
+              lines = not data and chunk or process,
+              efm = vim.o.errorformat,
+            }, action)
+            action = 'a'
+          end
+        end)
+      end,
+    })
+
+    if result.code ~= 0 then
+      vim.notify('Grep failed with exit code: ' .. result.code, vim.log.levels.ERROR)
+    end
+  end)
+end
+
 vim.api.nvim_create_user_command('Rg', function(opts)
-  if vim.o.filetype == 'oil' then
-    local dir = require('oil').get_current_dir()
-    last_cmd = 'silent! grep! ' .. opts.args .. ' ' .. dir
-  else
-    last_cmd = 'silent! grep! ' .. opts.args
-  end
-  vim.cmd(last_cmd)
-end, { nargs = 1, complete = 'dir' })
+  grep('c', opts.fargs)
+end, { nargs = '+', complete = 'file_in_path' })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
-  last_cmd = 'silent lgrep! "' .. opts.args .. '" %'
-  vim.cmd(last_cmd)
-end, { nargs = 1 })
+  grep('l', opts.fargs)
+end, { nargs = '+', complete = 'file_in_path' })
 
 vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
 
@@ -1082,3 +1142,4 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- https://github.com/stevearc/qf_helper.nvim (sync qflist cursor position)
 -- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941 (diagnostics autoupdate)
 -- https://github.com/stevearc/quicker.nvim/blob/master/lua/quicker/highlight.lua#L25 (ts highlighting)
+-- https://github.com/glepnir/nvim/blob/main/lua/private/grep.lua (async grep)
