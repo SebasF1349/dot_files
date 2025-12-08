@@ -12,10 +12,10 @@ opt.showcmd = false
 opt.shortmess = 'aoOstTWIcCF'
 
 --------------------------------------------------
--- Completion
+-- Autocompletion
 --------------------------------------------------
 
-opt.wildoptions = 'pum,tagfile,fuzzy'
+opt.wildoptions = 'pum,fuzzy'
 opt.wildmode = 'noselect:lastused,full'
 
 api.nvim_create_autocmd({ 'CmdlineChanged' }, {
@@ -37,51 +37,16 @@ opt.inccommand = 'split'
 opt.ignorecase = true
 opt.smartcase = true
 
-map('c', '<C-n>', function()
-  return fn.wildmenumode() == 1 and '<C-n>' or '<down>'
-end, { desc = 'Move Through Cmdline History', expr = true })
-map('c', '<C-p>', function()
-  return fn.wildmenumode() == 1 and '<C-p>' or '<up>'
-end, { desc = 'Move Through Cmdline History', expr = true })
+--------------------------------------------------
+-- Finder
+--------------------------------------------------
 
-local edit_buffer = {
-  w = { cmd = ':edit ', desc = '[W]indow' },
-  s = { cmd = ':split ', desc = '[S]plit' },
-  v = { cmd = ':vsplit ', desc = '[V]ertical split' },
-}
-
-for key, opts in pairs(edit_buffer) do
-  map('n', '<leader>' .. key:upper(), function()
-    return opts.cmd .. fn.expand('%:p:h') .. '/'
-  end, { desc = 'Edit Buffer in Current Directory in ' .. opts.desc, expr = true })
-  map('n', '<leader>a' .. key, function()
-    local current_path = fn.expand('%:p')
-    local alternative_path
-    if opt.filetype == 'java' then
-      if current_path:find('test') then
-        alternative_path = current_path:gsub('/test/', '/main/'):gsub('Test', '')
-      else
-        alternative_path = current_path:gsub('/main/', '/test/'):gsub('%.java', 'Test.java')
-      end
-    else
-      return
-    end
-    return opts.cmd .. alternative_path
-  end, { desc = 'Edit [A]lternative File in ' .. opts.desc, expr = true })
-end
-
-local find_buffer = {
-  w = { cmd = ':find ', desc = '[W]indow' },
-  s = { cmd = ':sfind ', desc = '[S]plit' },
-  v = { cmd = ':vsplit | find ', desc = '[V]ertical split' },
-}
-
-for key, opts in pairs(find_buffer) do
-  map('n', '<leader>' .. key, opts.cmd, { desc = 'Edit Buffer in ' .. opts.desc })
-end
+map('n', '<leader>w', ':find ', { desc = 'Find Buffer in [W]indow' })
+map('n', '<leader>s', ':sfind ', { desc = 'Find Buffer in [S]plit' })
+map('n', '<leader>v', ':vsplit | find ', { desc = 'Find Buffer in [V]ertical Split' })
 
 local function set_path()
-  local dirs = vim.system({'fd', '.', '--type', 'd', '--hidden', '--absolute-path', '--exclude', '.git', '--exclude', 'node_modules', '--exclude', 'target', '--exclude', 'vendor'}):wait()
+  local dirs = vim.system({ 'fd', '.', '--type', 'd', '--hidden', '--absolute-path' }):wait()
   if not dirs.stdout then
     return '.,,**'
   else
@@ -93,7 +58,7 @@ local files_list
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
   if not files_list then
-    local fd_cmd = { 'fd', '--type', 'file', '--relative-path', '--color', 'never', '--hidden', '.'}
+    local fd_cmd = { 'fd', '.', '--type', 'file', '--relative-path', '--color', 'never', '--hidden' }
     local files = vim.system(fd_cmd, { text = true }):wait()
     if not files.stdout then
       return {}
@@ -117,10 +82,6 @@ api.nvim_create_autocmd({ 'CmdlineLeave' }, {
   end,
   group = cmdline_autocmds,
 })
-
---------------------------------------------------
--- Magic
---------------------------------------------------
 
 local function add_magic(cmd_line, cmd_pos)
   local ok, cmd_parsed = pcall(api.nvim_parse_cmd, cmd_line, {})
@@ -206,6 +167,13 @@ map('c', '<C-space>', '<space>', { desc = 'Easier Space' })
 -- Misc Keymaps
 --------------------------------------------------
 
+map('c', '<C-n>', function()
+  return fn.wildmenumode() == 1 and '<C-n>' or '<down>'
+end, { desc = 'Move Through Cmdline History', expr = true })
+map('c', '<C-p>', function()
+  return fn.wildmenumode() == 1 and '<C-p>' or '<up>'
+end, { desc = 'Move Through Cmdline History', expr = true })
+
 map('c', '*', function()
   local cmd_line = fn.getcmdline()
   local cmd_pos = fn.getcmdpos()
@@ -231,7 +199,3 @@ local custom_cmds_typos = { 'RG', 'LA', 'MAson' }
 for _, cmd_typo in ipairs(custom_cmds_typos) do
   map('ca', cmd_typo, cmd_typo:sub(1, 1):upper() .. cmd_typo:sub(2):lower())
 end
-
---------------------------------------------------
--- Autocmds
---------------------------------------------------
