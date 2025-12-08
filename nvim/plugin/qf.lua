@@ -380,176 +380,7 @@ function _G.quickfixtextfunc(info)
   return ret
 end
 
--- vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
-
---------------------------------------------------
--- Keymaps
---------------------------------------------------
-
-local function document_symbols()
-  vim.lsp.buf.document_symbol({
-    on_list = function(options)
-      local items = options.items
-
-      local seen = {}
-      local out = {}
-      for _, item in ipairs(items) do
-        local v = item.kind
-        if v ~= nil and not seen[v] then
-          seen[v] = true
-          table.insert(out, v:lower())
-        end
-      end
-
-      ---@diagnostic disable-next-line: unused-local
-      function _G.qf_symbols_completion(cmdarg)
-        return out
-      end
-
-      vim.ui.input(
-        { prompt = 'File Search: ', completion = 'customlist,v:lua._G.qf_symbols_completion' },
-        function(input)
-          if not input then
-            return
-          end
-          items = vim.tbl_filter(function(item)
-            return input == string.lower(item.kind)
-          end, items)
-          if vim.tbl_isempty(items) then
-            vim.notify('No ' .. input .. ' Symbols in the Document', vim.lsp.log_levels.WARN)
-            return
-          end
-          items = vim.tbl_map(function(item)
-            item.text = vim.fn.trim(vim.fn.getline(item.lnum))
-            return item
-          end, items)
-          vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
-          vim.schedule(function()
-            vim.cmd('lopen')
-          end)
-        end
-      )
-    end,
-  })
-end
-
----@param listType ListType
----@param diagnostics? boolean
----@param severity? vim.diagnostic.SeverityFilter
----@param scope? string
-local function list_toggle(listType, diagnostics, severity, scope)
-  local list = getList(listType)
-  if list.winid ~= 0 then
-    vim.cmd(listType .. 'close')
-  elseif diagnostics then
-    last_cmd = ''
-    severity = severity or vim.diagnostic.severity.HINT
-    local diag_where = listType == 'l' and 0 or nil
-    local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
-    if scope then
-      diag_list = vim
-        .iter(diag_list)
-        :filter(function(v)
-          return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
-        end)
-        :totable()
-    end
-    if #diag_list == 0 then
-      vim.notify('List is Empty', vim.log.levels.INFO)
-      return
-    end
-    local qf_diag_list = getDiagList(listType, severity)
-    local action = ' '
-    if qf_diag_list then
-      -- NOTE: looks like a nvim bug that #chistory redraws the qf
-      vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
-      action = 'r'
-    end
-    local title = ('%s Diagnostics (%s)'):format(listType == 'c' and 'Workspace' or 'Local', severity)
-    setList(listType, {
-      title = title,
-      items = vim.diagnostic.toqflist(diag_list),
-      context = { qfim_diag = { type = listType, severity = severity, scope = scope } },
-    }, action)
-    vim.cmd(listType .. 'open')
-  elseif list.size == 0 then
-    vim.notify('List is Empty', vim.log.levels.INFO)
-  else
-    vim.cmd(listType .. 'open')
-  end
-end
-
----@param listType ListType
-local function moveToList(listType)
-  local list = getList(listType)
-  local win = list.winid
-  if vim.api.nvim_win_is_valid(win) then
-    vim.api.nvim_set_current_win(win)
-  end
-end
-
-vim.keymap.set('n', '<leader>qq', function()
-  list_toggle('c')
-end, { desc = 'Toggle [Q]uickfix' })
-vim.keymap.set('n', '<leader>qd', function()
-  list_toggle('c', true)
-end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
-vim.keymap.set('n', '<leader>qe', function()
-  list_toggle('c', true, vim.diagnostic.severity.ERROR)
-end, { desc = '[Q]uickfix [E]rror Toggle' })
-vim.keymap.set('n', '<leader>qE', function()
-  list_toggle('c', true, vim.diagnostic.severity.ERROR, vim.fn.expand('%:p:h'))
-end, { desc = '[Q]uickfix [E]rror Toggle' })
-vim.keymap.set('n', '<leader>qb', function()
-  moveToList('c')
-end, { desc = 'Move to [Q]uickfix [B]uffer' })
-
-vim.keymap.set('n', '<leader>ll', function()
-  list_toggle('l')
-end, { desc = 'Toggle [L]ocation List' })
-vim.keymap.set('n', '<leader>ld', function()
-  list_toggle('l', true)
-end, { desc = '[L]ocation List [D]iagnostics Toggle' })
-vim.keymap.set('n', '<leader>ls', document_symbols, { desc = '[L]ocation List [S]ymbols' })
-vim.keymap.set('n', '<leader>lb', function()
-  moveToList('l')
-end, { desc = 'Move to [L]ocation List [B]uffer' })
-
----@param listType? ListType
-local function addToQuickfix(listType)
-  listType = listType or 'c'
-  local cursor_pos = vim.fn.getpos('.')
-  local new_qf_item = {
-    {
-      bufnr = vim.api.nvim_get_current_buf(),
-      lnum = cursor_pos[2],
-      col = cursor_pos[3],
-      text = vim.fn.getline('.'),
-    },
-  }
-  setList(listType, { items = new_qf_item }, 'a')
-  local list = getList(listType)
-  if list.winid ~= 0 then
-    vim.schedule(function()
-      vim.cmd(listType .. 'open') -- needed to rerender highlights
-      vim.cmd(list.size .. listType .. listType) -- don't know if if should enter or keep the same qfitem position
-    end)
-  end
-end
-
-vim.keymap.set('n', '<leader>qa', addToQuickfix, { desc = '[A]dd cursor position to [Q]uickfix List' })
-vim.keymap.set('n', '<leader>la', function()
-  addToQuickfix('l')
-end, { desc = '[A]dd cursor position to [L]ocation List' })
-
--- NOTE: implement something similar to compare branches: https://gist.github.com/jmacadie/6f934282870f0d481599c8339ef61f64
--- and/or other commits: https://github.com/jecaro/fugitive-difftool.nvim
-vim.keymap.set('n', '<leader>qg', function()
-  vim.cmd('tabedit | Git difftool --name-status')
-  -- vim.cmd('tabedit | Git difftool --numstat --raw')
-  -- would be cool to have status and numstat in the same command, but looks like it's not possible
-  -- git diff --numstat --summary is difficult to parse (renaming is a mess)
-end, { desc = 'Open [Q]uickfix With [G]it Diff' })
+vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
 
 --------------------------------------------------
 -- Quickfix Options
@@ -587,9 +418,9 @@ function _G.qffoldtextfunc()
   end
 end
 
----@param buf integer
----@param win integer
-local function setOptions(buf, win)
+local function setOptions()
+  local buf = vim.api.nvim_get_current_buf()
+  local win = vim.api.nvim_get_current_win()
   vim.cmd('wincmd J')
   vim.api.nvim_win_set_height(win, getHeight())
   vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
@@ -1033,16 +864,13 @@ local function grep(listType, args)
             setList(listType, {
               lines = not data and chunk or process,
               efm = vim.o.errorformat,
-              quickfixtextfunc = _G.quickfixtextfunc,
             }, action)
             action = 'a'
 
             if not opened then
               vim.schedule(function()
                 vim.cmd(listType .. 'open')
-                local buf = vim.api.nvim_get_current_buf()
-                local win = vim.api.nvim_get_current_win()
-                setOptions(buf, win)
+                setOptions()
                 setKeymaps()
                 opened = true
               end)
@@ -1069,6 +897,183 @@ vim.api.nvim_create_user_command('LRg', function(opts)
 end, { nargs = '+', complete = 'file_in_path' })
 
 vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
+
+--------------------------------------------------
+-- Keymaps
+--------------------------------------------------
+
+local function document_symbols()
+  vim.lsp.buf.document_symbol({
+    on_list = function(options)
+      local items = options.items
+
+      local seen = {}
+      local out = {}
+      for _, item in ipairs(items) do
+        local v = item.kind
+        if v ~= nil and not seen[v] then
+          seen[v] = true
+          table.insert(out, v:lower())
+        end
+      end
+
+      ---@diagnostic disable-next-line: unused-local
+      function _G.qf_symbols_completion(cmdarg)
+        return out
+      end
+
+      vim.ui.input(
+        { prompt = 'File Search: ', completion = 'customlist,v:lua._G.qf_symbols_completion' },
+        function(input)
+          if not input then
+            return
+          end
+          items = vim.tbl_filter(function(item)
+            return input == string.lower(item.kind)
+          end, items)
+          if vim.tbl_isempty(items) then
+            vim.notify('No ' .. input .. ' Symbols in the Document', vim.lsp.log_levels.WARN)
+            return
+          end
+          items = vim.tbl_map(function(item)
+            item.text = vim.fn.trim(vim.fn.getline(item.lnum))
+            return item
+          end, items)
+          vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
+          vim.schedule(function()
+            vim.cmd('lopen')
+          end)
+        end
+      )
+    end,
+  })
+end
+
+---@param listType ListType
+---@param diagnostics? boolean
+---@param severity? vim.diagnostic.SeverityFilter
+---@param scope? string
+local function list_toggle(listType, diagnostics, severity, scope)
+  local list = getList(listType)
+  if list.winid ~= 0 then
+    vim.cmd(listType .. 'close')
+  elseif diagnostics then
+    last_cmd = ''
+    severity = severity or vim.diagnostic.severity.HINT
+    local diag_where = listType == 'l' and 0 or nil
+    local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
+    if scope then
+      diag_list = vim
+        .iter(diag_list)
+        :filter(function(v)
+          return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
+        end)
+        :totable()
+    end
+    if #diag_list == 0 then
+      vim.notify('List is Empty', vim.log.levels.INFO)
+      return
+    end
+    local qf_diag_list = getDiagList(listType, severity)
+    local action = ' '
+    if qf_diag_list then
+      -- NOTE: looks like a nvim bug that #chistory redraws the qf
+      vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
+      action = 'r'
+    end
+    local title = ('%s Diagnostics (%s)'):format(listType == 'c' and 'Workspace' or 'Local', severity)
+    setList(listType, {
+      title = title,
+      items = vim.diagnostic.toqflist(diag_list),
+      context = { qfim_diag = { type = listType, severity = severity, scope = scope } },
+    }, action)
+    vim.schedule(function()
+      vim.cmd(listType .. 'open')
+      setOptions()
+      setKeymaps()
+    end)
+  elseif list.size == 0 then
+    vim.notify('List is Empty', vim.log.levels.INFO)
+  else
+    vim.cmd(listType .. 'open')
+  end
+end
+
+---@param listType ListType
+local function moveToList(listType)
+  local list = getList(listType)
+  local win = list.winid
+  if vim.api.nvim_win_is_valid(win) then
+    vim.api.nvim_set_current_win(win)
+  end
+end
+
+---@param listType? ListType
+local function addToQuickfix(listType)
+  listType = listType or 'c'
+  local cursor_pos = vim.fn.getpos('.')
+  local new_qf_item = {
+    {
+      bufnr = vim.api.nvim_get_current_buf(),
+      lnum = cursor_pos[2],
+      col = cursor_pos[3],
+      text = vim.fn.getline('.'),
+    },
+  }
+  setList(listType, { items = new_qf_item }, 'a')
+  local list = getList(listType)
+  if list.winid ~= 0 then
+    vim.schedule(function()
+      vim.cmd(listType .. 'open') -- needed to rerender highlights
+      vim.cmd(list.size .. listType .. listType) -- don't know if if should enter or keep the same qfitem position
+    end)
+  end
+end
+
+vim.keymap.set('n', '<leader>qq', function()
+  list_toggle('c')
+end, { desc = 'Toggle [Q]uickfix' })
+vim.keymap.set('n', '<leader>qd', function()
+  list_toggle('c', true)
+end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
+vim.keymap.set('n', '<leader>qe', function()
+  list_toggle('c', true, vim.diagnostic.severity.ERROR)
+end, { desc = '[Q]uickfix [E]rror Toggle' })
+vim.keymap.set('n', '<leader>qE', function()
+  list_toggle('c', true, vim.diagnostic.severity.ERROR, vim.fn.expand('%:p:h'))
+end, { desc = '[Q]uickfix [E]rror Toggle' })
+vim.keymap.set('n', '<leader>qb', function()
+  moveToList('c')
+end, { desc = 'Move to [Q]uickfix [B]uffer' })
+
+vim.keymap.set('n', '<leader>ll', function()
+  list_toggle('l')
+end, { desc = 'Toggle [L]ocation List' })
+vim.keymap.set('n', '<leader>ld', function()
+  list_toggle('l', true)
+end, { desc = '[L]ocation List [D]iagnostics Toggle' })
+vim.keymap.set('n', '<leader>ls', document_symbols, { desc = '[L]ocation List [S]ymbols' })
+vim.keymap.set('n', '<leader>lb', function()
+  moveToList('l')
+end, { desc = 'Move to [L]ocation List [B]uffer' })
+
+vim.keymap.set('n', '<leader>qa', addToQuickfix, { desc = '[A]dd cursor position to [Q]uickfix List' })
+vim.keymap.set('n', '<leader>la', function()
+  addToQuickfix('l')
+end, { desc = '[A]dd cursor position to [L]ocation List' })
+
+-- NOTE: implement something similar to compare branches: https://gist.github.com/jmacadie/6f934282870f0d481599c8339ef61f64
+-- and/or other commits: https://github.com/jecaro/fugitive-difftool.nvim
+vim.keymap.set('n', '<leader>qg', function()
+  vim.cmd('tabedit | Git difftool --name-status')
+  -- vim.cmd('tabedit | Git difftool --numstat --raw')
+  -- would be cool to have status and numstat in the same command, but looks like it's not possible
+  -- git diff --numstat --summary is difficult to parse (renaming is a mess)
+  vim.schedule(function()
+    setOptions()
+    setKeymaps()
+  end)
+end, { desc = 'Open [Q]uickfix With [G]it Diff' })
 
 --------------------------------------------------
 -- Features
