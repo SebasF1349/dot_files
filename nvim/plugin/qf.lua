@@ -132,90 +132,6 @@ local function isDiffTool(list)
 end
 
 --------------------------------------------------
--- Better Grep
---------------------------------------------------
-
-vim.opt.grepprg = 'rg --vimgrep --smart-case --hidden'
-vim.opt.grepformat = '%f:%l:%c:%m'
-
----@param listType 'c' | 'l'
----@param args table
-local function grep(listType, args)
-  local async = require('vim._async')
-
-  async.run(function()
-    local grepprg = vim.o.grepprg
-    local cmd = vim.split(grepprg, '%s+', { trimempty = true })
-
-    for _, arg in ipairs(args) do
-      if arg:match("^['\"].*['\"]$") then
-        arg = arg:sub(2, -2)
-      end
-      table.insert(cmd, arg)
-    end
-    table.insert(cmd, '--fixed-strings')
-
-    local batch_size = 500
-    local chunk = {}
-    local action = ' '
-
-    local result = async.await(3, vim.system, cmd, {
-      text = true,
-      stdout = function(err, data)
-        assert(not err)
-        if data then
-          local lines = vim.split(data, '\n', { trimempty = true })
-          if #lines > 0 then
-            for _, line in ipairs(lines) do
-              table.insert(chunk, line)
-            end
-          end
-        end
-
-        local process = {}
-        for i = 1, batch_size do
-          process[i] = chunk[i]
-        end
-
-        if #chunk >= batch_size then
-          local new_chunk = {}
-          for i = batch_size + 1, #chunk do
-            table.insert(new_chunk, chunk[i])
-          end
-          chunk = new_chunk
-        else
-          chunk = {}
-        end
-
-        vim.schedule(function()
-          if #process > 0 or data ~= nil then
-            setList(listType, {
-              lines = not data and chunk or process,
-              efm = vim.o.errorformat,
-            }, action)
-            action = 'a'
-          end
-        end)
-      end,
-    })
-
-    if result.code ~= 0 then
-      vim.notify('Grep failed with exit code: ' .. result.code, vim.log.levels.ERROR)
-    end
-  end)
-end
-
-vim.api.nvim_create_user_command('Rg', function(opts)
-  grep('c', opts.fargs)
-end, { nargs = '+', complete = 'file_in_path' })
-
-vim.api.nvim_create_user_command('LRg', function(opts)
-  grep('l', opts.fargs)
-end, { nargs = '+', complete = 'file_in_path' })
-
-vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
-
---------------------------------------------------
 -- Treesitter highlighting
 --------------------------------------------------
 
@@ -363,7 +279,9 @@ vim.api.nvim_create_autocmd('CursorMoved', {
 ---@param i integer
 ---@param stop boolean
 local function hl_line(items, i, stop)
-  if stop and i == 100 then return end
+  if stop and i == 100 then
+    return
+  end
   local item = table.remove(items, 1)
   if not item then
     return
@@ -462,7 +380,7 @@ function _G.quickfixtextfunc(info)
   return ret
 end
 
-vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
+-- vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
 
 --------------------------------------------------
 -- Keymaps
@@ -669,39 +587,25 @@ function _G.qffoldtextfunc()
   end
 end
 
-vim.api.nvim_create_autocmd('BufWinEnter', {
-  group = qf_group,
-  pattern = 'quickfix',
-  callback = function(args)
-    -- NOTE: add an autcmd to autoclose preview window
-    -- NOTE: no se puede usar args.buf porque aparentemente la ventana se abre varias veces ?
-    vim.defer_fn(function()
-      if not qfbufnr then
-        return
-      end
-      local qfwinid = vim.fn.bufwinid(qfbufnr)
-      if not vim.api.nvim_win_is_valid(qfwinid) then
-        return
-      end
-      vim.cmd('wincmd J')
-      vim.api.nvim_win_set_height(0, getHeight())
-      vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
-      vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
-      vim.api.nvim_set_option_value('buflisted', false, { buf = args.buf, scope = 'local' })
-      vim.api.nvim_set_option_value('winfixheight', true, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('winfixbuf', true, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldmethod', 'expr', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldminlines', 0, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('signcolumn', 'no', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('statuscolumn', '', { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('number', true, { win = qfwinid, scope = 'local' })
-      vim.api.nvim_set_option_value('relativenumber', false, { win = qfwinid, scope = 'local' })
-    end, 10)
-  end,
-  desc = 'Qf options',
-})
+---@param buf integer
+---@param win integer
+local function setOptions(buf, win)
+  vim.cmd('wincmd J')
+  vim.api.nvim_win_set_height(win, getHeight())
+  vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
+  vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
+  vim.api.nvim_set_option_value('buflisted', false, { buf = buf, scope = 'local' })
+  vim.api.nvim_set_option_value('winfixheight', true, { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('winfixbuf', true, { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('foldmethod', 'expr', { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('foldminlines', 0, { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('signcolumn', 'no', { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('statuscolumn', '', { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('number', true, { win = win, scope = 'local' })
+  vim.api.nvim_set_option_value('relativenumber', false, { win = win, scope = 'local' })
+end
 
 --------------------------------------------------
 -- Keymaps inside Quickfix
@@ -845,7 +749,7 @@ local function selectItem(selectItemOpts)
     local prev_win = qflist.filewinid or get_prev_win(qflist.winid)
     if prev_win and prev_win > 0 and vim.fn.win_gettype(prev_win) == '' then
       local item = qflist.items[qfitempos[2]]
-      local split = vim.api.nvim_open_win(item.bufnr, false, { win = prev_win, vertical = opts.split == 'v' })
+      vim.api.nvim_open_win(item.bufnr, false, { win = prev_win, vertical = opts.split == 'v' })
       vim.cmd('.' .. qftype .. qftype)
       if opts.keep_cursor then
         vim.api.nvim_set_current_win(qflist.winid)
@@ -991,81 +895,60 @@ local function moveAdyacentFile(direction)
   vim.api.nvim_win_set_cursor(0, { extmarks[extmarkPos][2] + 1, 0 })
 end
 
-vim.api.nvim_create_autocmd('BufWinEnter', {
-  group = qf_group,
-  pattern = 'quickfix',
-  callback = function()
-    vim.keymap.set('n', 'q', closeList, { buffer = 0, desc = 'Close QF list' })
-    vim.keymap.set('n', '<CR>', selectItem, { buffer = 0, desc = 'Open QF item' })
-    vim.keymap.set('n', '<C-s>', function()
-      selectItem({ split = 'h' })
-    end, { buffer = 0, desc = 'Open QF Item in Horizontal [S]plit' })
-    vim.keymap.set('n', '<C-v>', function()
-      selectItem({ split = 'v' })
-    end, { buffer = 0, desc = 'Open QF Item in [V]ertical Split' })
-    vim.keymap.set('n', 'o', function()
-      selectItem({ close = true })
-    end, { buffer = 0, desc = 'Open and Close QF' })
-    vim.keymap.set('n', 'O', function()
-      selectItem({ keep_cursor = true })
-    end, { buffer = 0, desc = 'Open and Stay in QF' })
-    vim.keymap.set('n', '<C-n>', function()
-      moveWithPreview(1)
-    end, { buffer = 0, desc = 'Move and Preview Next QF Item' })
-    vim.keymap.set('n', '<C-p>', function()
-      moveWithPreview(-1)
-    end, { buffer = 0, desc = 'Move and Preview Previous QF Item' })
-    vim.keymap.set('n', ']]', function()
-      moveAdyacentFile('next')
-    end, { buffer = 0, desc = 'Move to QF Item in Next File' })
-    vim.keymap.set('n', '[[', function()
-      moveAdyacentFile('prev')
-    end, { buffer = 0, desc = 'Move to QF Item in Previous File' })
-    vim.keymap.set('n', '<C-o>', function()
-      listHistory('older')
-    end, { buffer = 0, desc = 'Open Older List' })
-    vim.keymap.set('n', '<C-i>', function()
-      listHistory('newer')
-    end, { buffer = 0, desc = 'Open Newer List' })
-    vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
-    vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
-    vim.keymap.set('n', 'D', function()
-      delete(true)
-    end, { buffer = 0, desc = 'Delete QF Items in Same Buffer' })
-    vim.keymap.set('x', 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
-    vim.keymap.set('n', 'yf', function()
-      yank('file')
-    end, { buffer = 0, desc = 'Yank Item File' })
-    vim.keymap.set('n', 'ym', function()
-      yank('message')
-    end, { buffer = 0, desc = 'Yank Item Message' })
-    vim.keymap.set('n', 'gd', openAsDiff, { buffer = 0, desc = '[G]it [D]iff' })
-    vim.keymap.set('n', 'r', refresh, { buffer = 0, desc = '[R]eload List' })
-    vim.keymap.set('n', 'g/', searchFile, { buffer = 0, desc = 'Search File Names' })
-    vim.keymap.set('n', 'gn', repeatSearchFileName, { buffer = 0, desc = 'Search File Names Again' })
-  end,
-  desc = 'Keymaps inside quickfix window',
-})
+local function setKeymaps()
+  vim.keymap.set('n', 'q', closeList, { buffer = 0, desc = 'Close QF list' })
+  vim.keymap.set('n', '<CR>', selectItem, { buffer = 0, desc = 'Open QF item' })
+  vim.keymap.set('n', '<C-s>', function()
+    selectItem({ split = 'h' })
+  end, { buffer = 0, desc = 'Open QF Item in Horizontal [S]plit' })
+  vim.keymap.set('n', '<C-v>', function()
+    selectItem({ split = 'v' })
+  end, { buffer = 0, desc = 'Open QF Item in [V]ertical Split' })
+  vim.keymap.set('n', 'o', function()
+    selectItem({ close = true })
+  end, { buffer = 0, desc = 'Open and Close QF' })
+  vim.keymap.set('n', 'O', function()
+    selectItem({ keep_cursor = true })
+  end, { buffer = 0, desc = 'Open and Stay in QF' })
+  vim.keymap.set('n', '<C-n>', function()
+    moveWithPreview(1)
+  end, { buffer = 0, desc = 'Move and Preview Next QF Item' })
+  vim.keymap.set('n', '<C-p>', function()
+    moveWithPreview(-1)
+  end, { buffer = 0, desc = 'Move and Preview Previous QF Item' })
+  vim.keymap.set('n', ']]', function()
+    moveAdyacentFile('next')
+  end, { buffer = 0, desc = 'Move to QF Item in Next File' })
+  vim.keymap.set('n', '[[', function()
+    moveAdyacentFile('prev')
+  end, { buffer = 0, desc = 'Move to QF Item in Previous File' })
+  vim.keymap.set('n', '<C-o>', function()
+    listHistory('older')
+  end, { buffer = 0, desc = 'Open Older List' })
+  vim.keymap.set('n', '<C-i>', function()
+    listHistory('newer')
+  end, { buffer = 0, desc = 'Open Newer List' })
+  vim.keymap.set('n', 'p', openPreview, { buffer = 0, desc = 'Open and Close QF' })
+  vim.keymap.set('n', 'dd', delete, { buffer = 0, desc = 'Delete QF Item' })
+  vim.keymap.set('n', 'D', function()
+    delete(true)
+  end, { buffer = 0, desc = 'Delete QF Items in Same Buffer' })
+  vim.keymap.set('x', 'd', delete, { buffer = 0, desc = 'Delete QF Item' })
+  vim.keymap.set('n', 'yf', function()
+    yank('file')
+  end, { buffer = 0, desc = 'Yank Item File' })
+  vim.keymap.set('n', 'ym', function()
+    yank('message')
+  end, { buffer = 0, desc = 'Yank Item Message' })
+  vim.keymap.set('n', 'gd', openAsDiff, { buffer = 0, desc = '[G]it [D]iff' })
+  vim.keymap.set('n', 'r', refresh, { buffer = 0, desc = '[R]eload List' })
+  vim.keymap.set('n', 'g/', searchFile, { buffer = 0, desc = 'Search File Names' })
+  vim.keymap.set('n', 'gn', repeatSearchFileName, { buffer = 0, desc = 'Search File Names Again' })
+end
 
 --------------------------------------------------
 -- Extras
 --------------------------------------------------
-
-vim.api.nvim_create_autocmd('QuickFixCmdPost', {
-  group = qf_group,
-  callback = function(args)
-    vim.schedule(function()
-      local listType = vim.startswith(args.match, 'l') and 'l' or 'c'
-      local list = getList(listType)
-      if list.size == 0 then
-        vim.notify('No results found', vim.log.levels.WARN)
-      else
-        vim.cmd(listType .. 'open')
-      end
-    end)
-  end,
-  desc = 'Open List Windows automatically',
-})
 
 vim.api.nvim_create_autocmd('WinEnter', {
   group = qf_group,
@@ -1087,6 +970,105 @@ vim.api.nvim_create_autocmd('WinClosed', {
   end,
   desc = 'Close location list if parent window is closed',
 })
+
+--------------------------------------------------
+-- Better Grep
+--------------------------------------------------
+
+vim.opt.grepprg = 'rg --vimgrep --smart-case --hidden'
+vim.opt.grepformat = '%f:%l:%c:%m'
+
+---@param listType 'c' | 'l'
+---@param args table
+local function grep(listType, args)
+  local async = require('vim._async')
+
+  async.run(function()
+    local grepprg = vim.o.grepprg
+    local cmd = vim.split(grepprg, '%s+', { trimempty = true })
+
+    for _, arg in ipairs(args) do
+      if arg:match('^[\'"].*[\'"]$') then
+        arg = arg:sub(2, -2)
+      end
+      table.insert(cmd, arg)
+    end
+    table.insert(cmd, '--fixed-strings')
+
+    local batch_size = 500
+    local chunk = {}
+    local action = ' '
+    local opened = false
+
+    local result = async.await(3, vim.system, cmd, {
+      text = true,
+      stdout = function(err, data)
+        assert(not err)
+        if data then
+          local lines = vim.split(data, '\n', { trimempty = true })
+          if #lines > 0 then
+            for _, line in ipairs(lines) do
+              table.insert(chunk, line)
+            end
+          end
+        end
+
+        local process = {}
+        for i = 1, batch_size do
+          process[i] = chunk[i]
+        end
+
+        if #chunk >= batch_size then
+          local new_chunk = {}
+          for i = batch_size + 1, #chunk do
+            table.insert(new_chunk, chunk[i])
+          end
+          chunk = new_chunk
+        else
+          chunk = {}
+        end
+
+        vim.schedule(function()
+          if #process > 0 or data ~= nil then
+            setList(listType, {
+              lines = not data and chunk or process,
+              efm = vim.o.errorformat,
+              quickfixtextfunc = _G.quickfixtextfunc,
+            }, action)
+            action = 'a'
+
+            if not opened then
+              vim.schedule(function()
+                vim.cmd(listType .. 'open')
+                local buf = vim.api.nvim_get_current_buf()
+                local win = vim.api.nvim_get_current_win()
+                setOptions(buf, win)
+                setKeymaps()
+                opened = true
+              end)
+            end
+          else
+            vim.notify('No results found', vim.log.levels.WARN)
+          end
+        end)
+      end,
+    })
+
+    if result.code ~= 0 then
+      vim.notify('Grep failed with exit code: ' .. result.code, vim.log.levels.ERROR)
+    end
+  end)
+end
+
+vim.api.nvim_create_user_command('Rg', function(opts)
+  grep('c', opts.fargs)
+end, { nargs = '+', complete = 'file_in_path' })
+
+vim.api.nvim_create_user_command('LRg', function(opts)
+  grep('l', opts.fargs)
+end, { nargs = '+', complete = 'file_in_path' })
+
+vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
 
 --------------------------------------------------
 -- Features
