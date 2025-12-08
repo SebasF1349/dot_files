@@ -70,53 +70,6 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
   desc = 'Hide cursorline when leaving window',
 })
 
-vim.api.nvim_create_autocmd({ 'CmdlineChanged' }, {
-  pattern = '*',
-  callback = function()
-    vim.fn.wildtrigger()
-  end,
-  group = general,
-  desc = 'Autocompletion in cmdline',
-})
-
-local function set_path()
-  local dirs = vim.system({'fd', '.', '--type', 'd', '--hidden', '--absolute-path', '--exclude', '.git', '--exclude', 'node_modules', '--exclude', 'target', '--exclude', 'vendor'}):wait()
-  if not dirs.stdout then
-    return '.,,**'
-  else
-    return '.,,' .. dirs.stdout:gsub('\n', ','):gsub('%./', '')
-  end
-end
-
-local files_list
----@param cmdarg string
-function FindFunc(cmdarg, _)
-  if not files_list then
-    local cmd = { 'fd', '--type', 'file', '--relative-path', '--color', 'never', '--hidden', '.'}
-    local files = vim.system(cmd, { text = true }):wait()
-    if not files.stdout then
-      return {}
-    end
-    files_list = vim.split(vim.trim(files.stdout), '\n')
-  end
-  return vim.fn.matchfuzzy(files_list, cmdarg)
-end
-
-vim.api.nvim_create_autocmd({ 'VimEnter' }, {
-  callback = function()
-    vim.o.path = set_path()
-    vim.o.findfunc = 'v:lua.FindFunc'
-  end,
-  group = general,
-})
-
-vim.api.nvim_create_autocmd({ 'CmdlineLeave' }, {
-  callback = function()
-    files_list = nil
-  end,
-  group = general,
-})
-
 local function open_external_file()
   local prev_buf = vim.fn.bufnr('%')
   local fn = vim.fn.expand('%:p')

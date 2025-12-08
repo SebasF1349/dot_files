@@ -45,14 +45,6 @@ vim.keymap.set({ 'n', 'x' }, '<leader>x', function()
   if is_visual then vim.api.nvim_feedkeys(esc, 'n', false) end -- \27 is ESC
 end, { desc = "Cleaning" })
 
--- better cmdline history
-vim.keymap.set('c', '<C-n>', function()
-  return vim.fn.wildmenumode() == 1 and '<C-n>' or '<down>'
-end, { desc = 'Move Through Cmdline History', expr = true })
-vim.keymap.set('c', '<C-p>', function()
-  return vim.fn.wildmenumode() == 1 and '<C-p>' or '<up>'
-end, { desc = 'Move Through Cmdline History', expr = true })
-
 vim.keymap.set('i', '<C-l>', function()
   local curr_node = vim.treesitter.get_node({ ignore_injections = false })
   if not curr_node then
@@ -75,98 +67,6 @@ vim.keymap.set('n', '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Searc
 vim.keymap.set('x', '?', 'ms<Esc>?\\%V', { desc = 'Search on Selection with Backward Search and add s Mark' })
 
 vim.keymap.set('o', '*', '"<esc>*g``".v:operator."gn"', { desc = 'Repeteable word text-object edit', expr = true })
-
-local function add_magic(cmd_line, cmd_pos)
-  local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
-  if not ok then
-    return '/'
-  end
-  local next_cmd_pos = cmd_line:find('|')
-  if next_cmd_pos and cmd_pos > next_cmd_pos then
-    return add_magic(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
-  end
-  local cmds = { 'substitute', 'global', 'vglobal' }
-  if vim.list_contains(cmds, cmd_parsed.cmd) and #cmd_parsed.args == 0 then
-    return '/\\v'
-  end
-  return '/'
-end
-
-vim.keymap.set('c', '/', function()
-  if vim.fn.getcmdtype() ~= ':' then
-    return '/'
-  end
-  local cmd_line = vim.fn.getcmdline()
-  local cmd_pos = vim.fn.getcmdpos()
-  return add_magic(cmd_line, cmd_pos)
-end, { desc = 'Add Very Magic to Cmdline Patterns', expr = true })
-
-local function get_fuzzy(cmd_line)
-  local closed_fuzzy_block
-  local very_nomagic_pos = cmd_line:find('\\V')
-  local very_magic_pos = cmd_line:find('\\v')
-  local is_magic = very_nomagic_pos or very_magic_pos
-  if is_magic and is_magic ~= 1 then -- is_magic == 1 means I'm searching with / or ?
-    local divider = cmd_line:sub(is_magic - 1, is_magic - 1)
-    closed_fuzzy_block = cmd_line:find(divider, is_magic)
-  end
-  if closed_fuzzy_block or not is_magic then
-    return '<c-]><space>'
-  elseif very_nomagic_pos then
-    return '\\.\\{-}'
-  elseif very_magic_pos then
-    return '.{-}'
-  end
-end
-
-local function fuzzy_find(cmd_line, cmd_pos)
-  local ok, cmd_parsed = pcall(vim.api.nvim_parse_cmd, cmd_line, {})
-  if not ok then
-    return '<c-]><space>'
-  end
-  local next_cmd_pos = cmd_line:find('|')
-  if #cmd_parsed.args == 0 and (cmd_parsed.nextcmd == '' or cmd_pos <= next_cmd_pos) then
-    return '<c-]><space>'
-  end
-  if next_cmd_pos and cmd_pos > next_cmd_pos then
-    return fuzzy_find(cmd_line:sub(next_cmd_pos + 1), cmd_pos - next_cmd_pos)
-  end
-  local edit_cmds = { 'edit', 'split', 'vsplit' }
-  if vim.list_contains(edit_cmds, cmd_parsed.cmd) then
-    return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
-  elseif cmd_parsed.cmd == 'help' then
-    return '*'
-  else
-    return get_fuzzy(cmd_line)
-  end
-end
-
-vim.keymap.set('c', '<space>', function()
-  local mode = vim.fn.getcmdtype()
-  local cmd_line = vim.fn.getcmdline()
-  if mode == '?' or mode == '/' then
-    return get_fuzzy(cmd_line)
-  elseif mode == ':' then
-    local cmd_pos = vim.fn.getcmdpos()
-    return fuzzy_find(cmd_line, cmd_pos)
-  else
-    return '<c-]><space>'
-  end
-end, { desc = 'Use <space> to "Fuzzy Find"', expr = true })
-
-vim.keymap.set('c', '<C-space>', '<space>', { desc = 'Easier Space' })
-
-vim.keymap.set('c', '*', function()
-  local cmd_line = vim.fn.getcmdline()
-  local cmd_pos = vim.fn.getcmdpos()
-  return (cmd_line:sub(cmd_pos - 2, cmd_pos - 1) == '**') and '/*' or '*'
-end, { desc = 'Expand *** to **/*', expr = true })
-
-vim.keymap.set('c', '%', function()
-  local cmd_line = vim.fn.getcmdline()
-  local cmd_pos = vim.fn.getcmdpos()
-  return cmd_line:sub(cmd_pos - 1, cmd_pos - 1) == '%' and ('<C-h>' .. vim.fn.expand('%:p:h') .. '/') or '%'
-end, { desc = 'Expand %% to File Directory', expr = true })
 
 --------------------------------------------------
 -- Window Management
@@ -435,17 +335,3 @@ vim.keymap.set('n', "g'", function()
 end, { desc = 'Add tilde to letters', expr = true })
 
 vim.keymap.set('n', '<A-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' });
-
---------------------------------------------------
--- Abbreviations
---------------------------------------------------
-
-local cmds_typos = { 'W', 'Wa', 'WA', 'X', 'Xa', 'XA', 'H', 'Mes', 'Mess' }
-for _, cmd in ipairs(cmds_typos) do
-  vim.keymap.set('ca', cmd, cmd:lower())
-end
-
-local custom_cmds_typos = { 'RG', 'LA', 'MAson' }
-for _, cmd in ipairs(custom_cmds_typos) do
-  vim.keymap.set('ca', cmd, cmd:sub(1, 1):upper() .. cmd:sub(2):lower())
-end

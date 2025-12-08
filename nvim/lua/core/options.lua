@@ -18,11 +18,6 @@ vim.o.signcolumn = 'yes'
 vim.o.numberwidth = 3
 vim.o.statuscolumn = '%=%{% v:virtnum > 0 ? "" : v:lnum %}%=%s'
 
-require('vim._extui').enable({})
-vim.o.showmode = false
-vim.o.showcmd = false
-vim.o.shortmess = 'aoOstTWIcCF'
-
 vim.o.mouse = ''
 vim.keymap.set('', '<up>', '<nop>', { noremap = true })
 vim.keymap.set('', '<down>', '<nop>', { noremap = true })
@@ -55,21 +50,12 @@ vim.o.helpheight = 0
 
 vim.o.winborder = 'solid'
 
-vim.cmd('packadd nohlsearch')
-vim.o.incsearch = true
-vim.o.inccommand = 'split'
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
 vim.o.splitright = true
 vim.o.splitbelow = true
 
 vim.o.diffopt = 'internal,filler,closeoff,indent-heuristic,inline:char,linematch:60,algorithm:histogram'
 
 vim.o.pumheight = 10
-
-vim.o.wildoptions = 'pum,tagfile,fuzzy'
-vim.o.wildmode = 'noselect:lastused,full'
 
 -- https://new.reddit.com/r/neovim/comments/1fzn1zt/custom_fold_text_function_with_treesitter_syntax/
 local function fold_virt_text(result, lnum, trim)
