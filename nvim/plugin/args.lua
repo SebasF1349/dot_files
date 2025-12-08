@@ -124,44 +124,8 @@ map('n', 'gao', only, { desc = '[A]rg [O]nly' })
 map('n', 'gac', '<cmd>%argdelete<CR>', { desc = '[A]arglist [C]lean', silent = true })
 
 --------------------------------------------------
--- Opening Buffers
+-- Update Arglist
 --------------------------------------------------
-
-local edit_buffer = {
-  w = { cmd = ':edit ', desc = '[W]indow' },
-  s = { cmd = ':split ', desc = '[S]plit' },
-  v = { cmd = ':vsplit ', desc = '[V]ertical split' },
-}
-
-for key, opts in pairs(edit_buffer) do
-  map('n', '<leader>' .. key:upper(), function()
-    return opts.cmd .. fn.expand('%:p:h') .. '/'
-  end, { desc = 'Edit Buffer in Current Directory in ' .. opts.desc, expr = true })
-  map('n', '<leader>a' .. key, function()
-    local current_path = fn.expand('%:p')
-    local alternative_path
-    if vim.o.filetype == 'java' then
-      if current_path:find('test') then
-        alternative_path = current_path:gsub('/test/', '/main/'):gsub('Test', '')
-      else
-        alternative_path = current_path:gsub('/main/', '/test/'):gsub('%.java', 'Test.java')
-      end
-    else
-      return
-    end
-    return opts.cmd .. alternative_path
-  end, { desc = 'Edit [A]lternative File in ' .. opts.desc, expr = true })
-end
-
-local find_buffer = {
-  w = { cmd = ':find ', desc = '[W]indow' },
-  s = { cmd = ':sfind ', desc = '[S]plit' },
-  v = { cmd = ':vsplit | find ', desc = '[V]ertical split' },
-}
-
-for key, opts in pairs(find_buffer) do
-  map('n', '<leader>' .. key, opts.cmd, { desc = 'Edit Buffer in ' .. opts.desc })
-end
 
 local args_augroup = api.nvim_create_augroup('Arglist', { clear = true })
 api.nvim_create_autocmd({ 'BufEnter' }, {
