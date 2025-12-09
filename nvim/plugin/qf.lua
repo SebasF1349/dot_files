@@ -533,7 +533,7 @@ local function openAsDiff()
       vim.api.nvim_win_close(win, true)
     end
   end
-  vim.cmd('. cc | Gvdiffsplit')
+  vim.cmd('pclose | . cc | Gvdiffsplit')
 end
 
 ---@param winnr integer
