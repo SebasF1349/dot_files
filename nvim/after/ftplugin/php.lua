@@ -235,6 +235,7 @@ local function get_returns()
         if arg_node then
           for _, argn in str_query:iter_captures(arg_node, bufnr) do
             text = vim.treesitter.get_node_text(argn, bufnr)
+            break
           end
           if text == '' then
             text = vim.treesitter.get_node_text(arg_node, bufnr)
@@ -333,7 +334,7 @@ vim.keymap.set('n', 'gf', function()
     local cfile = vim.fn.expand('<cfile>')
     local controller, file = cfile:match('([^/\\]+)[/\\]([^/\\]+)')
     if not controller then
-      controller, file = fileObj:getController(), cfile
+      controller, file = fileObj:getController(), cfile:gsub("[^%w]", "")
     end
     target = fileObj:getControllerPath(controller)
     action = 'action' .. kebab_to_pascal(file)
