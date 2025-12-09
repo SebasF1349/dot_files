@@ -1065,14 +1065,12 @@ end, { desc = '[A]dd cursor position to [L]ocation List' })
 -- NOTE: implement something similar to compare branches: https://gist.github.com/jmacadie/6f934282870f0d481599c8339ef61f64
 -- and/or other commits: https://github.com/jecaro/fugitive-difftool.nvim
 vim.keymap.set('n', '<leader>qg', function()
-  vim.cmd('tabedit | Git difftool --name-status')
+  vim.cmd('tabedit | Git difftool --name-status | wincmd p')
   -- vim.cmd('tabedit | Git difftool --numstat --raw')
   -- would be cool to have status and numstat in the same command, but looks like it's not possible
   -- git diff --numstat --summary is difficult to parse (renaming is a mess)
-  vim.schedule(function()
-    setOptions()
-    setKeymaps()
-  end)
+  setOptions()
+  setKeymaps()
 end, { desc = 'Open [Q]uickfix With [G]it Diff' })
 
 --------------------------------------------------
