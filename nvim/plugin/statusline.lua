@@ -231,8 +231,8 @@ local function update_git()
       local branch = output:match('# branch%.head%s+([%w%-%._%(%)]+)')
       local modified = (output:find('\n[^#\n]%S') ~= nil or output:match('^[^#\n]%S')) and '~' or ''
       local ahead, behind = output:match('# branch%.ab%s+%+([0-9]+)%s+%-([0-9]+)')
-      ahead = ahead ~= '0' and '' or ''
-      behind = behind ~= '0' and '' or ''
+      ahead = ahead and ahead ~= '0' and '' or ''
+      behind = behind and behind ~= '0' and '' or ''
 
       if ahead == '' and behind == '' and modified == '' then
         gstatus = string.format('%%#SLBranch#%s', branch)
