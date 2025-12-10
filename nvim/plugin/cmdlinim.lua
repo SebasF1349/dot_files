@@ -68,13 +68,8 @@ function FindFunc(cmdarg, _)
   return fn.matchfuzzy(files_list, cmdarg)
 end
 
-api.nvim_create_autocmd({ 'VimEnter' }, {
-  callback = function()
-    opt.path = set_path()
-    opt.findfunc = 'v:lua.FindFunc'
-  end,
-  group = cmdline_autocmds,
-})
+opt.path = set_path()
+opt.findfunc = 'v:lua.FindFunc'
 
 api.nvim_create_autocmd({ 'CmdlineLeave' }, {
   callback = function()
