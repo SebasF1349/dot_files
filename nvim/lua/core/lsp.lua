@@ -162,10 +162,10 @@ local function on_attach(client_id, buf)
   end, { desc = 'Trigger And Select Next Completion' })
 
   vim.keymap.set('n', ']e', function()
-    vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
+    vim.diagnostic.jump({ count = vim.v.count, severity = vim.diagnostic.severity.ERROR })
   end, { desc = 'LSP: Go to next [E]rror message', buffer = buf })
   vim.keymap.set('n', '[e', function()
-    vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
+    vim.diagnostic.jump({ count = -vim.v.count, severity = vim.diagnostic.severity.ERROR })
   end, { desc = 'LSP: Go to prev [E]rror message', buffer = buf })
 
   local function jump_to_reference(direction)
