@@ -818,13 +818,25 @@ local function grep(listType, args)
     local grepprg = vim.o.grepprg
     local cmd = vim.split(grepprg, '%s+', { trimempty = true })
 
+    local search_arg = {}
     for _, arg in ipairs(args) do
-      if arg:match('^[\'"].*[\'"]$') then
-        arg = arg:sub(2, -2)
+      if #search_arg == 0 then
+        if arg:match('^[\'"].*[^\\][\'"]$') then
+          table.insert(cmd, arg:sub(2, -2))
+        elseif arg:match('^[\'"]') then
+          table.insert(search_arg, arg:sub(2))
+        else
+          table.insert(cmd, arg)
+        end
+      elseif arg:match('[^\\][\'"]$') then
+        table.insert(search_arg, arg:sub(1, -2))
+        local str_arg = table.concat(search_arg, ' ')
+        table.insert(cmd, str_arg)
+        search_arg = {}
+      else
+        table.insert(search_arg, arg)
       end
-      table.insert(cmd, arg)
     end
-    table.insert(cmd, '--fixed-strings')
 
     local batch_size = 500
     local chunk = {}
@@ -869,14 +881,17 @@ local function grep(listType, args)
 
             if not opened then
               vim.schedule(function()
-                vim.cmd(listType .. 'open')
-                setOptions()
-                setKeymaps()
-                opened = true
+                local list = getList(listType)
+                if list.size == 0 then
+                  vim.notify('No results found', vim.log.levels.WARN)
+                else
+                  vim.cmd(listType .. 'open')
+                  setOptions()
+                  setKeymaps()
+                  opened = true
+                end
               end)
             end
-          else
-            vim.notify('No results found', vim.log.levels.WARN)
           end
         end)
       end,
@@ -996,6 +1011,8 @@ local function list_toggle(listType, diagnostics, severity, scope)
     vim.notify('List is Empty', vim.log.levels.INFO)
   else
     vim.cmd(listType .. 'open')
+    local win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_height(win, getHeight())
   end
 end
 
