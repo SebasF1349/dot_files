@@ -101,7 +101,7 @@ local function file()
   do
     table.insert(buffers, fs.normalize(fn.fnamemodify(arg, ':.')))
   end
-  for _, win in ipairs(api.nvim_list_wins()) do
+  for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
     if api.nvim_win_get_config(win).relative == '' then
       local bufnr = api.nvim_win_get_buf(win)
       local bufname = api.nvim_buf_get_name(bufnr)
