@@ -25,25 +25,27 @@ vim.keymap.set('x', 'A', function()
   return vim.api.nvim_get_mode().mode == 'V' and '$<C-v>A' or 'A'
 end, { desc = 'Append on multiple lines', expr = true })
 
-vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
-
-vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
-
 vim.keymap.set('n', 'dd', function()
   return vim.fn.getline('.') == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
 
+vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
+vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
 vim.keymap.set('n', 'yc', '"yy".v:count1."gcc\']p"', { desc = 'Make a Copy Commentted out', remap = true, expr = true })
 vim.keymap.set('x', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', remap = true })
+vim.keymap.set('n', '[p', '<cmd>exe "put! " . v:register<CR>', { desc = 'Paste Linewise Above' })
+vim.keymap.set('n', ']p', '<cmd>exe "put "  . v:register<CR>', { desc = 'Paste Linewise Below' })
 
 vim.keymap.set({ 'n', 'x' }, '<leader>x', function()
   local esc = vim.keycode('<esc>')
   vim.api.nvim_feedkeys(esc, 'n', false)
   local is_visual = vim.fn.mode():match('[vV\22]')
-  local range = is_visual and "'<,'>" or "%"
+  local range = is_visual and "'<,'>" or '%'
   vim.cmd(string.format('%ss/\\r//ge | %ss/\\s\\+$//ge | %ss/\\n\\n\\n\\+/\\r\\r/ge', range, range, range))
-  if is_visual then vim.api.nvim_feedkeys(esc, 'n', false) end -- \27 is ESC
-end, { desc = "Cleaning" })
+  if is_visual then
+    vim.api.nvim_feedkeys(esc, 'n', false)
+  end -- \27 is ESC
+end, { desc = 'Cleaning' })
 
 vim.keymap.set('i', '<C-l>', function()
   local curr_node = vim.treesitter.get_node({ ignore_injections = false })
@@ -232,7 +234,9 @@ local function open_notes(params)
         :gsub(vim.env.HOME, '')
         :gsub('^%w:', '') -- remove disk name in windows
         :gsub('/', '__') -- it can be any separator because windows is a mess
-        :gsub('\\', '__') .. '.' .. ext
+        :gsub('\\', '__')
+        .. '.'
+        .. ext
     end
     local note_file_path = vim.fs.normalize(oss.joinpath(projects_notes_directory, project_file_name))
     if vim.tbl_isempty(vim.fs.find(project_file_name, { type = 'file', path = projects_notes_directory })) then
@@ -320,8 +324,20 @@ vim.keymap.set('n', '[s', function()
   spell_select(-1)
 end, { desc = 'Shows previous spelling suggestions' })
 
-local replace_chars =
-  { a = 'á', e = 'é', i = 'í', o = 'ó', u = 'ú', A = 'Á', E = 'É', I = 'Í', O = 'Ó', U = 'Ú', n = 'ñ', N = 'Ñ' }
+local replace_chars = {
+  a = 'á',
+  e = 'é',
+  i = 'í',
+  o = 'ó',
+  u = 'ú',
+  A = 'Á',
+  E = 'É',
+  I = 'Í',
+  O = 'Ó',
+  U = 'Ú',
+  n = 'ñ',
+  N = 'Ñ',
+}
 vim.keymap.set('n', "g'", function()
   local line, col = vim.api.nvim_get_current_line(), vim.fn.col('.')
   local char = line:sub(col, col + vim.str_utf_end(line, col))
@@ -334,4 +350,4 @@ vim.keymap.set('n', "g'", function()
   end
 end, { desc = 'Add tilde to letters', expr = true })
 
-vim.keymap.set('n', '<A-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' });
+vim.keymap.set('n', '<A-;>', 'mzA;`z', { desc = 'Add [;] at the end of the line' })
