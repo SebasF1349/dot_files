@@ -138,6 +138,7 @@ require('conform').setup({
     sh = { 'shfmt' },
     rust = { 'rustfmt' },
     yaml = { 'yamlfmt' },
+    php = { 'php_cs_fixer' },
   },
   notify_on_error = false,
 })
@@ -391,6 +392,7 @@ vim.list_extend(ensure_installed, {
   -- work
   'phpstan',
   'php-debug-adapter',
+  'php-cs-fixer',
 })
 
 vim.api.nvim_create_user_command('MasonInstallNew', function()
