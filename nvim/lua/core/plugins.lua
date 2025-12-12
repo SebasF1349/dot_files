@@ -143,6 +143,10 @@ require('conform').setup({
   notify_on_error = false,
 })
 
+require('conform').formatters.prettier = {
+  append_args = { '--print-width', '120', '--tab-width', '4' },
+}
+
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
 vim.keymap.set({ 'n', 'x' }, '<leader>cf', function()
   require('conform').format({ bufnr = 0, async = true, lsp_format = 'never' })
