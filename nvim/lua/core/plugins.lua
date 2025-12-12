@@ -25,7 +25,9 @@ vim.pack.add({
   { src = 'https://github.com/mason-org/mason.nvim' },
 })
 
-vim.api.nvim_create_user_command('PUpdate', function() vim.pack.update() end, {})
+vim.api.nvim_create_user_command('PUpdate', function()
+  vim.pack.update()
+end, {})
 
 --------------------------------------------------
 -- Theme
@@ -90,7 +92,8 @@ if phpstanDir then
     'analyse',
     '--error-format=json',
     '--no-progress',
-    '-c', phpstanDir .. '/phpstan.neon',
+    '-c',
+    phpstanDir .. '/phpstan.neon',
     '--memory-limit=256M',
   }
 end
@@ -140,9 +143,11 @@ require('conform').setup({
 })
 
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
-vim.keymap.set('n', '<leader>cf', function() require('conform').format({ bufnr = 0, async = true, lsp_format = 'fallback' }) end, { desc = '[C]ode [F]ormat current file', })
-vim.keymap.set('x',  'gqp', 'mfgqap`f', { desc = 'Format Paragraph', })
-vim.keymap.set('x',  'gqg', 'mfgqag`f', { desc = 'Format File', remap = true })
+vim.keymap.set({ 'n', 'x' }, '<leader>cf', function()
+  require('conform').format({ bufnr = 0, async = true, lsp_format = 'never' })
+end, { desc = '[C]ode [F]ormat current file' })
+vim.keymap.set('x', 'gqp', 'mfgqap`f', { desc = 'Format Paragraph' })
+vim.keymap.set('x', 'gqg', 'mfgqag`f', { desc = 'Format File', remap = true })
 
 --------------------------------------------------
 -- Debug
@@ -156,7 +161,7 @@ local function debug_run()
   local dap = require('dap')
   local widgets = require('dap.ui.widgets')
   local dapview = require('dap-view')
-  require("nvim-dap-virtual-text").setup({})
+  require('nvim-dap-virtual-text').setup({})
 
   dap.listeners.before.attach['dap-view-config'] = function()
     dapview.open()
@@ -201,9 +206,9 @@ local function debug_run()
 
   dap.configurations.rust = {
     {
-      name = "Launch file",
-      type = "codelldb",
-      request = "launch",
+      name = 'Launch file',
+      type = 'codelldb',
+      request = 'launch',
       program = function()
         return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
       end,
@@ -242,9 +247,15 @@ local function debug_run()
   return dap
 end
 
-vim.keymap.set('n', '<leader>db', function() debug_run().toggle_breakpoint() end, { desc = '[D]ebug: Toggle [B]reakpoint' })
-vim.keymap.set('n', '<leader>dB', function() debug_run().set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, { desc = '[D]ebug: [B]reakpoint Condition' })
-vim.keymap.set('n', '<leader>dc', function() debug_run().continue() end, { desc = '[D]ebug: [C]ontinue' })
+vim.keymap.set('n', '<leader>db', function()
+  debug_run().toggle_breakpoint()
+end, { desc = '[D]ebug: Toggle [B]reakpoint' })
+vim.keymap.set('n', '<leader>dB', function()
+  debug_run().set_breakpoint(vim.fn.input('Breakpoint condition: '))
+end, { desc = '[D]ebug: [B]reakpoint Condition' })
+vim.keymap.set('n', '<leader>dc', function()
+  debug_run().continue()
+end, { desc = '[D]ebug: [C]ontinue' })
 
 --------------------------------------------------
 -- Git
@@ -253,7 +264,7 @@ vim.keymap.set('n', '<leader>dc', function() debug_run().continue() end, { desc 
 local function diffModeMap(key, cmd, desc)
   vim.keymap.set({ 'n', 'x' }, key, function()
     return not vim.wo.diff and 'normal! ' .. key
-    or (vim.api.nvim_get_mode().mode == 'n' and '?<<<<<<<<CR>V/>>>>>>><CR>' .. cmd or cmd)
+      or (vim.api.nvim_get_mode().mode == 'n' and '?<<<<<<<<CR>V/>>>>>>><CR>' .. cmd or cmd)
   end, { desc = desc, silent = true, expr = true })
 end
 diffModeMap('gh', ':diffget //2 <CR>', 'Git: get lhs of diff')
@@ -425,11 +436,11 @@ ai.setup({
     d = { '%f[%d%._][%d%._]+' }, -- digits with _ separator
     s = { -- subword (breaks sentence, but I never use it) https://github.com/echasnovski/mini.nvim/discussions/1434
       {
-        "%f[%a]%l+%d*",
-        "%f[%w]%d+",
-        "%f[%u]%u%f[%A]%d*",
-        "%f[%u]%u%l+%d*",
-        "%f[%u]%u%u+%d*",
+        '%f[%a]%l+%d*',
+        '%f[%w]%d+',
+        '%f[%u]%u%f[%A]%d*',
+        '%f[%u]%u%l+%d*',
+        '%f[%u]%u%u+%d*',
       },
     },
     u = ai.gen_spec.function_call(), -- u for "Usage"
@@ -465,10 +476,10 @@ ai.setup({
 
 local around_subword = function(reg)
   reg = vim.deepcopy(reg)
-  local SEP = "[_%-]+"
+  local SEP = '[_%-]+'
   local line = vim.fn.getline(reg.from.line)
-  local left = line:sub(1, reg.from.col - 1):find(SEP .. "$")
-  local _, right = line:find("^" .. SEP, reg.to.col + 1)
+  local left = line:sub(1, reg.from.col - 1):find(SEP .. '$')
+  local _, right = line:find('^' .. SEP, reg.to.col + 1)
   if left then
     reg.from.col = left
   elseif right then
@@ -476,12 +487,12 @@ local around_subword = function(reg)
   end
   return reg
 end
-vim.keymap.set({ "x", "o" }, "as", function()
-  local reg = MiniAi.find_textobject("i", "s")
+vim.keymap.set({ 'x', 'o' }, 'as', function()
+  local reg = MiniAi.find_textobject('i', 's')
   if reg then
     ---@diagnostic disable-next-line: inject-field
     MiniAi.config.custom_textobjects._Virt = around_subword(reg)
-    MiniAi.select_textobject("i", "_Virt")
+    MiniAi.select_textobject('i', '_Virt')
   end
 end)
 
@@ -493,22 +504,30 @@ local function refactoring_run()
   refactoring.setup({ show_success_message = true })
   return refactoring
 end
-vim.keymap.set({ 'n', 'x' }, '<leader>rr', function() refactoring_run().select_refactor({ prefer_ex_cmd = true }) end)
-vim.keymap.set('n', '<leader>rp', function() refactoring_run().debug.printf() end, { desc = '[R]efactoring: Debug [P]rint' })
-vim.keymap.set({ 'n', 'x' }, '<leader>rv', function() refactoring_run().debug.print_var() end)
-vim.keymap.set('n', '<leader>rc', function() refactoring_run().debug.cleanup() end, { desc = '[R]efactoring: [C]lear Debug' })
+vim.keymap.set({ 'n', 'x' }, '<leader>rr', function()
+  refactoring_run().select_refactor({ prefer_ex_cmd = true })
+end)
+vim.keymap.set('n', '<leader>rp', function()
+  refactoring_run().debug.printf()
+end, { desc = '[R]efactoring: Debug [P]rint' })
+vim.keymap.set({ 'n', 'x' }, '<leader>rv', function()
+  refactoring_run().debug.print_var()
+end)
+vim.keymap.set('n', '<leader>rc', function()
+  refactoring_run().debug.cleanup()
+end, { desc = '[R]efactoring: [C]lear Debug' })
 
 vim.api.nvim_create_autocmd('FileType', {
-    pattern = { 'svelte', 'html', 'markdown', 'php' },
-    callback = function()
-      require('nvim-ts-autotag').setup({
-        opts = {
-          enable_close_on_clash = true,
-          filetypes = { 'svelte', 'html', 'markdown', 'php' },
-        },
-      })
-    end,
-    once = true,
+  pattern = { 'svelte', 'html', 'markdown', 'php' },
+  callback = function()
+    require('nvim-ts-autotag').setup({
+      opts = {
+        enable_close_on_clash = true,
+        filetypes = { 'svelte', 'html', 'markdown', 'php' },
+      },
+    })
+  end,
+  once = true,
 })
 
 --------------------------------------------------
@@ -562,8 +581,12 @@ local function oil_run()
   return oil
 end
 
-vim.keymap.set('n', '-', function() oil_run().open() end, { desc = 'Open parent directory' })
-vim.keymap.set('n', '_', function() oil_run().open(vim.uv.cwd()) end, { desc = 'Open cwd' })
+vim.keymap.set('n', '-', function()
+  oil_run().open()
+end, { desc = 'Open parent directory' })
+vim.keymap.set('n', '_', function()
+  oil_run().open(vim.uv.cwd())
+end, { desc = 'Open cwd' })
 vim.api.nvim_create_user_command('Oil', function(args)
   vim.api.nvim_del_user_command('Oil')
   oil_run().open(args.args)
@@ -662,5 +685,5 @@ vim.api.nvim_create_autocmd('PackChanged', {
         require('nvim-treesitter').update()
       end
     end
-  end
+  end,
 })
