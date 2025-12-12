@@ -271,7 +271,7 @@ diffModeMap('gh', ':diffget //2 <CR>', 'Git: get lhs of diff')
 diffModeMap('gl', ':diffget //3 <CR>', 'Git: get rhs of diff')
 
 vim.keymap.set('n', '<leader>gg', '<cmd>tab Git<CR>]]', { desc = 'Open fu[G]itive in a new tab', remap = true })
-vim.keymap.set('n', '<leader>gd', '<cmd>Gvdiffsplit<CR>', { desc = '[D]iff Current File' })
+vim.keymap.set('n', '<leader>gd', ':Gvdiffsplit ', { desc = '[D]iff Current File' })
 vim.keymap.set('n', '<leader>gb', '<cmd>Git blame<cr>', { desc = 'fu[G]itive [B]lame' })
 
 local log_cmd = 'tab Git log -50 --graph --decorate --pretty=pf'
