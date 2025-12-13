@@ -166,8 +166,8 @@ local function buf_get_ts_highlights(bufnr, lnum)
   if lang == '' then
     return {}
   end
-  local ok, parser = pcall(vim.treesitter.get_parser, bufnr, lang)
-  if not ok or not parser then
+  local parser = vim.treesitter.get_parser(bufnr, lang, { error = false })
+  if not parser then
     return {}
   end
 
@@ -309,20 +309,18 @@ local function hl_line(items, i, stop)
       -- Only add highlights if the text in the quickfix matches the source line
       if item.text == src_line:sub(src_space + 1) then
         local offset = text_space - src_space
-        local ok, hls = pcall(buf_get_ts_highlights, item.bufnr, item.lnum)
-        if ok then
-          for _, hl in ipairs(hls) do
-            local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
-            if end_col == -1 then
-              end_col = src_line:len()
-            end
-            vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
+        local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
+        for _, hl in ipairs(hls) do
+          local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
+          if end_col == -1 then
+            end_col = src_line:len()
           end
-          vim.defer_fn(function()
-            hl_line(items, i + 1, stop)
-          end, 10)
-          return
+          vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
         end
+        vim.defer_fn(function()
+          hl_line(items, i + 1, stop)
+        end, 10)
+        return
       end
     end
   end
