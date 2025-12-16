@@ -1,4 +1,4 @@
-local api, normalize, fn, cmd, map, uiSelect = vim.api, vim.fs.normalize, vim.fn, vim.cmd, vim.keymap.set, vim.ui.select
+local api, normalize, fn, cmd, map, ui = vim.api, vim.fs.normalize, vim.fn, vim.cmd, vim.keymap.set, vim.ui
 
 --------------------------------------------------
 -- Utils
@@ -42,7 +42,7 @@ local function select()
   if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  uiSelect(getArgs(), {
+  ui.select(getArgs(), {
     prompt = 'Select buffer:',
     format_item = function(item)
       return item == fn.argv(fn.argidx()) and '[' .. item .. ']' or item
@@ -94,7 +94,7 @@ local function remove_select()
   if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  uiSelect(getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
+  ui.select(getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
     if selected then
       remove(selected)
     end
