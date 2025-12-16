@@ -316,14 +316,14 @@ require('gitsigns').setup({
   on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
 
-    vim.keymap.set('n', ']h', function()
+    vim.keymap.set({ 'n', 'x' }, ']h', function()
       if vim.wo.diff then
         vim.cmd.normal({ ']c', bang = true })
       else
         gitsigns.nav_hunk('next')
       end
     end, { desc = 'Jump to next Hunk', buffer = bufnr })
-    vim.keymap.set('n', '[h', function()
+    vim.keymap.set({ 'n', 'x' }, '[h', function()
       if vim.wo.diff then
         vim.cmd.normal({ '[c', bang = true })
       else
