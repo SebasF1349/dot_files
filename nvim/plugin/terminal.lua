@@ -64,6 +64,7 @@ local function set_term_opts(opts)
   vim.wo.statuscolumn = ''
   vim.wo.winfixheight = true
   vim.wo.winfixwidth = true
+  vim.wo.winfixbuf = true
   map('n', 'q', '<cmd>bd!<cr>', { buffer = opts.bufnr })
   api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
 end
