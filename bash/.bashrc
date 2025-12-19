@@ -54,7 +54,7 @@ fi
 if [ -f /etc/os-release ]; then
     # freedesktop.org and systemd
     . /etc/os-release
-    DISTRO=$ID_LIKE
+    DISTRO=${ID_LIKE:-$ID}
 fi
 
 # enable color support of ls and also add handy aliases
