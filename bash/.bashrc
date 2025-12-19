@@ -352,6 +352,7 @@ mvg() {
 
 #Install scripts
 export PATH=$PATH:~/dot_files/install_scripts/
+export PATH=$PATH:~/scripts/
 export PATH=$PATH:/usr/local/go/bin
 
 if [ "$DISTRO" = "debian" ]; then
