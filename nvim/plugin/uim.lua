@@ -33,4 +33,3 @@ ui.open = (function(overridden)
     overridden(path, opt)
   end
 end)(ui.open)
-

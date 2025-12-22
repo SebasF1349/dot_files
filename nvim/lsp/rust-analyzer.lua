@@ -39,12 +39,6 @@ return {
       diagnostics = {
         enable = true,
       },
-      inlayHints = {
-        enable = true,
-        showParameterNames = true,
-        parameterHintsPrefix = '<- ',
-        otherHintsPrefix = '=> ',
-      },
       imports = {
         granularity = {
           group = 'module',

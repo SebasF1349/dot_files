@@ -91,7 +91,7 @@ end
 ---@param pair string[][]
 ---@return string[]
 local function add_pair(text, pair)
-  assert(#pair == 2, "There must be 2 pairs")
+  assert(#pair == 2, 'There must be 2 pairs')
   local left_pad, first_line = get_whitespace(text[1], 'left')
   local newText = {}
   for i = 1, #pair[1] do
@@ -154,9 +154,9 @@ end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 ---@param pairDelete string[][]
 ---@param pairAdd? string[][]
 local function operateSurround(pairDelete, pairAdd)
-  assert(#pairDelete == 2, "There must be 2 pairs to delete")
+  assert(#pairDelete == 2, 'There must be 2 pairs to delete')
   if pairAdd then
-    assert(#pairAdd == 2, "There must be 2 pairs to add")
+    assert(#pairAdd == 2, 'There must be 2 pairs to add')
   end
   local curr = api.nvim_win_get_cursor(0)
   local o = fn.search(pairDelete[1][1], 'bW')

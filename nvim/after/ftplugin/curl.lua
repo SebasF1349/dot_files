@@ -1,4 +1,4 @@
-vim.bo.commentstring = "# %s"
+vim.bo.commentstring = '# %s'
 
 vim.api.nvim_set_hl(0, '@curl.program', { link = '@function' })
 vim.api.nvim_set_hl(0, '@flag', { link = '@keyword' })
@@ -6,7 +6,7 @@ vim.api.nvim_set_hl(0, '@http.method', { link = '@operator' })
 vim.api.nvim_set_hl(0, '@url', { link = '@text' })
 vim.api.nvim_set_hl(0, '@string.value', { link = '@string' })
 
-vim.treesitter.language.register("bash", "curl")
+vim.treesitter.language.register('bash', 'curl')
 
 local function get_lines_between_blanks()
   local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
@@ -15,14 +15,18 @@ local function get_lines_between_blanks()
   local line_count = vim.api.nvim_buf_line_count(0)
   while bottom <= line_count do
     local text = vim.api.nvim_buf_get_lines(0, bottom - 1, bottom, false)[1]
-    if text == '' then break end
+    if text == '' then
+      break
+    end
     bottom = bottom + 1
   end
 
   local top = row
   while top > 1 do
     local text = vim.api.nvim_buf_get_lines(0, top - 2, top - 1, false)[1]
-    if vim.startswith(text, 'curl') then break end
+    if vim.startswith(text, 'curl') then
+      break
+    end
     top = top - 1
   end
 
@@ -32,7 +36,7 @@ end
 
 local function starts_with_bracket(line)
   local first_char = line:sub(1, 1)
-  return first_char == "[" or first_char == "{"
+  return first_char == '[' or first_char == '{'
 end
 
 vim.keymap.set('n', '<CR>', function()
@@ -45,7 +49,9 @@ vim.keymap.set('n', '<CR>', function()
   if is_json and vim.fn.executable('jq') then
     local timing = table.remove(output)
     local json_formatted = vim.system({ 'jq', '.' }, { text = true, stdin = output }):wait(10000).stdout
-    if json_formatted then output = vim.split(json_formatted, '\n') end
+    if json_formatted then
+      output = vim.split(json_formatted, '\n')
+    end
     table.insert(output, timing)
   end
 
@@ -71,7 +77,7 @@ vim.api.nvim_create_user_command('CurlCreate', function(opts)
   local arg = opts.args
 
   if request_opts[arg] == nil then
-    vim.notify("Invalid option: " .. arg, vim.log.levels.ERROR)
+    vim.notify('Invalid option: ' .. arg, vim.log.levels.ERROR)
     return
   end
 
@@ -83,7 +89,8 @@ end, {
     return vim.tbl_filter(function(key)
       return key:find(arg_lead, 1, true) == 1
     end, keys)
-  end, desc = "Create a template for a curl command"
+  end,
+  desc = 'Create a template for a curl command',
 })
 
 vim.keymap.set('n', '<leader>c', ':CurlCreate ', { silent = true, desc = '[C]reate Curl', buffer = 0 })

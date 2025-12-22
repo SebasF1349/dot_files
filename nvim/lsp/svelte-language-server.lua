@@ -3,7 +3,6 @@ return {
   filetypes = { 'svelte' },
   root_markers = { 'package.json', '.git' },
   on_attach = function(client, bufnr)
-
     vim.api.nvim_buf_create_user_command(0, 'MigrateToSvelte5', function()
       client:exec_cmd({
         title = 'Migrate to Svelte 5',

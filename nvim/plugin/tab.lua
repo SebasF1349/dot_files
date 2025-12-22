@@ -20,7 +20,9 @@ function _G._personal_tab_label(i)
   local buflist = fn.tabpagebuflist(i) ---@type integer[]
   local winnr = fn.tabpagewinnr(i)
   local buf = buflist[winnr]
-  if not buf then return end
+  if not buf then
+    return
+  end
   local name = api.nvim_buf_get_name(buf)
   local protocol = name:match('^(.*)://')
   if name == '' then

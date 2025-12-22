@@ -57,7 +57,7 @@ vim.o.diffopt = 'internal,filler,closeoff,indent-heuristic,inline:char,linematch
 
 vim.o.pumheight = 10
 
-vim.o.jumpoptions = "view,clean"
+vim.o.jumpoptions = 'view,clean'
 
 -- https://new.reddit.com/r/neovim/comments/1fzn1zt/custom_fold_text_function_with_treesitter_syntax/
 local function fold_virt_text(result, lnum, trim)

@@ -1,6 +1,5 @@
 vim.filetype.add({
   extension = {
-    curl = "curl",
+    curl = 'curl',
   },
 })
-

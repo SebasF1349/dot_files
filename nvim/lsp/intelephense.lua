@@ -19,7 +19,7 @@ return {
       end,
     },
   },
-  before_init = function (_, config)
+  before_init = function(_, config)
     config.settings.intelephense.environment = { phpVersion = getPhpVersion() }
   end,
   settings = {

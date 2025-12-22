@@ -57,7 +57,6 @@ local function close_mappings(bufnr, closing_keys, on_close)
   })
 end
 
-
 ---@param wins integer[]
 ---@param current_win integer
 ---@param on_end function
@@ -128,7 +127,6 @@ function M.input(opts, on_confirm)
   vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
 
   if opts.completion then
-
     ---@param findstart number
     ---@param base string
     function _G.uim_complete(findstart, base)
@@ -205,8 +203,10 @@ function M.select(items, opts, on_choice)
   local max_length = -1
   local selected = {}
 
-  local code_action_chars = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' }
-  local default_chars = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
+  local code_action_chars =
+    { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', }
+  local default_chars =
+    { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
   local possible_chars = opts.kind == 'codeaction' and code_action_chars or default_chars
   local keys_method = opts.kind == 'codeaction' and 'intelligent' or 'list'
 
@@ -335,13 +335,7 @@ function M.select(items, opts, on_choice)
       local item_whitespace = col_start - vim.fn.strchars(text[j] or '')
       local col = #(text[j] or '') + item_whitespace + 1
       table.insert(hl[j], { col, col + 1 + #choice.option })
-      text[j] = string.format(
-        '%s%s %s: %s ',
-        text[j] or '',
-        (' '):rep(item_whitespace),
-        choice.option,
-        choice.item
-      )
+      text[j] = string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choice.option, choice.item)
       if choice.option ~= '-' then
         -- TODO: maybe use vim.fn.getcharstr() instead of keymaps?
         vim.keymap.set('n', choice.option, function()
