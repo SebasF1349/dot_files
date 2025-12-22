@@ -20,9 +20,11 @@ return {
       end,
     },
   },
+  before_init = function (_, config)
+    config.settings.intelephense.environment = { phpVersion = getPhpVersion() }
+  end,
   settings = {
     intelephense = {
-      environment = { phpVersion = getPhpVersion() },
       telemetry = { enabled = false },
       format = { enable = false },
       completion = {
