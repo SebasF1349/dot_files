@@ -12,12 +12,6 @@ require("keys").setup(config)
 config.color_scheme = "Catppuccin Mocha"
 
 if utils.is_windows() then
-	local has_wsl, _, res = pcall(wezterm.run_child_process, { "wsl", "--version" })
-	local start = "WSL version"
-	if has_wsl and res:gsub("\0", ""):sub(1, #start) == start then
-		config.default_domain = "WSL:Ubuntu"
-	else
-	end
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
 	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland and my windows notebook?
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"

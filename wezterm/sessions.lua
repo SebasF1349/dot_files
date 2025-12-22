@@ -102,11 +102,9 @@ local function close_all_other_tabs(tab, mux_window)
 	for _, t in ipairs(mux_window:tabs()) do
 		if t:tab_id() ~= tab:tab_id() then
 			t:activate()
-			pcall(function()
-				mux_window
-					:gui_window()
-					:perform_action(wezterm.action.CloseCurrentTab({ confirm = false }), mux_window:active_pane())
-			end)
+			mux_window
+				:gui_window()
+				:perform_action(wezterm.action.CloseCurrentTab({ confirm = false }), mux_window:active_pane())
 		end
 	end
 end
@@ -261,7 +259,7 @@ function M.select_workspace(win, pane, replace)
 					update_previous_workspace(workspace_name)
 					_, _, w = wezterm.mux.spawn_window({
 						workspace = workspace_name,
-						cwd = "", -- FIX: without this a first not-in-state tab gets created ??
+						cwd = state and state.window_state.tabs[1].pane.cwd or wezterm.home_dir
 					})
 				end
 				if state_path == "ssh" then
@@ -269,12 +267,12 @@ function M.select_workspace(win, pane, replace)
 						domain = { DomainName = "local" },
 						cwd = wezterm.home_dir,
 					})
-					close_all_other_tabs(t, w)
 					wezterm.mux.set_active_workspace(workspace_name)
+					close_all_other_tabs(t, w)
 					ssh.select_ssh(w:gui_window(), p)
 				else
-					load_workspace(state, w)
 					wezterm.mux.set_active_workspace(workspace_name)
+					load_workspace(state, w)
 				end
 			end),
 		}),
