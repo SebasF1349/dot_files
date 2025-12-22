@@ -220,66 +220,66 @@ end
 ---@param pane Pane
 ---@param replace? boolean
 function M.select_workspace(win, pane, replace)
-    local workspaces = project_dirs()
-    if #wezterm.default_ssh_domains() > 0 then
-        table.insert(workspaces, { id = "ssh", label = "SSH" })
-    end
-    table.insert(workspaces, { id = "new", label = "Create New Workspace" })
+	local workspaces = project_dirs()
+	if #wezterm.default_ssh_domains() > 0 then
+		table.insert(workspaces, { id = "ssh", label = "SSH" })
+	end
+	table.insert(workspaces, { id = "new", label = "Create New Workspace" })
 
-    win:perform_action(
-        wezterm.action.InputSelector({
-            title = "Choose Workspace",
-            choices = workspaces,
-            fuzzy = true,
-            fuzzy_description = "Select workspace: ",
-            action = wezterm.action_callback(function(_, _, state_path, workspace_name)
-                if not workspace_name or not state_path then
-                    return
-                end
-                if state_path == "new" then
-                    new_workspace(win, pane, replace)
-                    return
-                end
-                for _, workspace in ipairs(wezterm.mux.get_workspace_names()) do
-                    if workspace == workspace_name then
-                        update_previous_workspace(workspace_name)
-                        wezterm.mux.set_active_workspace(workspace)
-                        return
-                    end
-                end
-                local state, w
-                if state_path ~= "ssh" then
-                    state = load_json(state_path)
-                    if not state then
-                        return
-                    end
-                end
-                if replace then
-                    wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), workspace_name)
-                    w = get_active_mux_window(workspace_name)
-                else
-                    update_previous_workspace(workspace_name)
-                    _, _, w = wezterm.mux.spawn_window({
-                        workspace = workspace_name,
-                        cwd = "", -- FIX: without this a first not-in-state tab gets created ??
-                    })
-                end
-                if state_path == 'ssh' then
-                    local t, p, _ = w:spawn_tab({
-                        domain = { DomainName = "local" },
-                        cwd = wezterm.home_dir,
-                    })
-                    close_all_other_tabs(t, w)
-                    wezterm.mux.set_active_workspace(workspace_name)
-                    ssh.select_ssh(w:gui_window(), p)
-                else
-                    load_workspace(state, w)
-                    wezterm.mux.set_active_workspace(workspace_name)
-                end
-            end),
-        }),
-        pane
-    )
+	win:perform_action(
+		wezterm.action.InputSelector({
+			title = "Choose Workspace",
+			choices = workspaces,
+			fuzzy = true,
+			fuzzy_description = "Select workspace: ",
+			action = wezterm.action_callback(function(_, _, state_path, workspace_name)
+				if not workspace_name or not state_path then
+					return
+				end
+				if state_path == "new" then
+					new_workspace(win, pane, replace)
+					return
+				end
+				for _, workspace in ipairs(wezterm.mux.get_workspace_names()) do
+					if workspace == workspace_name then
+						update_previous_workspace(workspace_name)
+						wezterm.mux.set_active_workspace(workspace)
+						return
+					end
+				end
+				local state, w
+				if state_path ~= "ssh" then
+					state = load_json(state_path)
+					if not state then
+						return
+					end
+				end
+				if replace then
+					wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), workspace_name)
+					w = get_active_mux_window(workspace_name)
+				else
+					update_previous_workspace(workspace_name)
+					_, _, w = wezterm.mux.spawn_window({
+						workspace = workspace_name,
+						cwd = "", -- FIX: without this a first not-in-state tab gets created ??
+					})
+				end
+				if state_path == "ssh" then
+					local t, p, _ = w:spawn_tab({
+						domain = { DomainName = "local" },
+						cwd = wezterm.home_dir,
+					})
+					close_all_other_tabs(t, w)
+					wezterm.mux.set_active_workspace(workspace_name)
+					ssh.select_ssh(w:gui_window(), p)
+				else
+					load_workspace(state, w)
+					wezterm.mux.set_active_workspace(workspace_name)
+				end
+			end),
+		}),
+		pane
+	)
 end
 
 --------------------------------------------------
