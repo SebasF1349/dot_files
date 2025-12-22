@@ -117,8 +117,8 @@ function M.setup(config)
 		},
 		{ mods = M.modTab, key = "q", action = act.CloseCurrentTab({ confirm = false }) },
 		{
-		    mods = M.modTab,
-		    key = "s",
+			mods = M.modTab,
+			key = "s",
 			action = wezterm.action_callback(function(win, pane)
 				ssh.select_ssh(win, pane)
 			end),
