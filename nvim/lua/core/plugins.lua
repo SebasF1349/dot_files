@@ -159,7 +159,7 @@ vim.keymap.set('x', 'gqg', 'mfgqag`f', { desc = 'Format File', remap = true })
 --------------------------------------------------
 
 local function debug_run()
-  if package.loaded['dap-view'] then
+  if package.loaded['dap'] then
     return require('dap')
   end
 
