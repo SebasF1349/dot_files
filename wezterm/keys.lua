@@ -44,6 +44,7 @@ function M.setup(config)
 			mods = M.modWorkspace,
 			key = "w",
 			action = wezterm.action_callback(function(win, pane)
+				wezterm.GLOBAL.previous_workspace = win:active_workspace()
 				sessions.select_workspace(win, pane)
 			end),
 		},
