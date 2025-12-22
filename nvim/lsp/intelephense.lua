@@ -1,11 +1,10 @@
 local function getPhpVersion()
   local defaultVersion = '7.0.33'
-  local root = vim.fs.root(0, 'htdocs')
+  local root = vim.fs.root(0, 'php_version')
   if not root then
     return defaultVersion
   end
-  local versionOutput = vim.system({ root .. '/php/php.exe', '--version' }, { text = true }):wait()
-  return versionOutput.code == 0 and versionOutput.stdout:match('PHP %d+.%d+.%d+') or defaultVersion
+  return require('utils.files').read(root .. '/php_version')
 end
 
 return {
