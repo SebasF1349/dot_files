@@ -14,7 +14,7 @@ vim.cmd('setlocal iskeyword-=-')
 
 vim.b.friendlyManual = 'http://php.net/manual-lookup.php?pattern=%s'
 
-vim.b.contextStatus = { method_declaration = 'name' , class_declaration = 'name', function_definition = 'name' }
+vim.b.contextStatus = { method_declaration = 'name', class_declaration = 'name', function_definition = 'name' }
 
 vim.b.surroundPair = {
   ['-'] = { { '<?php ' }, { ' ?>' } },
@@ -73,14 +73,14 @@ local function phpTextObject(type)
 
   ---@type [integer,integer]
   local _end = vim.fn.searchpos('?>', 'eWc')
-  if _end[1] == 0 and _end[2]  == 0 then
+  if _end[1] == 0 and _end[2] == 0 then
     vim.api.nvim_win_set_cursor(0, curr)
     return
   end
 
   ---@type [integer,integer,integer]
   local opening = vim.fn.searchpos('\\(<?php\\)\\|\\(<?=\\)', 'bcp')
-  if opening[1] == 0 and opening[2]  == 0 then
+  if opening[1] == 0 and opening[2] == 0 then
     vim.api.nvim_win_set_cursor(0, curr)
     return
   end
@@ -146,7 +146,9 @@ File.__index = File
 
 function File:new()
   local root = vim.fs.root(0, 'controllers')
-  if not root then return end
+  if not root then
+    return
+  end
   File.__base_dir = (root:gsub('[/\\]', separator) .. separator) or ''
 
   ---@type string
@@ -157,7 +159,7 @@ function File:new()
     File.__controller = PascalToKebab(controller)
   elseif fpath:find('views') then
     File.__type = 'view'
-    local controller = vim.fn.expand('%:p:h'):match("([^\\/]+)$")
+    local controller = vim.fn.expand('%:p:h'):match('([^\\/]+)$')
     File.__controller = kebab_to_pascal(controller)
   end
 
@@ -263,20 +265,28 @@ local function move(target, action, action2)
   end
 
   vim.cmd('edit ' .. target)
-  if not action then return end
+  if not action then
+    return
+  end
 
   action2 = action2 or ''
-  local action_query = string.format([[
+  local action_query = string.format(
+    [[
 (
 method_declaration
   (visibility_modifier)?
   name: (name) @method_name
     (#any-of? @method_name %s %s)
 )
-]], action, action2)
+]],
+    action,
+    action2
+  )
 
   local parser = vim.treesitter.get_parser(0, 'php')
-  if not parser then return end
+  if not parser then
+    return
+  end
   local tree = parser:parse()[1]
   local root = tree:root()
   local query = vim.treesitter.query.parse('php', action_query)
@@ -287,7 +297,7 @@ method_declaration
       local bufnr = vim.api.nvim_get_current_buf()
       local text = vim.treesitter.get_node_text(method_node, bufnr)
       if text == action or text == action2 then
-        vim.api.nvim_win_set_cursor(0, {start_row + 1, start_col})
+        vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
         return
       end
     end
@@ -309,12 +319,14 @@ vim.keymap.set('n', 'gf', function()
       return
     end
     vim.ui.select(returns, {
-        prompt = 'Returns: ',
-        format_item = function(item)
-            return ('%s -> %s'):format(item.method, item.args)
-        end,
+      prompt = 'Returns: ',
+      format_item = function(item)
+        return ('%s -> %s'):format(item.method, item.args)
+      end,
     }, function(choice)
-      if not choice then return end
+      if not choice then
+        return
+      end
       local controller, file = choice.args:match('^([^/\\]+)[/\\](.+)$')
       if not controller then
         controller, file = fileObj:getController(), choice.args
@@ -334,14 +346,13 @@ vim.keymap.set('n', 'gf', function()
     local cfile = vim.fn.expand('<cfile>')
     local controller, file = cfile:match('([^/\\]+)[/\\]([^/\\]+)')
     if not controller then
-      controller, file = fileObj:getController(), cfile:gsub("[^%w]", "")
+      controller, file = fileObj:getController(), cfile:gsub('[^%w]', '')
     end
     target = fileObj:getControllerPath(controller)
     action = 'action' .. kebab_to_pascal(file)
     action2 = 'action' .. kebab_to_pascal(vim.fn.expand('%:t:r'))
     move(target, action, action2)
   end
-
 end, { desc = 'Improved gf for Yii2', buffer = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')

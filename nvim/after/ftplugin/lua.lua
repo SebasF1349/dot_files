@@ -18,7 +18,6 @@ for key, snippet in pairs(snippets) do
   snip.addSnippet(key, snippet)
 end
 
-
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '
   .. 'unlet! b:contextStatus'
