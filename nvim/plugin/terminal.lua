@@ -44,14 +44,6 @@ map({ 'n', 't' }, '<leader>tb', function()
   end
 end, { desc = 'Move to [T]erminal [B]uffer ' })
 
-map('t', 'gf', function()
-  local file = fn.expand('<cfile>')
-  if file ~= '' then
-    cmd('wincmd p')
-    cmd('sfind ' .. file)
-  end
-end, { desc = 'Open file under the cursor' })
-
 --------------------------------------------------
 -- Togglers
 --------------------------------------------------
@@ -66,6 +58,7 @@ local function set_term_opts(opts)
   vim.wo.winfixwidth = true
   vim.wo.winfixbuf = true
   map('n', 'q', '<cmd>bd!<cr>', { buffer = opts.bufnr })
+  map('n', 'gf', '<cmd>aboveleft vertical wincmd F<cr>', { buffer = opts.bufnr, desc = 'Open file under the cursor' })
   api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
 end
 
