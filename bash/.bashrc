@@ -106,6 +106,8 @@ bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 # trick: use `cat > /dev/null` to see the input of your keys
 
+source "$HOME/dot_files/bash/OSC133.sh"
+
 alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
 
