@@ -69,28 +69,6 @@ let &viminfo='!,'.&viminfo
 let g:vimsyn_embed='l'
 set cursorline
 
-" AUTOCMD
-
-augroup vimStartup
-autocmd!
-
-autocmd BufReadPost *
-  \ let line = line("'\"")
-  \ | if line >= 1 && line <= line("$") && &filetype !~# 'commit'
-  \      && index(['xxd', 'gitrebase'], &filetype) == -1
-  \ |   execute "normal! g`\""
-  \ | endif
-
-augroup END
-
-augroup vimHints
-au!
-autocmd CmdwinEnter *
-  \ echohl Todo |
-  \ echo gettext('You discovered the command-line window! You can close it with ":q".') |
-  \ echohl None
-augroup END
-
 syntax on
 let c_comment_strings=1
 
@@ -310,12 +288,6 @@ endif
 if executable('rg') == 1
   let &grepprg='rg --vimgrep -uu '
   let &grepformat='%f:%l:%c:%m'
-endif
-
-" LOAD init.vim
-
-if &exrc && filereadable('.nvimrc')
-  source .nvimrc
 endif
 
 " COLORSCHEME
