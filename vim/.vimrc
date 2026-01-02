@@ -4,70 +4,119 @@ set nocompatible
 filetype plugin indent on
 
 set encoding=utf-8
+set fileencoding=utf-8
 
-set number relativenumber
-set autoindent                 " Minimal automatic indenting for any filetype.
-set hidden                     " Possibility to have more than one unsaved buffers.
+set number
+set numberwidth=3
+set signcolumn=yes
+set cursorline
+set cursorlineopt=number
+set ruler
+set laststatus=2
+set showcmd
+set cmdheight=1
+
 set hlsearch
 set incsearch
 set ignorecase
 set smartcase
 set showmatch
 
-set backspace=indent,eol,start " Allow backspacing over everything in insert mode.
-set nolangremap
-let &nrformats="bin,hex"
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set wildmenu		" display completion matches in a status line
-let &wildoptions="pum,tagfile"
+set mouse=a
+set virtualedit=block
+set clipboard=unnamed,unnamedplus
+set iskeyword+=-
+set backspace=indent,eol,start
+set nojoinspaces
+set nostartofline
+
+set scrolloff=8
 set sidescroll=1
-set sidescrolloff=2
+set sidescrolloff=20
+set scroll=13
+
+set splitbelow
+set splitright
+
+set wildmenu
+set wildmode=longest:full,full
+let &wildoptions="pum,tagfile"
+set pumheight=10
+set complete=.,w,b,u,t
+set completeopt=menuone,noselect
+
+set autoindent
+set smartindent
+set breakindent
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set expandtab
+set smarttab
+
+set formatoptions=qjl1
+set nowrap
+set linebreak
+set textwidth=0
+if v:version >= 901
+  set smoothscroll
+endif
+
+set fillchars=eob:\ ,fold:\ ,foldopen: \ ,foldclose:\ ,foldsep:\ 
 set listchars=
-set fillchars=
+
+set undodir=~/.vim/undodir
+set undofile
+set undolevels=1000
+set undoreload=10000
+set nobackup
+set nowritebackup
+set history=10000
+
+set hidden
 set autoread
+set nofsync
+
+set diffopt=internal,filler,closeoff,indent-heuristic,algorithm:histogram
+
+set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor
+
+set updatetime=2000
+set timeoutlen=300
+set ttimeout
+set ttimeoutlen=100
+
 set background=dark
 set belloff=all
-set cdpath=,.,~/src,~/
-set clipboard=unnamed,unnamedplus
-set cmdheight=1
-set complete=.,w,b,u,t
-set diffopt=internal,filler
 set display=lastline
-set formatoptions=tcqj
-let &keywordprg=":Man"
-set nofsync
-set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
-set hidden
-set history=10000
-set hlsearch
-set nojoinspaces
-set laststatus=2
+set helpheight=0
 set maxcombine=6
-set mouse=a
-set scroll=13
+
 set sessionoptions-=options
-set shortmess=filnxtToOF
-set smarttab
-set nostartofline
+set viewoptions-=options
 set tabpagemax=50
+set switchbuf=uselast
+
 set tags=./tags;,tags
+set cdpath=,.,~/src,~/
+
 set notitle
 set titleold=
-set switchbuf=uselast
-set ttimeout		" time out for key codes
-set ttimeoutlen=100	" wait up to 100ms after Esc for special key
-set scrolloff=8
+
+set shortmess=filnxtToOF
+
+let &nrformats="bin,hex"
 set nrformats-=octal
+set nolangremap
+
 if has('win32')
   set guioptions-=t
 endif
+
 set ttyfast
-"TODO: set viewoptions+=unix,slash
-set viewoptions-=options
+
 let &viminfo='!,'.&viminfo
 let g:vimsyn_embed='l'
-set cursorline
 
 syntax on
 let c_comment_strings=1
@@ -92,12 +141,8 @@ nnoremap <C-q> <cmd>close<CR>
 nnoremap <C-r> <C-w><C-w>
 nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<CR><C-L>
 
-vnoremap "J", ":m '>+1<CR>gv=gv"
-vnoremap "K", ":m '<-2<CR>gv=gv"
-
 inoremap <C-U> <C-G>u<C-U>
 inoremap <C-W> <C-G>u<C-W>
-inoremap jk <esc>
 
 vnoremap < <gv
 vnoremap > >gv
@@ -110,12 +155,6 @@ vnoremap S{ <esc>`>a}<esc>`<i{<esc>
 vnoremap S" <esc>`>a"<esc>`<i"<esc>
 vnoremap S' <esc>`>a'<esc>`<i'<esc>
 vnoremap S` <esc>`>a`<esc>`<i`<esc>
-
-cnoremap <C-A> <Home>
-cnoremap <C-E> <End>
-cnoremap <C-K> <C-U>
-cnoremap <C-P> <Up>
-cnoremap <C-N> <Down>
 
 " Implement Q
 let g:qreg='@'
@@ -135,36 +174,6 @@ endfunction
 " :MapQ will activate the Q mapping
 command! MapQ noremap q <cmd>call RecordOrStop()<cr>
 noremap Q <cmd>execute 'normal! @'.g:qreg<cr>
-
-function! Toggle()
-    let toggles = {
-        \'true': 'false', 'false': 'true', 'True': 'False', 'False': 'True', 'TRUE': 'FALSE', 'FALSE': 'TRUE',
-        \'yes': 'no', 'no': 'yes', 'Yes': 'No', 'No': 'Yes', 'YES': 'NO', 'NO': 'YES',
-        \'on': 'off', 'off': 'on', 'On': 'Off', 'Off': 'On', 'ON': 'OFF', 'OFF': 'ON',
-        \'open': 'close', 'close': 'open', 'Open': 'Close', 'Close': 'Open',
-        \'dark': 'light', 'light': 'dark',
-        \'width': 'height', 'height': 'width',
-        \'first': 'last', 'last': 'first',
-        \'top': 'right', 'right': 'bottom', 'bottom': 'left', 'left': 'center', 'center': 'top',
-        \'and': 'or', 'or': 'and',
-        \'=': '!', '!': '>', '>': '<', '<': '=',
-        \'"': "'", "'": '`', '`': '"',
-        \'&&': '||', '||': '&&',
-    \}
-    " && and || doesn't work as <cword> doesn't get symbols if there is text
-    " after
-    let word = getline('.')->slice(charcol('.') - 1, charcol('.'))
-    if toggles->has_key(word)
-        execute 'normal! "_s' .. toggles[word]
-    else
-        let word = expand("<cword>")
-        if toggles->has_key(word)
-            execute 'normal! "_ciw' .. toggles[word]
-        endif
-    endif
-endfunction
-
-nnoremap <silent> <BS> <cmd>call Toggle()<CR>
 
 " TEXT-OBJECTS
 
