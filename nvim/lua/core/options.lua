@@ -12,7 +12,6 @@ vim.o.cursorlineopt = 'number'
 vim.o.guicursor = 'n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor'
 
 vim.o.number = true
-vim.o.relativenumber = true
 
 vim.o.signcolumn = 'yes'
 vim.o.numberwidth = 3
