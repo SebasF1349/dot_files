@@ -168,5 +168,6 @@
     "jk": {
       "command": "vscode-neovim.escape"
     }
-  }
+  },
+  "vscode-neovim.NVIM_APPNAME": "nvim-vscode",
 }

@@ -27,6 +27,7 @@ $file_links = @{
 
 $dir_links = @{
     "$env:LocalAppData\nvim\" = "..\nvim\" 
+    "$env:LocalAppData\nvim-vscode\" = "..\nvim-vscode\"
     "$env:USERPROFILE\.glzr\" = "..\.glzr\"
     "$env:APPDATA\bat\" = "..\bat\"
 }
