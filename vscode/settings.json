@@ -19,7 +19,7 @@
   },
   "cmake.configureOnOpen": true,
   "debug.console.fontFamily": "'JetBrainsMono Nerd Font'",
-  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.ignoreTrimWhitespace": true,
   "editor.accessibilitySupport": "off",
   "editor.acceptSuggestionOnEnter": "off",
   "editor.bracketPairColorization.enabled": true,
@@ -36,7 +36,6 @@
   "editor.fontFamily": "'JetBrainsMono Nerd Font'",
   "editor.fontLigatures": true,
   "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
   "editor.guides.bracketPairs": true,
   "editor.inlayHints.fontFamily": "'JetBrainsMono Nerd Font'",
   "editor.linkedEditing": true,
@@ -91,6 +90,7 @@
   "search.seedOnFocus": true,
   "search.seedWithNearestWord": true,
   "security.allowedUNCHosts": ["wsl.localhost", "wsl$"],
+  "security.workspace.trust.enabled": false,
   "security.workspace.trust.untrustedFiles": "open",
   "svelte.enable-ts-plugin": true,
   "telemetry.telemetryLevel": "off",
@@ -141,6 +141,12 @@
   "todohighlight.maxFilesForSearch": 5120,
   "todohighlight.toggleURI": false,
   "typescript.updateImportsOnFileMove.enabled": "always",
+  "vscode-neovim.compositeKeys": {
+    "jk": {
+      "command": "vscode-neovim.escape"
+    }
+  },
+  "vscode-neovim.NVIM_APPNAME": "nvim-vscode",
   "window.commandCenter": false,
   "window.menuBarVisibility": "toggle",
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
@@ -154,20 +160,13 @@
   "workbench.editor.limit.value": 1,
   "workbench.editor.showTabs": "single",
   "workbench.iconTheme": "material-icon-theme",
-  "workbench.panel.defaultLocation": "right",
   "workbench.layoutControl.enabled": false,
+  "workbench.panel.defaultLocation": "right",
   "workbench.sideBar.location": "right",
   "workbench.statusBar.visible": false,
   "workbench.tree.indent": 16,
   "workbench.tree.renderIndentGuides": "none",
-
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1
-  },
-  "vscode-neovim.compositeKeys": {
-    "jk": {
-      "command": "vscode-neovim.escape"
-    }
-  },
-  "vscode-neovim.NVIM_APPNAME": "nvim-vscode",
+  }
 }
