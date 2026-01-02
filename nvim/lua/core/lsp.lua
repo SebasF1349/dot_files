@@ -69,6 +69,15 @@ local function on_attach(client_id, buf)
   end
 
   if client:supports_method('completionItem/resolve') then
+    ---@param items table<integer, { err: (lsp.ResponseError)?, result: any, context: lsp.HandlerContext }>
+    local function get_docs(items)
+      for _, item in ipairs(items) do
+        if item.result.documentation then
+          return item.result.documentation
+        end
+      end
+    end
+
     local cancel_prev = function() end
     vim.api.nvim_create_autocmd('CompleteChanged', {
       buffer = buf,
@@ -79,14 +88,14 @@ local function on_attach(client_id, buf)
         if nil == completionItem then
           return
         end
-        _, cancel_prev = vim.lsp.buf_request(buf, methods.completionItem_resolve, completionItem, function(_, item, _)
-          if not item then
+        cancel_prev = vim.lsp.buf_request_all(buf, methods.completionItem_resolve, completionItem, function(items, _)
+          if not items or #items == 0 then
             return
           end
-          local docs = (item.documentation or {}).value
-          local win = vim.api.nvim__complete_set(info['selected'], { info = docs })
+          local docs = get_docs(items)
+          local win = vim.api.nvim__complete_set(info['selected'], { info = docs.value })
           if win.winid and vim.api.nvim_win_is_valid(win.winid) then
-            vim.treesitter.start(win.bufnr, 'markdown')
+            vim.treesitter.start(win.bufnr, docs.kind)
             vim.wo[win.winid].conceallevel = 3
           end
         end)
