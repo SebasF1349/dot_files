@@ -151,8 +151,7 @@ vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
 vim.keymap.set({ 'n', 'x' }, '<leader>cf', function()
   require('conform').format({ bufnr = 0, async = true, lsp_format = 'never' })
 end, { desc = '[C]ode [F]ormat current file' })
-vim.keymap.set('x', 'gqp', 'mfgqap`f', { desc = 'Format Paragraph' })
-vim.keymap.set('x', 'gqg', 'mfgqag`f', { desc = 'Format File', remap = true })
+vim.keymap.set('n', 'gqp', 'mfgqap`f', { desc = 'Format Paragraph' })
 
 --------------------------------------------------
 -- Debug
