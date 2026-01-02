@@ -123,6 +123,9 @@ require('conform').setup({
     ['markdown-toc'] = {
       prepend_args = { '--bullets', '-' },
     },
+    prettier = {
+      append_args = { '--print-width', '120', '--tab-width', '4' },
+    },
   },
   formatters_by_ft = {
     lua = { 'stylua' },
@@ -142,10 +145,6 @@ require('conform').setup({
   },
   notify_on_error = false,
 })
-
-require('conform').formatters.prettier = {
-  append_args = { '--print-width', '120', '--tab-width', '4' },
-}
 
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
 vim.keymap.set({ 'n', 'x' }, '<leader>cf', function()
