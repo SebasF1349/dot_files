@@ -626,7 +626,6 @@ local parsers = {
   'svelte',
   -- config
   'json',
-  'jsonc',
   'toml',
   'yaml',
   'markdown',
