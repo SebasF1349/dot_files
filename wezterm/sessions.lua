@@ -259,7 +259,7 @@ function M.select_workspace(win, pane, replace)
 					update_previous_workspace(workspace_name)
 					_, _, w = wezterm.mux.spawn_window({
 						workspace = workspace_name,
-						cwd = state and state.window_state.tabs[1].pane.cwd or wezterm.home_dir
+						cwd = state and state.window_state.tabs[1].pane.cwd or wezterm.home_dir,
 					})
 				end
 				if state_path == "ssh" then

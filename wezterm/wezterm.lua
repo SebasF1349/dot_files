@@ -89,7 +89,7 @@ end)
 
 wezterm.on("format-window-title", function(tab, pane, tabs, panes, config)
 	local muxtab = wezterm.mux.get_tab(tab.tab_id)
-    local muxwin = muxtab:window()
+	local muxwin = muxtab:window()
 	return muxwin:get_workspace()
 end)
 
