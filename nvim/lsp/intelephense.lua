@@ -104,6 +104,7 @@ return {
         'Phar',
         'posix',
         'pspell',
+        'random',
         'readline',
         'Reflection',
         'session',
@@ -132,6 +133,7 @@ return {
         'zlib',
         -- not default
         'imagick',
+        'fpdf',
       },
     },
   },
