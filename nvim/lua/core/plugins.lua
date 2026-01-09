@@ -351,16 +351,7 @@ require('gitsigns').setup({
 -- Mason
 --------------------------------------------------
 
-require('mason').setup({
-  ui = {
-    icons = {
-      package_installed = '✓',
-      package_pending = '➜',
-      package_uninstalled = '✗',
-    },
-    height = 0.8,
-  },
-})
+require('mason').setup()
 
 local servers = require('core.lsp').servers
 local ensure_installed = {}
