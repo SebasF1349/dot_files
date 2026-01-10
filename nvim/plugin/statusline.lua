@@ -53,9 +53,7 @@ api.nvim_set_hl(0, 'SLDiagExternal', { bg = curr_statusline_bg, fg = diag_extern
 
 -- git hl --
 local git_branch = api.nvim_get_hl(0, { name = 'Special' })['fg']
-local git_diff = api.nvim_get_hl(0, { name = 'Error' })['fg']
 api.nvim_set_hl(0, 'SLBranch', { bg = curr_statusline_bg, fg = git_branch })
-api.nvim_set_hl(0, 'SLDiff', { bg = curr_statusline_bg, fg = git_diff })
 
 ---- MODE ----
 local function mode()
@@ -205,55 +203,8 @@ local function get_context()
 end
 
 ---- GIT ----
-local gstatus = ''
-
--- improved my implementation stealing from https://github.com/pynappo/git-notify.nvim/blob/main/lua/git-notify/init.lua
-local function git_command(args)
-  return {
-    'git',
-    '--no-pager',
-    '--no-optional-locks',
-    '--literal-pathspecs',
-    '-c',
-    'gc.auto=0',
-    unpack(args),
-  }
-end
-
-local function update_git()
-  vim.system(git_command({ 'fetch' }), {}, function()
-    vim.system(git_command({ 'status', '--porcelain=v2', '--branch' }), {}, function(branch_status_output)
-      local output = branch_status_output.stdout
-      if branch_status_output.code ~= 0 or not output then
-        return
-      end
-
-      local branch = output:match('# branch%.head%s+([%w%-%._%(%)]+)')
-      local modified = (output:find('\n[^#\n]%S') ~= nil or output:match('^[^#\n]%S')) and '~' or ''
-      local ahead, behind = output:match('# branch%.ab%s+%+([0-9]+)%s+%-([0-9]+)')
-      ahead = ahead and ahead ~= '0' and '' or ''
-      behind = behind and behind ~= '0' and '' or ''
-
-      if ahead == '' and behind == '' and modified == '' then
-        gstatus = string.format('%%#SLBranch#%s', branch)
-      else
-        gstatus = string.format('%%#SLBranch#%s%%#SLDiff#[%s%s%s]', branch, ahead, behind, modified)
-      end
-      vim.defer_fn(function()
-        api.nvim__redraw({ statusline = true })
-      end, 0)
-    end)
-  end)
-end
-
-local is_git = require('utils.is-git')()
-if is_git then
-  if _G.Gstatus_timer == nil then
-    _G.Gstatus_timer = uv.new_timer()
-  else
-    _G.Gstatus_timer:stop()
-  end
-  _G.Gstatus_timer:start(0, 300000, vim.schedule_wrap(update_git))
+local function get_branch()
+  return string.format('%%#SLBranch#%s', vim.g.gitsigns_head or '')
 end
 
 ---- DIAGNOSTICS ----
@@ -331,7 +282,7 @@ Statusline = {
         ls_progress,
         ' ',
         custom_diagnostics(),
-        gstatus,
+        get_branch(),
         ' ',
       })
     else
@@ -341,7 +292,7 @@ Statusline = {
         file(),
         '%=',
         custom_diagnostics(),
-        gstatus,
+        get_branch(),
         ' ',
       })
     end
