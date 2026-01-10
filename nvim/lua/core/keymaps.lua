@@ -5,7 +5,7 @@
 vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
-vim.keymap.set('n', 'U', '<C-r>', { desc = 'Redo' })
+vim.keymap.set('n', 'U', '<Nop>', { desc = 'Redo' })
 
 -- Stay in indent mode
 vim.keymap.set('x', '<', '<gv', { desc = 'Stay in visual mode after indenting' })
@@ -75,7 +75,6 @@ vim.keymap.set('o', '*', '"<esc>*g``".v:operator."gn"', { desc = 'Repeteable wor
 --------------------------------------------------
 
 vim.keymap.set('n', '<C-q>', '<cmd>close<CR>', { desc = 'Window [Q]uit' })
-vim.keymap.set('n', '<C-r>', '<C-w><C-w>', { desc = 'Move A[R]ound Windows' })
 
 local nav = {
   h = 'Left',
