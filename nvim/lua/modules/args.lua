@@ -50,6 +50,7 @@ end
 function M.select()
   if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
+    return
   end
   ui.select(M.getArgs(), {
     prompt = 'Select buffer:',
@@ -102,6 +103,7 @@ end
 function M.remove_select()
   if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
+    return
   end
   ui.select(M.getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
     if selected then

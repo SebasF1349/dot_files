@@ -3,14 +3,7 @@ local args = require('modules.args')
 
 map('n', ']a', args.cycle_next, { desc = 'Next [A]rg' })
 map('n', '[a', args.cycle_prev, { desc = 'Previous [A]rg' })
-map('n', 'gaa', function()
-  local count = vim.v.count
-  if count ~= 0 and count <= fn.argc() then
-    args.move(count)
-  else
-    args.select()
-  end
-end, { desc = 'Select [A]rg Buffer' })
+map('n', 'gaa', args.select, { desc = 'Select [A]rg Buffer' })
 map('n', 'gai', args.insert, { desc = '[A]rg [I]nsert' })
 map('n', 'gad', ':argdo ', { desc = '[A]rg[D]o' })
 map('n', 'gar', args.remove, { desc = '[A]rg [R]emove' })
