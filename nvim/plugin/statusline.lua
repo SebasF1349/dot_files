@@ -1,7 +1,7 @@
 local api, fn, fs, uv = vim.api, vim.fn, vim.fs, vim.uv
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local signs = require('utils.ui').diagnostic_icons_num
-local args = require('plugin.args')
+local args = require('modules.args')
 
 ---- Highlights ----
 local custom_bg = mocha.surface0
@@ -68,7 +68,6 @@ end
 local function file()
   local ftype = vim.o.filetype
   local label, title
-  -- TODO: Change filename in special buffers (dap)
   if ftype == 'help' then
     title, label = fn.expand('%:t:r:r'), 'Help'
   elseif ftype == 'netrw' then
