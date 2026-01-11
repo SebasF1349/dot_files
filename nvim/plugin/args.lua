@@ -1,22 +1,30 @@
 local api, normalize, fn, cmd, map, ui = vim.api, vim.fs.normalize, vim.fn, vim.cmd, vim.keymap.set, vim.ui
+local M = {}
 
 --------------------------------------------------
 -- Utils
 --------------------------------------------------
 
---- Get normalized filename
----@param bufnr? integer
+---Get normalized filename
+---@param buf string
 ---@return string
-local function getBufName(bufnr)
-  bufnr = bufnr or 0
-  local buf = api.nvim_buf_get_name(bufnr)
+local function normalizeCompleteBufName(buf)
   return normalize(fn.fnamemodify(buf, ':.'))
 end
 
-local function getArgs()
+---Get normalized filename
+---@param bufnr? integer
+---@return string
+function M.getBufName(bufnr)
+  bufnr = bufnr or 0
+  local buf = api.nvim_buf_get_name(bufnr)
+  return normalizeCompleteBufName(buf)
+end
+
+function M.getArgs()
   local args = fn.argv() --[[@as string[] ]]
   for i, arg in ipairs(args) do
-    args[i] = normalize(fn.fnamemodify(arg, ':.'))
+    args[i] = normalizeCompleteBufName(arg)
   end
   return args
 end
@@ -42,7 +50,7 @@ local function select()
   if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  ui.select(getArgs(), {
+  ui.select(M.getArgs(), {
     prompt = 'Select buffer:',
     format_item = function(item)
       return item == fn.argv(fn.argidx()) and '[' .. item .. ']' or item
@@ -65,9 +73,9 @@ local function cycle_prev()
   if fn.argc() == 0 then
     return
   end
-  local bufname = getBufName(0)
+  local bufname = M.getBufName(0)
   local moves = fn.argidx() + 1 - vim.v.count1
-  if not vim.list_contains(getArgs(), bufname) then
+  if not vim.list_contains(M.getArgs(), bufname) then
     moves = moves + 1
   end
   move(moves)
@@ -75,7 +83,7 @@ end
 
 ---@param bufnr? integer
 local function insert(bufnr)
-  local buf = getBufName(bufnr)
+  local buf = M.getBufName(bufnr)
   cmd('silent! argedit ' .. buf .. ' | argdedupe')
 end
 
@@ -94,7 +102,7 @@ local function remove_select()
   if fn.argc() == 0 then
     vim.notify('No args', vim.log.levels.WARN)
   end
-  ui.select(getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
+  ui.select(M.getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
     if selected then
       remove(selected)
     end
@@ -102,7 +110,7 @@ local function remove_select()
 end
 
 local function only()
-  local buf = getBufName(0)
+  local buf = M.getBufName(0)
   cmd('silent! args ' .. buf)
 end
 
@@ -131,8 +139,8 @@ local args_augroup = api.nvim_create_augroup('Arglist', { clear = true })
 api.nvim_create_autocmd({ 'BufEnter' }, {
   group = args_augroup,
   callback = function()
-    local buf = getBufName(0)
-    for i, a in ipairs(getArgs()) do
+    local buf = M.getBufName(0)
+    for i, a in ipairs(M.getArgs()) do
       if a == buf and i ~= fn.argidx() + 1 then
         move(i)
       end
@@ -140,3 +148,5 @@ api.nvim_create_autocmd({ 'BufEnter' }, {
   end,
   desc = 'Update arglist when changing buffers',
 })
+
+return M

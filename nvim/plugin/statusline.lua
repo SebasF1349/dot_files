@@ -1,6 +1,7 @@
 local api, fn, fs, uv = vim.api, vim.fn, vim.fs, vim.uv
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local signs = require('utils.ui').diagnostic_icons_num
+local args = require('plugin.args')
 
 ---- Highlights ----
 local custom_bg = mocha.surface0
@@ -93,25 +94,17 @@ local function file()
   if label then
     return string.format('%%#SLInactiveBuffer# [%s] %%#SLActiveBuffer#%s ', label, title)
   end
-  local buffers = {}
-  for _, arg in
-    ipairs(fn.argv()--[[@as string[] ]])
-  do
-    table.insert(buffers, fs.normalize(fn.fnamemodify(arg, ':.')))
-  end
+  local buffers = args.getArgs()
   for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
     if api.nvim_win_get_config(win).relative == '' then
       local bufnr = api.nvim_win_get_buf(win)
-      local bufname = api.nvim_buf_get_name(bufnr)
-      bufname = fs.normalize(fn.fnamemodify(bufname, ':.'))
+      local bufname = args.getBufName(bufnr)
       if not vim.list_contains(buffers, bufname) then
         table.insert(buffers, bufname)
       end
     end
   end
-  local current_bufnr = api.nvim_get_current_buf()
-  local current_bufname = api.nvim_buf_get_name(current_bufnr)
-  current_bufname = fs.normalize(fn.fnamemodify(current_bufname, ':.'))
+  local current_bufname = args.getBufName()
   local current_buf_shorten = { pos = -1, path = '', fname = '' }
   local buffer_names = {}
   local display_length = 0
@@ -135,8 +128,8 @@ local function file()
     if bufname ~= current_bufname then
       file_display = string.format('%%#SLInactiveBuffer#%s', fname)
     else
-      local fpath = is_svelte and fn.fnamemodify(bufname, ':~:.:h:h') or fn.fnamemodify(bufname, ':~:.:h')
-      fpath = fs.normalize(fpath)
+      local mods = is_svelte and ':~:.:h:h' or ':~:.:h'
+      local fpath = fs.normalize(fn.fnamemodify(bufname, mods))
       current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
       current_buf_shorten.pos = #buffer_names + 1
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term:/') then
