@@ -776,31 +776,6 @@ local function setKeymaps()
 end
 
 --------------------------------------------------
--- Extras
---------------------------------------------------
-
-vim.api.nvim_create_autocmd('WinEnter', {
-  group = qf_group,
-  callback = function()
-    if vim.bo.filetype == 'qf' and vim.fn.winnr('$') == 1 then
-      vim.cmd('quit')
-    end
-  end,
-  desc = 'Close Neovim if the last window is a quickfix window',
-})
-
-vim.api.nvim_create_autocmd('WinClosed', {
-  group = qf_group,
-  callback = function(opt)
-    local loclist = vim.fn.getloclist(tonumber(opt.file) or 0, { winid = 0 })
-    if loclist and loclist.winid ~= 0 then
-      vim.cmd('close ' .. loclist.winid)
-    end
-  end,
-  desc = 'Close location list if parent window is closed',
-})
-
---------------------------------------------------
 -- Better Grep
 --------------------------------------------------
 
@@ -910,7 +885,7 @@ end, { nargs = '+', complete = 'file_in_path' })
 vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
 
 --------------------------------------------------
--- Keymaps
+-- Keymaps to open qf
 --------------------------------------------------
 
 local function document_symbols()
@@ -1098,6 +1073,31 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     setKeymaps()
   end,
   desc = 'Set qf options and keymaps',
+})
+
+--------------------------------------------------
+-- Extras
+--------------------------------------------------
+
+vim.api.nvim_create_autocmd('WinEnter', {
+  group = qf_group,
+  callback = function()
+    if vim.bo.filetype == 'qf' and vim.fn.winnr('$') == 1 then
+      vim.cmd('quit')
+    end
+  end,
+  desc = 'Close Neovim if the last window is a quickfix window',
+})
+
+vim.api.nvim_create_autocmd('WinClosed', {
+  group = qf_group,
+  callback = function(opt)
+    local loclist = vim.fn.getloclist(tonumber(opt.file) or 0, { winid = 0 })
+    if loclist and loclist.winid ~= 0 then
+      vim.cmd('close ' .. loclist.winid)
+    end
+  end,
+  desc = 'Close location list if parent window is closed',
 })
 
 --------------------------------------------------
