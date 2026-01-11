@@ -139,7 +139,7 @@ local function file()
       fpath = fs.normalize(fpath)
       current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
       current_buf_shorten.pos = #buffer_names + 1
-      if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term://') then
+      if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term:/') then
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
       else
