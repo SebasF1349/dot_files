@@ -884,8 +884,6 @@ local function grep(listType, args)
                   vim.notify('No results found', vim.log.levels.WARN)
                 else
                   vim.cmd(listType .. 'open')
-                  setOptions()
-                  setKeymaps()
                   opened = true
                 end
               end)
@@ -1002,8 +1000,6 @@ local function list_toggle(listType, diagnostics, severity, scope)
     }, action)
     vim.schedule(function()
       vim.cmd(listType .. 'open')
-      setOptions()
-      setKeymaps()
     end)
   elseif list.size == 0 then
     vim.notify('List is Empty', vim.log.levels.INFO)
@@ -1084,9 +1080,25 @@ vim.keymap.set('n', '<leader>qg', function()
   -- vim.cmd('tabedit | Git difftool --numstat --raw')
   -- would be cool to have status and numstat in the same command, but looks like it's not possible
   -- git diff --numstat --summary is difficult to parse (renaming is a mess)
-  setOptions()
-  setKeymaps()
 end, { desc = 'Open [Q]uickfix With [G]it Diff' })
+
+--------------------------------------------------
+-- Set options and keymaps
+--------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  group = qf_group,
+  pattern = 'quickfix',
+  callback = function()
+    local foldexpr = vim.api.nvim_get_option_value('foldexpr', { scope = 'local' })
+    if foldexpr == 'v:lua._G.qffoldexprfunc()' then
+      return
+    end
+    setOptions()
+    setKeymaps()
+  end,
+  desc = 'Set qf options and keymaps',
+})
 
 --------------------------------------------------
 -- Features
