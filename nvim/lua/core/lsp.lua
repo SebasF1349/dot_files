@@ -93,10 +93,12 @@ local function on_attach(client_id, buf)
             return
           end
           local docs = get_docs(items)
-          local win = vim.api.nvim__complete_set(info['selected'], { info = docs.value })
-          if win.winid and vim.api.nvim_win_is_valid(win.winid) then
-            vim.treesitter.start(win.bufnr, docs.kind)
-            vim.wo[win.winid].conceallevel = 3
+          if docs then
+            local win = vim.api.nvim__complete_set(info['selected'], { info = docs.value })
+            if win.winid and vim.api.nvim_win_is_valid(win.winid) then
+              vim.treesitter.start(win.bufnr, docs.kind)
+              vim.wo[win.winid].conceallevel = 3
+            end
           end
         end)
       end,
