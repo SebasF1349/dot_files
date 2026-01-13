@@ -496,7 +496,14 @@ local function refactoring_run()
     return require('refactoring')
   end
   local refactoring = require('refactoring')
-  refactoring.setup({ show_success_message = true })
+  refactoring.setup({
+    show_success_message = true,
+    print_var_statements = {
+      php = {
+        "echo '<pre>%s ->' . %s; var_export(%s); echo '<pre>'; exit;",
+      },
+    },
+  })
   return refactoring
 end
 vim.keymap.set({ 'n', 'x' }, '<leader>rr', function()
