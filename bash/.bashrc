@@ -8,7 +8,7 @@
 [[ $- != *i* ]] && return
 
 set -o vi
-shopt -s histappend checkwinsize autocd
+shopt -s histappend checkwinsize autocd extglob cmdhist cdspell nocaseglob histverify
 HISTCONTROL=erasedups:ignoredups:ignorespace
 HISTSIZE=10000
 HISTFILESIZE=10000
@@ -82,17 +82,25 @@ alias repos="cd ~/repos"
 
 alias eza='eza -lah'
 alias ezat="eza --tree --level=2"
-alias cd..="cd .."
 alias ..="cd .."
 alias ...="cd ../.."
+alias cp="cp -iv"
+alias df='df -h'
+alias free='free -m'
+alias du='du -hc'
+alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+
 alias nocomment="grep -Ev '^[[:space:]]*(#|$)'"
 alias tree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
+
+function ll {
+    command ls -lAhFv --color=always --time-style=long-iso "$@" | less -R -X -F
+}
 
 if [ -x /usr/bin/dircolors ]; then
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
-    alias ls="ls -lAhF --time-style=long-iso --color=auto --ignore=lost+found"
 fi
 
 # 7. GIT INTEGRATION
