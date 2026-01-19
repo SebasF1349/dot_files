@@ -148,7 +148,7 @@ function M.input(opts, on_confirm)
     end)
   end, { buffer = input_bufnr })
 
-  local closing_keys = { { 'q', modes = { 'n', 'v' } }, '<C-c>' }
+  local closing_keys = { { 'q', modes = { 'n', 'x' } }, '<C-c>' }
   close_mappings(input_bufnr, closing_keys, function()
     select_and_close({ input_win, title_win }, current_win, function()
       on_confirm(nil)
