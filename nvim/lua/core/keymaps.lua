@@ -33,8 +33,8 @@ vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m ma
 vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
 vim.keymap.set('n', 'yc', '"yy".v:count1."gcc\']p"', { desc = 'Make a Copy Commentted out', remap = true, expr = true })
 vim.keymap.set('x', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', remap = true })
-vim.keymap.set('n', '[p', '<cmd>exe "put! " . v:register<CR>', { desc = 'Paste Linewise Above' })
-vim.keymap.set('n', ']p', '<cmd>exe "put "  . v:register<CR>', { desc = 'Paste Linewise Below' })
+vim.keymap.set('n', '[p', '<cmd>exe "iput! " . v:register<CR>', { desc = 'Paste Linewise Above' })
+vim.keymap.set('n', ']p', '<cmd>exe "iput "  . v:register<CR>', { desc = 'Paste Linewise Below' })
 
 vim.keymap.set({ 'n', 'x' }, '<leader>x', function()
   local esc = vim.keycode('<esc>')
