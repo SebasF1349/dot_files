@@ -63,6 +63,7 @@ end
 local function select_and_close(wins, current_win, on_end)
   if autocmd_id then
     vim.api.nvim_del_autocmd(autocmd_id)
+    autocmd_id = nil
   end
   for _, win in ipairs(wins) do
     if win and vim.api.nvim_win_is_valid(win) then
