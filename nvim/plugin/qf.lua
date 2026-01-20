@@ -884,6 +884,46 @@ end, { nargs = '+', complete = 'file_in_path' })
 
 vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
 
+local function cf_preview(opts, preview_ns, _)
+	local pattern = opts.args
+	if pattern == '' then return end
+	local ok, regex = pcall(vim.regex, pattern)
+	if not ok then return end
+	local qf_winid = vim.fn.getqflist({ winid = 0 }).winid
+	if qf_winid == 0 then return end -- No quickfix window open
+	local qf_bufnr = vim.api.nvim_win_get_buf(qf_winid)
+	local lines = vim.api.nvim_buf_get_lines(qf_bufnr, 0, -1, false)
+	for lnum, line in ipairs(lines) do
+		local col = 0
+		while col < #line do
+			local start, finish = regex:match_str(line:sub(col + 1))
+			if not start then break end
+			start = start + col
+			finish = finish + col
+			vim.hl.range(qf_bufnr, preview_ns, 'IncSearch',
+				{ lnum - 1, start }, { lnum - 1, finish })
+			col = finish
+		end
+	end
+	return 1
+end
+
+local function cf_execute(opts)
+	vim.cmd.packadd('cfilter')
+	local bang = opts.bang and '!' or ''
+	local pattern = opts.args
+	if pattern ~= '' then
+		vim.cmd('Cfilter' .. bang .. ' /' .. pattern .. '/')
+	end
+end
+
+vim.api.nvim_create_user_command('Cf', cf_execute, {
+	nargs = '?',
+	bang = true,
+	preview = cf_preview,
+	desc = '[Cf]ilter with live preview'
+})
+
 --------------------------------------------------
 -- Keymaps to open qf
 --------------------------------------------------
@@ -1155,3 +1195,4 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941 (diagnostics autoupdate)
 -- https://github.com/stevearc/quicker.nvim/blob/master/lua/quicker/highlight.lua#L25 (ts highlighting)
 -- https://github.com/glepnir/nvim/blob/main/lua/private/grep.lua (async grep)
+-- https://github.com/neovim/neovim/issues/25410#issuecomment-3744609833 (Cf with preview)
