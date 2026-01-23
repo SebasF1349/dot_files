@@ -62,7 +62,7 @@ if v:version >= 901
   set smoothscroll
 endif
 
-set fillchars=eob:\ ,fold:\ ,foldopen: \ ,foldclose:\ ,foldsep:\ 
+set fillchars=eob:\ ,fold:\ ,foldopen:\ ,foldclose:\ ,foldsep:\ 
 set listchars=
 
 set undodir=~/.vim/undodir
@@ -79,7 +79,7 @@ set nofsync
 
 set diffopt=internal,filler,closeoff,indent-heuristic,algorithm:histogram
 
-set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor
+set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
 
 set updatetime=2000
 set timeoutlen=300
