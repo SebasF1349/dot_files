@@ -1,4 +1,5 @@
 local ui = require('utils.ui')
+local oss = require('utils.os')
 local signs = ui.diagnostic_icons_char
 local highlights = ui.diagnostic_hl_char
 
@@ -241,15 +242,14 @@ local function add_virt_lines(list)
   vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_file_namespace, 0, -1)
   local lastfname = ''
   for i, item in ipairs(list) do
-    local fname = vim.fn.bufname(item.bufnr)
-    fname = vim.fn.fnamemodify(fname, ':p:~:.')
-    if fname ~= '' and fname ~= lastfname then
+    local fname = vim.fs.relpath('.', vim.fn.bufname(item.bufnr))
+    if fname and fname ~= lastfname then
       lastfname = fname
-      local path = vim.fn.fnamemodify(fname, ':h')
-      if path == '.' then
+      local path = vim.fs.dirname(fname) .. oss.dir_separator
+      if path == './' then
         path = ''
       end
-      local name = vim.fn.fnamemodify(fname, ':p:t')
+      local name = vim.fs.basename(fname)
       vim.api.nvim_buf_set_extmark(qfbufnr, qfim_file_namespace, i - 1, 0, {
         virt_lines = { { { name .. ' ', 'qfFileName' }, { path, 'Comment' } } },
         virt_lines_above = true,
@@ -642,7 +642,7 @@ local function yank(what)
   local line = vim.api.nvim_win_get_cursor(0)
   local qfitem = list.items[line[1]]
   local text = what == 'message' and vim.trim(qfitem.text)
-    or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(qfitem.bufnr), ':.')
+    or vim.fs.relpath('.', vim.api.nvim_buf_get_name(qfitem.bufnr))
   vim.fn.setreg('', text)
 end
 

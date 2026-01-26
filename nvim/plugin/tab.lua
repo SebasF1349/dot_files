@@ -1,5 +1,5 @@
 -- https://github.com/TheLeoP/nvim-config/blob/master/plugin/tab.lua
-local api, fn = vim.api, vim.fn
+local api, fn, fs = vim.api, vim.fn, vim.fs
 
 function _G._personal_tab()
   local last = fn.tabpagenr('$')
@@ -31,10 +31,10 @@ function _G._personal_tab_label(i)
     return protocol .. '://'
   elseif vim.endswith(name, '/') or vim.endswith(name, '\\') then
     local dirname = name:sub(1, -2)
-    local tail = fn.fnamemodify(dirname, ':t')
+    local tail = fs.basename(dirname)
     return tail .. '/'
   end
-  local tail = fn.fnamemodify(name, ':t')
+  local tail = fs.basename(name)
   return tail
 end
 

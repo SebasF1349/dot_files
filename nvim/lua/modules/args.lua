@@ -1,4 +1,4 @@
-local api, normalize, fn, cmd, ui = vim.api, vim.fs.normalize, vim.fn, vim.cmd, vim.ui
+local api, fs, fn, cmd, ui = vim.api, vim.fs, vim.fn, vim.cmd, vim.ui
 
 local M = {}
 
@@ -8,14 +8,14 @@ local M = {}
 
 ---Get normalized filename
 ---@param buf string
----@return string
+---@return string?
 local function normalizeCompleteBufName(buf)
-  return normalize(fn.fnamemodify(buf, ':.'))
+  return fs.relpath('.', buf)
 end
 
 ---Get normalized filename
 ---@param bufnr? integer
----@return string
+---@return string?
 function M.getBufName(bufnr)
   bufnr = bufnr or 0
   local buf = api.nvim_buf_get_name(bufnr)

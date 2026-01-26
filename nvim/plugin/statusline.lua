@@ -72,7 +72,7 @@ local function file()
     title, label = fn.expand('%:t:r:r'), 'Help'
   elseif ftype == 'netrw' then
     label = 'Netrw'
-    title = fn.fnamemodify(uv.cwd() or '', ':t')
+    title = fs.basename(uv.cwd() or '')
     local target = api.nvim_call_function('netrw#Expose', { 'netrwmftgt' })
     if target ~= 'n/a' then
       title = string.format('%s - Target: %s', title, target:gsub('^' .. uv.os_homedir(), '~'))
@@ -108,13 +108,13 @@ local function file()
   local buffer_names = {}
   local display_length = 0
   for i, bufname in ipairs(buffers) do
-    local fname = fn.fnamemodify(bufname, ':t')
+    local fname = fs.basename(bufname)
     local is_svelte = vim.startswith(fname, '+')
     if is_svelte then
       fname = fs.joinpath(fn.fnamemodify(bufname, ':h:t'), fname)
     end
     if fname == '' then
-      fname = fn.fnamemodify(uv.cwd() or '', ':t')
+      fname = fs.basename(uv.cwd() or '')
     end
     fname = fs.normalize(fname)
     local bufnr = fn.bufnr(fname)
@@ -127,18 +127,17 @@ local function file()
     if bufname ~= current_bufname then
       file_display = string.format('%%#SLInactiveBuffer#%s', fname)
     else
-      local mods = is_svelte and ':~:.:h:h' or ':~:.:h'
-      local fpath = fs.normalize(fn.fnamemodify(bufname, mods))
+      local fpath = bufname:sub(1, -#fname - 1) -- remove fname from fpath
       current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
       current_buf_shorten.pos = #buffer_names + 1
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term:/') then
         file_display = current_buf_shorten.fname
         current_buf_shorten.path = file_display
       else
-        file_display = string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', fpath, fname)
+        file_display = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
         current_buf_shorten.path =
-          string.format('%%#SLInactiveBuffer#%s/%%#SLActiveBuffer#%s', fn.pathshorten(fpath), fname)
-        display_length = display_length + #fpath + 1
+          string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fn.pathshorten(fpath), fname)
+        display_length = display_length + #fpath
       end
     end
     if i == fn.argidx() + 1 and fn.argc() ~= 0 then
