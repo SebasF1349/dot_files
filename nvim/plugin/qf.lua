@@ -720,6 +720,10 @@ local function moveAdyacentFile(direction)
   local start = direction == 'next' and curr_pos or 0
   local end_ = direction == 'next' and -1 or { curr_pos[1] - 1, curr_pos[2] }
   local extmarks = vim.api.nvim_buf_get_extmarks(0, qfim_file_namespace, start, end_, { type = 'virt_lines' })
+  if #extmarks == 0 then
+    vim.notify('No File', vim.log.levels.INFO)
+    return
+  end
   local extmarkPos = direction == 'next' and 1 or #extmarks - 1
   vim.api.nvim_win_set_cursor(0, { extmarks[extmarkPos][2] + 1, 0 })
 end
