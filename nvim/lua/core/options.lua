@@ -24,7 +24,7 @@ vim.keymap.set('i', '<up>', '<nop>', { noremap = true })
 vim.keymap.set('i', '<down>', '<nop>', { noremap = true })
 
 vim.o.fileencoding = 'utf-8'
-vim.opt.iskeyword:append('-')
+vim.o.iskeyword = vim.o.iskeyword .. ',-'
 
 vim.o.undofile = true
 vim.o.backup = false
@@ -98,14 +98,6 @@ end
 
 vim.o.foldtext = 'v:lua.custom_foldtext()'
 vim.o.foldlevelstart = 99
-
-vim.opt.fillchars = {
-  eob = ' ',
-  fold = ' ',
-  foldopen = ' ',
-  foldclose = ' ',
-  foldsep = ' ',
-}
 
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0

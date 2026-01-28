@@ -291,6 +291,6 @@ Statusline = {
 }
 
 vim.g.qf_disable_statusline = true
-vim.opt.statusline = '%!v:lua.Statusline.active()'
-vim.opt.laststatus = 3
-vim.opt.ruler = false
+vim.o.statusline = '%!v:lua.Statusline.active()'
+vim.o.laststatus = 3
+vim.o.ruler = false

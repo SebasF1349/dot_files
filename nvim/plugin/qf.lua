@@ -783,8 +783,8 @@ end
 -- Better Grep
 --------------------------------------------------
 
-vim.opt.grepprg = 'rg --vimgrep --smart-case --hidden'
-vim.opt.grepformat = '%f:%l:%c:%m'
+vim.o.grepprg = 'rg --vimgrep --smart-case --hidden'
+vim.o.grepformat = '%f:%l:%c:%m'
 
 ---@param listType 'c' | 'l'
 ---@param args table
