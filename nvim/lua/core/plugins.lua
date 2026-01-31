@@ -49,8 +49,6 @@ require('catppuccin').setup({
   },
   custom_highlights = function(colors)
     return {
-      LspReferenceShow = { bg = colors.surface1 }, -- custom hl
-
       Pmenu = { bg = colors.base, fg = colors.overlay2 },
 
       NormalFloat = { bg = colors.base, fg = colors.text },
