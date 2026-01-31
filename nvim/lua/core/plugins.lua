@@ -57,11 +57,6 @@ require('catppuccin').setup({
       FloatBorder = { bg = colors.base, fg = colors.text },
 
       TerminalNormal = { bg = colors.base, fg = colors.text },
-
-      -- Checkhealth
-      ['@health.success'] = { bg = colors.none, fg = colors.teal, style = { 'bold', 'underline' } }, -- healthSuccess
-      ['@health.warning'] = { bg = colors.none, fg = colors.yellow, style = { 'bold', 'underline' } }, -- healthWarning
-      ['@health.error'] = { bg = colors.none, fg = colors.red, style = { 'bold', 'underline' } }, -- healthError
     }
   end,
 })
