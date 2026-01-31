@@ -1,53 +1,48 @@
 @import "mocha.css";
 
 * {
-  font-family: "JetBrainsMono Nerd Font";
-  border: 0px;
-  padding: 0;
-  margin: 0;
-  min-height: 10px;
-  font-weight: 900;
-  font-size: 12px;
-  color: @text;
-  transition: all 0.3s ease;
+    font-family: "JetBrainsMono Nerd Font";
+    border: 0px;
+    padding: 0;
+    margin: 0;
+    min-height: 10px;
+    font-weight: 900;
+    font-size: 12px;
+    color: @text;
+    transition: all 0.3s ease;
 }
 
 window#waybar {
-  background: transparent;
-  border: none;
+    background: transparent;
+    border: none;
 }
 
 window > box {
+    /* padding: 5px; */
 }
 
 #workspaces {
-  background-color: @surface0;
-  margin-left: 6px;
-  margin-top: 6px;
+    background-color: @surface0;
 }
 
 #workspaces label {
-  color: @pink;
-  padding-right: 10px;
-  padding-left: 5px;
+    color: @pink;
 }
 
-#workspaces button.active label {
-  color: @surface0;
-  font-weight: bolder;
+#workspaces button.focused label {
+    color: @surface0;
+    font-weight: bolder;
 }
 
-#workspaces button.active {
-  background-color: @pink;
-  border-radius: 0px;
+#workspaces button.focused {
+    background-color: @pink;
+    border-radius: 0px;
 }
 
 #clock {
-  background-color: @surface0;
-  padding: 1px 10px;
-  margin-right: 6px;
-  margin-top: 6px;
-  color: @pink;
+    background-color: @surface0;
+    padding: 1px 10px;
+    color: @pink;
 }
 
 #network,
@@ -56,79 +51,73 @@ window > box {
 #pulseaudio,
 #pulseaudio-slider,
 #battery {
-  background-color: @surface0;
-  padding: 1px 10px;
-  margin-top: 6px;
+    background-color: @surface0;
+    padding: 1px 10px;
 }
 
 #network {
-  color: @sapphire;
+    color: @sapphire;
 }
 
 #backlight {
-  color: @peach;
+    color: @peach;
 }
 
 #pulseaudio {
-  color: @mauve;
+    color: @mauve;
 }
 
 #battery {
-  margin-right: 5px;
+    margin-right: 5px;
 }
 
 @keyframes blink {
-  to {
-    opacity: 0.7;
-    font-size: 12px;
-  }
+    to {
+        opacity: 0.7;
+        font-size: 12px;
+    }
 }
 
 #battery.critical:not(.charging) {
-  opacity: 1;
-  font-size: 15px;
-  animation-name: blink;
-  animation-duration: 0.5s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
+    opacity: 1;
+    font-size: 15px;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 }
 
 #pulseaudio-slider,
 #backlight-slider {
-  padding-left: 10px;
+    padding-left: 10px;
 }
 
 slider {
-  min-height: 8px;
-  min-width: 8px;
-  opacity: 0;
-  background-image: none;
-  border: none;
-  box-shadow: none;
-  background-color: @lavender;
+    min-height: 8px;
+    min-width: 8px;
+    opacity: 0;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    background-color: @lavender;
 }
 
 trough {
-  min-height: 5px;
-  min-width: 80px;
-  border-radius: 2px;
-  background-color: @surface1;
+    min-height: 5px;
+    min-width: 80px;
+    border-radius: 2px;
+    background-color: @surface1;
 }
 
 highlight {
-  min-height: 5px;
-  border-radius: 5px;
-  background-color: @lavender;
+    min-height: 5px;
+    border-radius: 5px;
+    background-color: @lavender;
 }
 
-/* NO CAMBIA EL COLOR DEL SLIDER */
-
-/* PLAYER DOESN'T WORK */
 #custom-playerctl {
-  background-color: @surface0;
-  padding: 1px 10px;
-  margin: 5px 0;
-  border-radius: 8px;
-  margin-right: 10px;
+    background-color: @surface0;
+    padding: 1px 10px;
+    margin-right: 5px;
 }

@@ -1,59 +1,46 @@
- {
-  "layer": "top",
-  "modules-left": [
-    "hyprland/workspaces"
-  ],
-  "modules-center": [],
-  "modules-right": [
-    "custom/playerctl",
-    "network",
-    "group/group-backlight",
-    "group/group-audio",
-    "battery",
-    "clock",
-  ],
-  "hyprland/workspaces": {
-    "format": "{name}",
-    //"disable-scroll": false,
-    //"on-scroll-up": "hyprctl dispatch workspace e+1",
-    //"on-scroll-down": "hyprctl dispatch workspace e-1",
-    //"all-outputs": true,
-    //"on-click": "activate"
-  },
-  "custom/weather": {
-    "format": "{}",
-    "tooltip": true,
-    "interval": 3600,
-    "exec": "~/.config/waybar/scripts/wabar-wttr.py",
-    "return-type": "json"
-  },
-  "tray": {
-    "icon-size": 18,
-    "spacing": 5
-  },
-  "clock": {
-    "format": "{:%a %d %H:%M}",
-    "tooltip-format": "<tt><small>{calendar}</small></tt>",
-    "on-scroll": { "calendar": 1 },
-    "calendar" : {
-        "on-scroll": 1,
-        "format" : {
-            "today": "<span color='#a6e3af'><b><u>{}</u></b></span>"
+{
+    "layer": "top",
+    "modules-left": [
+        "sway/workspaces"
+    ],
+    "modules-center": [],
+    "modules-right": [
+        "custom/playerctl",
+        "tray",
+        "network",
+        "group/group-backlight",
+        "group/group-audio",
+        "battery",
+        "clock",
+    ],
+    "sway/workspaces": {
+        "format": "{name}",
+    },
+    "tray": {
+        "icon-size": 18,
+        "spacing": 5
+    },
+    "clock": {
+        "format": "{:%a %d %H:%M}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "on-scroll": { "calendar": 1 },
+        "calendar" : {
+            "on-scroll": 1,
+            "format" : {
+                "today": "<span color='#a6e3af'><b><u>{}</u></b></span>"
+            }
         }
-    }
-  },
-  "network": {
-    "interface": "wlan0",
-    "format-icons": ["󰤟","󰤢","󰤥","󰖩"],
-    "format": "󰤭", 
-    "format-wifi":"{icon}",
-    "format-disconnected": "󰤭",
-    "format-ethernet": "{ipaddr}/{cidr}󰊗",
-    "tooltip-format": "{ifname} via {gwaddr}",
-    "tooltip-format-wifi": "{essid}",
-    "tooltip-format-ethernet": "{ifname}",
-    "max-length": 50
-  },
+    },
+    "network": {
+        "format-icons": ["󰤟","󰤢","󰤥","󰖩"],
+        "format-wifi":"{icon}",
+        "format-disconnected": "󰤭",
+        "format-ethernet": "{ipaddr}/{cidr}󰊗",
+        "tooltip-format": "{ifname} via {gwaddr}",
+        "tooltip-format-wifi": "{essid}",
+        "tooltip-format-ethernet": "{ifname}",
+        "max-length": 50
+    },
     "group/group-audio": {
         "orientation": "inherit",
         "drawer": {
@@ -86,35 +73,21 @@
         "on-click-right": "pavucontrol",
         "on-click": "amixer set Master toggle",
     },
-  "idle_inhibitor": {
-    "format": "{icon}",
-    "format-icons": {
-      "activated": " ",
-      "deactivated": " "
-    },
-    "tooltip": false
-  },
-  "custom/power-menu": {
-    "format": "⏻",
-    "on-click": "~/.config/waybar/scripts/power-menu/powermenu.sh"
-  },
-  "battery": {
-    "interval": 10,
-    "states": {
-      "warning": 50,
-      "critical": 20
-    },
-    "format": "<span color='#a6e3a1'>{icon}</span>",
-    "format-icons": {
-        "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
-        "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]
-    },
-    "format-warning": "<span color='#f9e2af'>{icon}</span>",
-    "format-critical": "<span color='#f38ba8'>{icon}</span>",
-    //"format-charging-warning": "<span color='#f9e2af'>{icon}</span>",
-    //"format-charging-critical": "<span color='#f38ba8'>{icon}</span>",
+    "battery": {
+        "interval": 10,
+        "states": {
+            "warning": 50,
+            "critical": 20
+        },
+        "format": "<span color='#a6e3a1'>{icon}</span>",
+        "format-icons": {
+            "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+            "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]
+        },
+        "format-warning": "<span color='#f9e2af'>{icon}</span>",
+        "format-critical": "<span color='#f38ba8'>{icon}</span>",
     "tooltip-format": "{capacity}%",
-  },
+    },
     "group/group-backlight": {
         "orientation": "inherit",
         "drawer": {
@@ -137,22 +110,22 @@
         "on-click": "brightnessctl set 5%+",
         "on-click-right": "brightnessctl set 5%-",
         "tooltip-format": "{percent}%"
-  },
-  "custom/playerctl": {
-    "interval": 1,
-    "format": "{icon} {}",
-    "max-length": 40,
-    "exec": "~/.config/waybar/scripts/playerctl.sh",
-    "on-click": "playerctl play-pause",
-    "on-scroll-up": "playerctl next",
-    "on-scroll-down": "playerctl previous",
-    "scroll-step": 10,
-    "return-type": "json",
-    "format-icons": {
-      "Firefox": "<span color='#f38ba8'><b> </b></span>",
-      "Playing": "<span color='#b4befe'><b>󰎈</b></span>",
-      "Paused": "<span color='#f9e2af'><b>󰏤</b></span>",
     },
-    "escape": true
-  },
+    "custom/playerctl": {
+        "interval": 1,
+        "format": "{icon} {text}",
+        "max-length": 40,
+        "exec": "~/.config/waybar/scripts/playerctl.sh",
+        "on-click": "playerctl play-pause",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous",
+        "scroll-step": 10,
+        "return-type": "json",
+        "format-icons": {
+            "Firefox": "<span color='#f38ba8'><b> </b></span>",
+            "Playing": "<span color='#b4befe'><b>󰎈</b></span>",
+            "Paused": "<span color='#f9e2af'><b>󰏤</b></span>",
+        },
+        "escape": true
+    },
 }

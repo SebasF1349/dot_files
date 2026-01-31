@@ -27,6 +27,7 @@ declare -A dir_links=(
     ["$CONFIG_DIR/bat"]="$DOT_FILES_DIR/bat/"
     ["$CONFIG_DIR/nvim"]="$DOT_FILES_DIR/nvim/"
     ["$CONFIG_DIR/waybar"]="$DOT_FILES_DIR/waybar/"
+    ["$CONFIG_DIR/sway"]="$DOT_FILES_DIR/sway/"
     ["$CONFIG_DIR/wezterm"]="$DOT_FILES_DIR/wezterm/"
     ["$CONFIG_DIR/tealdeer"]="$DOT_FILES_DIR/tealdeer/"
     ["$CONFIG_DIR/rofi"]="$DOT_FILES_DIR/rofi/"
