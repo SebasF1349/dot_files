@@ -17,7 +17,7 @@
         "format": "{name}",
     },
     "tray": {
-        "icon-size": 18,
+        "icon-size": 12,
         "spacing": 5
     },
     "clock": {
