@@ -68,17 +68,16 @@ end
 local cached_filelist_info = ''
 
 local function file()
+  if api.nvim_win_get_config(0).relative ~= '' then
+    return cached_filelist_info
+  end
   local ftype = vim.o.filetype
   local label, title
   if ftype == 'help' then
     title, label = fn.expand('%:t:r:r'), 'Help'
   elseif ftype == 'netrw' then
     label = 'Netrw'
-    title = fs.basename(uv.cwd() or '')
-    local target = api.nvim_call_function('netrw#Expose', { 'netrwmftgt' })
-    if target ~= 'n/a' then
-      title = string.format('%s - Target: %s', title, target:gsub('^' .. uv.os_homedir(), '~'))
-    end
+    title = vim.b.netrw_curdir:gsub(uv.cwd(), '.')
   elseif ftype == 'fugitive' then
     title, label = fn.expand('%:h:h:t'), 'Fugitive'
   elseif ftype == 'gitcommit' then
@@ -89,8 +88,6 @@ local function file()
     title = isLoclist and fn.getloclist(0, { title = 0 }).title or fn.getqflist({ title = 0 }).title
   elseif ftype == 'oil' then
     title, label = require('oil').get_current_dir() or 'Trash', 'oil'
-  elseif api.nvim_win_get_config(0).relative ~= '' then
-    return cached_filelist_info
   end
   if label then
     return string.format('%%#SLInactiveBuffer# [%s] %%#SLActiveBuffer#%s ', label, title)
