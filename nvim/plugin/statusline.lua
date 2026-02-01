@@ -117,6 +117,7 @@ local function file()
       fname = fs.basename(uv.cwd() or '')
     end
     fname = fs.normalize(fname)
+    local fpath = bufname:sub(1, -#fname - 1)
     local bufnr = fn.bufnr(fname)
     local modified = bufnr ~= -1 and vim.bo[bufnr].modified or false
     if modified then
@@ -127,7 +128,6 @@ local function file()
     if bufname ~= current_bufname then
       file_display = string.format('%%#SLInactiveBuffer#%s', fname)
     else
-      local fpath = bufname:sub(1, -#fname - 1) -- remove fname from fpath
       current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
       current_buf_shorten.pos = #buffer_names + 1
       if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term:/') then
