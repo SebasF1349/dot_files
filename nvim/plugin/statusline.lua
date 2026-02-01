@@ -101,8 +101,8 @@ local function file()
   local buffer_list = args.getArgs()
   for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
     if api.nvim_win_get_config(win).relative == '' then
-      local b = api.nvim_win_get_buf(win)
-      local name = args.getBufName(b)
+      local bufnr = api.nvim_win_get_buf(win)
+      local name = args.getBufName(bufnr)
       if not vim.list_contains(buffer_list, name) then
         table.insert(buffer_list, name)
       end
@@ -117,7 +117,7 @@ local function file()
 
     local fname = fs.basename(bufname)
     if fname == '' then
-      fname = fs.basename(vim.uv.cwd() or '')
+      fname = fs.basename(uv.cwd() or '')
     end
     if vim.startswith(fname, '+') then
       fname = fs.joinpath(fn.fnamemodify(bufname, ':h:t'), fname)
