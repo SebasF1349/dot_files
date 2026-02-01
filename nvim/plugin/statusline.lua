@@ -64,7 +64,9 @@ local function mode()
   return string.format('%%#SLMode%s#%s', mode_char, mode_char)
 end
 
----- FILENAME ----
+---- FILELIST ----
+local cached_filelist_info = ''
+
 local function file()
   local ftype = vim.o.filetype
   local label, title
@@ -87,89 +89,71 @@ local function file()
     title = isLoclist and fn.getloclist(0, { title = 0 }).title or fn.getqflist({ title = 0 }).title
   elseif ftype == 'oil' then
     title, label = require('oil').get_current_dir() or 'Trash', 'oil'
-  elseif vim.list_contains({ 'mason' }, ftype) then
-    return ''
+  elseif api.nvim_win_get_config(0).relative ~= '' then
+    return cached_filelist_info
   end
   if label then
     return string.format('%%#SLInactiveBuffer# [%s] %%#SLActiveBuffer#%s ', label, title)
   end
-  local buffers = args.getArgs()
+
+  local current_bufname = args.getBufName()
+
+  local buffer_list = args.getArgs()
   for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
     if api.nvim_win_get_config(win).relative == '' then
-      local bufnr = api.nvim_win_get_buf(win)
-      local bufname = args.getBufName(bufnr)
-      if not vim.list_contains(buffers, bufname) then
-        table.insert(buffers, bufname)
+      local b = api.nvim_win_get_buf(win)
+      local name = args.getBufName(b)
+      if not vim.list_contains(buffer_list, name) then
+        table.insert(buffer_list, name)
       end
     end
   end
-  local current_bufname = args.getBufName()
-  local current_buf_shorten = { pos = -1, path = '', fname = '' }
-  local buffer_names = {}
-  local display_length = 0
-  for i, bufname in ipairs(buffers) do
+
+  local buffer_displays = {}
+  local total_len = 0
+
+  for i, bufname in ipairs(buffer_list) do
+    local is_active = (bufname == current_bufname)
+
     local fname = fs.basename(bufname)
-    local is_svelte = vim.startswith(fname, '+')
-    if is_svelte then
+    if fname == '' then
+      fname = fs.basename(vim.uv.cwd() or '')
+    end
+    if vim.startswith(fname, '+') then
       fname = fs.joinpath(fn.fnamemodify(bufname, ':h:t'), fname)
     end
-    if fname == '' then
-      fname = fs.basename(uv.cwd() or '')
-    end
-    fname = fs.normalize(fname)
     local fpath = bufname:sub(1, -#fname - 1)
     local bufnr = fn.bufnr(fname)
-    local modified = bufnr ~= -1 and vim.bo[bufnr].modified or false
-    if modified then
+    if bufnr ~= -1 and vim.bo[bufnr].modified or false then
       fname = fname .. '•'
     end
-    display_length = display_length + #fname + 3 -- separators + []
-    local file_display
-    if bufname ~= current_bufname then
-      file_display = string.format('%%#SLInactiveBuffer#%s', fname)
+
+    local display_str = ''
+    if is_active then
+      if fpath ~= '' and fpath ~= '.' and not vim.startswith(bufname, 'term:/') then
+        display_str = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
+      else
+        display_str = string.format('%%#SLActiveBuffer#%s', fname)
+      end
     else
-      current_buf_shorten.fname = string.format('%%#SLActiveBuffer#%s', fname)
-      current_buf_shorten.pos = #buffer_names + 1
-      if fpath == '' or fpath == '.' or vim.startswith(bufname, 'term:/') then
-        file_display = current_buf_shorten.fname
-        current_buf_shorten.path = file_display
-      else
-        file_display = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
-        current_buf_shorten.path =
-          string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fn.pathshorten(fpath), fname)
-        display_length = display_length + #fpath
-      end
+      display_str = string.format('%%#SLInactiveBuffer#%s', fname)
     end
+
     if i == fn.argidx() + 1 and fn.argc() ~= 0 then
-      if bufname == current_bufname then
-        file_display = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', file_display)
-        current_buf_shorten.fname = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', current_buf_shorten.fname)
-        current_buf_shorten.path = string.format('%%#SLActiveBuffer#[%s%%#SLActiveBuffer#]', current_buf_shorten.path)
-      else
-        file_display = string.format('%%#SLInactiveBuffer#[%s%%#SLInactiveBuffer#]', file_display)
-      end
+      local hl = is_active and '%#SLActiveBuffer#' or '%#SLInactiveBuffer#'
+      display_str = string.format('%s[%s%s]', hl, display_str, hl)
     end
-    vim.list_extend(buffer_names, { file_display })
+
+    table.insert(buffer_displays, display_str)
+    total_len = total_len + #fname + 3
   end
-  if #buffer_names == 0 then
+
+  if #buffer_displays == 0 then
     return ''
   end
-  local max_columns = vim.o.columns
-  if display_length < max_columns or current_buf_shorten.pos == -1 then
-    return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
-  elseif display_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.path < max_columns then
-    buffer_names[current_buf_shorten.pos] = current_buf_shorten.path
-    return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
-  elseif display_length - #buffer_names[current_buf_shorten.pos] + #current_buf_shorten.fname < max_columns then
-    buffer_names[current_buf_shorten.pos] = current_buf_shorten.fname
-    return string.format(' %s ', table.concat(buffer_names, ' %#SLSeparator#| '))
-  elseif #buffer_names[current_buf_shorten.pos] < max_columns then
-    return string.format(' %s […] ', buffer_names[current_buf_shorten.pos])
-  elseif #current_buf_shorten.path < max_columns then
-    return string.format(' %s […] ', current_buf_shorten.path)
-  else
-    return string.format(' %s […] ', current_buf_shorten.fname)
-  end
+
+  cached_filelist_info = string.format(' %s ', table.concat(buffer_displays, ' %#SLSeparator#| '))
+  return cached_filelist_info
 end
 
 ---- Context ----
