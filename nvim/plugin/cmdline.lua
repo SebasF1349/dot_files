@@ -5,7 +5,7 @@ local cmdline_autocmds = api.nvim_create_augroup('cmdline_autocmds', { clear = t
 -- General Options
 --------------------------------------------------
 
-require('vim._extui').enable({})
+require('vim._core.ui2').enable({})
 
 opt.showmode = false
 opt.showcmd = false
