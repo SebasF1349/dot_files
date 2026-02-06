@@ -107,7 +107,6 @@ local function file()
   end
 
   local buffer_displays = {}
-  local total_len = 0
 
   for i, bufname in ipairs(buffer_list) do
     local is_active = (bufname == current_bufname)
@@ -125,15 +124,13 @@ local function file()
       fname = fname .. '•'
     end
 
-    local display_str = ''
-    if is_active then
-      if fpath ~= '' and fpath ~= '.' and not vim.startswith(bufname, 'term:/') then
-        display_str = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
-      else
-        display_str = string.format('%%#SLActiveBuffer#%s', fname)
-      end
-    else
+    local display_str
+    if not is_active then
       display_str = string.format('%%#SLInactiveBuffer#%s', fname)
+    elseif fpath ~= '' and fpath ~= '.' and not vim.startswith(bufname, 'term:/') then
+      display_str = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
+    else
+      display_str = string.format('%%#SLActiveBuffer#%s', fname)
     end
 
     if i == fn.argidx() + 1 and fn.argc() ~= 0 then
@@ -142,7 +139,6 @@ local function file()
     end
 
     table.insert(buffer_displays, display_str)
-    total_len = total_len + #fname + 3
   end
 
   if #buffer_displays == 0 then
