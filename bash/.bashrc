@@ -241,4 +241,9 @@ if [ -f /etc/os-release ]; then
     esac
 fi
 
-eval "$(starship init bash)"
+if [ "$TERM" != "linux" ]; then
+    eval "$(starship init bash)"
+else
+    unset PROMPT_COMMAND
+    PS1='\u@\h:\w\$ '
+fi
