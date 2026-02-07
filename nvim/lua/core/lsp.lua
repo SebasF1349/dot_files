@@ -68,6 +68,20 @@ local function on_attach(client_id, buf)
     return
   end
 
+  vim.api.nvim_create_autocmd('LspProgress', {
+    buffer = buf,
+    callback = function(ev)
+      local value = ev.data.params.value
+      vim.api.nvim_echo({ { value.message or 'done' } }, false, {
+        id = 'lsp',
+        kind = 'progress',
+        title = value.title,
+        status = value.kind ~= 'end' and 'running' or 'success',
+        percent = value.percentage,
+      })
+    end,
+  })
+
   if client:supports_method('completionItem/resolve') then
     ---@param items table<integer, { err: (lsp.ResponseError)?, result: any, context: lsp.HandlerContext }>
     local function get_docs(items)

@@ -107,7 +107,6 @@ local function file()
   end
 
   local buffer_displays = {}
-  local total_len = 0
 
   for i, bufname in ipairs(buffer_list) do
     local is_active = (bufname == current_bufname)
@@ -125,15 +124,13 @@ local function file()
       fname = fname .. '•'
     end
 
-    local display_str = ''
-    if is_active then
-      if fpath ~= '' and fpath ~= '.' and not vim.startswith(bufname, 'term:/') then
-        display_str = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
-      else
-        display_str = string.format('%%#SLActiveBuffer#%s', fname)
-      end
-    else
+    local display_str
+    if not is_active then
       display_str = string.format('%%#SLInactiveBuffer#%s', fname)
+    elseif fpath ~= '' and fpath ~= '.' and not vim.startswith(bufname, 'term:/') then
+      display_str = string.format('%%#SLInactiveBuffer#%s%%#SLActiveBuffer#%s', fpath, fname)
+    else
+      display_str = string.format('%%#SLActiveBuffer#%s', fname)
     end
 
     if i == fn.argidx() + 1 and fn.argc() ~= 0 then
@@ -142,7 +139,6 @@ local function file()
     end
 
     table.insert(buffer_displays, display_str)
-    total_len = total_len + #fname + 3
   end
 
   if #buffer_displays == 0 then
@@ -216,31 +212,6 @@ local function custom_diagnostics()
   return string.format('%s%s', local_diagnostics, workspace_diagnostics)
 end
 
----- LS PROGRESS
-local spinner = { '•◦', '◦•' }
-local progress = 1
-local ls_progress = ''
-
-vim.lsp.handlers['$/progress'] = function(_, p, _)
-  if p.value.kind == 'end' and _G.ls_progress_timer:is_active() then
-    ls_progress = ''
-    _G.ls_progress_timer:stop()
-    _G.ls_progress_timer:close()
-    api.nvim__redraw({ statusline = true })
-  elseif not _G.ls_progress_timer or not _G.ls_progress_timer:is_active() then
-    _G.ls_progress_timer = uv.new_timer()
-    _G.ls_progress_timer:start(
-      0,
-      200,
-      vim.schedule_wrap(function()
-        progress = (progress == 1) and 2 or 1
-        ls_progress = string.format('%%#SLSeparator# %s', spinner[progress])
-        api.nvim__redraw({ statusline = true })
-      end)
-    )
-  end
-end
-
 ---- STATUSLINE ----
 Statusline = {
   active = function()
@@ -251,7 +222,6 @@ Statusline = {
         file(),
         '%=',
         get_context(),
-        ls_progress,
         ' ',
         custom_diagnostics(),
         get_branch(),
