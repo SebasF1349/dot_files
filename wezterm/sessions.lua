@@ -44,7 +44,7 @@ end
 
 function M.setup()
 	if not exists(workspaces_dir) then
-		os.execute("mkdir " .. workspaces_dir)
+		os.execute("mkdir -p " .. workspaces_dir)
 	end
 end
 
