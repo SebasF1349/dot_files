@@ -10,7 +10,7 @@ local M = {}
 ---@param buf string
 ---@return string?
 local function normalizeCompleteBufName(buf)
-  return fs.relpath('.', buf)
+  return fn.fnamemodify(buf, ':p:~:.')
 end
 
 ---Get normalized filename
