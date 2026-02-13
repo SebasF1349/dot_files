@@ -182,7 +182,7 @@ local function on_attach(client_id, buf)
   vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = buf })
   vim.keymap.set('i', '<C-n>', function()
     if vim.fn.pumvisible() ~= 0 then
-      vim.api.nvim_input('<C-n>')
+      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-n>', true, false, true), 'n', false)
     elseif next(vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/completion' })) then
       vim.lsp.completion.get()
     elseif vim.bo.omnifunc == '' then
