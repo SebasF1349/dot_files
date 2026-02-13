@@ -5,6 +5,26 @@ vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (oss.is_win and ';' or 
 
 local M = {}
 
+vim.api.nvim_create_autocmd('LspProgress', {
+  callback = function(ev)
+    local value = ev.data.params.value
+    local clientId = ev.data.client_id
+    local client = assert(vim.lsp.get_clients({ id = clientId })[1])
+
+    local msgId = ('progress-lsp-%s-%s'):format(clientId, value.title)
+    local title = ('[%s] %s'):format(client.name or clientId, value.title)
+    local msg = value.message or 'finished'
+
+    vim.api.nvim_echo({ { msg } }, false, {
+      id = msgId,
+      kind = 'progress',
+      title = title,
+      status = 'success',
+      percent = value.percentage,
+    })
+  end,
+})
+
 vim.diagnostic.config({
   underline = false,
   float = {
@@ -67,20 +87,6 @@ local function on_attach(client_id, buf)
     client:stop()
     return
   end
-
-  vim.api.nvim_create_autocmd('LspProgress', {
-    buffer = buf,
-    callback = function(ev)
-      local value = ev.data.params.value
-      vim.api.nvim_echo({ { value.message or 'done' } }, false, {
-        id = 'lsp',
-        kind = 'progress',
-        title = value.title,
-        status = value.kind ~= 'end' and 'running' or 'success',
-        percent = value.percentage,
-      })
-    end,
-  })
 
   if client:supports_method('completionItem/resolve') then
     ---@param items table<integer, { err: (lsp.ResponseError)?, result: any, context: lsp.HandlerContext }>
