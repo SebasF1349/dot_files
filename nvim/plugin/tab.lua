@@ -30,7 +30,7 @@ function _G._personal_tab_label(i)
     return '[No name]'
   elseif protocol == 'fugitive' or protocol == 'health' then
     return protocol .. '://'
-  elseif vim.bo[buf].filetype == 'git' and first_line and first_line:sub(1, 1) == "*" then
+  elseif vim.bo[buf].filetype == 'git' and first_line then
     return 'Git Log'
   elseif vim.endswith(name, '/') or vim.endswith(name, '\\') then
     local dirname = name:sub(1, -2)
