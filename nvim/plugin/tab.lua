@@ -25,10 +25,13 @@ function _G._personal_tab_label(i)
   end
   local name = api.nvim_buf_get_name(buf)
   local protocol = name:match('^(.*)://')
+  local first_line = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
   if name == '' then
     return '[No name]'
   elseif protocol == 'fugitive' or protocol == 'health' then
     return protocol .. '://'
+  elseif vim.bo[buf].filetype == 'git' and first_line and first_line:sub(1, 1) == "*" then
+    return 'Git Log'
   elseif vim.endswith(name, '/') or vim.endswith(name, '\\') then
     local dirname = name:sub(1, -2)
     local tail = fs.basename(dirname)
