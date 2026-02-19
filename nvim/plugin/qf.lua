@@ -853,6 +853,7 @@ local function grep(listType, args)
             setList(listType, {
               lines = not data and chunk or process,
               efm = vim.o.errorformat,
+              title = table.concat(cmd, ' '),
             }, action)
             action = 'a'
 
