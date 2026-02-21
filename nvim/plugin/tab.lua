@@ -11,6 +11,7 @@ function _G._personal_tab()
 
     table.insert(out, (' %d: %%{v:lua._personal_tab_label(%d)} '):format(i, i))
   end
+  table.insert(out, '%#TabLine#')
 
   return table.concat(out)
 end
