@@ -49,21 +49,12 @@ map('n', '<leader>w', ':find ', { desc = 'Find Buffer in [W]indow' })
 map('n', '<leader>s', ':sfind ', { desc = 'Find Buffer in [S]plit' })
 map('n', '<leader>v', ':vsplit | find ', { desc = 'Find Buffer in [V]ertical Split' })
 
-local function set_path()
-  local dirs = vim.system({ 'fd', '.', '--type', 'd', '--hidden', '--absolute-path' }):wait()
-  if not dirs.stdout then
-    return '.,,**'
-  else
-    return '.,,' .. dirs.stdout:gsub('\n', ','):gsub('%./', '')
-  end
-end
-
 local files_list
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
   if not files_list then
-    local fd_cmd = { 'fd', '.', '--type', 'file', '--relative-path', '--color', 'never', '--hidden' }
-    local files = vim.system(fd_cmd, { text = true }):wait()
+    local cmd = { 'fd', '.', '--type', 'file', '--relative-path', '--color', 'never', '--hidden' }
+    local files = vim.system(cmd, { text = true }):wait()
     if not files.stdout then
       return {}
     end
@@ -72,7 +63,6 @@ function FindFunc(cmdarg, _)
   return fn.matchfuzzy(files_list, cmdarg)
 end
 
-opt.path = set_path()
 opt.findfunc = 'v:lua.FindFunc'
 
 api.nvim_create_autocmd({ 'CmdlineLeave' }, {
