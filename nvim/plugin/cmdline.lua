@@ -24,8 +24,11 @@ opt.wildmode = 'noselect:lastused,full'
 
 api.nvim_create_autocmd({ 'CmdlineChanged' }, {
   pattern = '*',
-  callback = function()
-    fn.wildtrigger()
+  callback = function(args)
+    local cmdline = fn.getcmdline()
+    if not args.match == ':' or not vim.startswith(cmdline, '!') then
+      fn.wildtrigger()
+    end
   end,
   group = cmdline_autocmds,
   desc = 'Autocompletion in cmdline',
