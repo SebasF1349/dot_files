@@ -1,4 +1,4 @@
-local api, fn, fs, uv = vim.api, vim.fn, vim.fs, vim.uv
+local api, fn, fs, cwd = vim.api, vim.fn, vim.fs, vim.uv.cwd
 local mocha = require('catppuccin.palettes').get_palette('mocha')
 local signs = require('utils.ui').diagnostic_icons_num
 local args = require('modules.args')
@@ -77,7 +77,7 @@ local function file()
     title, label = fn.expand('%:t:r:r'), 'Help'
   elseif ftype == 'netrw' then
     label = 'Netrw'
-    title = vim.b.netrw_curdir:gsub(uv.cwd(), '.')
+    title = vim.b.netrw_curdir:gsub(cwd(), '.')
   elseif ftype == 'fugitive' then
     title, label = fn.expand('%:h:h:t'), 'Fugitive'
   elseif ftype == 'gitcommit' then
@@ -113,7 +113,7 @@ local function file()
 
     local fname = fs.basename(bufname)
     if fname == '' then
-      fname = fs.basename(uv.cwd() or '')
+      fname = fs.basename(cwd() or '')
     end
     if vim.startswith(fname, '+') then
       fname = fs.joinpath(fn.fnamemodify(bufname, ':h:t'), fname)
