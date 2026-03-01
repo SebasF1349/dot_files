@@ -5,7 +5,11 @@ local cmdline_autocmds = api.nvim_create_augroup('cmdline_autocmds', { clear = t
 -- General Options
 --------------------------------------------------
 
-require('vim._core.ui2').enable({})
+require('vim._core.ui2').enable({
+  msg = {
+    targets = { progress = 'msg' },
+  },
+})
 
 opt.showmode = false
 opt.showcmd = false
