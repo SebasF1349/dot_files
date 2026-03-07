@@ -198,7 +198,7 @@ local function buf_get_ts_highlights(bufnr, lnum)
       return
     end
 
-    for capture, node, metadata in query:iter_captures(root_node, bufnr, row, root_end_row + 1) do
+    for capture, node, metadata in query:iter_captures(root_node, bufnr, row, row + 1) do
       if capture == nil then
         break
       end
@@ -276,56 +276,73 @@ vim.api.nvim_create_autocmd('CursorMoved', {
 })
 
 ---@param items vim.quickfix.entry[]
----@param i integer
----@param stop boolean
-local function hl_line(items, i, stop)
-  if stop and i == 100 then
-    return
-  end
-  local item = table.remove(items, 1)
-  if not item then
-    return
-  end
-
-  local text_space = 2
-  if item.lnum > 0 then
-    text_space = #tostring(item.lnum) + 4
-    vim.hl.range(qfbufnr, qfim_namespace, 'CursorLineNr', { i, 0 }, { i, text_space })
-  end
-  local default_hl = 'CursorLineNr'
-  if item.type ~= '' then
-    default_hl = highlights[item.type]
-  else
-    -- TS highlight
-    if not vim.api.nvim_buf_is_loaded(item.bufnr) then
-      vim.fn.bufload(item.bufnr)
+local function hl_lines(items)
+  local columns = vim.o.columns
+  for i = 0, 100 do
+    local item = items[i + 1]
+    if not item then
+      return
     end
 
-    local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
-    if src_line then
-      -- I trim spaces so I need to take that into account before comparing
-      -- (if the og line has spaces at the end it deserves to not be found)
-      local src_space = src_line:match('^%s*'):len()
-      -- Only add highlights if the text in the quickfix matches the source line
-      if item.text == src_line:sub(src_space + 1) then
-        local offset = text_space - src_space
-        local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
-        for _, hl in ipairs(hls) do
-          local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
-          if end_col == -1 then
-            end_col = src_line:len()
+    local is_unloaded = not vim.api.nvim_buf_is_loaded(item.bufnr)
+    local default_hl = 'CursorLineNr'
+    local text_space = 2
+    if item.lnum > 0 then
+      text_space = #tostring(item.lnum) + 4
+      vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, 0, {
+        hl_group = default_hl,
+        end_col = text_space,
+        priority = 100,
+        strict = false,
+      })
+    end
+    if item.type ~= '' then
+      default_hl = highlights[item.type]
+    else
+      if is_unloaded then
+        vim.cmd('noautocmd call bufload(' .. item.bufnr .. ')')
+      end
+
+      -- TS highlight
+      local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
+      if src_line then
+        -- I trim spaces so I need to take that into account before comparing
+        -- (if the og line has spaces at the end it deserves to not be found)
+        local src_space = src_line:match('^%s*'):len()
+        -- local src_space = src_line:find('^%s*')
+        -- Only add highlights if the text in the quickfix matches the source line
+        if item.text == src_line:sub(src_space + 1) then
+          local offset = text_space - src_space
+          local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
+          for _, hl in ipairs(hls) do
+            local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
+            if end_col == -1 then
+              end_col = src_line:len()
+            end
+            vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, start_col + offset, {
+              hl_group = hl_group,
+              end_col = end_col + offset,
+              priority = 100,
+              strict = false,
+            })
           end
-          vim.hl.range(qfbufnr, qfim_namespace, hl_group, { i, start_col + offset }, { i, end_col + offset })
+          goto continue
         end
-        vim.defer_fn(function()
-          hl_line(items, i + 1, stop)
-        end, 10)
-        return
       end
     end
+
+    vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, text_space, {
+      hl_group = default_hl,
+      end_col = columns,
+      priority = 100,
+      strict = false,
+    })
+
+    ::continue::
+    if is_unloaded then
+      vim.api.nvim_buf_delete(item.bufnr, { unload = true })
+    end
   end
-  vim.hl.range(qfbufnr, qfim_namespace, default_hl, { i, text_space }, { i, vim.o.columns })
-  hl_line(items, i + 1, stop)
 end
 
 function _G.quickfixtextfunc(info)
@@ -373,7 +390,7 @@ function _G.quickfixtextfunc(info)
   vim.defer_fn(function()
     vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
     add_virt_lines(list)
-    hl_line(list, 0, vim.fn.has('win32') == 1)
+    hl_lines(list)
   end, 10)
   return ret
 end
