@@ -63,7 +63,7 @@ vim.diagnostic.config({
   },
 })
 
--- copied from https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/util.lua#L23C1-L28C4
+-- copied from https://github.com/neovim/nvim-lspconfig/blob/2163c54bb6cfec53e3e555665ada945b8c8331b9/lua/lspconfig/util.lua#L393-L398
 -- until https://github.com/neovim/neovim/issues/33225 gets resolved
 local function bufname_valid(bufname)
   if
@@ -84,7 +84,6 @@ local function on_attach(client_id, buf)
 
   local bufname = vim.api.nvim_buf_get_name(buf)
   if #bufname ~= 0 and not bufname_valid(bufname) then
-    client:stop()
     return
   end
 
