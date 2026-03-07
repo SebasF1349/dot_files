@@ -325,7 +325,6 @@ end
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
-  ---@param args {buf:integer, data:{client_id:integer}}
   callback = function(args)
     on_attach(args.data.client_id, args.buf)
   end,
