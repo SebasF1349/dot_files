@@ -803,106 +803,15 @@ end
 vim.o.grepprg = 'rg --vimgrep --smart-case --hidden'
 vim.o.grepformat = '%f:%l:%c:%m'
 
----@param listType 'c' | 'l'
----@param args table
-local function grep(listType, args)
-  local async = require('vim._async')
-
-  async.run(function()
-    local grepprg = vim.o.grepprg
-    local cmd = vim.split(grepprg, '%s+', { trimempty = true })
-
-    local search_arg = {}
-    for _, arg in ipairs(args) do
-      if #search_arg == 0 then
-        if arg:match('^[\'"].*[^\\][\'"]$') then
-          table.insert(cmd, arg:sub(2, -2))
-        elseif arg:match('^[\'"]') then
-          table.insert(search_arg, arg:sub(2))
-        else
-          table.insert(cmd, arg)
-        end
-      elseif arg:match('[^\\][\'"]$') then
-        table.insert(search_arg, arg:sub(1, -2))
-        local str_arg = table.concat(search_arg, ' ')
-        table.insert(cmd, str_arg)
-        search_arg = {}
-      else
-        table.insert(search_arg, arg)
-      end
-    end
-
-    local batch_size = 500
-    local chunk = {}
-    local action = ' '
-    local opened = false
-
-    local result = async.await(3, vim.system, cmd, {
-      text = true,
-      stdout = function(err, data)
-        assert(not err)
-        if data then
-          local lines = vim.split(data, '\n', { trimempty = true })
-          if #lines > 0 then
-            for _, line in ipairs(lines) do
-              table.insert(chunk, line)
-            end
-          end
-        end
-
-        local process = {}
-        for i = 1, batch_size do
-          process[i] = chunk[i]
-        end
-
-        if #chunk >= batch_size then
-          local new_chunk = {}
-          for i = batch_size + 1, #chunk do
-            table.insert(new_chunk, chunk[i])
-          end
-          chunk = new_chunk
-        else
-          chunk = {}
-        end
-
-        vim.schedule(function()
-          if #process > 0 or data ~= nil then
-            setList(listType, {
-              lines = not data and chunk or process,
-              efm = vim.o.errorformat,
-              title = table.concat(cmd, ' '),
-            }, action)
-            action = 'a'
-
-            if not opened then
-              vim.schedule(function()
-                local list = getList(listType)
-                if list.size == 0 then
-                  vim.notify('No results found', vim.log.levels.WARN)
-                else
-                  vim.cmd(listType .. 'open')
-                  opened = true
-                end
-              end)
-            end
-          end
-        end)
-      end,
-    })
-
-    if result.code ~= 0 then
-      vim.notify('Grep failed with exit code: ' .. result.code, vim.log.levels.ERROR)
-    end
-  end)
-end
-
 vim.api.nvim_create_user_command('Rg', function(opts)
-  grep('c', opts.fargs)
-end, { nargs = '+', complete = 'file_in_path' })
+  last_cmd = 'silent! grep! ' .. opts.args
+  vim.cmd(last_cmd)
+end, { nargs = '+' })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
-  grep('l', opts.fargs)
-end, { nargs = '+', complete = 'file_in_path' })
+  last_cmd = 'silent lgrep! "' .. opts.args .. '" %'
+  vim.cmd(last_cmd)
+end, { nargs = '+' })
 
 vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
 
@@ -1147,6 +1056,23 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
 --------------------------------------------------
 -- Extras
 --------------------------------------------------
+
+
+vim.api.nvim_create_autocmd('QuickFixCmdPost', {
+  group = qf_group,
+  callback = function(args)
+    vim.schedule(function()
+      local listType = vim.startswith(args.match, 'l') and 'l' or 'c'
+      local list = getList(listType)
+      if list.size == 0 then
+        vim.notify('No results found', vim.log.levels.WARN)
+      else
+        vim.cmd(listType .. 'open')
+      end
+    end)
+  end,
+  desc = 'Open List Windows automatically',
+})
 
 vim.api.nvim_create_autocmd('WinEnter', {
   group = qf_group,
