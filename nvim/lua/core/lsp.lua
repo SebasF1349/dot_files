@@ -244,13 +244,11 @@ local function on_attach(client_id, buf)
 
         local extmarks = {}
         for i, item in ipairs(options.items) do
-          extmarks[i] = vim.api.nvim_buf_set_extmark(
-            0,
-            ns_hl,
-            item.lnum - 1,
-            item.col - 1,
-            { hl_group = 'LspReferenceText', end_col = item.end_col - 1, virt_text_pos = 'overlay' }
-          )
+          extmarks[i] = vim.api.nvim_buf_set_extmark(0, ns_hl, item.lnum - 1, item.col - 1, {
+            hl_group = 'LspReferenceText',
+            end_col = item.end_col - 1,
+            virt_text_pos = 'overlay',
+          })
           vim.defer_fn(function()
             vim.api.nvim_buf_del_extmark(0, ns_hl, extmarks[i])
           end, 10 * 1000)
