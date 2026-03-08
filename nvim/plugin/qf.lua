@@ -287,6 +287,7 @@ local function hl_lines(items)
     local is_unloaded = not vim.api.nvim_buf_is_loaded(item.bufnr)
     local default_hl = 'CursorLineNr'
     local text_space = 2
+    local ts_highlighted = nil
     if item.lnum > 0 then
       text_space = #tostring(item.lnum) + 4
       vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, 0, {
@@ -305,42 +306,39 @@ local function hl_lines(items)
 
       -- TS highlight
       local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
-      if src_line then
-        -- I trim spaces so I need to take that into account before comparing
-        -- (if the og line has spaces at the end it deserves to not be found)
+      if src_line and item.text == vim.trim(src_line) then
         local src_space = src_line:match('^%s*'):len()
-        -- local src_space = src_line:find('^%s*')
-        -- Only add highlights if the text in the quickfix matches the source line
-        if item.text == src_line:sub(src_space + 1) then
-          local offset = text_space - src_space
-          local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
-          for _, hl in ipairs(hls) do
-            local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
-            if end_col == -1 then
-              end_col = src_line:len()
-            end
-            vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, start_col + offset, {
-              hl_group = hl_group,
-              end_col = end_col + offset,
-              priority = 100,
-              strict = false,
-            })
+        local offset = text_space - src_space
+        local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
+        for _, hl in ipairs(hls) do
+          local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
+          if end_col == -1 then
+            end_col = src_line:len()
           end
-          goto continue
+          vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, start_col + offset, {
+            hl_group = hl_group,
+            end_col = end_col + offset,
+            priority = 100,
+            strict = false,
+          })
         end
+        if #hls > 0 then
+          ts_highlighted = true
+        end
+      end
+
+      if is_unloaded then
+        vim.api.nvim_buf_delete(item.bufnr, { unload = true })
       end
     end
 
-    vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, text_space, {
-      hl_group = default_hl,
-      end_col = columns,
-      priority = 100,
-      strict = false,
-    })
-
-    ::continue::
-    if is_unloaded then
-      vim.api.nvim_buf_delete(item.bufnr, { unload = true })
+    if not ts_highlighted then
+      vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, text_space, {
+        hl_group = default_hl,
+        end_col = columns,
+        priority = 100,
+        strict = false,
+      })
     end
   end
 end
