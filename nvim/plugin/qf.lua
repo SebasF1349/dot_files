@@ -275,6 +275,15 @@ vim.api.nvim_create_autocmd('CursorMoved', {
   desc = 'Show first virtual line',
 })
 
+local function hl_line(line, col, end_col, hl_group)
+  vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, line, col, {
+    hl_group = hl_group,
+    end_col = end_col,
+    priority = 100,
+    strict = false,
+  })
+end
+
 ---@param items vim.quickfix.entry[]
 local function hl_lines(items)
   local columns = vim.o.columns
@@ -290,12 +299,7 @@ local function hl_lines(items)
     local ts_highlighted = nil
     if item.lnum > 0 then
       text_space = #tostring(item.lnum) + 4
-      vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, 0, {
-        hl_group = default_hl,
-        end_col = text_space,
-        priority = 100,
-        strict = false,
-      })
+      hl_line(i, 0, text_space, default_hl)
     end
     if item.type ~= '' then
       default_hl = highlights[item.type]
@@ -315,12 +319,7 @@ local function hl_lines(items)
           if end_col == -1 then
             end_col = src_line:len()
           end
-          vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, start_col + offset, {
-            hl_group = hl_group,
-            end_col = end_col + offset,
-            priority = 100,
-            strict = false,
-          })
+          hl_line(i, start_col + offset, end_col + offset, hl_group)
         end
         if #hls > 0 then
           ts_highlighted = true
@@ -333,12 +332,7 @@ local function hl_lines(items)
     end
 
     if not ts_highlighted then
-      vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, i, text_space, {
-        hl_group = default_hl,
-        end_col = columns,
-        priority = 100,
-        strict = false,
-      })
+      hl_line(i, text_space, columns, default_hl)
     end
   end
 end
