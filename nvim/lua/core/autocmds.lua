@@ -34,7 +34,7 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
 vim.api.nvim_create_autocmd({ 'BufEnter' }, {
   callback = function()
     vim.schedule(function()
-      if vim.o.buftype == '' then
+      if vim.o.buftype == '' and vim.o.filetype ~= 'dbout' then
         vim.fn.matchadd('ColorColumn', '\\%101v', 100)
       end
     end)

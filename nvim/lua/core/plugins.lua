@@ -77,6 +77,8 @@ lint.linters_by_ft = {
   json = { 'jsonlint' },
   text = { 'vale' },
   php = { 'phpstan' },
+  sql = { 'sqlfluff' },
+  mysql = { 'sqlfluff' },
 }
 
 local phpstanDir = vim.fs.root(0, 'phpstan.neon')
@@ -92,6 +94,12 @@ if phpstanDir then
 end
 
 lint.linters.shellcheck.args = { '-x' }
+lint.linters.sqlfluff.args = {
+  'lint',
+  '--format=json',
+  '--dialect=mariadb',
+  '-',
+}
 
 local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
@@ -119,6 +127,10 @@ require('conform').setup({
     prettier = {
       append_args = { '--print-width', '120', '--tab-width', '4' },
     },
+    sqlfluff = {
+      args = { 'format', '--dialect=mariadb', '-' },
+      require_cwd = false,
+    },
   },
   formatters_by_ft = {
     lua = { 'stylua' },
@@ -135,6 +147,8 @@ require('conform').setup({
     rust = { 'rustfmt' },
     yaml = { 'yamlfmt' },
     php = { 'php_cs_fixer' },
+    sql = { 'sqlfluff' },
+    mysql = { 'sqlfluff' },
   },
   notify_on_error = false,
 })
@@ -595,6 +609,8 @@ vim.filetype.add({
   },
 })
 
+vim.treesitter.language.register('sql', { 'mysql' })
+
 local parsers = {
   -- langs
   'c',
@@ -677,3 +693,383 @@ vim.api.nvim_create_autocmd('PackChanged', {
     end
   end,
 })
+
+--------------------------------------------------
+-- DB
+--------------------------------------------------
+
+local secrets_path = vim.fn.expand('~/secrets/nvim.lua')
+local db_status, db_secrets = pcall(dofile, secrets_path)
+
+if db_status and db_secrets and db_secrets.databases then
+  vim.pack.add({
+    { src = 'https://github.com/tpope/vim-dadbod' },
+    { src = 'https://github.com/kristijanhusak/vim-dadbod-ui' },
+    { src = 'https://github.com/kristijanhusak/vim-dadbod-completion' },
+  })
+
+  local data_path = vim.fn.stdpath('data')
+  vim.g.db_ui_save_location = data_path .. '/dadbod_ui'
+  vim.g.db_ui_execute_on_save = false
+  vim.g.db_ui_auto_execute_table_helpers = 1
+  vim.g.db_ui_use_nvim_notify = true
+  vim.g.db_ui_show_database_icon = true
+  vim.g.db_ui_use_nerd_fonts = true
+  vim.g.db_ui_disable_mappings_sql = false
+
+  local DBFactory = require('modules.db_types')
+  local databases_connections = DBFactory.generate(db_secrets.databases)
+
+  local SSHFactory = require('modules.ssh_types')
+  local ssh_connections = SSHFactory.generate(db_secrets.ssh)
+
+  local sql_helpers = {
+    {
+      name = 'Columns',
+      query = [[
+SELECT
+    COLUMN_NAME AS 'Field',
+    COLUMN_TYPE AS 'Type',
+    IS_NULLABLE AS 'Null',
+    COLUMN_DEFAULT AS 'Default',
+    COLUMN_KEY AS 'Key',
+    EXTRA AS 'Extra',
+    COLLATION_NAME AS 'Collation',
+    COLUMN_COMMENT AS 'Comment'
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = '%s'
+    AND TABLE_SCHEMA = '%s'
+ORDER BY ORDINAL_POSITION;
+      ]],
+    },
+    {
+      name = 'Indexes',
+      query = [[
+SELECT
+    TABLE_NAME AS 'Table',
+    NON_UNIQUE AS 'Non Unique',
+    INDEX_NAME AS 'Index Name',
+    SEQ_IN_INDEX AS 'Sequence in Index',
+    COLUMN_NAME AS 'Column',
+    INDEX_TYPE AS 'Type',
+    COLLATION AS 'Order',
+    CARDINALITY AS 'Cardinality',
+    NULLABLE AS 'Nullable',
+    COMMENT AS 'Column Comment',
+    INDEX_COMMENT AS 'Index Comment'
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_NAME = '%s'
+    AND TABLE_SCHEMA = '%s';
+      ]],
+    },
+    {
+      name = 'Keys',
+      query = [[
+SELECT
+    CONSTRAINT_NAME AS 'Constraint Name',
+    COLUMN_NAME AS 'Column',
+    ORDINAL_POSITION AS 'Ordinal',
+    REFERENCED_TABLE_NAME AS 'Referenced Table',
+    REFERENCED_COLUMN_NAME AS 'Referenced Column'
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE TABLE_NAME = '%s'
+    AND TABLE_SCHEMA = '%s'
+ORDER BY CONSTRAINT_NAME;
+      ]],
+    },
+    {
+      name = 'References',
+      query = [[
+SELECT
+    TABLE_SCHEMA AS 'Referencing Database',
+    TABLE_NAME AS 'Referencing Table',
+    COLUMN_NAME AS 'Referencing Column',
+    CONSTRAINT_NAME AS 'Foreign Key Name',
+    REFERENCED_COLUMN_NAME AS 'Referenced Column'
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_NAME = '%s'
+    AND REFERENCED_TABLE_SCHEMA = '%s'
+ORDER BY TABLE_NAME;
+      ]],
+    },
+    {
+      name = 'Table Data',
+      query = [[
+SELECT 
+    ENGINE,
+    TABLE_ROWS,
+    AUTO_INCREMENT,
+    ROUND(DATA_LENGTH / 1024 / 1024, 2) AS 'Data_Size_MB',
+    ROUND(INDEX_LENGTH / 1024 / 1024, 2) AS 'Index_Size_MB',
+    ROUND(DATA_FREE / 1024 / 1024, 2) AS 'Free_Space_MB',
+    CREATE_TIME,
+    UPDATE_TIME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_NAME = '%s' 
+    AND TABLE_SCHEMA = '%s';
+      ]],
+    },
+    {
+      name = 'Triggers',
+      query = [[
+SELECT 
+    TRIGGER_NAME, 
+    ACTION_TIMING, 
+    EVENT_MANIPULATION AS 'EVENT', 
+    ACTION_STATEMENT AS 'LOGIC'
+FROM INFORMATION_SCHEMA.TRIGGERS
+WHERE EVENT_OBJECT_TABLE = '%s' 
+    AND TRIGGER_SCHEMA = '%s';
+      ]],
+    },
+  }
+
+  vim.g.db_ui_table_helpers = {
+    mysql = {
+      List = [[SELECT *
+    FROM {optional_schema}`{table}`
+    LIMIT 10;]],
+      Columns = '',
+      ['Primary Keys'] = '',
+      Indexes = '',
+      ['Foreign Keys'] = '',
+    },
+  }
+
+  local db_tab
+
+  local function get_db_tab()
+    if db_tab and vim.api.nvim_tabpage_is_valid(db_tab) then
+      return db_tab
+    end
+  end
+
+  local function open_db_tab()
+    db_tab = get_db_tab()
+    local curr_tab = vim.api.nvim_get_current_tabpage()
+    if not db_tab then
+      vim.cmd('tab DBUI')
+    elseif curr_tab ~= db_tab then
+      vim.api.nvim_set_current_tabpage(db_tab)
+    end
+    vim.schedule(function()
+      vim.api.nvim_win_set_cursor(0, { 1, 0 })
+      vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(DBUI_Redraw)', true, false, true), 'm')
+    end)
+  end
+
+  local function toggle_db_tab()
+    db_tab = get_db_tab()
+    local curr_tab = vim.api.nvim_get_current_tabpage()
+    if curr_tab == db_tab then
+      local tab_nr = vim.api.nvim_tabpage_get_number(db_tab)
+      vim.cmd('wa | ' .. tab_nr .. 'tabclose')
+      db_tab = nil
+      return
+    else
+      open_db_tab()
+    end
+  end
+
+  local active_tunnels = {}
+
+  local function connect_db(name)
+    local db = databases_connections[name]
+    if not db then
+      vim.notify('DB "' .. name .. '" not found', vim.log.levels.ERROR)
+      return
+    end
+
+    local dbs = vim.g.dbs or {}
+    if dbs[name] then
+      open_db_tab()
+      return
+    end
+
+    if not db.db_host then
+      local ssh = ssh_connections[name]
+      if not ssh then
+        vim.notify('Missing credentials to open tunnel to ' .. name, vim.log.levels.ERROR)
+        return
+      end
+      local pid = ssh:create_tunnel(active_tunnels, name, db.db_port)
+      active_tunnels[name] = pid
+    end
+
+    dbs[name] = db:get_connection_cmd()
+
+    vim.g.dbs = dbs
+
+    open_db_tab()
+  end
+
+  local function disconnect_db(name)
+    local dbs = vim.g.dbs or {}
+    if not dbs[name] then
+      vim.notify('DB "' .. name .. '" is not active', vim.log.levels.WARN)
+      return
+    end
+
+    dbs[name] = nil
+    vim.g.dbs = dbs
+    vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(DBUI_Redraw)', true, false, true), 'm')
+
+    local pid = active_tunnels[name]
+    if not pid then
+      return
+    end
+
+    vim.system({ 'kill', tostring(pid) }, {}, function(obj)
+      if obj.code == 0 then
+        vim.schedule(function()
+          vim.notify('Successfully killed tunnel ' .. name, vim.log.levels.INFO)
+          active_tunnels[name] = nil
+        end)
+      else
+        vim.schedule(function()
+          vim.notify('Failed to kill tunnel: ' .. obj.stderr, vim.log.levels.ERROR)
+        end)
+      end
+    end)
+  end
+
+  local function db_completion(arg_lead, list)
+    local items = {}
+    for name, _ in pairs(list) do
+      if name:find('^' .. arg_lead) then
+        table.insert(items, name)
+      end
+    end
+    return items
+  end
+
+  local function all_db_complete(arg_lead)
+    return db_completion(arg_lead, databases_connections)
+  end
+
+  local function active_db_complete(arg_lead)
+    return db_completion(arg_lead, vim.g.dbs)
+  end
+
+  vim.api.nvim_create_user_command('ConnectDB', function(opts)
+    connect_db(opts.args)
+  end, { nargs = 1, complete = all_db_complete })
+
+  vim.api.nvim_create_user_command('DisconnectDB', function(opts)
+    disconnect_db(opts.args)
+  end, { nargs = 1, complete = active_db_complete })
+
+  vim.keymap.set('n', '<leader>dd', toggle_db_tab, { desc = '[D]B: Toggle' })
+  vim.keymap.set('n', '<leader>dn', ':ConnectDB ', { desc = '[D]B: [N]ew Connection' })
+  vim.keymap.set('n', '<leader>ds', ':DisconnectDB ', { desc = '[D]B: [S]top Connection' })
+
+  vim.api.nvim_create_autocmd('VimLeavePre', {
+    callback = function()
+      local pids = vim.tbl_values(active_tunnels)
+      if #pids > 0 then
+        local cmd = { 'kill', '-9' }
+        for _, pid in ipairs(pids) do
+          table.insert(cmd, tostring(pid))
+        end
+        vim.system(cmd):wait()
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('User', {
+    pattern = 'DBUIOpened',
+    callback = function()
+      vim.schedule(function()
+        db_tab = vim.api.nvim_get_current_tabpage()
+      end)
+    end,
+  })
+
+  local function get_statement()
+    local curr_line = vim.api.nvim_win_get_cursor(0)
+    local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
+    local bufnr = vim.api.nvim_win_get_buf(0)
+    vim.treesitter.get_parser(bufnr):parse()
+    local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank } })
+    while curr_node do
+      if curr_node:type() == 'statement' then
+        return vim.treesitter.get_node_range(curr_node)
+      end
+      curr_node = curr_node:parent()
+    end
+  end
+
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'mysql', 'sql' },
+    callback = function()
+      vim.bo[0].omnifunc = 'vim_dadbod_completion#omni'
+      vim.bo[0].complete = 'o'
+      vim.bo[0].autocomplete = true
+
+      vim.keymap.set('n', '<leader>h', function()
+        vim.ui.select(sql_helpers, {
+          prompt = 'Query: ',
+          format_item = function(item)
+            return item.name
+          end,
+        }, function(choice)
+          if not choice then
+            return
+          end
+          local query = choice.query:format(vim.b.dbui_table_name, vim.b.dbui_schema_name)
+          local output = vim.split(query, '\n')
+          local cursor = vim.api.nvim_win_get_cursor(0)
+          vim.api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1] - 1, false, output)
+        end)
+      end, { desc = 'DB: [H]elpers', buffer = 0 })
+
+      vim.keymap.set('x', '<CR>', '<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buffer = 0 })
+      vim.keymap.set('n', '<CR>', 'vaq<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buffer = 0, remap = true })
+      vim.keymap.set('n', 'W', '<Plug>(DBUI_SaveQuery)', { desc = 'DB: [W]rite', buffer = 0 })
+      vim.keymap.set('n', 'E', '<Plug>(DBUI_EditBindParameters)', { desc = 'DB: [E]dit Parameters', buffer = 0 })
+      vim.keymap.set('n', 'L', '<Plug>(DBUI_ToggleResultLayout)', { desc = 'DB: Change Result [L]ayout' })
+
+      vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
+        return vim.fn['db#op_exec']()
+      end, { desc = 'DB: Execute Operator', buffer = 0, expr = true })
+
+      vim.keymap.set('x', 'aq', function()
+        local start_row, start_col, end_row, end_col = get_statement()
+        if not start_row then
+          return
+        end
+        vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
+        if vim.api.nvim_get_mode().mode:find('v') then
+          vim.cmd.normal({ 'o', bang = true })
+        else
+          vim.cmd.normal({ 'v', bang = true })
+        end
+        vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
+      end, { desc = 'DB: Select SQL Query', buffer = 0 })
+      vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buffer = 0, remap = true })
+
+      if vim.b.dbui_db_key_name then
+        local server = vim.b.dbui_db_key_name:match('([^_]+)')
+        local db = databases_connections[server]
+        local win = vim.api.nvim_get_current_win()
+        local hl = db.type == 'prod' and 'Normal:DiffDelete' or ''
+        vim.wo[win][0].winhighlight = hl
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'dbui',
+    callback = function()
+      vim.keymap.set('n', '<CR>', function()
+        local line = vim.api.nvim_get_current_line()
+
+        vim.cmd([[execute "normal! \<Plug>(DBUI_SelectLine)"]])
+
+        if vim.startswith(vim.trim(line), '▸  ') then
+          vim.cmd([[execute "normal! j\<Plug>(DBUI_SelectLine)"]])
+        end
+      end, { buffer = true })
+    end,
+  })
+end
