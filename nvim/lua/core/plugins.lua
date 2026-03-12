@@ -720,8 +720,11 @@ if db_status and db_secrets and db_secrets.databases then
   local DBFactory = require('modules.db_types')
   local databases_connections = DBFactory.generate(db_secrets.databases)
 
-  local SSHFactory = require('modules.ssh_types')
-  local ssh_connections = SSHFactory.generate(db_secrets.ssh)
+  local ssh_connections = {}
+  if db_secrets.shh then
+    local SSHFactory = require('modules.ssh_types')
+    ssh_connections = SSHFactory.generate(db_secrets.ssh)
+  end
 
   local sql_helpers = {
     {
