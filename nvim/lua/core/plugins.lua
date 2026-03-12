@@ -721,7 +721,7 @@ if db_status and db_secrets and db_secrets.databases then
   local databases_connections = DBFactory.generate(db_secrets.databases)
 
   local ssh_connections = {}
-  if db_secrets.shh then
+  if db_secrets.ssh then
     local SSHFactory = require('modules.ssh_types')
     ssh_connections = SSHFactory.generate(db_secrets.ssh)
   end
