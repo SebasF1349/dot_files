@@ -21,6 +21,7 @@ declare -A file_links=(
     ["$HOME/.vimrc"]="$DOT_FILES_DIR/vim/.vimrc"
     ["$HOME/.ideavimrc"]="$DOT_FILES_DIR/ideavim/.ideavimrc"
     ["$CONFIG_DIR/starship.toml"]="$DOT_FILES_DIR/starship/starship.toml"
+    ["$HOME/.xinitrc"]="$DOT_FILES_DIR/.xinitrc"
 )
 
 declare -A dir_links=(
@@ -32,6 +33,7 @@ declare -A dir_links=(
     ["$CONFIG_DIR/tealdeer"]="$DOT_FILES_DIR/tealdeer/"
     ["$CONFIG_DIR/rofi"]="$DOT_FILES_DIR/rofi/"
     ["$CONFIG_DIR/wofi"]="$DOT_FILES_DIR/wofi/"
+    ["$CONFIG_DIR/picom"]="$DOT_FILES_DIR/picom/"
 )
 
 declare -A hypr_dir_links=(
