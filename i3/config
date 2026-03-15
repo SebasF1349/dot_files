@@ -41,6 +41,7 @@ focus_follows_mouse no
 bindsym $mod+Shift+q kill
 bindsym $mod+Return exec wezterm start --always-new-process
 bindsym $mod+Space exec rofi -show combi
+bindsym Mod1+space exec rofi -show combi # because of Kanata - still wondering I need kanata to do this...
 
 # Apps
 bindsym $mod+w exec firefox
