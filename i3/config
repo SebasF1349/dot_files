@@ -30,6 +30,8 @@ exec_always --no-startup-id autotiling
 
 exec --no-startup-id $term
 
+exec_always --no-startup-id dunst
+
 ### Input configuration (X11 style)
 # i3 doesn't handle this directly. Use 'setxkbmap' and 'xinput'
 exec_always --no-startup-id setxkbmap -layout us -variant altgr-intl -option "lvl3:rctrl"

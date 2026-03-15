@@ -34,6 +34,7 @@ declare -A dir_links=(
     ["$CONFIG_DIR/rofi"]="$DOT_FILES_DIR/rofi/"
     ["$CONFIG_DIR/wofi"]="$DOT_FILES_DIR/wofi/"
     ["$CONFIG_DIR/picom"]="$DOT_FILES_DIR/picom/"
+    ["$CONFIG_DIR/dunst"]="$DOT_FILES_DIR/dunst/"
 )
 
 declare -A hypr_dir_links=(
