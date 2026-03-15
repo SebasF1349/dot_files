@@ -131,5 +131,17 @@ bindsym Print exec maim | xclip -selection clipboard -t image/png
 # Status Bar:
 bar {
     position top
-    status_command i3status
+    status_command i3blocks -c ~/.config/i3/i3blocks.conf
+
+    colors {
+        background #1e1e2e
+        statusline #cdd6f4
+        separator  #45475a
+
+        #                  border  backgr. text
+        focused_workspace  #cba6f7 #cba6f7 #1e1e2e
+        active_workspace   #89b4fa #313244 #cdd6f4
+        inactive_workspace #313244 #181825 #cdd6f4
+        urgent_workspace   #f38ba8 #f38ba8 #1e1e2e
+    }
 }

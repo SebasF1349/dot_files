@@ -1,0 +1,43 @@
+#!/bin/bash
+
+shopt -s nullglob
+bats=( /sys/class/power_supply/BAT[0-9]* )
+shopt -u nullglob
+
+if [ ${#bats[@]} -eq 0 ]; then
+    exit 0
+fi
+
+BAT=$(basename "${bats[0]}")
+
+CAPACITY=$(cat "/sys/class/power_supply/$BAT/capacity")
+STATUS=$(cat "/sys/class/power_supply/$BAT/status")
+
+if [ "$CAPACITY" -ge 70 ]; then
+    COLOR="#a6e3a1" # Green
+elif [ "$CAPACITY" -ge 30 ]; then
+    COLOR="#f9e2af" # Yellow
+else
+    COLOR="#f38ba8" # Red
+fi
+
+if [ "$STATUS" = "Charging" ]; then
+    ICON="󰂄"
+elif [ "$STATUS" = "Full" ]; then
+    ICON="󰁹"
+else
+    if [ "$CAPACITY" -ge 95 ]; then ICON="󰁹"
+    elif [ "$CAPACITY" -ge 85 ]; then ICON="󰂂"
+    elif [ "$CAPACITY" -ge 75 ]; then ICON="󰂁"
+    elif [ "$CAPACITY" -ge 65 ]; then ICON="󰂀"
+    elif [ "$CAPACITY" -ge 55 ]; then ICON="󰁿"
+    elif [ "$CAPACITY" -ge 45 ]; then ICON="󰁾"
+    elif [ "$CAPACITY" -ge 35 ]; then ICON="󰁽"
+    elif [ "$CAPACITY" -ge 25 ]; then ICON="󰁼"
+    elif [ "$CAPACITY" -ge 15 ]; then ICON="󰁻"
+    elif [ "$CAPACITY" -ge 5 ];  then ICON="󰁺"
+    else ICON="󰂃";
+    fi
+fi
+
+echo "<span color='$COLOR'>$ICON</span>"

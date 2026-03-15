@@ -1,0 +1,23 @@
+#!/bin/bash
+
+case $BLOCK_BUTTON in
+1) wezterm cli spawn -- nmtui ;;
+esac
+
+if [ "$(cat /sys/class/net/e*/operstate 2>/dev/null)" = "up" ]; then
+    echo "<span foreground='#a6e3a1'>󰈀</span>"
+elif [ "$(cat /sys/class/net/w*/operstate 2>/dev/null)" = "up" ]; then
+    SIGNAL=$(nmcli -t -f SIGNAL dev wifi | head -n1)
+
+    if [ "$SIGNAL" -ge 90 ]; then
+        echo "<span foreground='#a6e3a1'>󰤨</span>"
+    elif [ "$SIGNAL" -ge 70 ]; then
+        echo "<span foreground='#f9e2af'>󰤥</span>"
+    elif [ "$SIGNAL" -ge 40 ]; then
+        echo "<span foreground='#f9e2af'>󰤢</span>"
+    else
+        echo "<span foreground='#f38ba8'>󰤟</span>"
+    fi
+else
+    echo "<span foreground='#f38ba8'>󰤮</span>"
+fi
