@@ -12,9 +12,7 @@ ui.select = select()
 ui.input = input()
 ui.open = (function(overridden)
   return function(path, opt)
-    vim.validate({
-      path = { path, 'string' },
-    })
+    vim.validate('path', path, 'string')
     local is_uri = path:match('%w+:')
     local is_half_url = path:match('%.com$') or path:match('%.com%.')
     local is_repo = vim.bo.filetype == 'lua' and path:match('%w/%w') and vim.fn.count(path, '/') == 1
