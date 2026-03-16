@@ -31,6 +31,13 @@ return {
         insertUseDeclaration = true,
         fullyQualifyGlobalConstantsAndFunctions = true,
       },
+      codeLens = {
+        implementations = { enable = true },
+        overrides = { enable = true },
+        parent = { enable = true },
+        references = { enable = true },
+        usages = { enable = true },
+      },
       files = {
         maxSize = 1000000,
         exclude = {

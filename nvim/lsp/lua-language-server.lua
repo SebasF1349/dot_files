@@ -12,6 +12,7 @@ return {
   log_level = vim.lsp.protocol.MessageType.Warning,
   settings = {
     Lua = {
+      codeLens = { enable = true },
       format = { enable = false },
       completion = { callSnippet = 'Replace' },
       hint = { enable = true, arrayIndex = 'Disable' },

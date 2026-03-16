@@ -77,6 +77,8 @@ local function bufname_valid(bufname)
   return false
 end
 
+vim.lsp.codelens.enable(true)
+
 ---@param client_id integer
 ---@param buf integer
 local function on_attach(client_id, buf)
