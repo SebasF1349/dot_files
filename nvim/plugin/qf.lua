@@ -819,7 +819,7 @@ local function cf_preview(opts, preview_ns, _)
   local qf_winid = vim.fn.getqflist({ winid = 0 }).winid
   if qf_winid == 0 then
     return
-  end -- No quickfix window open
+  end
   local qf_bufnr = vim.api.nvim_win_get_buf(qf_winid)
   local lines = vim.api.nvim_buf_get_lines(qf_bufnr, 0, -1, false)
   for lnum, line in ipairs(lines) do
