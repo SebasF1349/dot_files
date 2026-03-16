@@ -24,6 +24,13 @@ vim.b.surroundPair = {
   ['p'] = { { 'var_dump(' }, { ');exit;' } },
 }
 
+vim.b.runners = {
+  ['8.4'] = 'php8.4',
+  ['7.0'] = 'php7.0',
+  default = 'php',
+  prefix = '<?php',
+}
+
 local snippets = {
   fn = [[${1:public} function ${2:FunctionName}(${3:})
 {
