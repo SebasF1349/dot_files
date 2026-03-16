@@ -381,7 +381,7 @@ vim.list_extend(ensure_installed, {
   -- text
   'vale', -- linter
   -- sql
-  -- "sqlfluff", -- linter
+  'sqlfluff', -- linter & formatter
   -- work
   'phpstan',
   'php-debug-adapter',
