@@ -15,7 +15,7 @@ vim.o.number = true
 
 vim.o.signcolumn = 'yes'
 vim.o.numberwidth = 3
-vim.o.statuscolumn = '%=%{% v:virtnum > 0 ? "" : v:lnum %}%=%s'
+vim.o.statuscolumn = '%{% v:virtnum == 0 ? v:lnum : "" %}%=%s'
 
 vim.o.mouse = ''
 vim.keymap.set('', '<up>', '<nop>', { noremap = true })
