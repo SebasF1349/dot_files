@@ -1,5 +1,3 @@
-local methods = vim.lsp.protocol.Methods
-
 local oss = require('utils.os')
 vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (oss.is_win and ';' or ':') .. vim.env.PATH
 
@@ -87,43 +85,6 @@ local function on_attach(client_id, buf)
   local bufname = vim.api.nvim_buf_get_name(buf)
   if #bufname ~= 0 and not bufname_valid(bufname) then
     return
-  end
-
-  if client:supports_method('completionItem/resolve') then
-    ---@param items table<integer, { err: (lsp.ResponseError)?, result: any, context: lsp.HandlerContext }>
-    local function get_docs(items)
-      for _, item in ipairs(items) do
-        if item.result.documentation then
-          return item.result.documentation
-        end
-      end
-    end
-
-    local cancel_prev = function() end
-    vim.api.nvim_create_autocmd('CompleteChanged', {
-      buffer = buf,
-      callback = function()
-        cancel_prev()
-        local info = vim.fn.complete_info({ 'selected' })
-        local completionItem = vim.tbl_get(vim.v.completed_item, 'user_data', 'nvim', 'lsp', 'completion_item')
-        if nil == completionItem then
-          return
-        end
-        cancel_prev = vim.lsp.buf_request_all(buf, methods.completionItem_resolve, completionItem, function(items, _)
-          if not items or #items == 0 then
-            return
-          end
-          local docs = get_docs(items)
-          if docs then
-            local win = vim.api.nvim__complete_set(info['selected'], { info = docs.value })
-            if win.winid and vim.api.nvim_win_is_valid(win.winid) then
-              vim.treesitter.start(win.bufnr, docs.kind)
-              vim.wo[win.winid].conceallevel = 3
-            end
-          end
-        end)
-      end,
-    })
   end
 
   local Kind = vim.lsp.protocol.CompletionItemKind
