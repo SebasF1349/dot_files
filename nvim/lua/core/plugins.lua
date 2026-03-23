@@ -39,6 +39,7 @@ require('catppuccin').setup({
   default_integrations = false,
   integrations = {
     cmp = true,
+    dadbod_ui = true,
     dap = true,
     gitsigns = true,
     markdown = true,
