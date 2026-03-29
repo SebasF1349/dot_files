@@ -167,7 +167,7 @@ local function buf_get_ts_highlights(bufnr, lnum)
   if lang == '' then
     return {}
   end
-  local parser = vim.treesitter.get_parser(bufnr, lang, { error = false })
+  local parser = vim.treesitter.get_parser(bufnr, lang)
   if not parser then
     return {}
   end
@@ -1049,7 +1049,6 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
 -- Extras
 --------------------------------------------------
 
-
 vim.api.nvim_create_autocmd('QuickFixCmdPost', {
   group = qf_group,
   callback = function(args)
@@ -1141,5 +1140,4 @@ vim.api.nvim_create_autocmd('WinClosed', {
 -- https://github.com/stevearc/qf_helper.nvim (sync qflist cursor position)
 -- https://github.com/neovim/nvim-lspconfig/issues/69#issuecomment-1877781941 (diagnostics autoupdate)
 -- https://github.com/stevearc/quicker.nvim/blob/master/lua/quicker/highlight.lua#L25 (ts highlighting)
--- https://github.com/glepnir/nvim/blob/main/lua/private/grep.lua (async grep)
 -- https://github.com/neovim/neovim/issues/25410#issuecomment-3744609833 (Cf with preview)
