@@ -16,8 +16,9 @@ vim.api.nvim_create_autocmd('LspProgress', {
     vim.api.nvim_echo({ { msg } }, false, {
       id = msgId,
       kind = 'progress',
-      title = title,
+      source = 'lsp',
       status = 'success',
+      title = title,
       percent = value.percentage,
     })
   end,
