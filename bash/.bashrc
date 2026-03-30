@@ -80,8 +80,6 @@ alias tup="cd ~/tup"
 alias dot="cd ~/dot_files"
 alias repos="cd ~/repos"
 
-alias eza='eza -lah'
-alias ezat="eza --tree --level=2"
 alias ..="cd .."
 alias ...="cd ../.."
 alias cp="cp -iv"
@@ -132,8 +130,6 @@ alias gac="git commit -am"
 alias gca="commit -a --amend --no-edit"
 alias gcl="git clone"
 alias ga="git add"
-alias ga.="git add ."
-alias gad="git add ."
 alias gaa="git add --all"
 alias gap="git add --patch"
 alias gb="git branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(contents:subject) %(color:green)(%(committerdate:relative)) [%(authorname)]' --sort=-committerdate"
@@ -156,21 +152,6 @@ alias sourcebash='source ~/.bashrc'
 alias snv='sudo ${EDITOR}'
 
 nvf() {
-    local dir="${1:-.}"
-    [[ "$dir" == "repos" ]] && dir="${HOME}/repos/"
-    [[ "$dir" == "dot" ]] && dir="${HOME}/dot_files/"
-
-    local selected_dir
-    selected_dir=$(fd . "${dir}" --type d --max-depth 2 | fzf)
-    if [[ -n "$selected_dir" ]]; then
-        cd "$selected_dir" || return
-        local files
-        IFS=$'\n' files=("$(fzf --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}")")
-        [[ -n "${files[*]}" ]] && ${EDITOR:-vim} "${files[@]}"
-    fi
-}
-
-nvff() {
     local files
     IFS=$'\n' files=("$(fzf --query="$1" --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}")")
     [[ -n "${files[*]}" ]] && ${EDITOR:-vim} "${files[@]}"
@@ -180,15 +161,6 @@ cdf() {
     local dir
     dir=$(fd . "${1:-$HOME}" --type d | fzf +m)
     [[ -n "$dir" ]] && cd "$dir" || exit
-}
-
-cl() {
-    local dir="${1:=$HOME}"
-    if [[ -d "$dir" ]]; then
-        cd "$dir" >/dev/null && eza -lah
-    else
-        echo "bash: cl: $dir: Directory not found" >&2
-    fi
 }
 
 mkcd() { mkdir -p -- "$1" && cd -P -- "$1" || exit; }
@@ -212,7 +184,6 @@ extract() {
 }
 
 if [ -f /etc/os-release ]; then
-    . /etc/os-release
     case ${ID_LIKE:-$ID} in
     debian)
         [ -r /etc/debian_chroot ] && debian_chroot=$(cat /etc/debian_chroot)
@@ -221,13 +192,6 @@ if [ -f /etc/os-release ]; then
         alias clean="sudo apt autoclean && sudo apt autoremove"
         ;;
     arch)
-        # wifi_info=$(ip -4 -o addr show wlan0)
-        # if [ -z "$wifi_info" ]; then
-        #     nmcli radio wifi off &
-        #     sleep 1 &
-        #     nmcli radio wifi on
-        # fi
-
         # pacman + fzf
         # install
         alias fuzi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
