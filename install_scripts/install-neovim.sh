@@ -1,10 +1,12 @@
 #!/usr/bin/bash
 
 force=false
+no_pull=false
 
-while getopts 'f' flag; do
+while getopts 'fn' flag; do
     case "${flag}" in
     f) force=true ;;
+    n) no_pull=true ;;
     *) ;;
     esac
 done
@@ -27,7 +29,7 @@ if [ ! -d "$neovim_dir" ]; then
     elif [ "$DISTRO" = "arch" ]; then
         sudo pacman -Syu base-devel cmake unzip ninja curl
     fi
-else
+elif [ "$no_pull" = false ]; then
     cd "$neovim_dir" && git fetch origin
 
     if [ "$force" = false ]; then
@@ -42,5 +44,10 @@ else
     fi
 fi
 
-cd "$neovim_dir" && git pull origin master &&
-    sudo make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install
+cd "$neovim_dir" || exit 1
+
+if [ "$no_pull" = false ]; then
+    git pull origin master
+fi
+
+sudo make CMAKE_BUILD_TYPE=RelWithDebInfo && sudo make install
