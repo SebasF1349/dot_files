@@ -11,14 +11,6 @@ return {
   cmd = { 'intelephense', '--stdio' },
   filetypes = { 'php' },
   root_markers = { 'vendor/', 'includes/' },
-  commands = {
-    IntelephenseIndex = {
-      function()
-        local clients = vim.lsp.get_clients({ name = 'intelephense' })
-        clients[1]:exec_cmd({ title = 'php_index_workspace', command = 'intelephense.index.workspace' })
-      end,
-    },
-  },
   before_init = function(_, config)
     config.settings.intelephense.environment = { phpVersion = getPhpVersion() }
   end,
