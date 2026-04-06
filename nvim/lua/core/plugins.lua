@@ -73,10 +73,8 @@ lint.linters_by_ft = {
   javascriptreact = { 'eslint_d' },
   typescriptreact = { 'eslint_d' },
   svelte = { 'eslint_d' },
-  markdown = { 'markdownlint' },
   sh = { 'shellcheck' },
   json = { 'jsonlint' },
-  text = { 'vale' },
   php = { 'phpstan' },
   sql = { 'sqlfluff' },
   mysql = { 'sqlfluff' },
@@ -142,7 +140,7 @@ require('conform').setup({
     typescriptreact = { 'prettier', stop_after_first = true },
     css = { 'prettier', stop_after_first = true },
     json = { 'prettier', stop_after_first = true },
-    markdown = { 'prettier', 'markdownlint', 'markdown-toc' },
+    markdown = { 'prettier', 'markdown-toc' },
     html = { 'prettier', stop_after_first = true },
     sh = { 'shfmt' },
     rust = { 'rustfmt' },
@@ -368,7 +366,6 @@ vim.list_extend(ensure_installed, {
   'eslint_d',
   'prettier',
   -- markdown
-  'markdownlint',
   'markdown-toc',
   -- lua
   'stylua', -- formatter
@@ -379,8 +376,6 @@ vim.list_extend(ensure_installed, {
   'yamlfmt', -- formatter
   -- json
   'jsonlint', -- linter
-  -- text
-  'vale', -- linter
   -- sql
   'sqlfluff', -- linter & formatter
   -- work
