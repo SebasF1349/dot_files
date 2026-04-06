@@ -395,9 +395,9 @@ vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
 
 ---@return number
 local function getHeight()
-  local lines = vim.api.nvim_buf_get_lines(qfbufnr, 0, -1, false)
+  local lines = vim.api.nvim_buf_line_count(qfbufnr)
   local extmarks = vim.api.nvim_buf_get_extmarks(qfbufnr, qfim_file_namespace, 0, -1, { details = true })
-  return math.max(math.min(#lines + #extmarks, 10), 5)
+  return math.max(math.min(lines + #extmarks, 10), 5)
 end
 
 function _G.qffoldexprfunc()

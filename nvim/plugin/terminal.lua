@@ -106,7 +106,7 @@ end, { desc = '[T]oggle [T]erminal 1' })
 ---@param winid integer
 local function scroll_to_end(bufnr, winid)
   api.nvim_buf_call(bufnr, function()
-    local target_line = vim.tbl_count(api.nvim_buf_get_lines(bufnr, 0, -1, true))
+    local target_line = api.nvim_buf_line_count(bufnr)
     api.nvim_win_set_cursor(winid, { target_line, 0 })
   end)
 end
