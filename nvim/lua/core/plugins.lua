@@ -847,12 +847,13 @@ WHERE EVENT_OBJECT_TABLE = '%s'
     db_tab = get_db_tab()
     local curr_tab = vim.api.nvim_get_current_tabpage()
     if not db_tab then
-      vim.cmd('tab DBUI')
+      db_tab = vim.api.nvim_open_tabpage(0, true, { after = -1 })
+      vim.cmd('DBUI')
+      vim.cmd('only')
     elseif curr_tab ~= db_tab then
       vim.api.nvim_set_current_tabpage(db_tab)
     end
     vim.schedule(function()
-      vim.api.nvim_win_set_cursor(0, { 1, 0 })
       vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(DBUI_Redraw)', true, false, true), 'm')
     end)
   end
@@ -972,15 +973,6 @@ WHERE EVENT_OBJECT_TABLE = '%s'
         end
         vim.system(cmd):wait()
       end
-    end,
-  })
-
-  vim.api.nvim_create_autocmd('User', {
-    pattern = 'DBUIOpened',
-    callback = function()
-      vim.schedule(function()
-        db_tab = vim.api.nvim_get_current_tabpage()
-      end)
     end,
   })
 
