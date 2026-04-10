@@ -1,3 +1,61 @@
+local parsers = {
+  -- langs
+  'c',
+  'cpp',
+  'go',
+  'gomod',
+  'gowork',
+  'gosum',
+  'lua',
+  'rust',
+  -- web
+  'javascript',
+  'typescript',
+  'css',
+  'html',
+  'svelte',
+  -- config
+  'json',
+  'toml',
+  'yaml',
+  'markdown',
+  'markdown_inline',
+  -- specific config
+  'bash',
+  'hyprlang',
+  'git_config',
+  'gitcommit',
+  'gitignore',
+  'rasi',
+  'readline',
+  'powershell',
+  'query',
+  'vim',
+  'vimdoc',
+  -- misc
+  'diff',
+  'regex',
+  'sql',
+  -- work
+  'php',
+  'php_only',
+  'phpdoc',
+}
+
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    if ev.data.kind == 'install' then
+      if ev.data.spec.name == 'nvim-treesitter' then
+        require('nvim-treesitter').install(parsers)
+      end
+    else
+      if ev.data.spec.name == 'nvim-treesitter' then
+        require('nvim-treesitter').update()
+      end
+    end
+  end,
+})
+
 vim.pack.add({
   { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
 
@@ -607,50 +665,6 @@ vim.filetype.add({
 
 vim.treesitter.language.register('sql', { 'mysql' })
 
-local parsers = {
-  -- langs
-  'c',
-  'cpp',
-  'go',
-  'gomod',
-  'gowork',
-  'gosum',
-  'lua',
-  'rust',
-  -- web
-  'javascript',
-  'typescript',
-  'css',
-  'html',
-  'svelte',
-  -- config
-  'json',
-  'toml',
-  'yaml',
-  'markdown',
-  'markdown_inline',
-  -- specific config
-  'bash',
-  'hyprlang',
-  'git_config',
-  'gitcommit',
-  'gitignore',
-  'rasi',
-  'readline',
-  'powershell',
-  'query',
-  'vim',
-  'vimdoc',
-  -- misc
-  'diff',
-  'regex',
-  'sql',
-  -- work
-  'php',
-  'php_only',
-  'phpdoc',
-}
-
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { '*' },
   callback = function(args)
@@ -675,20 +689,6 @@ vim.keymap.set('x', 'iz', ':<C-U>silent! normal! [zV]zkoj<CR>', { desc = 'Fold T
 vim.keymap.set('o', 'iz', '<cmd>normal Viz<CR>', { desc = 'Fold Text-Object', remap = false })
 vim.keymap.set('x', 'az', ':<C-U>silent! normal! [zV]z<CR>', { desc = 'Fold Text-Object', silent = true })
 vim.keymap.set('o', 'az', '<cmd>normal Vaz<CR>', { desc = 'Fold Text-Object', remap = false })
-
-vim.api.nvim_create_autocmd('PackChanged', {
-  callback = function(ev)
-    if ev.data.kind == 'install' then
-      if ev.data.spec.name == 'nvim-treesitter' then
-        require('nvim-treesitter').install(parsers)
-      end
-    else
-      if ev.data.spec.name == 'nvim-treesitter' then
-        require('nvim-treesitter').update()
-      end
-    end
-  end,
-})
 
 --------------------------------------------------
 -- DB
