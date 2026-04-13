@@ -1,4 +1,4 @@
-vim.keymap.set('n', 'q', '<cmd>close<CR>', { desc = 'Close', buffer = 0 })
+vim.keymap.set('n', 'q', '<cmd>close<CR>', { desc = 'Close', buf = 0 })
 
 vim.keymap.set('n', 'gx', function()
   local cfile = vim.fn.expand('<cfile>')
@@ -23,6 +23,6 @@ vim.keymap.set('n', 'gx', function()
   else
     vim.print("Could not find a 'Source:' URL above the cursor")
   end
-end, { desc = 'Open in Browser', buffer = 0 })
+end, { desc = 'Open in Browser', buf = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '') .. '\n ' .. 'sil! nunmap <buffer> q'

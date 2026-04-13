@@ -6,7 +6,7 @@ local M = {}
 ---@param body string snippet text that will be expanded
 ---@param opts? vim.keymap.set.Opts
 function M.addSnippet(trigger, body, opts)
-  opts = opts or { buffer = 0 }
+  opts = opts or { buf = 0 }
   vim.keymap.set('ia', trigger, function()
     -- If abbrev is expanded with keys like "(", ")", "<cr>", "<space>",
     -- don't expand the snippet. Only accept "<c-]>" as trigger key.

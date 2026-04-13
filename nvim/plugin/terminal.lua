@@ -57,8 +57,8 @@ local function set_term_opts(opts)
   vim.wo.winfixheight = true
   vim.wo.winfixwidth = true
   vim.wo.winfixbuf = true
-  map('n', 'q', '<cmd>bd!<cr>', { buffer = opts.bufnr })
-  map('n', 'gf', '<cmd>aboveleft vertical wincmd F<cr>', { buffer = opts.bufnr, desc = 'Open file under the cursor' })
+  map('n', 'q', '<cmd>bd!<cr>', { buf = opts.bufnr })
+  map('n', 'gf', '<cmd>aboveleft vertical wincmd F<cr>', { buf = opts.bufnr, desc = 'Open file under the cursor' })
   api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
 end
 

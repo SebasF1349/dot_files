@@ -25,7 +25,7 @@ vim.keymap.set(
   'n',
   '<leader>mt',
   'i<!-- toc --><ESC><cmd>w<CR>',
-  { desc = 'Add [M]arkdown [T]OC using markdown-toc', buffer = 0 }
+  { desc = 'Add [M]arkdown [T]OC using markdown-toc', buf = 0 }
 )
 
 function _G.MakeList()
@@ -40,7 +40,7 @@ vim.keymap.set(
   { 'n', 'v' },
   'gl',
   _G.opfunc('_G.MakeList'),
-  { desc = 'Make [L]ist', silent = true, expr = true, buffer = 0 }
+  { desc = 'Make [L]ist', silent = true, expr = true, buf = 0 }
 )
 
 vim.keymap.set('n', '<leader>x', function()
@@ -52,7 +52,7 @@ vim.keymap.set('n', '<leader>x', function()
     local new_line = line:gsub('- %b[]', '- [ ]')
     vim.api.nvim_set_current_line(new_line)
   end
-end, { desc = 'Toggle TODO Completed', buffer = 0 })
+end, { desc = 'Toggle TODO Completed', buf = 0 })
 
 vim.keymap.set('n', '<leader>-', function()
   local line = vim.api.nvim_get_current_line()
@@ -63,7 +63,7 @@ vim.keymap.set('n', '<leader>-', function()
     local new_line = line:gsub('- %b[]', '- [ ]')
     vim.api.nvim_set_current_line(new_line)
   end
-end, { desc = 'Toggle TODO Incompleted', buffer = 0 })
+end, { desc = 'Toggle TODO Incompleted', buf = 0 })
 
 vim.keymap.set('n', '<leader>r', function()
   local line = vim.api.nvim_get_current_line()
@@ -80,7 +80,7 @@ vim.keymap.set('n', '<leader>r', function()
   vim.bo[buf].swapfile = false
 
   vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-end, { desc = 'Run cmd in a new buffer', buffer = 0 })
+end, { desc = 'Run cmd in a new buffer', buf = 0 })
 
 local oss = require('utils.os')
 local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
@@ -117,7 +117,7 @@ if vim.startswith(curr_buf, notes_path) then
   vim.keymap.set({ 'n', 'i' }, '<C-l>', function()
     vim.cmd.stopinsert()
     select_link()
-  end, { desc = 'Add [L]ink', buffer = 0 })
+  end, { desc = 'Add [L]ink', buf = 0 })
 
   vim.keymap.set({ 'x' }, '<C-l>', function()
     local starting = vim.fn.getpos('v')
@@ -128,7 +128,7 @@ if vim.startswith(curr_buf, notes_path) then
     local text = vim.api.nvim_buf_get_text(0, starting[2] - 1, starting[3] - 1, ending[2] - 1, ending[3], {})
     vim.api.nvim_buf_set_text(0, starting[2] - 1, starting[3] - 1, ending[2] - 1, ending[3], { '' })
     select_link(text[1])
-  end, { desc = 'Add [L]ink', buffer = 0 })
+  end, { desc = 'Add [L]ink', buf = 0 })
 
   vim.keymap.set('n', 'gf', function()
     local node = vim.treesitter.get_node({ ignore_injections = false })
@@ -149,7 +149,7 @@ if vim.startswith(curr_buf, notes_path) then
       link = vim.fn.expand('%:p:h') .. [[/]] .. link
     end
     vim.cmd.edit(link)
-  end, { desc = 'Open link under the cursor', buffer = 0 })
+  end, { desc = 'Open link under the cursor', buf = 0 })
 
   vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
     .. '\n '

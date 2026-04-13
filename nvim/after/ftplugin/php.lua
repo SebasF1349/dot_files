@@ -124,13 +124,13 @@ end
 
 vim.keymap.set({ 'x', 'o' }, 'i=', function()
   phpTextObject('i')
-end, { desc = 'PHP Block Text-Object', silent = true, buffer = 0 })
+end, { desc = 'PHP Block Text-Object', silent = true, buf = 0 })
 vim.keymap.set({ 'x', 'o' }, 'a=', function()
   phpTextObject('a')
-end, { desc = 'PHP Block Text-Object', silent = true, buffer = 0 })
+end, { desc = 'PHP Block Text-Object', silent = true, buf = 0 })
 
-vim.keymap.set('n', 'L', 'f$l', { desc = 'Next variable', buffer = 0 })
-vim.keymap.set('n', 'H', 'F$l', { desc = 'Previous variable', buffer = 0 })
+vim.keymap.set('n', 'L', 'f$l', { desc = 'Next variable', buf = 0 })
+vim.keymap.set('n', 'H', 'F$l', { desc = 'Previous variable', buf = 0 })
 
 -- YII2 keymaps
 local function PascalToKebab(pascal)
@@ -360,7 +360,7 @@ vim.keymap.set('n', 'gf', function()
     action2 = 'action' .. kebab_to_pascal(vim.fn.expand('%:t:r'))
     move(target, action, action2)
   end
-end, { desc = 'Improved gf for Yii2', buffer = 0 })
+end, { desc = 'Improved gf for Yii2', buf = 0 })
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. '\n '

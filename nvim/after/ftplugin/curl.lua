@@ -67,7 +67,7 @@ vim.keymap.set('n', '<CR>', function()
   end
 
   vim.api.nvim_buf_set_lines(0, 0, -1, false, output)
-end, { silent = true, desc = 'Execute Curl', buffer = 0 })
+end, { silent = true, desc = 'Execute Curl', buf = 0 })
 
 local request_opts = {
   GET = [[curl -s "https://${1:url}"]],
@@ -93,6 +93,6 @@ end, {
   desc = 'Create a template for a curl command',
 })
 
-vim.keymap.set('n', '<leader>c', ':CurlCreate ', { silent = true, desc = '[C]reate Curl', buffer = 0 })
+vim.keymap.set('n', '<leader>c', ':CurlCreate ', { silent = true, desc = '[C]reate Curl', buf = 0 })
 
 -- <CR> keymap heavily inspired by https://github.com/oysandvik94/curl.nvim/tree/3ee14fbafc8169fc803e80562ce7ac5b4474bdff

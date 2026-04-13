@@ -3,13 +3,13 @@ vim.wo.signcolumn = 'yes'
 vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
 
-vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = 0 })
+vim.keymap.set('n', 'q', '<cmd>close<cr>', { buf = 0 })
 
 vim.keymap.set(
   'n',
   'dt',
   ':Gtabedit <Plug><cfile><Bar>Gdiffsplit<CR>',
-  { desc = 'Open [D]iff in New [T]ab', remap = true, buffer = 0 }
+  { desc = 'Open [D]iff in New [T]ab', remap = true, buf = 0 }
 )
 
 vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')

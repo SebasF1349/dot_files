@@ -377,30 +377,30 @@ require('gitsigns').setup({
       else
         gitsigns.nav_hunk('next')
       end
-    end, { desc = 'Jump to next Hunk', buffer = bufnr })
+    end, { desc = 'Jump to next Hunk', buf = bufnr })
     vim.keymap.set({ 'n', 'x' }, '[h', function()
       if vim.wo.diff then
         vim.cmd.normal({ '[c', bang = true })
       else
         gitsigns.nav_hunk('prev')
       end
-    end, { desc = 'Jump to previous Hunk', buffer = bufnr })
+    end, { desc = 'Jump to previous Hunk', buf = bufnr })
 
     vim.keymap.set('x', '<leader>hs', function()
       gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
-    end, { desc = '[H]unk [S]tage', buffer = bufnr })
+    end, { desc = '[H]unk [S]tage', buf = bufnr })
     vim.keymap.set('x', '<leader>hr', function()
       gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
-    end, { desc = '[H]unk [R]eset', buffer = bufnr })
+    end, { desc = '[H]unk [R]eset', buf = bufnr })
 
-    vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = '[I]nside [H]unk TextObject', buffer = bufnr })
+    vim.keymap.set({ 'o', 'x' }, 'ih', gitsigns.select_hunk, { desc = '[I]nside [H]unk TextObject', buf = bufnr })
 
-    vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage', buffer = bufnr })
-    vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset', buffer = bufnr })
-    vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk_inline, { desc = '[H]unk [P]review', buffer = bufnr })
+    vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage', buf = bufnr })
+    vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset', buf = bufnr })
+    vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk_inline, { desc = '[H]unk [P]review', buf = bufnr })
 
-    vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage', buffer = bufnr })
-    vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset', buffer = bufnr })
+    vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage', buf = bufnr })
+    vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset', buf = bufnr })
   end,
 })
 
@@ -1012,17 +1012,17 @@ WHERE EVENT_OBJECT_TABLE = '%s'
           local cursor = vim.api.nvim_win_get_cursor(0)
           vim.api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1] - 1, false, output)
         end)
-      end, { desc = 'DB: [H]elpers', buffer = 0 })
+      end, { desc = 'DB: [H]elpers', buf = 0 })
 
-      vim.keymap.set('x', '<CR>', '<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buffer = 0 })
-      vim.keymap.set('n', '<CR>', 'vaq<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buffer = 0, remap = true })
-      vim.keymap.set('n', 'W', '<Plug>(DBUI_SaveQuery)', { desc = 'DB: [W]rite', buffer = 0 })
-      vim.keymap.set('n', 'E', '<Plug>(DBUI_EditBindParameters)', { desc = 'DB: [E]dit Parameters', buffer = 0 })
+      vim.keymap.set('x', '<CR>', '<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buf = 0 })
+      vim.keymap.set('n', '<CR>', 'vaq<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buf = 0, remap = true })
+      vim.keymap.set('n', 'W', '<Plug>(DBUI_SaveQuery)', { desc = 'DB: [W]rite', buf = 0 })
+      vim.keymap.set('n', 'E', '<Plug>(DBUI_EditBindParameters)', { desc = 'DB: [E]dit Parameters', buf = 0 })
       vim.keymap.set('n', 'L', '<Plug>(DBUI_ToggleResultLayout)', { desc = 'DB: Change Result [L]ayout' })
 
       vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
         return vim.fn['db#op_exec']()
-      end, { desc = 'DB: Execute Operator', buffer = 0, expr = true })
+      end, { desc = 'DB: Execute Operator', buf = 0, expr = true })
 
       vim.keymap.set('x', 'aq', function()
         local start_row, start_col, end_row, end_col = get_statement()
@@ -1036,8 +1036,8 @@ WHERE EVENT_OBJECT_TABLE = '%s'
           vim.cmd.normal({ 'v', bang = true })
         end
         vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
-      end, { desc = 'DB: Select SQL Query', buffer = 0 })
-      vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buffer = 0, remap = true })
+      end, { desc = 'DB: Select SQL Query', buf = 0 })
+      vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buf = 0, remap = true })
 
       if vim.b.dbui_db_key_name then
         local server = vim.b.dbui_db_key_name:match('([^_]+)')
@@ -1060,7 +1060,7 @@ WHERE EVENT_OBJECT_TABLE = '%s'
         if vim.startswith(vim.trim(line), '▸  ') then
           vim.cmd([[execute "normal! j\<Plug>(DBUI_SelectLine)"]])
         end
-      end, { buffer = true })
+      end, { buf = 0 })
     end,
   })
 end

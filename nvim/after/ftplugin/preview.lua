@@ -10,7 +10,7 @@ vim.wo.spell = false
 
 vim.cmd('wincmd J')
 
-vim.keymap.set('n', 'q', '<cmd>q<CR>', { desc = 'Close', buffer = 0 })
+vim.keymap.set('n', 'q', '<cmd>q<CR>', { desc = 'Close', buf = 0 })
 
 vim.keymap.set('n', '<leader>pq', '<cmd>pclose<CR>', { desc = 'Close' })
 vim.keymap.set('n', '<leader>pb', '<cmd>wincmd P<CR>', { desc = 'Open Preview Buffer' })

@@ -36,12 +36,12 @@ local function close_mappings(bufnr, closing_keys, on_close)
       vim.keymap.set({ 'n', 'i', 'x' }, key, function()
         vim.cmd.stopinsert()
         on_close()
-      end, { buffer = bufnr })
+      end, { buf = bufnr })
     elseif type(key) == 'table' then
       vim.keymap.set(key.modes, key[1], function()
         vim.cmd.stopinsert()
         on_close()
-      end, { buffer = bufnr })
+      end, { buf = bufnr })
     end
   end
 
@@ -50,7 +50,7 @@ local function close_mappings(bufnr, closing_keys, on_close)
     callback = function()
       on_close(nil)
     end,
-    buffer = bufnr,
+    buf = bufnr,
     once = true,
     group = augroup,
     desc = 'Close select',
@@ -147,7 +147,7 @@ function M.input(opts, on_confirm)
     select_and_close({ input_win, title_win }, current_win, function()
       on_confirm(line)
     end)
-  end, { buffer = input_bufnr })
+  end, { buf = input_bufnr })
 
   local closing_keys = { { 'q', modes = { 'n', 'x' } }, '<C-c>' }
   close_mappings(input_bufnr, closing_keys, function()
@@ -344,7 +344,7 @@ function M.select(items, opts, on_choice)
             restore_cursor()
             on_choice(items[pos], pos)
           end)
-        end, { buffer = select_bufnr })
+        end, { buf = select_bufnr })
       end
     end
   end

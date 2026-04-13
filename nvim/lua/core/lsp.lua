@@ -142,7 +142,7 @@ local function on_attach(client_id, buf)
   vim.o.completeopt = 'menuone,popup,noselect,fuzzy'
   vim.o.completeitemalign = 'kind,abbr,menu'
 
-  vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buffer = buf })
+  vim.keymap.set('s', '<BS>', '<C-O>s', { desc = 'Delete Selected Text', buf = buf })
   vim.keymap.set('i', '<C-n>', function()
     if vim.fn.pumvisible() ~= 0 then
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-n>', true, false, true), 'n', false)
@@ -157,10 +157,10 @@ local function on_attach(client_id, buf)
 
   vim.keymap.set('n', ']e', function()
     vim.diagnostic.jump({ count = vim.v.count, severity = vim.diagnostic.severity.ERROR })
-  end, { desc = 'LSP: Go to next [E]rror message', buffer = buf })
+  end, { desc = 'LSP: Go to next [E]rror message', buf = buf })
   vim.keymap.set('n', '[e', function()
     vim.diagnostic.jump({ count = -vim.v.count, severity = vim.diagnostic.severity.ERROR })
-  end, { desc = 'LSP: Go to prev [E]rror message', buffer = buf })
+  end, { desc = 'LSP: Go to prev [E]rror message', buf = buf })
 
   local function jump_to_reference(direction)
     return function()
@@ -221,9 +221,9 @@ local function on_attach(client_id, buf)
     })
   end
 
-  vim.keymap.set('n', '<leader>8', hl_references, { desc = 'LSP: Select all references', buffer = buf })
+  vim.keymap.set('n', '<leader>8', hl_references, { desc = 'LSP: Select all references', buf = buf })
 
-  vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buffer = buf })
+  vim.keymap.set('n', 'gr', '<NOP>', { desc = 'LSP mappings', buf = buf })
   vim.keymap.set('n', '<C-w>d', function()
     if
       vim.diagnostic.open_float({ scope = 'c', header = 'Cursor Diagnostics:' })
@@ -244,7 +244,7 @@ local function on_attach(client_id, buf)
         apply = true,
       })
     end
-  end, { desc = 'LSP: [O]rganize Imports', buffer = buf })
+  end, { desc = 'LSP: [O]rganize Imports', buf = buf })
 
   for _, key in ipairs({ '<C-u>', '<C-d>' }) do
     vim.keymap.set({ 'n', 'i' }, key, function()

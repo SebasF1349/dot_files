@@ -5,8 +5,8 @@ local function set_playground_opts(ft)
   vim.bo.buflisted = false
   vim.wo.statuscolumn = ''
   vim.wo.winfixbuf = true
-  vim.keymap.set('n', 'q', '<cmd>bd! | pclose<cr>', { buffer = bufnr, desc = '[Q]uit' })
-  vim.keymap.set({ 'n', 'x' }, '<CR>', ':RunCode<CR>', { buffer = bufnr, desc = '[R]un Code' })
+  vim.keymap.set('n', 'q', '<cmd>bd! | pclose<cr>', { buf = bufnr, desc = '[Q]uit' })
+  vim.keymap.set({ 'n', 'x' }, '<CR>', ':RunCode<CR>', { buf = bufnr, desc = '[R]un Code' })
 end
 
 local function create_playground(ft)
