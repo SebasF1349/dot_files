@@ -1,4 +1,4 @@
-local api, fs, fn, cmd, ui = vim.api, vim.fs, vim.fn, vim.cmd, vim.ui
+local api, fn, cmd, ui = vim.api, vim.fn, vim.cmd, vim.ui
 
 local M = {}
 

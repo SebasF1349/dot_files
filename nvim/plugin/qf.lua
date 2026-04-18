@@ -80,7 +80,6 @@ local function getList(listType, nr, winid)
 end
 
 -- NOTE: This supposes only one list is opened, if there is more than one quickfix wins
----@return qflist
 local function getActiveList()
   local qflist = getList('c')
   local loclist = getList('l')
@@ -393,7 +392,6 @@ vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
 -- Quickfix Options
 --------------------------------------------------
 
----@return number
 local function getHeight()
   local lines = vim.api.nvim_buf_line_count(qfbufnr)
   local extmarks = vim.api.nvim_buf_get_extmarks(qfbufnr, qfim_file_namespace, 0, -1, { details = true })
@@ -862,6 +860,7 @@ local function document_symbols()
   vim.lsp.buf.document_symbol({
     on_list = function(options)
       local items = options.items
+      if not items then return end
 
       local seen = {}
       local out = {}
