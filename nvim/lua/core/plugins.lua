@@ -440,6 +440,8 @@ vim.list_extend(ensure_installed, {
   'phpstan',
   'php-debug-adapter',
   'php-cs-fixer',
+  -- utils
+  'tree-sitter-cli',
 })
 
 vim.api.nvim_create_user_command('MasonInstallNew', function()
