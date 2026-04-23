@@ -353,7 +353,7 @@ function M.select(items, opts, on_choice)
   vim.api.nvim_buf_set_lines(select_bufnr, 0, #text, false, text)
   for line, cols in ipairs(hl) do
     for _, col in ipairs(cols) do
-      vim.highlight.range(select_bufnr, select_ns, 'Title', { line - 1, col[1] }, { line - 1, col[2] })
+      vim.hl.range(select_bufnr, select_ns, 'Title', { line - 1, col[1] }, { line - 1, col[2] })
     end
   end
 
