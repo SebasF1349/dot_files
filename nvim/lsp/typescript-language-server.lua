@@ -26,7 +26,6 @@ return {
         return vim.startswith(action, 'source.')
       end, client.server_capabilities.codeActionProvider.codeActionKinds)
       vim.lsp.buf.code_action({
-        ---@diagnostic disable-next-line: missing-fields
         context = { only = source_actions },
       })
     end, {})

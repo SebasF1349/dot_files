@@ -239,7 +239,6 @@ local function on_attach(client_id, buf)
       vim.cmd('OrganizeImports')
     else
       vim.lsp.buf.code_action({
-        ---@diagnostic disable-next-line: missing-fields
         context = { only = { 'source.organizeImports' } },
         apply = true,
       })
