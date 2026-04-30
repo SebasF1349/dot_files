@@ -7,6 +7,7 @@
     "modules-right": [
         "custom/playerctl",
         "tray",
+        "idle_inhibitor",
         "network",
         "group/group-backlight",
         "group/group-audio",
@@ -30,6 +31,13 @@
             "format" : {
                 "today": "<span color='#a6e3af'><b><u>{}</u></b></span>"
             }
+        }
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
         }
     },
     "network": {
