@@ -231,7 +231,9 @@ local function add_virt_lines(list)
       })
     end
   end
-  vim.api.nvim_feedkeys(vim.keycode('<C-u>'), 'm', true)
+  vim.schedule(function()
+    vim.api.nvim_win_set_cursor(0, {1, 0})
+  end)
 end
 
 -- workaround for cannot scroll to see virtual line before first line - see https://github.com/neovim/neovim/issues/16166
@@ -835,7 +837,9 @@ local function document_symbols()
   vim.lsp.buf.document_symbol({
     on_list = function(options)
       local items = options.items
-      if not items then return end
+      if not items then
+        return
+      end
 
       local seen = {}
       local out = {}
