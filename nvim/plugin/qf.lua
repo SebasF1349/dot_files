@@ -37,13 +37,10 @@ local last_cmd = ''
 ---@param winid? integer
 ---@return nil| ListType
 local function getListType(winid)
-  winid = winid or vim.api.nvim_get_current_win()
-  local info = vim.fn.getwininfo(winid)[1]
-  if info.quickfix == 0 then
-    return nil
-  elseif info.loclist == 0 then
+  local type = vim.fn.win_gettype(winid or 0)
+  if type == 'quickfix' then
     return 'c'
-  else
+  elseif type == 'loclist' then
     return 'l'
   end
 end
@@ -79,31 +76,9 @@ local function getList(listType, nr, winid)
   end
 end
 
--- NOTE: This supposes only one list is opened, if there is more than one quickfix wins
 local function getActiveList()
-  local qflist = getList('c')
-  local loclist = getList('l')
-
-  local wintype = getListType()
-  if wintype == 'c' then
-    return qflist
-  elseif wintype == 'l' then
-    return loclist
-  -- If loclist is empty, use quickfix
-  elseif loclist.size == 0 then
-    return qflist
-  -- If quickfix is empty, use loclist
-  elseif qflist.size == 0 then
-    return loclist
-  elseif qflist.winid ~= 0 then
-    if loclist.winid == 0 then
-      return qflist
-    end
-  elseif loclist.winid ~= 0 then
-    return loclist
-  end
-  -- They're either both empty or both open
-  return qflist
+  local type = getListType() or (vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and 'l') or 'c'
+  return getList(type)
 end
 
 ---@param listType ListType
