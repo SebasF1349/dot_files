@@ -18,6 +18,7 @@ default_border pixel 0
 exec_always --no-startup-id picom -b
 
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock -n -c 000000
+exec --no-startup-id caffeine
 
 exec_always --no-startup-id autotiling
 
