@@ -58,10 +58,7 @@ function FindFunc(cmdarg, _)
   if not files_list then
     local cmd = { 'fd', '.', '--type', 'file', '--relative-path', '--color', 'never', '--hidden' }
     local files = vim.system(cmd, { text = true }):wait()
-    if not files.stdout then
-      return {}
-    end
-    files_list = vim.split(vim.trim(files.stdout), '\n')
+    files_list = files.stdout and vim.split(vim.trim(files.stdout), '\n') or {}
   end
   return fn.matchfuzzy(files_list, cmdarg)
 end
