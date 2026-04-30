@@ -26,7 +26,7 @@ api.nvim_create_autocmd({ 'CmdlineChanged' }, {
   pattern = '*',
   callback = function(args)
     local cmdline = fn.getcmdline()
-    if not args.match == ':' or not vim.startswith(cmdline, '!') then
+    if args.match ~= ':' or not vim.startswith(cmdline, '!') then
       fn.wildtrigger()
     end
   end,
