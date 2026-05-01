@@ -3,8 +3,8 @@ local bufnr, winid
 local function set_playground_opts(ft)
   vim.bo.filetype = ft
   vim.bo.buflisted = false
-  vim.wo.statuscolumn = ''
-  vim.wo.winfixbuf = true
+  vim.wo[0][0].statuscolumn = ''
+  vim.wo[0][0].winfixbuf = true
   vim.keymap.set('n', 'q', '<cmd>bd! | pclose<cr>', { buf = bufnr, desc = '[Q]uit' })
   vim.keymap.set({ 'n', 'x' }, '<CR>', ':RunCode<CR>', { buf = bufnr, desc = '[R]un Code' })
 end

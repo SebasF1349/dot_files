@@ -1,5 +1,5 @@
-vim.wo.statuscolumn = ' '
-vim.wo.signcolumn = 'yes'
+vim.wo[0][0].statuscolumn = ' '
+vim.wo[0][0].signcolumn = 'yes'
 vim.bo.buflisted = false
 vim.bo.bufhidden = 'wipe'
 vim.bo.tabstop = 8

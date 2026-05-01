@@ -1,12 +1,12 @@
 vim.bo.bufhidden = 'wipe'
 vim.bo.buflisted = false
 vim.bo.modifiable = false
-vim.wo.number = false
-vim.wo.relativenumber = false
-vim.wo.statuscolumn = ''
-vim.wo.conceallevel = 3
-vim.wo.concealcursor = 'nvic'
-vim.wo.spell = false
+vim.wo[0][0].number = false
+vim.wo[0][0].relativenumber = false
+vim.wo[0][0].statuscolumn = ''
+vim.wo[0][0].conceallevel = 3
+vim.wo[0][0].concealcursor = 'nvic'
+vim.wo[0][0].spell = false
 
 vim.cmd('wincmd J')
 
