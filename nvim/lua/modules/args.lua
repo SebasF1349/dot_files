@@ -36,26 +36,29 @@ end
 
 ---@param argnr number?
 function M.move(argnr)
+  local argc = fn.argc()
+  if argc == 0 then
+    return
+  end
+
   cmd('silent! write')
-  argnr = argnr or fn.argidx() + 1
-  if argnr < 1 or argnr > fn.argc() then
-    argnr = math.fmod(argnr, fn.argc())
-  end
-  if argnr <= 0 then
-    argnr = argnr + fn.argc()
-  end
+  argnr = (argnr - 1) % argc + 1
+
   cmd({ cmd = 'argument', count = argnr, bang = true, mods = { silent = true } })
 end
 
 function M.select()
-  if fn.argc() == 0 then
-    vim.notify('No args', vim.log.levels.WARN)
+  local args = M.getArgs()
+  if #args == 0 then
+    vim.notify('Arglist empty', vim.log.levels.WARN)
     return
   end
-  ui.select(M.getArgs(), {
+
+  local current = fn.argidx()
+  ui.select(args, {
     prompt = 'Select buffer:',
     format_item = function(item)
-      return item == fn.argv(fn.argidx()) and '[' .. item .. ']' or item
+      return item == args[current + 1] and ('[' .. item .. ']') or item
     end,
   }, function(_, selected)
     if selected then
@@ -65,16 +68,10 @@ function M.select()
 end
 
 function M.cycle_next()
-  if fn.argc() == 0 then
-    return
-  end
-  M.move(fn.argidx() + vim.v.count1 + 1)
+  M.move(fn.argidx() + 1 + vim.v.count1)
 end
 
 function M.cycle_prev()
-  if fn.argc() == 0 then
-    return
-  end
   local bufname = M.getBufName(0)
   local moves = fn.argidx() + 1 - vim.v.count1
   if not vim.list_contains(M.getArgs(), bufname) then
