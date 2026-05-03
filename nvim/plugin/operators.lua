@@ -11,8 +11,6 @@ end
 -- Surround
 --------------------------------------------------
 
--- TODO: to work well with tags, I need to be able to use .{-}, but that will break at line 170 as I need the correct lenght
--- TODO: add 'surround with function' with fn.input to input the function name
 -- TODO: try to reduce boilerplate
 
 local surround = {
@@ -39,7 +37,12 @@ local function get_pair()
   end
   if char == 't' then
     local tag = fn.input('Enter tag: ')
-    return { { '<' .. tag .. '>' }, { '</' .. tag .. '>' } }
+    if tag == '' then
+      return nil
+    end
+    -- Support attributes like <div class="test"> by splitting at first space
+    local tag_name = tag:match('^(%S+)')
+    return { { '<' .. tag .. '>' }, { '</' .. tag_name .. '>' }, 'tag' }
   end
   if vim.b.surroundPair then
     local _, item = vim.iter(vim.b.surroundPair):find(function(t, _)
@@ -91,7 +94,7 @@ end
 ---@param pair string[][]
 ---@return string[]
 local function add_pair(text, pair)
-  assert(#pair == 2, 'There must be 2 pairs')
+  assert(#pair == 2 or #pair == 3, "There can't be less than 2 pairs")
   local left_pad, first_line = get_whitespace(text[1], 'left')
   local newText = {}
   for i = 1, #pair[1] do
@@ -154,30 +157,45 @@ end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 ---@param pairDelete string[][]
 ---@param pairAdd? string[][]
 local function operateSurround(pairDelete, pairAdd)
-  assert(#pairDelete == 2, 'There must be 2 pairs to delete')
+  assert(#pairDelete == 2 or #pairDelete == 3, 'There must be 2 pairs to delete')
   if pairAdd then
-    assert(#pairAdd == 2, 'There must be 2 pairs to add')
+    assert(#pairAdd == 2 or #pairAdd == 3, 'There must be 2 pairs to add')
   end
   local curr = api.nvim_win_get_cursor(0)
-  local o = fn.search(pairDelete[1][1], 'bW')
+
+  local open_pattern = pairDelete[1][1]
+  local close_pattern = pairDelete[2][#pairDelete[2]]
+
+  -- If it's a tag, use a regex that ignores attributes
+  if pairDelete[3] == 'tag' then
+    local tag_name = close_pattern:match('</(%S+)>')
+    open_pattern, close_pattern = '<' .. tag_name .. '[^>]*>', '</' .. tag_name .. '>'
+  else
+    open_pattern, close_pattern = [[\V]] .. open_pattern, [[\V]] .. close_pattern
+  end
+
+  local o = fn.search(open_pattern, 'bW')
   if o == 0 then
     return
   end
   local opening = api.nvim_win_get_cursor(0)
-  local e = fn.search(pairDelete[2][#pairDelete[2]], 'eW')
+  local e = fn.search(close_pattern, 'eW')
   local ending = api.nvim_win_get_cursor(0)
   if e == 0 or ending[1] < curr[1] or (ending[1] == curr[1] and ending[2] < curr[2]) then
     api.nvim_win_set_cursor(0, curr)
     return
   end
 
+  local actual_open = fn.matchstr(fn.getline(opening[1]), open_pattern)
+  local actual_close = fn.matchstr(fn.getline(ending[1]), close_pattern)
+
   local lines = api.nvim_buf_get_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, {})
-  lines[1] = lines[1]:sub(#pairDelete[1][1] + 1, -1)
-  if #lines[1] == 0 then
+  lines[1] = lines[1]:sub(#actual_open + 1)
+  lines[#lines] = lines[#lines]:sub(1, #lines[#lines] - #actual_close)
+  if #lines > 1 and lines[1]:match('^%s*$') then
     table.remove(lines, 1)
   end
-  lines[#lines] = lines[#lines]:sub(1, -1 * (#pairDelete[2][#pairDelete[2]] + 1))
-  if #lines[#lines] == 0 then
+  if #lines > 1 and lines[#lines]:match('^%s*$') then
     table.remove(lines, #lines)
   end
   if pairAdd then
