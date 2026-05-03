@@ -921,18 +921,14 @@ WHERE EVENT_OBJECT_TABLE = '%s'
       return
     end
 
-    vim.system({ 'kill', tostring(pid) }, {}, function(obj)
-      if obj.code == 0 then
-        vim.schedule(function()
-          vim.notify('Successfully killed tunnel ' .. name, vim.log.levels.INFO)
-          active_tunnels[name] = nil
-        end)
-      else
-        vim.schedule(function()
-          vim.notify('Failed to kill tunnel: ' .. obj.stderr, vim.log.levels.ERROR)
-        end)
-      end
-    end)
+    local success, err = vim.uv.kill(pid, 15)
+
+    if success then
+      vim.notify('Successfully stopped tunnel: ' .. name, vim.log.levels.INFO)
+      active_tunnels[name] = nil
+    else
+      vim.notify('Failed to kill tunnel ' .. name .. ': ' .. (err or 'unknown error'), vim.log.levels.ERROR)
+    end
   end
 
   local function db_completion(arg_lead, list)
@@ -967,13 +963,8 @@ WHERE EVENT_OBJECT_TABLE = '%s'
 
   vim.api.nvim_create_autocmd('VimLeavePre', {
     callback = function()
-      local pids = vim.tbl_values(active_tunnels)
-      if #pids > 0 then
-        local cmd = { 'kill', '-9' }
-        for _, pid in ipairs(pids) do
-          table.insert(cmd, tostring(pid))
-        end
-        vim.system(cmd):wait()
+      for _, pid in pairs(active_tunnels) do
+        vim.uv.kill(pid, 9)
       end
     end,
   })
