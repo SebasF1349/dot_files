@@ -209,7 +209,7 @@ end, { desc = '[C]hange [S]urround' })
 function _G.Substitute(mode)
   local reg = fn.getreg()
   local text = vim.split(reg, '\n')
-  if text[text] == '' then
+  if text[#text] == '' then
     table.remove(text)
   end
   local starting = api.nvim_buf_get_mark(0, '[')
