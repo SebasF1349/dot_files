@@ -1,4 +1,4 @@
-vim.wo.spell = true
+vim.wo[0][0].spell = true
 vim.bo.spelllang = 'es,en'
 vim.bo.comments = 'b:#,b:-'
 vim.bo.formatoptions = vim.bo.formatoptions .. 'cro'

@@ -53,10 +53,10 @@ local function set_term_opts(opts)
   cmd.startinsert()
   vim.bo.filetype = 'terminal'
   vim.bo.buflisted = false
-  vim.wo.statuscolumn = ''
-  vim.wo.winfixheight = true
-  vim.wo.winfixwidth = true
-  vim.wo.winfixbuf = true
+  vim.wo[0][0].statuscolumn = ''
+  vim.wo[0][0].winfixheight = true
+  vim.wo[0][0].winfixwidth = true
+  vim.wo[0][0].winfixbuf = true
   map('n', 'q', '<cmd>bd!<cr>', { buf = opts.bufnr })
   map('n', 'gf', '<cmd>aboveleft vertical wincmd F<cr>', { buf = opts.bufnr, desc = 'Open file under the cursor' })
   api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })

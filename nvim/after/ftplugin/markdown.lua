@@ -10,11 +10,11 @@ vim.bo.softtabstop = 2
 vim.bo.shiftwidth = 2
 vim.bo.expandtab = true
 vim.bo.textwidth = 0
-vim.wo.colorcolumn = '81'
-vim.wo.wrap = true
+vim.wo[0][0].colorcolumn = '81'
+vim.wo[0][0].wrap = true
 vim.bo.wrapmargin = 0
-vim.wo.linebreak = true
-vim.wo.spell = true
+vim.wo[0][0].linebreak = true
+vim.wo[0][0].spell = true
 vim.bo.spelllang = 'es,en'
 -- automatically continue lists
 vim.bo.formatoptions = vim.bo.formatoptions .. 'ro'
