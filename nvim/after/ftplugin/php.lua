@@ -263,7 +263,7 @@ end
 ---@param action? string
 ---@param action2? string
 local function move(target, action, action2)
-  if vim.fn.filereadable(target) ~= 1 then
+  if not vim.uv.fs_stat(target) then
     vim.notify('"' .. target .. '" not found', vim.log.levels.INFO)
     return
   end

@@ -232,7 +232,7 @@ local function add_virt_lines(list)
     end
   end
   vim.schedule(function()
-    vim.api.nvim_win_set_cursor(0, {1, 0})
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
   end)
 end
 
@@ -477,13 +477,13 @@ local function getPreview()
 end
 
 local function openPreview()
-  local qfLinenr = vim.fn.line('.')
+  local qfLinenr = vim.api.nvim_win_get_cursor(0)[1]
   local list = getActiveList().items
   if qfLinenr > #list then
     vim.notify('Error retriving list items', vim.log.levels.WARN)
     return
   end
-  local path = vim.fn.bufname(list[qfLinenr].bufnr)
+  local path = vim.api.nvim_buf_get_name(list[qfLinenr].bufnr)
   local line = list[qfLinenr].lnum
   vim.cmd('keepjumps aboveleft pedit +' .. line .. ' ' .. path)
   local preview_win = getPreview()
@@ -870,7 +870,7 @@ local function document_symbols()
             return
           end
           items = vim.tbl_map(function(item)
-            item.text = vim.fn.trim(vim.fn.getline(item.lnum))
+            item.text = vim.trim(vim.fn.getline(item.lnum))
             return item
           end, items)
           vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
@@ -951,7 +951,7 @@ local function addToQuickfix(listType)
       bufnr = vim.api.nvim_get_current_buf(),
       lnum = cursor_pos[2],
       col = cursor_pos[3],
-      text = vim.fn.getline('.'),
+      text = vim.api.nvim_get_current_line(),
     },
   }
   setList(listType, { items = new_qf_item }, 'a')

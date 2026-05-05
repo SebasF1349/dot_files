@@ -26,7 +26,7 @@ vim.keymap.set('x', 'A', function()
 end, { desc = 'Append on multiple lines', expr = true })
 
 vim.keymap.set('n', 'dd', function()
-  return vim.fn.getline('.') == '' and '"_dd' or 'dd'
+  return vim.api.nvim_get_current_line() == '' and '"_dd' or 'dd'
 end, { desc = 'Send blank lines to black hole', expr = true })
 
 vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
@@ -53,7 +53,7 @@ vim.keymap.set('i', '<C-l>', function()
     return
   end
   local rowe, cole = curr_node:end_()
-  if vim.fn.line('$') == rowe then
+  if vim.api.nvim_buf_line_count(0) == rowe then
     return
   end
   vim.api.nvim_win_set_cursor(0, { rowe + 1, cole })
@@ -210,7 +210,7 @@ local notes_cache = {}
 ---@param params? notes -- use index or project local
 local function open_notes(params)
   params = params or {}
-  local project_dir = params.index and 'index' or vim.fn.getcwd()
+  local project_dir = params.index and 'index' or vim.uv.cwd() or ''
   local ext = params.extension or 'md'
   if not notes_cache[project_dir] then
     notes_cache[project_dir] = {}
@@ -219,7 +219,7 @@ local function open_notes(params)
   if not curr_project then
     local oss = require('utils.os')
     local projects_notes_directory = oss.joinpath(vim.env.HOME, 'notes', 'dev')
-    if vim.fn.isdirectory(projects_notes_directory) == 0 then
+    if not vim.uv.fs_stat(projects_notes_directory) then
       os.execute('mkdir -p ' .. projects_notes_directory)
     end
     local project_file_name
@@ -233,9 +233,7 @@ local function open_notes(params)
         :gsub(vim.env.HOME, '')
         :gsub('^%w:', '') -- remove disk name in windows
         :gsub('/', '__') -- it can be any separator because windows is a mess
-        :gsub('\\', '__')
-        .. '.'
-        .. ext
+        :gsub('\\', '__') .. '.' .. ext
     end
     local note_file_path = vim.fs.normalize(oss.joinpath(projects_notes_directory, project_file_name))
     if vim.tbl_isempty(vim.fs.find(project_file_name, { type = 'file', path = projects_notes_directory })) then
@@ -338,7 +336,7 @@ local replace_chars = {
   N = 'Ñ',
 }
 vim.keymap.set('n', "g'", function()
-  local line, col = vim.api.nvim_get_current_line(), vim.fn.col('.')
+  local line, col = vim.api.nvim_get_current_line(), #vim.api.nvim_get_current_line()
   local char = line:sub(col, col + vim.str_utf_end(line, col))
   for k1, k2 in pairs(replace_chars) do
     if char == k1 then

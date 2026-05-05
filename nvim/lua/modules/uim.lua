@@ -295,7 +295,7 @@ function M.select(items, opts, on_choice)
     end
     option = option or '-'
     table.insert(choices, { option = option, item = item })
-    local charnr = vim.fn.strchars(option) + vim.fn.strchars(item) + 5 -- 5 because of the spaces I will add later
+    local charnr = vim.str_utfindex(option, 'utf-8') + vim.str_utfindex(item, "utf-8") + 5 -- 5 because of the spaces I will add later
     if charnr > max_length then
       max_length = charnr
     end
@@ -333,7 +333,7 @@ function M.select(items, opts, on_choice)
         break
       end
       local choice = choices[pos]
-      local item_whitespace = col_start - vim.fn.strchars(text[j] or '')
+      local item_whitespace = col_start - vim.str_utfindex(text[j] or '', "utf-8")
       local col = #(text[j] or '') + item_whitespace + 1
       table.insert(hl[j], { col, col + 1 + #choice.option })
       text[j] = string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choice.option, choice.item)
