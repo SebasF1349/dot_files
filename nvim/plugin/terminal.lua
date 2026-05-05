@@ -53,6 +53,7 @@ local function set_term_opts(opts)
   cmd.startinsert()
   vim.bo.filetype = 'terminal'
   vim.bo.buflisted = false
+  vim.bo.scrollback = 1000000
   vim.wo[0][0].statuscolumn = ''
   vim.wo[0][0].winfixheight = true
   vim.wo[0][0].winfixwidth = true
