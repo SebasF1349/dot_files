@@ -9,7 +9,10 @@
     name: (name) @method_name
     arguments: (arguments
       (argument
-        (_
-          (string_content) @injection.content))))
+        [
+          (_ (string_content) @injection.content)
+          (_ (_ (string_content) @injection.content))
+          (_ (_ (_ (string_content) @injection.content)))
+        ])))
   (#eq? @method_name "registerJs")
   (#set! injection.language "javascript"))
