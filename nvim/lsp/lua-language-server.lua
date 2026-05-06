@@ -17,12 +17,6 @@ return {
       completion = { callSnippet = 'Replace' },
       hint = { enable = true, arrayIndex = 'Disable' },
       telemetry = { enable = false },
-      runtime = { version = 'LuaJIT' },
-      workspace = {
-        checkThirdParty = false,
-        library = {
-          vim.env.VIMRUNTIME,
-          vim.fn.stdpath('data') .. '/site/pack/core/opt', -- plugins types
         },
       },
     },
