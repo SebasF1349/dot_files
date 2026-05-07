@@ -17,8 +17,6 @@ return {
       completion = { callSnippet = 'Replace' },
       hint = { enable = true, arrayIndex = 'Disable' },
       telemetry = { enable = false },
-        },
-      },
     },
   },
 }
