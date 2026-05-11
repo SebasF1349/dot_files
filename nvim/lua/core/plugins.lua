@@ -73,8 +73,8 @@ vim.pack.add({
 
   { src = 'https://github.com/nvim-mini/mini.splitjoin' },
   { src = 'https://github.com/nvim-mini/mini.ai' },
-  { src = 'https://github.com/nvim-lua/plenary.nvim' },
-  { src = 'https://github.com/ThePrimeagen/refactoring.nvim' },
+  { src = 'https://github.com/lewis6991/async.nvim' },
+  { src = 'https://github.com/ThePrimeagen/refactoring.nvim', version = 'develop' },
   { src = 'https://github.com/windwp/nvim-ts-autotag' },
   { src = 'https://github.com/artemave/workspace-diagnostics.nvim' },
 
@@ -547,36 +547,45 @@ vim.keymap.set({ 'x', 'o' }, 'as', function()
   end
 end)
 
-local function refactoring_run()
-  if package.loaded['refactoring'] then
-    return require('refactoring')
-  end
-  local refactoring = require('refactoring')
-  refactoring.setup({
-    show_success_message = true,
-    print_var_statements = {
-      php = {
-        "echo '<pre>%s ->' . %s; var_export(%s); echo '<pre>'; exit;",
+-- "echo '<pre>%s ->' . %s; var_export(%s); echo '<pre>'; exit;",
+local refactoring = require('refactoring')
+refactoring.setup({
+  -- show_success_message = true,
+  debug = {
+    print_var = {
+      code_generation = {
+        print_var = {
+          php = function(opts)
+            return ([[echo '<pre>%s(%s) ->'; var_export(%s); echo '</pre>'; exit;]]):format(
+              opts.identifier_str,
+              opts.count,
+              opts.identifier
+            )
+          end,
+        },
       },
     },
-  })
-  return refactoring
-end
+  },
+})
+local refactoring_debug = require('refactoring.debug')
 vim.keymap.set({ 'n', 'x' }, '<leader>rr', function()
-  refactoring_run().select_refactor({ prefer_ex_cmd = true })
+  refactoring.select_refactor({ prefer_ex_cmd = true })
 end)
 vim.keymap.set('n', '<leader>rp', function()
-  refactoring_run().debug.printf()
-end, { desc = '[R]efactoring: Debug [P]rint' })
+  return refactoring_debug.print_loc({ output_location = 'below' })
+end, { desc = '[R]efactoring: Debug [P]rint', expr = true })
 vim.keymap.set({ 'n', 'x' }, '<leader>rv', function()
-  refactoring_run().debug.print_var()
-end, { desc = '[R]efactoring: Debug Print [V]ariable' })
+  return refactoring_debug.print_var({ output_location = 'below' })
+end, { desc = '[R]efactoring: Debug Print [V]ariable', expr = true })
 vim.keymap.set({ 'n', 'x' }, '<leader>rV', function()
-  refactoring_run().debug.print_var({ below = false })
-end, { desc = '[R]efactoring: Debug Print [V]ariable Above' })
-vim.keymap.set('n', '<leader>rc', function()
-  refactoring_run().debug.cleanup()
-end, { desc = '[R]efactoring: [C]lear Debug' })
+  return refactoring_debug.print_var({ output_location = 'above' })
+end, { desc = '[R]efactoring: Debug Print [V]ariable Above', expr = true })
+vim.keymap.set({ 'x', 'n' }, '<leader>re', function()
+  return refactoring_debug.print_exp({ output_location = 'below' })
+end, { desc = '[R]efactoring: Debug Print [E]xp', expr = true })
+vim.keymap.set({ 'x', 'n' }, '<leader>rc', function()
+  return refactoring_debug.cleanup({ restore_view = true })
+end, { desc = '[R]efactoring: [C]lear Debug', expr = true })
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'svelte', 'html', 'markdown', 'php' },
