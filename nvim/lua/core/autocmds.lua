@@ -12,12 +12,12 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
   desc = 'Open file at the last position it was edited earlier',
 })
 
-vim.api.nvim_create_autocmd('TextYankPost', {
+vim.api.nvim_create_autocmd({ 'TextYankPost', 'TextPutPost' }, {
   callback = function()
-    vim.hl.on_yank()
+    vim.hl.hl_op()
   end,
   group = general,
-  desc = 'Highlight on yank',
+  desc = 'Highlight on Yank and Put',
 })
 
 -- This is needed as the formatoptions are set in ft files in neovim core
