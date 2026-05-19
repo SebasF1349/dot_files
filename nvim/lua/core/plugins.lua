@@ -66,6 +66,7 @@ vim.pack.add({
 
   { src = 'https://github.com/tpope/vim-fugitive' },
   { src = 'https://github.com/lewis6991/gitsigns.nvim' },
+  { src = 'https://github.com/barrettruth/diffs.nvim' },
 
   { src = 'https://github.com/mfussenegger/nvim-dap' },
   { src = 'https://github.com/igorlfs/nvim-dap-view' },
@@ -393,12 +394,19 @@ require('gitsigns').setup({
 
     vim.keymap.set('n', '<leader>hs', gitsigns.stage_hunk, { desc = '[H]unk [S]tage', buf = bufnr })
     vim.keymap.set('n', '<leader>hr', gitsigns.reset_hunk, { desc = '[H]unk [R]eset', buf = bufnr })
-    vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk_inline, { desc = '[H]unk [P]review', buf = bufnr })
+    vim.keymap.set('n', '<leader>hp', gitsigns.preview_hunk, { desc = '[H]unk [P]review', buf = bufnr })
 
     vim.keymap.set('n', '<leader>bs', gitsigns.stage_buffer, { desc = '[B]uffer [S]tage', buf = bufnr })
     vim.keymap.set('n', '<leader>br', gitsigns.reset_buffer, { desc = '[B]uffer [R]eset', buf = bufnr })
   end,
 })
+
+vim.g.diffs = {
+  integrations = {
+    fugitive = true,
+    gitsigns = true,
+  },
+}
 
 --------------------------------------------------
 -- Mason
