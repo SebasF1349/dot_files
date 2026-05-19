@@ -13,6 +13,12 @@ local function get_session_path()
   if #session_name == 0 then
     session_name = 'home'
   end
+  -- local branch = vim.g.gitsigns_head
+  local branch = vim.system({ 'git', 'rev-parse', '--abbrev-ref', 'HEAD' }, { text = true }):wait(500)
+  if branch.code == 0 then
+    local branch_name = vim.trim(branch.stdout)
+    session_name = session_name .. '@@' .. branch_name:gsub('[\\/:]', '_')
+  end
   return oss.joinpath(sessions_path, session_name)
 end
 
@@ -25,7 +31,12 @@ end
 local function sessionLoad()
   cmd('silent! %bwipeout!')
   local session_path = get_session_path()
-  cmd('source ' .. session_path)
+  if not vim.uv.fs_stat(session_path) then
+    session_path = session_path:gsub('@@.*$', '')
+  end
+  if vim.uv.fs_stat(session_path) then
+    cmd('source ' .. session_path)
+  end
 end
 
 local function sessionRemove()
