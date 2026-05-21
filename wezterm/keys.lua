@@ -62,7 +62,7 @@ function M.setup(config)
 		},
 		{
 			mods = M.modWorkspace,
-			key = "n",
+			key = "k",
 			action = wezterm.action_callback(function(win, pane)
 				wezterm.GLOBAL.previous_workspace = win:active_workspace()
 				win:perform_action(act.SwitchWorkspaceRelative(1), pane)
@@ -70,7 +70,7 @@ function M.setup(config)
 		},
 		{
 			mods = M.modWorkspace,
-			key = "p",
+			key = "j",
 			action = wezterm.action_callback(function(win, pane)
 				wezterm.GLOBAL.previous_workspace = win:active_workspace()
 				win:perform_action(act.SwitchWorkspaceRelative(-1), pane)
