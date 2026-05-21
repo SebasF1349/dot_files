@@ -266,17 +266,20 @@ local function on_attach(client_id, buf)
     end, { desc = 'Scroll Docs' })
   end
 
-  local ok_wd, wd = pcall(require, 'workspace-diagnostics', function()
-    local cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', vim.uv.cwd() }
-    local files = vim.system(cmd, { text = true }):wait()
-    if not files.stdout then
-      return {}
+  if client:supports_method('workspace/diagnostic', buf) then
+    vim.lsp.buf.workspace_diagnostics({ client_id = client_id })
+  else
+    local ok_wd, wd = pcall(require, 'workspace-diagnostics', function()
+      local cmd = { 'fd', '--type', 'file', '--full-path', '--color', 'never', vim.uv.cwd() }
+      local files = vim.system(cmd, { text = true }):wait()
+      if not files.stdout then
+        return {}
+      end
+      return vim.split(vim.trim(files.stdout), '\n')
+    end)
+    if ok_wd then
+      wd.populate_workspace_diagnostics(client, buf)
     end
-    return vim.split(vim.trim(files.stdout), '\n')
-  end)
-  if ok_wd then
-    wd.populate_workspace_diagnostics(client, buf)
-  end
 
   -- NOTE: only works on html, not in intelephense
   if client.server_capabilities.linkedEditingRangeProvider then
