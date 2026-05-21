@@ -77,6 +77,7 @@ local function bufname_valid(bufname)
 end
 
 vim.lsp.codelens.enable(true)
+vim.lsp.linked_editing_range.enable(true)
 
 ---@param client_id integer
 ---@param buf integer
@@ -280,10 +281,6 @@ local function on_attach(client_id, buf)
     if ok_wd then
       wd.populate_workspace_diagnostics(client, buf)
     end
-
-  -- NOTE: only works on html, not in intelephense
-  if client.server_capabilities.linkedEditingRangeProvider then
-    vim.lsp.linked_editing_range.enable(true, { client_id = client_id })
   end
 end
 
