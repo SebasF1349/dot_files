@@ -366,6 +366,9 @@ vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
 --------------------------------------------------
 
 local function getHeight()
+  if not qfbufnr then
+    return 10
+  end
   local lines = vim.api.nvim_buf_line_count(qfbufnr)
   local extmarks = vim.api.nvim_buf_get_extmarks(qfbufnr, qfim_file_namespace, 0, -1, { details = true })
   return math.max(math.min(lines + #extmarks, 10), 5)
