@@ -322,12 +322,12 @@ function _G.quickfixtextfunc(info)
     }, 'a')
   end
   qfbufnr = list.qfbufnr
-  local diffs
+  local diffs_arr
   local isDiff = isDiffTool(list)
   if isDiff then
-    diffs = vim.system({ 'git', 'diff', '--numstat' }, { text = true }):wait()
-    diffs = vim.split(diffs.stdout, '\n')
-    diffs = vim.iter(diffs):rskip(1):fold({}, function(acc, diff)
+    local diffs = vim.system({ 'git', 'diff', '--numstat' }, { text = true }):wait()
+    diffs_arr = vim.split(diffs.stdout, '\n')
+    diffs_arr = vim.iter(diffs_arr):rskip(1):fold({}, function(acc, diff)
       diff = vim.split(diff, '\t')
       acc[vim.fn.bufnr(diff[3])] = { added = diff[1], removed = diff[2] }
       return acc
@@ -340,12 +340,12 @@ function _G.quickfixtextfunc(info)
     local l = list[i]
     if not isDiff then
       list[i].text = vim.trim(l.text)
-    elseif diffs and diffs[l.bufnr] then
+    elseif diffs_arr and diffs_arr[l.bufnr] then
       list[i].text = (GIT_STATUS_MAP[l.text:sub(1, 1)] or '')
         .. ' (+'
-        .. diffs[l.bufnr].added
+        .. diffs_arr[l.bufnr].added
         .. '-'
-        .. diffs[l.bufnr].removed
+        .. diffs_arr[l.bufnr].removed
         .. ')'
     else
       list[i].text = GIT_STATUS_MAP[l.text:sub(1, 1)]
