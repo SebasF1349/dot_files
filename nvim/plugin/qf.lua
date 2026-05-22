@@ -341,7 +341,7 @@ function _G.quickfixtextfunc(info)
     local d = diffs_arr and diffs_arr[l.bufnr]
     if not isDiff then
       list[i].text = vim.trim(l.text)
-    elseif diffs_arr and d then
+    elseif d then
       list[i].text = ('%s (+%s-%s)'):format(GIT_STATUS_MAP[l.text:sub(1, 1)] or '', d.added, d.removed)
     else
       list[i].text = GIT_STATUS_MAP[l.text:sub(1, 1)]
