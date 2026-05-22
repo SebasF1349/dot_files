@@ -338,7 +338,7 @@ function _G.quickfixtextfunc(info)
   local ret = {}
   for i = info.start_idx, info.end_idx do
     local l = list[i]
-    local d = diffs_arr[l.bufnr]
+    local d = diffs_arr and diffs_arr[l.bufnr]
     if not isDiff then
       list[i].text = vim.trim(l.text)
     elseif diffs_arr and d then
