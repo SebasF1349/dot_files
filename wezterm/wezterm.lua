@@ -62,7 +62,12 @@ config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0cell", bo
 config.enable_wayland = false
 
 wezterm.on("update-status", function(window, pane)
-	local domain = pane:get_domain_name()
+	local ok, domain = pcall(function()
+		return pane:get_domain_name()
+	end)
+	if not ok then
+		return
+	end
 	if domain:find("SSH") then
 		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), domain)
 
