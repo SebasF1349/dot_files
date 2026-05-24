@@ -273,29 +273,24 @@ end, { desc = '[O]pen Notes [C]url' })
 -- Spell
 --------------------------------------------------
 
+-- stylua: ignore
 local replace_chars = {
-  a = 'á',
-  e = 'é',
-  i = 'í',
-  o = 'ó',
-  u = 'ú',
-  A = 'Á',
-  E = 'É',
-  I = 'Í',
-  O = 'Ó',
-  U = 'Ú',
-  n = 'ñ',
-  N = 'Ñ',
+  a = 'á', e = 'é', i = 'í', o = 'ó', u = 'ú',
+  A = 'Á', E = 'É', I = 'Í', O = 'Ó', U = 'Ú',
+  n = 'ñ', N = 'Ñ',
 }
+local reverse_chars = {}
+for k, v in pairs(replace_chars) do
+  reverse_chars[v] = k
+end
+
 vim.keymap.set('n', "g'", function()
-  local line, col = vim.api.nvim_get_current_line(), #vim.api.nvim_get_current_line()
+  local line, col = vim.api.nvim_get_current_line(), vim.api.nvim_win_get_cursor(0)[2] + 1
   local char = line:sub(col, col + vim.str_utf_end(line, col))
-  for k1, k2 in pairs(replace_chars) do
-    if char == k1 then
-      return 'r' .. k2
-    elseif char == k2 then
-      return 'r' .. k1
-    end
+  if replace_chars[char] then
+    return 'r' .. replace_chars[char]
+  elseif reverse_chars[char] then
+    return 'r' .. reverse_chars[char]
   end
 end, { desc = 'Add tilde to letters', expr = true })
 
