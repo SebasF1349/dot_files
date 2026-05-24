@@ -36,17 +36,6 @@ vim.keymap.set('x', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', rem
 vim.keymap.set('n', '[p', '<cmd>exe "iput! " . v:register<CR>', { desc = 'Paste Linewise Above' })
 vim.keymap.set('n', ']p', '<cmd>exe "iput "  . v:register<CR>', { desc = 'Paste Linewise Below' })
 
-vim.keymap.set({ 'n', 'x' }, '<leader>x', function()
-  local esc = vim.keycode('<esc>')
-  vim.api.nvim_feedkeys(esc, 'n', false)
-  local is_visual = vim.fn.mode():match('[vV\22]')
-  local range = is_visual and "'<,'>" or '%'
-  vim.cmd(string.format('%ss/\\r//ge | %ss/\\s\\+$//ge | %ss/\\n\\n\\n\\+/\\r\\r/ge', range, range, range))
-  if is_visual then
-    vim.api.nvim_feedkeys(esc, 'n', false)
-  end -- \27 is ESC
-end, { desc = 'Cleaning' })
-
 vim.keymap.set('i', '<C-l>', function()
   local curr_node = vim.treesitter.get_node({ ignore_injections = false })
   if not curr_node then
