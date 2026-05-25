@@ -489,15 +489,46 @@ ai.setup({
   custom_textobjects = {
     t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags
     d = { '%f[%d%._][%d%._]+' }, -- digits with _ separator
-    s = { -- subword (breaks sentence, but I never use it) https://github.com/echasnovski/mini.nvim/discussions/1434
-      {
-        '%f[%a]%l+%d*',
-        '%f[%w]%d+',
-        '%f[%u]%u%f[%A]%d*',
-        '%f[%u]%u%l+%d*',
-        '%f[%u]%u%u+%d*',
-      },
-    },
+    s = function(ai_type, id, opts)
+      -- subword (breaks sentence, but I never use it)
+      -- https://github.com/nvim-mini/mini.nvim/discussions/1434#discussioncomment-13238259 (15/03/26)
+      local SEP = '_%-'
+      if ai_type == 'a' then
+        return {
+          {
+            -- pattern, [^_]pattern__
+            '%f[%a' .. SEP .. ']%l+%d*[' .. SEP .. ']*',
+            '%f[%w' .. SEP .. ']%d+[' .. SEP .. ']*',
+            '%f[%u' .. SEP .. ']%u%f[%A]%d*[' .. SEP .. ']*',
+            '%f[%u' .. SEP .. ']%u%l+%d*[' .. SEP .. ']*',
+            '%f[%u' .. SEP .. ']%u%u+%d*[' .. SEP .. ']*',
+            --__pattern
+            '%f[' .. SEP .. '][' .. SEP .. ']+%l+%d*',
+            '%f[' .. SEP .. '][' .. SEP .. ']+%d+',
+            '%f[' .. SEP .. '][' .. SEP .. ']+%u%f[%A]%d*',
+            '%f[' .. SEP .. '][' .. SEP .. ']+%u%l+%d*',
+            '%f[' .. SEP .. '][' .. SEP .. ']+%u%u+%d*',
+            --[_]pattern__[%s]
+            '%f[^' .. SEP .. ']%l+%d*[' .. SEP .. ']+%f[%s]',
+            '%f[^' .. SEP .. ']%d+[' .. SEP .. ']+%f[%s]',
+            '%f[^' .. SEP .. ']%u%f[%A]%d*[' .. SEP .. ']+%f[%s]',
+            '%f[^' .. SEP .. ']%u%l+%d*[' .. SEP .. ']+%f[%s]',
+            '%f[^' .. SEP .. ']%u%u+%d*[' .. SEP .. ']+%f[%s]',
+          },
+          '^().*()$',
+        }
+      end
+      if ai_type == 'i' then
+        ---@diagnostic disable-next-line: undefined-global
+        local reg = MiniAi.find_textobject('a', id, opts)
+        if reg then
+          local line = vim.fn.getLine(reg.from.line)
+          local _, s = line:find('^[' .. SEP .. ']*.', reg.from.col)
+          local e = line:sub(1, reg.to.col):find('.[' .. SEP .. ']*$')
+          return vim.tbl_deep_extend('force', reg, { from = { col = s }, to = { col = e } })
+        end
+      end
+    end,
     u = ai.gen_spec.function_call(), -- u for "Usage"
     U = ai.gen_spec.function_call({ name_pattern = '[%w_]' }), -- without dot in function name
     g = function() -- whole buffer
@@ -528,28 +559,6 @@ ai.setup({
     end,
   },
 })
-
-local around_subword = function(reg)
-  reg = vim.deepcopy(reg)
-  local SEP = '[_%-]+'
-  local line = vim.fn.getline(reg.from.line)
-  local left = line:sub(1, reg.from.col - 1):find(SEP .. '$')
-  local _, right = line:find('^' .. SEP, reg.to.col + 1)
-  if left then
-    reg.from.col = left
-  elseif right then
-    reg.to.col = right
-  end
-  return reg
-end
-vim.keymap.set({ 'x', 'o' }, 'as', function()
-  local reg = MiniAi.find_textobject('i', 's')
-  if reg then
-    ---@diagnostic disable-next-line: inject-field
-    MiniAi.config.custom_textobjects._Virt = around_subword(reg)
-    MiniAi.select_textobject('i', '_Virt')
-  end
-end)
 
 -- "echo '<pre>%s ->' . %s; var_export(%s); echo '<pre>'; exit;",
 local refactoring = require('refactoring')
