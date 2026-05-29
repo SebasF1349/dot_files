@@ -524,7 +524,7 @@ ai.setup({
         ---@diagnostic disable-next-line: undefined-global
         local reg = MiniAi.find_textobject('a', id, opts)
         if reg then
-          local line = vim.fn.getLine(reg.from.line)
+          local line = vim.fn.getline(reg.from.line)
           local _, s = line:find('^[' .. SEP .. ']*.', reg.from.col)
           local e = line:sub(1, reg.to.col):find('.[' .. SEP .. ']*$')
           return vim.tbl_deep_extend('force', reg, { from = { col = s }, to = { col = e } })
