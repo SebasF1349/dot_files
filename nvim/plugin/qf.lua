@@ -427,9 +427,7 @@ end
 ---@param file boolean remove all items in file
 local function delete(file)
   local listType = getListType()
-  if not listType then
-    return
-  end
+  assert(listType)
   local list = getList(listType)
   local qfitems = list.items
 
@@ -541,11 +539,9 @@ end
 ---@param selectItemOpts SelectItemOpts
 local function selectItem(selectItemOpts)
   local opts = selectItemOpts or {}
-  local qftype = getListType()
-  if not qftype then
-    return
-  end
-  local qflist = getList(qftype)
+  local listType = getListType()
+  assert(listType)
+  local qflist = getList(listType)
   if isDiffTool(qflist) then
     openAsDiff()
     return
@@ -556,13 +552,13 @@ local function selectItem(selectItemOpts)
     vim.cmd('pclose')
   end
   if not opts.split then
-    vim.cmd('.' .. qftype .. qftype)
+    vim.cmd('.' .. listType .. listType)
   else
     local prev_win = qflist.filewinid or get_prev_win(qflist.winid)
     if prev_win and prev_win > 0 and vim.fn.win_gettype(prev_win) == '' then
       local item = qflist.items[qfitempos[2]]
       vim.api.nvim_open_win(item.bufnr, false, { win = prev_win, vertical = opts.split == 'v' })
-      vim.cmd('.' .. qftype .. qftype)
+      vim.cmd('.' .. listType .. listType)
       if opts.keep_cursor then
         vim.api.nvim_set_current_win(qflist.winid)
       end
@@ -570,7 +566,6 @@ local function selectItem(selectItemOpts)
   end
   vim.schedule(function()
     if opts.close then
-      local listType = getActiveList().filewinid and 'l' or 'c'
       vim.cmd(listType .. 'close')
     elseif opts.keep_cursor and not opts.split then
       vim.api.nvim_set_current_win(qflist.winid)
@@ -580,9 +575,7 @@ end
 
 local function closeList()
   local listType = getListType()
-  if not listType then
-    return
-  end
+  assert(listType)
   local list = getList(listType)
   if isDiffTool(list) then
     pcall(vim.cmd.tabclose)
@@ -598,9 +591,7 @@ end
 ---@param direction 'older'|'newer'
 local function listHistory(direction)
   local listType = getListType()
-  if not listType then
-    return
-  end
+  assert(listType)
   local listCount = getList(listType, '$').nr
   if listCount == 1 then
     vim.notify('There is only one list in the history', vim.log.levels.WARN)
@@ -618,9 +609,7 @@ end
 ---@param what 'message' | 'file'
 local function yank(what)
   local listType = getListType()
-  if not listType then
-    return
-  end
+  assert(listType)
   local list = getList(listType)
   local line = vim.api.nvim_win_get_cursor(0)
   local qfitem = list.items[line[1]]
@@ -631,9 +620,7 @@ end
 
 local function refresh()
   local listType = getListType()
-  if not listType then
-    return
-  end
+  assert(listType)
   local list = getList(listType)
   if list.context == '' then
     return
