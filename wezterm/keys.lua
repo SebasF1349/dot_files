@@ -8,17 +8,7 @@ local utils = require("utils")
 local M = {}
 
 M.modWorkspace = "CTRL|ALT"
-M.modSplit = "SHIFT|ALT"
-M.modTab = "ALT"
-
-M.smart_split = wezterm.action_callback(function(window, pane)
-	local dim = pane:get_dimensions()
-	if dim.pixel_height > dim.pixel_width then
-		window:perform_action(act.SplitVertical({ domain = "CurrentPaneDomain" }), pane)
-	else
-		window:perform_action(act.SplitHorizontal({ domain = "CurrentPaneDomain" }), pane)
-	end
-end)
+M.mod = "ALT"
 
 function M.setup(config)
 	config.disable_default_key_bindings = true
@@ -90,7 +80,7 @@ function M.setup(config)
 		},
 		-- New Tab
 		{
-			mods = M.modTab,
+			mods = M.mod,
 			key = "t",
 			action = act.PromptInputLine({
 				description = "Enter name of new tab",
@@ -103,9 +93,9 @@ function M.setup(config)
 				end),
 			}),
 		},
-		{ mods = M.modTab, key = "T", action = act.SpawnTab("CurrentPaneDomain") },
+		{ mods = M.mod, key = "T", action = act.SpawnTab("CurrentPaneDomain") },
 		{
-			mods = M.modTab,
+			mods = M.mod,
 			key = "r",
 			action = act.PromptInputLine({
 				description = "Enter new name for tab",
@@ -116,53 +106,115 @@ function M.setup(config)
 				end),
 			}),
 		},
-		{ mods = M.modTab, key = "q", action = act.CloseCurrentTab({ confirm = false }) },
+		{ mods = M.mod, key = "Q", action = act.CloseCurrentTab({ confirm = false }) },
 		{
-			mods = M.modTab,
-			key = "s",
+			mods = M.mod,
+			key = "S",
 			action = wezterm.action_callback(function(win, pane)
 				ssh.select_ssh(win, pane)
 			end),
 		},
 		-- Move Tabs
-		{ mods = M.modTab, key = ".", action = act.MoveTabRelative(1) },
-		{ mods = M.modTab, key = ",", action = act.MoveTabRelative(-1) },
+		{ mods = M.mod, key = "=", action = act.MoveTabRelative(1) },
+		{ mods = M.mod, key = "-", action = act.MoveTabRelative(-1) },
 		-- Acivate Tabs
-		{ mods = M.modTab, key = "n", action = act.ActivateTabRelative(1) },
-		{ mods = M.modTab, key = "p", action = act.ActivateTabRelative(-1) },
-		{ mods = M.modTab, key = "1", action = act.ActivateTab(0) },
-		{ mods = M.modTab, key = "2", action = act.ActivateTab(1) },
-		{ mods = M.modTab, key = "3", action = act.ActivateTab(2) },
-		{ mods = M.modTab, key = "4", action = act.ActivateTab(3) },
+		{ mods = M.mod, key = "n", action = act.ActivateTabRelative(1) },
+		{ mods = M.mod, key = "p", action = act.ActivateTabRelative(-1) },
+		{ mods = M.mod, key = "1", action = act.ActivateTab(0) },
+		{ mods = M.mod, key = "2", action = act.ActivateTab(1) },
+		{ mods = M.mod, key = "3", action = act.ActivateTab(2) },
+		{ mods = M.mod, key = "4", action = act.ActivateTab(3) },
 		-- Clipboard
-		{ mods = M.modTab, key = "c", action = act.CopyTo("Clipboard") },
-		{ mods = M.modTab, key = "v", action = act.PasteFrom("Clipboard") },
-		{ mods = M.modTab, key = "y", action = act.ActivateCopyMode },
-		-- { mods = M.modTab, key = "s", action = act.QuickSelect },
-		{ mods = M.modTab, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
-		-- { mods = M.mod, key = "p", action = act.ActivateCommandPalette },
-		-- { mods = M.mod, key = "d", action = act.ShowDebugOverlay },
+		{ mods = M.mod, key = "Y", action = act.CopyTo("Clipboard") },
+		{ mods = M.mod, key = "P", action = act.PasteFrom("Clipboard") },
+		{ mods = M.mod, key = "V", action = act.ActivateCopyMode },
+		-- Search
+		{ mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
+		{ mods = M.mod, key = "F", action = act.QuickSelect },
+		{
+			key = "u",
+			mods = M.mod,
+			action = wezterm.action.QuickSelectArgs({
+				label = "open url",
+				patterns = {
+					"https?://\\S+",
+				},
+				skip_action_on_paste = true,
+				action = wezterm.action_callback(function(window, pane)
+					local url = window:get_selection_text_for_pane(pane)
+					wezterm.open_with(url)
+				end),
+			}),
+		},
 		-- Splits
-		{ mods = M.modSplit, key = "Enter", action = M.smart_split },
-		{ mods = M.modSplit, key = "|", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.modSplit, key = "_", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.modSplit, key = "Q", action = act.CloseCurrentPane({ confirm = false }) },
-		{ mods = M.modSplit, key = "S", action = act.PaneSelect({ mode = "SwapWithActive" }) },
-		{ mods = M.modSplit, key = "R", action = act.RotatePanes("Clockwise") },
-		{ mods = M.modSplit, key = "z", action = act.TogglePaneZoomState },
-		M.split_nav("resize", "CTRL|SHIFT", "<", "Left"),
-		M.split_nav("resize", "CTRL|SHIFT", ">", "Right"),
-		M.split_nav("resize", "CTRL", ",", "Up"),
-		M.split_nav("resize", "CTRL", ".", "Down"),
-		M.split_nav("move", "CTRL", "h", "Left"),
-		M.split_nav("move", "CTRL", "j", "Down"),
-		M.split_nav("move", "CTRL", "k", "Up"),
-		M.split_nav("move", "CTRL", "l", "Right"),
+		{ mods = M.mod, key = "Enter", action = M.smart_split },
+		{ mods = M.mod, key = "v", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+		{ mods = M.mod, key = "s", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+		{ mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
+		{ mods = M.mod, key = "R", action = act.RotatePanes("Clockwise") },
+		{ mods = M.mod, key = "z", action = act.TogglePaneZoomState },
+		M.split_nav("resize", "ALT|SHIFT", "<", "Left"),
+		M.split_nav("resize", "ALT|SHIFT", ">", "Right"),
+		M.split_nav("resize", "ALT", ",", "Up"),
+		M.split_nav("resize", "ALT", ".", "Down"),
+		M.split_nav("move", "ALT", "h", "Left"),
+		M.split_nav("move", "ALT", "j", "Down"),
+		M.split_nav("move", "ALT", "k", "Up"),
+		M.split_nav("move", "ALT", "l", "Right"),
 		-- Scrollback
 		M.scroll("CTRL", "u", "Up"),
 		M.scroll("CTRL", "d", "Down"),
 	}
+
+	local copy_mode = {}
+	local search_mode = {}
+	if wezterm.gui then
+		local default_tables = wezterm.gui.default_key_tables()
+		copy_mode = default_tables.copy_mode
+		search_mode = default_tables.search_mode
+	end
+
+	local shared_mappings = {
+		{
+			key = "y",
+			mods = M.mod,
+			action = act.Multiple({
+				act.CopyTo("PrimarySelection"),
+				act.ClearSelection,
+				act.CopyMode("ClearSelectionMode"),
+				act.CopyMode("ClearPattern"),
+			}),
+		},
+		{
+			key = "Escape",
+			mods = "NONE",
+			action = act.Multiple({
+				act.CopyMode("ClearSelectionMode"),
+				act.CopyMode("ClearPattern"),
+				act.CopyMode("Close"),
+			}),
+		},
+	}
+
+	for _, mapping in ipairs(shared_mappings) do
+		table.insert(copy_mode, mapping)
+		table.insert(search_mode, mapping)
+	end
+
+	config.key_tables = {
+		copy_mode = copy_mode,
+		search_mode = search_mode,
+	}
 end
+
+M.smart_split = wezterm.action_callback(function(window, pane)
+	local dim = pane:get_dimensions()
+	if dim.pixel_height > dim.pixel_width then
+		window:perform_action(act.SplitVertical({ domain = "CurrentPaneDomain" }), pane)
+	else
+		window:perform_action(act.SplitHorizontal({ domain = "CurrentPaneDomain" }), pane)
+	end
+end)
 
 function M.scroll(mods, key, dir)
 	local event = "Scroll_" .. dir
@@ -198,10 +250,11 @@ function M.split_nav(resize_or_move, mods, key, dir)
 				for _, p in ipairs(panes) do
 					if p.is_zoomed then
 						is_zoomed = true
+            break
 					end
 				end
 				if is_zoomed then
-					dir = dir == "Up" or dir == "Right" and "Next" or "Prev"
+					dir = (dir == "Up" or dir == "Right") and "Next" or "Prev"
 				end
 				win:perform_action({ ActivatePaneDirection = dir }, pane)
 				win:perform_action({ SetPaneZoomState = is_zoomed }, pane)

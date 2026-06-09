@@ -95,7 +95,7 @@ local function navigate(dir)
 end
 
 for key, direction in pairs(nav) do
-  vim.keymap.set({ 'n', 't' }, '<C-' .. key .. '>', navigate(key), { desc = 'Move to Window ' .. direction })
+  vim.keymap.set({ 'n', 't' }, '<A-' .. key .. '>', navigate(key), { desc = 'Move to Window ' .. direction })
 end
 
 local resize_dir = {
