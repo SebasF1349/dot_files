@@ -1,19 +1,31 @@
 local wezterm = require("wezterm")
 local utils = require("utils")
 
-local config = {}
-
-if wezterm.config_builder then
-	config = wezterm.config_builder()
-end
+local config = wezterm.config_builder and wezterm.config_builder() or {}
 
 require("keys").setup(config)
 
 config.color_scheme = "Catppuccin Mocha"
+config.font = wezterm.font("JetBrainsMono Nerd Font")
+config.check_for_updates = false
+
+config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0cell", bottom = "0cell" }
+config.use_resize_increments = true
+config.unzoom_on_switch_pane = true
+
+config.use_fancy_tab_bar = false
+config.tab_max_width = 32
+config.show_new_tab_button_in_tab_bar = false
+
+config.enable_scroll_bar = false
+config.inactive_pane_hsb = { saturation = 1, brightness = 0.5 }
+config.window_close_confirmation = "NeverPrompt"
+config.cursor_blink_ease_in = "Constant"
+config.cursor_blink_ease_out = "Constant"
 
 if utils.is_windows() then
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
-	config.window_decorations = "RESIZE" -- it breaks wezterm in hyprland and my windows notebook?
+	config.window_decorations = "TITLE | RESIZE"
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"
 	local scheme = wezterm.color.get_builtin_schemes()[config.color_scheme]
 	config.background = {
@@ -29,37 +41,10 @@ if utils.is_windows() then
 			opacity = 0.7,
 		},
 	}
-elseif wezterm.target_triple == "x86_64-unknown-linux-gnu" then
+elseif wezterm.target_triple:find("linux") then
 	config.window_background_opacity = 0.9
+	config.enable_wayland = false
 end
-
---config.adjust_window_size_when_changing_font_size = false
-config.font = wezterm.font("JetBrainsMono Nerd Font")
-config.use_fancy_tab_bar = false
-config.tab_max_width = 32
-config.unzoom_on_switch_pane = true
-config.show_new_tab_button_in_tab_bar = false
-config.inactive_pane_hsb = {
-	saturation = 1,
-	brightness = 0.5,
-}
-config.use_resize_increments = true
-
-config.enable_scroll_bar = false
-
-config.window_close_confirmation = "NeverPrompt"
-
--- config.front_end = "WebGpu"
--- config.webgpu_power_preference = "HighPerformance"
--- config.animation_fps = 1
-config.cursor_blink_ease_in = "Constant"
-config.cursor_blink_ease_out = "Constant"
-
-config.check_for_updates = false
-
-config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0cell", bottom = "0cell" }
-
-config.enable_wayland = false
 
 wezterm.on("update-status", function(window, pane)
 	local ok, domain = pcall(function()
@@ -68,52 +53,43 @@ wezterm.on("update-status", function(window, pane)
 	if not ok then
 		return
 	end
+
 	if domain:find("SSH") then
 		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), domain)
-
-		local overrides = window:get_config_overrides() or {}
-		overrides.color_scheme = "Catppuccin Frappe"
-		overrides.background = {}
-		window:set_config_overrides(overrides)
+		window:set_config_overrides({
+			color_scheme = "Catppuccin Frappe",
+			background = {},
+		})
 	end
 
-	local workspace = window:active_workspace()
-
 	local color_scheme = window:effective_config().resolved_palette
-
 	local elements = {}
 
 	local mode = window:active_key_table()
 	if mode then
-		local icon = " 󰌌 "
-		local mode_bg = color_scheme.ansi[5]
-
-		if mode == "copy_mode" then
-			icon = " 󰆏 "
-			mode_bg = color_scheme.ansi[7]
-		elseif mode == "search_mode" then
-			icon = " 󰍉 "
-			mode_bg = color_scheme.ansi[4]
-		end
+		local modes = {
+			copy_mode = { icon = " 󰆏 ", color = color_scheme.ansi[7] },
+			search_mode = { icon = " 󰍉 ", color = color_scheme.ansi[4] },
+		}
+		local current = modes[mode] or { icon = " 󰌌 ", color = color_scheme.ansi[5] }
 
 		table.insert(elements, { Background = { Color = color_scheme.background } })
-		table.insert(elements, { Foreground = { Color = mode_bg } })
-		table.insert(elements, { Text = icon })
+		table.insert(elements, { Foreground = { Color = current.color } })
+		table.insert(elements, { Text = current.icon })
 	end
 
 	local bg = wezterm.color.parse(color_scheme.background):lighten(0.2)
-	local fg = color_scheme.foreground
+	local workspace = window:active_workspace()
+
 	table.insert(elements, { Background = { Color = bg } })
-	table.insert(elements, { Foreground = { Color = fg } })
+	table.insert(elements, { Foreground = { Color = (color_scheme.foreground) } })
 	table.insert(elements, { Text = " " .. workspace .. " " })
 
 	window:set_right_status(wezterm.format(elements))
 end)
 
-wezterm.on("format-window-title", function(tab, pane, tabs, panes, config)
-	local muxtab = wezterm.mux.get_tab(tab.tab_id)
-	local muxwin = muxtab:window()
-	return muxwin:get_workspace()
+wezterm.on("format-window-title", function(tab)
+  return wezterm.mux.get_tab(tab.tab_id):window():get_workspace()
 end)
 
 wezterm.on("gui-startup", function(cmd)
