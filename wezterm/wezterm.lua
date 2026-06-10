@@ -80,14 +80,32 @@ wezterm.on("update-status", function(window, pane)
 	local workspace = window:active_workspace()
 
 	local color_scheme = window:effective_config().resolved_palette
+
+	local elements = {}
+
+	local mode = window:active_key_table()
+	if mode then
+		local icon = " 󰌌 "
+		local mode_bg = color_scheme.ansi[5]
+
+		if mode == "copy_mode" then
+			icon = " 󰆏 "
+			mode_bg = color_scheme.ansi[7]
+		elseif mode == "search_mode" then
+			icon = " 󰍉 "
+			mode_bg = color_scheme.ansi[4]
+		end
+
+		table.insert(elements, { Background = { Color = color_scheme.background } })
+		table.insert(elements, { Foreground = { Color = mode_bg } })
+		table.insert(elements, { Text = icon })
+	end
+
 	local bg = wezterm.color.parse(color_scheme.background):lighten(0.2)
 	local fg = color_scheme.foreground
-
-	local elements = {
-		{ Foreground = { Color = fg } },
-		{ Background = { Color = bg } },
-		{ Text = " " .. workspace .. " " },
-	}
+	table.insert(elements, { Background = { Color = bg } })
+	table.insert(elements, { Foreground = { Color = fg } })
+	table.insert(elements, { Text = " " .. workspace .. " " })
 
 	window:set_right_status(wezterm.format(elements))
 end)
