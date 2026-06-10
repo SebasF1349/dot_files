@@ -54,8 +54,11 @@ wezterm.on("update-status", function(window, pane)
 		return
 	end
 
-	if domain:find("SSH") then
-		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), domain)
+	local process_name = pane:get_foreground_process_name() or ""
+	local is_ssh = domain:find("SSH") or process_name:lower():find("ssh")
+	if is_ssh then
+		local host = domain:match("to%s+(.+)$")
+		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), host)
 		window:set_config_overrides({
 			color_scheme = "Catppuccin Frappe",
 			background = {},
@@ -63,33 +66,39 @@ wezterm.on("update-status", function(window, pane)
 	end
 
 	local color_scheme = window:effective_config().resolved_palette
+
 	local elements = {}
+	table.insert(elements, { Background = { Color = color_scheme.background } })
 
 	local mode = window:active_key_table()
-	if mode then
-		local modes = {
-			copy_mode = { icon = " 󰆏 ", color = color_scheme.ansi[7] },
-			search_mode = { icon = " 󰍉 ", color = color_scheme.ansi[4] },
-		}
-		local current = modes[mode] or { icon = " 󰌌 ", color = color_scheme.ansi[5] }
+	local modes = {
+		copy_mode = { icon = " 󰆏 ", color = color_scheme.ansi[7] },
+		search_mode = { icon = " 󰍉 ", color = color_scheme.ansi[4] },
+	}
+	local current = modes[mode] or { icon = " 󰌌 ", color = color_scheme.split }
 
-		table.insert(elements, { Background = { Color = color_scheme.background } })
-		table.insert(elements, { Foreground = { Color = current.color } })
-		table.insert(elements, { Text = current.icon })
+	table.insert(elements, { Foreground = { Color = current.color } })
+	table.insert(elements, { Text = current.icon })
+
+	if is_ssh then
+		table.insert(elements, { Foreground = { Color = color_scheme.ansi[2] } })
+	else
+		table.insert(elements, { Foreground = { Color = color_scheme.split } })
 	end
+	table.insert(elements, { Text = " 󰒋 " })
 
 	local bg = wezterm.color.parse(color_scheme.background):lighten(0.2)
 	local workspace = window:active_workspace()
 
 	table.insert(elements, { Background = { Color = bg } })
-	table.insert(elements, { Foreground = { Color = (color_scheme.foreground) } })
+	table.insert(elements, { Foreground = { Color = color_scheme.foreground } })
 	table.insert(elements, { Text = " " .. workspace .. " " })
 
 	window:set_right_status(wezterm.format(elements))
 end)
 
 wezterm.on("format-window-title", function(tab)
-  return wezterm.mux.get_tab(tab.tab_id):window():get_workspace()
+	return wezterm.mux.get_tab(tab.tab_id):window():get_workspace()
 end)
 
 wezterm.on("gui-startup", function(cmd)
