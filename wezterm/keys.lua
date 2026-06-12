@@ -164,6 +164,8 @@ function M.setup(config)
 		-- Scrollback
 		M.scroll("CTRL", "u", "Up"),
 		M.scroll("CTRL", "d", "Down"),
+		{ mods = M.mod, key = "[", action = act.ScrollToPrompt(-1) },
+		{ mods = M.mod, key = "]", action = act.ScrollToPrompt(1) },
 	}
 
 	local copy_mode = {}
@@ -250,7 +252,7 @@ function M.split_nav(resize_or_move, mods, key, dir)
 				for _, p in ipairs(panes) do
 					if p.is_zoomed then
 						is_zoomed = true
-            break
+						break
 					end
 				end
 				if is_zoomed then
