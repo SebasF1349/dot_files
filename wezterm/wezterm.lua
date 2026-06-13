@@ -25,7 +25,7 @@ config.cursor_blink_ease_out = "Constant"
 
 if utils.is_windows() then
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
-	config.window_decorations = "TITLE | RESIZE"
+	config.window_decorations = "RESIZE"
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"
 	local scheme = wezterm.color.get_builtin_schemes()[config.color_scheme]
 	config.background = {
