@@ -9,10 +9,13 @@
     ff = true
 [push]
     default = current
+    autoSetupRemote = true
 [merge]
     conflictstyle = zdiff3
     tool = fugitive
 [diff]
+    renames = copies
+    interHunkContext = 10
     colorMoved = default
     algorithm = histogram
     wsErrorHighlight = all
@@ -22,6 +25,7 @@
 [rebase]
     autosquash = true
     autostash = true
+    missingCommitsCheck = warn
 [pretty]
     pf = format:%C(auto)%h%C(reset) %C(white)-%C(reset) %C(italic blue)%aD%C(reset) %C(italic cyan)(%ar) - %aN %C(reset)%n %C(white)⤷%C(reset) %s %C(241) %C(reset)%C(auto)%d%C(reset)%n%w(0,7,7)%+(trailers:only,unfold)
 [branch]
