@@ -205,11 +205,7 @@ local function custom_diagnostics()
     end
   end
 
-  if local_diagnostics == '' and workspace_diagnostics == '' then
-    return ''
-  end
-
-  return string.format('%s%s', local_diagnostics, workspace_diagnostics)
+  return local_diagnostics .. workspace_diagnostics
 end
 
 ---- STATUSLINE ----
