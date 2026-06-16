@@ -162,7 +162,7 @@ local function resize(dir)
 end
 
 for dir, content in pairs(resize_dir) do
-  vim.keymap.set({ 'n', 't' }, '<C-' .. content.key .. '>', resize(dir), { desc = content.desc })
+  vim.keymap.set({ 'n', 't' }, '<A-' .. content.key .. '>', resize(dir), { desc = content.desc })
 end
 
 --------------------------------------------------
