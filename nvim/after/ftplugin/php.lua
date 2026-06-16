@@ -6,7 +6,9 @@
 --- rector (to update php)
 --- php-cs-fixer or phpcbf (formatting - if it's even introduced at work)
 
-local separator = require('utils.os').dir_separator
+local utils_os = require('utils.os')
+local separator = utils_os.dir_separator
+local correct_separator = utils_os.correct_separator
 local snip = require('utils.snippets')
 
 vim.bo.commentstring = '// %s'
@@ -154,20 +156,21 @@ function File:new()
   if not root then
     return
   end
-  File.__base_dir = (root:gsub('[/\\]', separator) .. separator) or ''
+  File.__base_dir = correct_separator(root) .. separator
 
   local fpath = vim.fn.expand('%:.')
-  if string.find(fpath, 'controllers') then
+  if fpath:find('controllers') then
     File.__type = 'controller'
-    local controller = fpath:match('[\\/](%a*)Controller.php')
+    local filename = vim.fs.basename(fpath)
+    local controller = filename:gsub('Controller%.php$', '')
     File.__controller = PascalToKebab(controller)
   elseif fpath:find('views') then
     File.__type = 'view'
-    local controller = vim.fn.expand('%:p:h'):match('([^\\/]+)$')
+    local controller = vim.fs.basename(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
     File.__controller = kebab_to_pascal(controller)
   end
 
-  File.__controller = File.__controller:gsub('[/\\]', separator)
+  File.__controller = correct_separator(File.__controller)
 
   return self
 end
@@ -331,9 +334,9 @@ vim.keymap.set('n', 'gf', function()
       if not choice then
         return
       end
-      local controller, file = choice.args:match('^([^/\\]+)[/\\](.+)$')
-      if not controller then
-        controller, file = fileObj:getController(), choice.args
+      local controller, file = vim.fs.dirname(choice.args), vim.fs.basename(choice.args)
+      if controller == '.' then
+        controller = fileObj:getController()
       end
 
       if choice.method == 'render' then
@@ -348,9 +351,9 @@ vim.keymap.set('n', 'gf', function()
     end)
   elseif fileObj:getType() == 'view' then
     local cfile = vim.fn.expand('<cfile>')
-    local controller, file = cfile:match('([^/\\]+)[/\\]([^/\\]+)')
-    if not controller then
-      controller, file = fileObj:getController(), cfile:gsub('[^%w]', '')
+    local controller, file = vim.fs.dirname(cfile), vim.fs.basename(cfile)
+    if controller == '.' then
+      controller = fileObj:getController()
     end
     target = fileObj:getControllerPath(controller)
     action = 'action' .. kebab_to_pascal(file)
