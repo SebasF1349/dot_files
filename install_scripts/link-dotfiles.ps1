@@ -30,6 +30,7 @@ $dir_links = @{
     "$env:LocalAppData\nvim-vscode\" = "..\nvim-vscode\"
     "$env:USERPROFILE\.glzr\" = "..\.glzr\"
     "$env:APPDATA\bat\" = "..\bat\"
+    "$env:Programfiles\WezTerm\colors" = "..\wezterm\colors\"
 }
 
 # LibreOffice?

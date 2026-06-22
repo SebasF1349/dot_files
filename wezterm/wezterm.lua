@@ -5,7 +5,8 @@ local config = wezterm.config_builder and wezterm.config_builder() or {}
 
 require("keys").setup(config)
 
-config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = "Catppuccin Mocha Custom"
+local color_scheme_file = "catppuccin-mocha-custom"
 config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.check_for_updates = false
 
@@ -27,7 +28,8 @@ if utils.is_windows() then
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
 	config.window_decorations = "RESIZE"
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"
-	local scheme = wezterm.color.get_builtin_schemes()[config.color_scheme]
+	local theme_path = wezterm.config_dir .. "/colors/" .. color_scheme_file .. ".toml"
+	local color_scheme = wezterm.color.load_scheme(theme_path)
 	config.background = {
 		{
 			source = { File = background_image },
@@ -35,7 +37,7 @@ if utils.is_windows() then
 			vertical_align = "Middle",
 		},
 		{
-			source = { Color = scheme.background },
+			source = { Color = color_scheme.background },
 			height = "100%",
 			width = "100%",
 			opacity = 0.7,
@@ -60,12 +62,14 @@ wezterm.on("update-status", function(window, pane)
 		local host = domain:match("to%s+(.+)$")
 		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), host)
 		window:set_config_overrides({
-			color_scheme = "Catppuccin Frappe",
+			color_scheme = "Catppuccin Frappe Custom",
 			background = {},
 		})
+		color_scheme_file = "catppuccin-frappe-custom"
 	end
 
-	local color_scheme = window:effective_config().resolved_palette
+	local theme_path = wezterm.config_dir .. "/colors/" .. color_scheme_file .. ".toml"
+	local color_scheme = wezterm.color.load_scheme(theme_path)
 
 	local elements = {}
 	table.insert(elements, { Background = { Color = color_scheme.background } })
