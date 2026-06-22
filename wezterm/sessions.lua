@@ -125,10 +125,10 @@ end
 local function project_dirs()
 	local projects = {}
 
-	for _, dir in ipairs(wezterm.glob(workspaces_dir .. "/*")) do
+	for i, dir in ipairs(wezterm.glob(workspaces_dir .. "/*")) do
 		local file_name = dir:match("[^/]*.json$")
 		file_name = file_name:sub(0, #file_name - 5)
-		table.insert(projects, { id = dir, label = file_name })
+		table.insert(projects, { id = dir, label = i .. " - " .. file_name })
 	end
 
 	return projects
@@ -231,6 +231,7 @@ function M.select_workspace(win, pane, replace)
 			fuzzy = true,
 			fuzzy_description = "Select workspace: ",
 			action = wezterm.action_callback(function(_, _, state_path, workspace_name)
+				workspace_name = workspace_name:gsub("^%d+ %- ", "")
 				if not workspace_name or not state_path then
 					return
 				end
@@ -332,10 +333,10 @@ local function get_window_state(window)
 
 	local tabs = window:tabs_with_info()
 
-	for i, tab in ipairs(tabs) do
+	for _, tab in ipairs(tabs) do
 		local tab_state = get_tab_state(tab.tab)
 		tab_state.is_active = tab.is_active
-		window_state.tabs[i] = tab_state
+		table.insert(window_state.tabs, tab_state)
 	end
 
 	return window_state
