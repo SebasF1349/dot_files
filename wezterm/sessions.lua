@@ -56,29 +56,25 @@ end
 ---@param state workspace_state
 local function write_json(file_path, state)
 	local json_state = wezterm.json_encode(state)
-	local ok, err = pcall(function()
-		local file = assert(io.open(file_path, "w"))
-		file:write(json_state)
-		file:close()
-	end)
-	if not ok then
-		wezterm.log_error("Failed to write state: " .. err)
+	local file, err = io.open(file_path, "w")
+	if not file then
+		wezterm.log_error("Failed to open file: " .. err)
+		return
 	end
+	file:write(json_state)
+	file:close()
 end
 
 ---@param file_path string
 ---@return workspace_state|nil
 local function load_json(file_path)
-	local json
-	local lines = {}
-	for line in io.lines(file_path) do
-		table.insert(lines, line)
-	end
-	json = table.concat(lines)
-	if not json then
+	local file = io.open(file_path, "r")
+	if not file then
 		return nil
 	end
-	return wezterm.json_parse(json)
+	local content = file:read("*a")
+	file:close()
+	return content and wezterm.json_parse(content) or nil
 end
 
 --------------------------------------------------
