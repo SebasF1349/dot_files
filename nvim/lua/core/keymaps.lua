@@ -244,7 +244,9 @@ local function open_notes(params)
   })
 
   if vim.api.nvim_buf_get_name(note_buf) == '' then
-    vim.cmd.edit(note_file_path)
+    vim.fn.bufload(note_buf)
+    vim.bo[note_buf].buflisted = true
+    vim.api.nvim_win_set_buf(note_win, note_buf)
   end
 
   notes_cache[project_dir][ext] = { buf = note_buf, win = note_win, file_path = note_file_path }
