@@ -7,7 +7,6 @@
 # 1. EARLY EXIT & SHELL OPTIONS
 [[ $- != *i* ]] && return
 
-set -o vi
 shopt -s histappend checkwinsize autocd extglob cmdhist cdspell nocaseglob histverify
 HISTCONTROL=erasedups:ignoredups:ignorespace
 HISTSIZE=10000
