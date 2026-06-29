@@ -36,6 +36,8 @@ path_add "$ANDROID_HOME/platform-tools"
 export PNPM_HOME="$HOME/.local/share/pnpm"
 path_add "$PNPM_HOME"
 
+path_add "$HOME/.config/composer/vendor/bin"
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
