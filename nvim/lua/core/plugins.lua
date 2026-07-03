@@ -70,7 +70,6 @@ vim.pack.add({
 
   { src = 'https://github.com/mfussenegger/nvim-dap' },
   { src = 'https://github.com/igorlfs/nvim-dap-view' },
-  { src = 'https://github.com/theHamsta/nvim-dap-virtual-text' },
 
   { src = 'https://github.com/nvim-mini/mini.splitjoin' },
   { src = 'https://github.com/nvim-mini/mini.ai' },
@@ -225,7 +224,11 @@ local function debug_run()
   local dap = require('dap')
   local widgets = require('dap.ui.widgets')
   local dapview = require('dap-view')
-  require('nvim-dap-virtual-text').setup({})
+  dapview.setup({
+    virtual_text = {
+      enabled = true
+    }
+  })
 
   dap.listeners.before.attach['dap-view-config'] = function()
     dapview.open()
