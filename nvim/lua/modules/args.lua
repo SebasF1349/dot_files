@@ -36,6 +36,7 @@ end
 
 ---@param argnr number?
 function M.move(argnr)
+  argnr = argnr or 0
   local argc = fn.argc()
   if argc == 0 then
     return
