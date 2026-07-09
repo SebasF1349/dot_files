@@ -217,7 +217,7 @@ local function open_notes(params)
 
   local projects_notes_directory = vim.fs.joinpath(vim.env.HOME, 'notes', 'dev')
   if not vim.uv.fs_stat(projects_notes_directory) then
-    vim.fn.mkdir(projects_notes_directory, 'p')
+    vim.fs.mkdir(projects_notes_directory, { parents = true })
   end
 
   local project_file_name

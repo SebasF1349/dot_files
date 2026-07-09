@@ -6,7 +6,7 @@ local sessions_path = oss.joinpath(fn.stdpath('data'), 'sessions')
 
 local function get_session_path()
   if fn.isdirectory(sessions_path) == 0 then
-    os.execute('mkdir ' .. sessions_path)
+    vim.fs.mkdir(sessions_path, { parents = true })
   end
   local session_name =
     vim.uv.cwd():gsub('%s+', ''):gsub(vim.env.HOME, ''):gsub('.:\\', ''):gsub(oss.dir_separator, '__')
