@@ -1,4 +1,4 @@
-local opt, api, fn, map = vim.o, vim.api, vim.fn, vim.keymap.set
+local opt, api, fn, map, cmd = vim.o, vim.api, vim.fn, vim.keymap.set, vim.cmd
 local cmdline_autocmds = api.nvim_create_augroup('cmdline_autocmds', { clear = true })
 
 --------------------------------------------------
@@ -38,11 +38,19 @@ api.nvim_create_autocmd({ 'CmdlineChanged' }, {
 -- Search
 --------------------------------------------------
 
-vim.cmd('packadd nohlsearch')
 opt.incsearch = true
 opt.inccommand = 'split'
 opt.ignorecase = true
 opt.smartcase = true
+
+api.nvim_create_autocmd({ 'CursorHold', 'InsertEnter' }, {
+  pattern = '*',
+  callback = vim.schedule_wrap(function()
+    cmd.nohlsearch()
+  end),
+  group = api.nvim_create_augroup('nohlsearch', { clear = true }),
+  desc = 'Clean hlsearch Automatically',
+})
 
 --------------------------------------------------
 -- Finder
@@ -56,8 +64,8 @@ local files_list
 ---@param cmdarg string
 function FindFunc(cmdarg, _)
   if not files_list then
-    local cmd = { 'fd', '.', '--type', 'file', '--relative-path', '--color', 'never', '--hidden' }
-    local files = vim.system(cmd, { text = true }):wait()
+    local command = { 'fd', '.', '--type', 'file', '--relative-path', '--color', 'never', '--hidden' }
+    local files = vim.system(command, { text = true }):wait()
     files_list = files.stdout and vim.split(vim.trim(files.stdout), '\n') or {}
   end
   return fn.matchfuzzy(files_list, cmdarg)
