@@ -82,9 +82,8 @@ vim.keymap.set('n', '<leader>r', function()
   vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 end, { desc = 'Run cmd in a new buffer', buf = 0 })
 
-local oss = require('utils.os')
-local notes_path = oss.joinpath(vim.env.HOME, 'notes', 'dev')
-local curr_buf = oss.correct_separator(vim.api.nvim_buf_get_name(0))
+local notes_path = vim.fs.joinpath(vim.env.HOME, 'notes', 'dev')
+local curr_buf = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
 
 if vim.startswith(curr_buf, notes_path) then
   local function select_link(text)

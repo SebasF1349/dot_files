@@ -2,7 +2,7 @@ local api, fn, fs, cmd = vim.api, vim.fn, vim.fs, vim.cmd
 local oss = require('utils.os')
 
 vim.o.sessionoptions = 'curdir,winsize'
-local sessions_path = oss.joinpath(fn.stdpath('data'), 'sessions')
+local sessions_path = vim.fs.joinpath(fn.stdpath('data'), 'sessions')
 
 local function get_session_path()
   if fn.isdirectory(sessions_path) == 0 then
@@ -19,7 +19,7 @@ local function get_session_path()
     local branch_name = vim.trim(branch.stdout)
     session_name = session_name .. '@@' .. branch_name:gsub('[\\/:]', '_')
   end
-  return oss.joinpath(sessions_path, session_name)
+  return vim.fs.joinpath(sessions_path, session_name)
 end
 
 local function sessionSave()
