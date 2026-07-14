@@ -6,9 +6,6 @@
 --- rector (to update php)
 --- php-cs-fixer or phpcbf (formatting - if it's even introduced at work)
 
-local utils_os = require('utils.os')
-local separator = utils_os.dir_separator
-local correct_separator = utils_os.correct_separator
 local snip = require('utils.snippets')
 
 vim.bo.commentstring = '// %s'
@@ -134,10 +131,11 @@ vim.keymap.set('n', 'H', 'F$l', { desc = 'Previous variable', buf = 0 })
 
 -- YII2 keymaps
 local function PascalToKebab(pascal)
-  local res = pascal:gsub('%u', function(c)
-    return '-' .. c:lower()
-  end)
-  return res:gsub('^%-', '')
+  return pascal
+    :gsub('%u', function(c)
+      return '-' .. c:lower()
+    end)
+    :gsub('^%-', '')
 end
 
 local function kebab_to_pascal(kebab)
@@ -156,23 +154,25 @@ function File:new()
   if not root then
     return
   end
-  File.__base_dir = correct_separator(root) .. separator
+
+  local instance = setmetatable({}, self)
+  instance.__base_dir = vim.fs.normalize(root) .. '/'
 
   local fpath = vim.fn.expand('%:.')
   if fpath:find('controllers') then
-    File.__type = 'controller'
+    instance.__type = 'controller'
     local filename = vim.fs.basename(fpath)
     local controller = filename:gsub('Controller%.php$', '')
-    File.__controller = PascalToKebab(controller)
+    instance.__controller = PascalToKebab(controller)
   elseif fpath:find('views') then
-    File.__type = 'view'
+    instance.__type = 'view'
     local controller = vim.fs.basename(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
-    File.__controller = kebab_to_pascal(controller)
+    instance.__controller = kebab_to_pascal(controller)
   end
 
-  File.__controller = correct_separator(File.__controller)
+  instance.__controller = vim.fs.normalize(instance.__controller)
 
-  return self
+  return instance
 end
 function File:getBaseDir()
   return self.__base_dir
@@ -184,10 +184,10 @@ function File:getController()
   return self.__controller
 end
 function File:getControllerPath(controller)
-  return ('%scontrollers%s%sController.php'):format(self.__base_dir, separator, kebab_to_pascal(controller))
+  return ('%scontrollers/%sController.php'):format(self.__base_dir, kebab_to_pascal(controller))
 end
 function File:getViewPath(controller, file)
-  return ('%sviews%s%s%s%s.php'):format(self.__base_dir, separator, controller, separator, file)
+  return ('%sviews/%s/%s.php'):format(self.__base_dir, controller, file)
 end
 
 local function contains_return(list, candidate)
@@ -198,6 +198,22 @@ local function contains_return(list, candidate)
   end
   return false
 end
+
+local q = [[
+(
+  return_statement
+    (member_call_expression
+      object: (variable_name) @obj
+        (#eq? @obj "$this")
+      name: (name) @method
+        (#any-of? @method "redirect" "render" "renderPartial" "renderAjax")
+      arguments: (arguments
+        (argument)) @args
+    ) @call
+)
+]]
+local return_query = vim.treesitter.query.parse('php', q)
+local str_query = vim.treesitter.query.parse('php', '(string_content) @str_content')
 
 local function get_returns()
   local bufnr = vim.api.nvim_get_current_buf()
@@ -210,26 +226,11 @@ local function get_returns()
     return
   end
 
-  local q = [[
-(
-  return_statement
-    (member_call_expression
-      object: (variable_name) @obj
-        (#eq? @obj "$this")
-      name: (name) @method
-        (#any-of? @method "redirect" "render")
-      arguments: (arguments
-        (argument)) @args
-    ) @call
-)
-]]
-  local query = vim.treesitter.query.parse('php', q)
-  local str_query = vim.treesitter.query.parse('php', '(string_content) @str_content')
   local return_nodes = {}
-  for _, match, _ in query:iter_matches(method_node, bufnr) do
+  for _, match, _ in return_query:iter_matches(method_node, bufnr) do
     local rn = {}
-    for id, n in ipairs(match) do
-      local name = query.captures[id]
+    for id, n in pairs(match) do
+      local name = return_query.captures[id]
       local text = ''
       local node = n[1]
       if name == 'args' then
@@ -263,31 +264,31 @@ local function get_returns()
 end
 
 ---@param target string
----@param action? string
----@param action2? string
-local function move(target, action, action2)
+---@param method? string
+---@param method2? string
+local function move(target, method, method2)
   if not vim.uv.fs_stat(target) then
     vim.notify('"' .. target .. '" not found', vim.log.levels.INFO)
     return
   end
 
   vim.cmd('edit ' .. target)
-  if not action then
+  if not method then
     return
   end
 
-  action2 = action2 or ''
+  method2 = method2 or ''
   local action_query = string.format(
     [[
 (
 method_declaration
   (visibility_modifier)?
   name: (name) @method_name
-    (#any-of? @method_name %s %s)
+    (#any-of? @method_name "%s" "%s")
 )
 ]],
-    action,
-    action2
+    method,
+    method2
   )
 
   local parser = vim.treesitter.get_parser(0, 'php')
@@ -297,19 +298,21 @@ method_declaration
   local tree = parser:parse()[1]
   local root = tree:root()
   local query = vim.treesitter.query.parse('php', action_query)
+
   for _, match, _ in query:iter_matches(root, 0) do
     if match[1] then
       local method_node = match[1][1]
       local start_row, start_col = method_node:range()
       local bufnr = vim.api.nvim_get_current_buf()
       local text = vim.treesitter.get_node_text(method_node, bufnr)
-      if text == action or text == action2 then
+      if text == method or text == method2 then
         vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
         return
       end
     end
   end
-  vim.notify('Action "' .. action .. '" not found', vim.log.levels.INFO)
+
+  vim.notify('Method "' .. method .. '" not found', vim.log.levels.INFO)
 end
 
 vim.keymap.set('n', 'gf', function()
@@ -318,7 +321,7 @@ vim.keymap.set('n', 'gf', function()
     vim.notify('Controller directory not found', vim.log.levels.INFO)
     return
   end
-  local target, action, action2, method
+  local target, action, action2
   if fileObj:getType() == 'controller' then
     local returns = get_returns()
     if not returns or #returns == 0 then
@@ -339,9 +342,9 @@ vim.keymap.set('n', 'gf', function()
         controller = fileObj:getController()
       end
 
-      if choice.method == 'render' then
+      if choice.method:find('^render') then
         target = fileObj:getViewPath(controller, file)
-      elseif choice.method == 'redirect' or not method then
+      elseif choice.method == 'redirect' then
         target = fileObj:getControllerPath(controller)
         action = 'action' .. kebab_to_pascal(file)
       end
@@ -350,9 +353,26 @@ vim.keymap.set('n', 'gf', function()
       end
     end)
   elseif fileObj:getType() == 'view' then
+    local line = vim.api.nvim_get_current_line()
+    local m_var, attr = line:match('->field%(%s*%$([%w_]+)%s*,%s*[\'"]([%w_]+)[\'"]')
+
+    if m_var then
+      local content = table.concat(vim.api.nvim_buf_get_lines(0, 0, 50, false), '\n')
+      local model_class = content:match('@var%s+([%w_\\]+)%s+%$' .. m_var)
+
+      if model_class then
+        local proj_root = vim.fs.root(0, { 'yii', 'composer.json' }) or fileObj:getBaseDir()
+        local rel_path = model_class:gsub('^app\\', ''):gsub('\\', '/') .. '.php'
+        local target_path = vim.fs.normalize(proj_root .. '/' .. rel_path)
+
+        move(target_path, 'rules')
+        return
+      end
+    end
+
     local cfile = vim.fn.expand('<cfile>')
     local controller, file = vim.fs.dirname(cfile), vim.fs.basename(cfile)
-    if controller == '.' then
+    if controller == '.' or controller == '/' then
       controller = fileObj:getController()
     end
     target = fileObj:getControllerPath(controller)
