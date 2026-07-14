@@ -9,33 +9,35 @@ vim.api.nvim_set_hl(0, '@string.value', { link = '@string' })
 vim.treesitter.language.register('bash', 'curl')
 
 local function get_lines_between_blanks()
-  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+  local cursor_row = vim.api.nvim_win_get_cursor(0)[1]
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
-  local bottom = row
-  local line_count = vim.api.nvim_buf_line_count(0)
-  while bottom <= line_count do
-    local text = vim.api.nvim_buf_get_lines(0, bottom - 1, bottom, false)[1]
-    if text == '' then
-      break
-    end
+  local bottom = cursor_row
+  while bottom <= #lines and lines[bottom] ~= '' do
     bottom = bottom + 1
   end
 
-  local top = row
-  while top > 1 do
-    local text = vim.api.nvim_buf_get_lines(0, top - 2, top - 1, false)[1]
-    if vim.startswith(text, 'curl') then
+  local top = cursor_row
+  while top >= 1 do
+    if vim.startswith(lines[top], 'curl') then
       break
     end
     top = top - 1
   end
+  if top < 1 then
+    top = cursor_row
+  end
 
-  local lines = vim.api.nvim_buf_get_lines(0, top - 1, bottom - 1, false)
-  return table.concat(lines, '\n')
+  local slice = {}
+  for i = top, bottom - 1 do
+    table.insert(slice, lines[i])
+  end
+  return table.concat(slice, '\n')
 end
 
 local function starts_with_bracket(line)
-  local first_char = line:sub(1, 1)
+  if not line then return false end
+  local first_char = (vim.trim(line)):sub(1, 1)
   return first_char == '[' or first_char == '{'
 end
 
@@ -71,6 +73,9 @@ end, { silent = true, desc = 'Execute Curl', buf = 0 })
 
 local request_opts = {
   GET = [[curl -s "https://${1:url}"]],
+  POST_JSON = [[curl -s -X POST "https://${1:url}" \
+    -H "Content-Type: application/json" \
+    -d '{${2:body}}']],
 }
 
 vim.api.nvim_create_user_command('CurlCreate', function(opts)
@@ -87,12 +92,12 @@ end, {
   complete = function(arg_lead)
     local keys = vim.tbl_keys(request_opts)
     return vim.tbl_filter(function(key)
-      return key:find(arg_lead, 1, true) == 1
+      return key:lower():find(arg_lead:lower(), 1, true) ~= nil
     end, keys)
   end,
   desc = 'Create a template for a curl command',
 })
 
-vim.keymap.set('n', '<leader>c', ':CurlCreate ', { silent = true, desc = '[C]reate Curl', buf = 0 })
+vim.keymap.set('n', '<leader>c', ':CurlCreate ', { desc = '[C]reate Curl', buf = 0 })
 
 -- <CR> keymap heavily inspired by https://github.com/oysandvik94/curl.nvim/tree/3ee14fbafc8169fc803e80562ce7ac5b4474bdff
