@@ -316,7 +316,7 @@ end
 function _G.quickfixtextfunc(info)
   local listType = info.quickfix == 1 and 'c' or 'l'
   local list = getList(listType, nil, info.winid)
-  if list.context == '' and last_cmd ~= '' then
+  if list.context == '' and last_cmd and last_cmd ~= '' then
     setList(listType, {
       context = { last_cmd = last_cmd },
     }, 'a')
