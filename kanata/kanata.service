@@ -14,7 +14,7 @@ Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin
 # IOSchedulingClass=realtime
 # Nice=-20
 Type=simple
-ExecStart=/usr/bin/sh -c 'exec $$(which kanata) --cfg /etc/kanata/kanata.kbd'
+ExecStart=/usr/bin/bash -c 'exec $$(which kanata) --cfg /etc/kanata/kanata.kbd'
 Restart=no
 
 [Install]
