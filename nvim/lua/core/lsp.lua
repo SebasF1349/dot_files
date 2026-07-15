@@ -290,12 +290,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
     on_attach(args.data.client_id, args.buf)
   end,
 })
-local register_capability = vim.lsp.handlers[methods.client_registerCapability]
-vim.lsp.handlers[methods.client_registerCapability] = function(err, res, ctx)
-  local return_value = register_capability(err, res, ctx)
-  on_attach(ctx.client_id, vim.api.nvim_get_current_buf())
-  return return_value
-end
+-- local register_capability = vim.lsp.handlers[methods.client_registerCapability]
+-- vim.lsp.handlers[methods.client_registerCapability] = function(err, res, ctx)
+--   local return_value = register_capability(err, res, ctx)
+--   on_attach(ctx.client_id, vim.api.nvim_get_current_buf())
+--   return return_value
+-- end
 
 local function float_config()
   local max_height = vim.fn.screenrow() == vim.o.scrolloff + 1 and vim.o.scrolloff - 1 or 8
