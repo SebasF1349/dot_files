@@ -406,6 +406,11 @@ require('gitsigns').setup({
 })
 
 vim.g.diffs = {
+  highlights = {
+    context = { lines = 1000 },
+    treesitter = { max_lines = 1000 },
+    vim = { max_lines = 1000 },
+  },
   integrations = {
     fugitive = true,
     gitsigns = true,
