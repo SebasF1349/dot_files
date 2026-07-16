@@ -3,7 +3,7 @@ Description=Kanata keyboard remapper
 Documentation=https://github.com/jtroo/kanata
 
 [Service]
-Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin
+Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/home/sebas/.cargo/bin/
 #   Uncomment the 4 lines beneath this to increase process priority
 #   of Kanata in case you encounter lagginess when resource constrained.
 #   WARNING: doing so will require the service to run as an elevated user such as root.
@@ -14,7 +14,7 @@ Environment=PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin
 # IOSchedulingClass=realtime
 # Nice=-20
 Type=simple
-ExecStart=/usr/bin/bash -c 'exec $$(which kanata) --cfg /etc/kanata/kanata.kbd'
+ExecStart=/usr/bin/bash -c 'exec $(which kanata) --cfg /etc/kanata/kanata.kbd'
 Restart=no
 
 [Install]
