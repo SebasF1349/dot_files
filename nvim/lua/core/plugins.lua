@@ -343,9 +343,10 @@ vim.keymap.set('n', '<leader>gb', '<cmd>Git blame<cr>', { desc = '[G]it: [B]lame
 
 local function log_cmd(args)
   args = args or ''
-  return ('<cmd>tab Git log -50 --graph --decorate --pretty=pf %s<cr>'):format(args)
+  return ('<cmd>tab Git log -100 --graph --decorate --pretty=pf %s<cr>'):format(args)
 end
 vim.keymap.set('n', '<leader>gl', log_cmd(), { desc = '[G]it: [L]og' })
+-- stylua: ignore
 vim.keymap.set('x', '<leader>gl', ":<C-u>execute 'Git log -L ' . line(\"'<\") . ',' . line(\"'>\") . ':%'<CR>", { desc = '[G]it: [L]og' })
 vim.keymap.set('n', '<leader>gL', log_cmd('%'), { desc = '[G]it: [L]og File' })
 vim.keymap.set('n', '<leader>gr', log_cmd('--numstat'), { desc = '[G]it: [R]eview Log' })
