@@ -226,8 +226,8 @@ local function debug_run()
   local dapview = require('dap-view')
   dapview.setup({
     virtual_text = {
-      enabled = true
-    }
+      enabled = true,
+    },
   })
 
   dap.listeners.before.attach['dap-view-config'] = function()
@@ -295,7 +295,13 @@ local function debug_run()
       type = 'php',
       request = 'launch',
       name = 'Listen for Xdebug',
-      port = 9003,
+      port = 9200,
+      pathMappings = {
+        ['/var/www/html'] = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'dir')
+        end,
+      },
+      hostname = 'localhost',
     },
   }
 
