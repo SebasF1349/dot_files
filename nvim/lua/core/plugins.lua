@@ -1058,4 +1058,15 @@ WHERE EVENT_OBJECT_TABLE = '%s'
       end, { buf = 0 })
     end,
   })
+
+  vim.api.nvim_create_autocmd('WinEnter', {
+    callback = function()
+      db_tab = get_db_tab()
+      local curr_tab = vim.api.nvim_get_current_tabpage()
+      if curr_tab == db_tab and #vim.api.nvim_list_tabpages() == 1 then
+        vim.cmd('quitall!')
+      end
+    end,
+    desc = 'Close Neovim if the last tab is a DBUI tabpage',
+  })
 end
