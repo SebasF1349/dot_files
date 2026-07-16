@@ -263,7 +263,7 @@ end
 ---@param items vim.quickfix.entry[]
 local function hl_lines(items)
   local columns = vim.o.columns
-  for i = 0, 100 do
+  for i = 0, 500 do
     local item = items[i + 1]
     if not item then
       return
