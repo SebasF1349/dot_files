@@ -7,6 +7,12 @@
 # 1. EARLY EXIT & SHELL OPTIONS
 [[ $- != *i* ]] && return
 
+if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+    if command -v startx >/dev/null; then
+        exec startx
+    fi
+fi
+
 shopt -s histappend checkwinsize autocd extglob cmdhist cdspell nocaseglob histverify
 HISTCONTROL=erasedups:ignoredups:ignorespace
 HISTSIZE=10000
