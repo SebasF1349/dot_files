@@ -81,6 +81,6 @@ if vim.v.vim_did_enter then
     sessionLoad()
   elseif fn.argc() == 0 or (fn.argc() == 1 and fn.isdirectory(fn.expand('%')) == 1) then
     local dir = fn.argc() == 1 and fn.expand('%:p') or vim.uv.cwd()
-    cmd.Oil(dir)
+    cmd.edit(dir)
   end
 end

@@ -86,8 +86,8 @@ local function file()
     local isLoclist = fn.getloclist(0, { filewinid = 1 }).filewinid ~= 0
     label = isLoclist and 'Location List' or 'Quickfix List'
     title = isLoclist and fn.getloclist(0, { title = 0 }).title or fn.getqflist({ title = 0 }).title
-  elseif ftype == 'oil' then
-    title, label = require('oil').get_current_dir() or 'Trash', 'oil'
+  elseif ftype == 'directory' then
+    title, label = api.nvim_buf_get_name(0), 'dir'
   end
   if label then
     return string.format('%%#SLInactiveBuffer# [%s] %%#SLActiveBuffer#%s ', label, title)
