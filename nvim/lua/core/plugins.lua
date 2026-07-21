@@ -89,8 +89,8 @@ vim.pack.add({
 
 require('catppuccin').setup({
   flavour = 'mocha',
+  auto_integrations = false,
   transparent_background = true,
-  default_integrations = false,
   integrations = {
     cmp = true,
     dadbod_ui = true,
