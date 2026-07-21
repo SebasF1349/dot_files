@@ -75,6 +75,8 @@ local function file()
   local label, title
   if ftype == 'help' then
     title, label = fn.expand('%:t:r:r'), 'Help'
+  elseif ftype == 'checkhealth' then
+    title, label = '', 'CheckHealth'
   elseif ftype == 'netrw' then
     label = 'Netrw'
     title = vim.b.netrw_curdir:gsub(cwd(), '.')
