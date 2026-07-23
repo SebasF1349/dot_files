@@ -94,7 +94,7 @@ local function run_code(opts)
   vim.api.nvim_buf_set_lines(preview_buf, 0, -1, false, output_lines)
 
   local height = math.max(5, math.min(15, #output_lines))
-  vim.api.nvim_win_set_height(preview_win, height)
+  vim.api.nvim_win_resize(preview_win, -1, height)
 end
 
 local function get_completions(arg_lead)

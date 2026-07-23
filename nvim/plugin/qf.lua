@@ -403,7 +403,7 @@ local function setOptions()
   local buf = vim.api.nvim_get_current_buf()
   local win = vim.api.nvim_get_current_win()
   vim.cmd('wincmd J')
-  vim.api.nvim_win_set_height(win, getHeight())
+  vim.api.nvim_win_resize(win, -1, getHeight())
   vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
   vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
   vim.api.nvim_set_option_value('buflisted', false, { buf = buf, scope = 'local' })
@@ -916,7 +916,7 @@ local function list_toggle(listType, diagnostics, severity, scope)
   else
     vim.cmd(listType .. 'open')
     local win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_height(win, getHeight())
+    vim.api.nvim_win_resize(win, -1, getHeight())
   end
 end
 
