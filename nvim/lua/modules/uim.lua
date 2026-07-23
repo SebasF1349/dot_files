@@ -45,33 +45,29 @@ local function close_mappings(bufnr, closing_keys, on_close)
     end
   end
 
-  local augroup = vim.api.nvim_create_augroup('ui', { clear = true })
-  autocmd_id = vim.api.nvim_create_autocmd('BufLeave', {
+  local augroup = vim.api.nvim_create_augroup('ui_' .. bufnr, { clear = true })
+  return vim.api.nvim_create_autocmd('BufLeave', {
     callback = function()
-      on_close(nil)
+      on_close()
     end,
     buf = bufnr,
     once = true,
     group = augroup,
-    desc = 'Close select',
+    desc = 'Close UI',
   })
 end
 
 ---@param wins integer[]
 ---@param current_win integer
----@param on_end function
-local function select_and_close(wins, current_win, on_end)
-  if autocmd_id then
-    vim.api.nvim_del_autocmd(autocmd_id)
-    autocmd_id = nil
-  end
+local function close_wins(wins, current_win)
   for _, win in ipairs(wins) do
     if win and vim.api.nvim_win_is_valid(win) then
       vim.api.nvim_win_close(win, true)
     end
   end
-  vim.api.nvim_set_current_win(current_win)
-  on_end()
+  if current_win and vim.api.nvim_win_is_valid(current_win) then
+    vim.api.nvim_set_current_win(current_win)
+  end
 end
 
 -- TODO: Implement ->
@@ -87,6 +83,7 @@ function M.input(opts, on_confirm)
   vim.validate('on_confirm', on_confirm, 'function')
 
   opts = (opts and not vim.tbl_isempty(opts)) and opts or { prompt = '', default = '' }
+  local prompt_str = opts.prompt or ''
 
   local current_win = vim.api.nvim_get_current_win()
 
@@ -94,12 +91,12 @@ function M.input(opts, on_confirm)
   local title_win = create_win(title_bufnr, {
     relative = 'laststatus',
     height = 1,
-    width = #opts.prompt,
+    width = #prompt_str > 0 and #prompt_str or 1,
     border = 'none',
     row = 1,
     col = 0,
   })
-  vim.api.nvim_buf_set_lines(title_bufnr, 0, 1, false, { opts.prompt .. ' ' })
+  vim.api.nvim_buf_set_lines(title_bufnr, 0, 1, false, { prompt_str .. ' ' })
   vim.api.nvim_set_option_value('filetype', 'uiinputtitle', { buf = title_bufnr })
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = title_bufnr })
   vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = title_win })
@@ -109,12 +106,12 @@ function M.input(opts, on_confirm)
   local input_win = create_win(input_bufnr, {
     relative = 'laststatus',
     height = 1,
-    width = vim.o.columns - #opts.prompt,
+    width = vim.o.columns - #prompt_str,
     border = 'none',
     title = opts.prompt,
     title_pos = 'left',
     row = 1,
-    col = #opts.prompt,
+    col = #prompt_str,
   })
   if opts.default then
     vim.api.nvim_buf_set_lines(input_bufnr, 0, #opts.default, false, { opts.default })
@@ -127,33 +124,45 @@ function M.input(opts, on_confirm)
   vim.api.nvim_set_option_value('winhighlight', 'NormalFloat:Normal', { win = input_win })
   vim.api.nvim_set_option_value('winblend', 0, { win = input_win })
 
+  local input_autocmd_id = nil
+  local func_name = 'uim_complete_' .. input_bufnr
+
+  local function cleanup()
+    if input_autocmd_id then
+      pcall(vim.api.nvim_del_autocmd, input_autocmd_id)
+      input_autocmd_id = nil
+    end
+    if opts.completion and _G[func_name] then
+      _G[func_name] = nil
+    end
+    close_wins({ input_win, title_win }, current_win)
+  end
+
   if opts.completion then
     ---@param findstart number
     ---@param base string
-    function _G.uim_complete(findstart, base)
+    _G[func_name] = function(findstart, base)
       if findstart == 1 then
         return 0
       end
       return vim.fn.getcompletion(base, opts.completion)
     end
 
-    vim.api.nvim_set_option_value('completefunc', 'v:lua._G.uim_complete', { buf = input_bufnr })
-    vim.api.nvim_set_option_value('omnifunc', 'v:lua._G.uim_complete', { buf = input_bufnr })
+    vim.api.nvim_set_option_value('completefunc', 'v:lua._G.' .. func_name, { buf = input_bufnr })
+    vim.api.nvim_set_option_value('omnifunc', 'v:lua._G.' .. func_name, { buf = input_bufnr })
   end
 
   vim.keymap.set({ 'n', 'i', 'x' }, '<CR>', function()
     vim.api.nvim_input('<ESC>')
     local line = vim.api.nvim_buf_get_lines(input_bufnr, 0, 1, false)[1]
-    select_and_close({ input_win, title_win }, current_win, function()
-      on_confirm(line)
-    end)
+    cleanup()
+    on_confirm(line)
   end, { buf = input_bufnr })
 
   local closing_keys = { { 'q', modes = { 'n', 'x' } }, '<C-c>' }
-  close_mappings(input_bufnr, closing_keys, function()
-    select_and_close({ input_win, title_win }, current_win, function()
-      on_confirm(nil)
-    end)
+  input_autocmd_id = close_mappings(input_bufnr, closing_keys, function()
+    cleanup()
+    on_confirm(nil)
   end)
 end
 
@@ -320,6 +329,16 @@ function M.select(items, opts, on_choice)
     col = 0,
   })
 
+  local select_autocmd_id = nil
+  local function cleanup()
+    if select_autocmd_id then
+      pcall(vim.api.nvim_del_autocmd, select_autocmd_id)
+      select_autocmd_id = nil
+    end
+    close_wins({ select_win }, current_win)
+    restore_cursor()
+  end
+
   local hl = {}
   local text = {}
   for i = 1, number_columns do
@@ -340,10 +359,8 @@ function M.select(items, opts, on_choice)
       if choice.option ~= '-' then
         -- TODO: maybe use vim.fn.getcharstr() instead of keymaps?
         vim.keymap.set('n', choice.option, function()
-          select_and_close({ select_win }, current_win, function()
-            restore_cursor()
-            on_choice(items[pos], pos)
-          end)
+          cleanup()
+          on_choice(items[pos], pos)
         end, { buf = select_bufnr })
       end
     end
@@ -361,11 +378,9 @@ function M.select(items, opts, on_choice)
   vim.api.nvim_set_option_value('bufhidden', 'wipe', { buf = select_bufnr })
   vim.api.nvim_set_option_value('modifiable', false, { buf = select_bufnr })
 
-  close_mappings(select_bufnr, closing_keys, function()
-    select_and_close({ select_win }, current_win, function()
-      restore_cursor()
-      on_choice(nil, nil)
-    end)
+  select_autocmd_id = close_mappings(select_bufnr, closing_keys, function()
+    cleanup()
+    on_choice(nil, nil)
   end)
 end
 
