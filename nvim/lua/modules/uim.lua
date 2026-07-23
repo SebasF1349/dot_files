@@ -214,7 +214,7 @@ function M.select(items, opts, on_choice)
   local selected = {}
 
   local code_action_chars =
-    { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', }
+    { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' }
   local default_chars =
     { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
   local possible_chars = opts.kind == 'codeaction' and code_action_chars or default_chars
@@ -237,14 +237,11 @@ function M.select(items, opts, on_choice)
     end)
     :totable()
 
-  ---@param n number
-  local function get_number_chars(n)
-    if #items <= math.pow(#posible_chars, n) then
-      return n
-    end
-    return get_number_chars(n + 1)
+  local number_chars = 1
+  while #items > math.pow(#posible_chars, number_chars) do
+    number_chars = number_chars + 1
   end
-  local number_chars = get_number_chars(1)
+
   ---@param o string[]
   ---@return string[]
   local function get_options(o)
@@ -289,7 +286,9 @@ function M.select(items, opts, on_choice)
     local option
     if keys_method == 'intelligent' then
       option = choose_key(item, '')
-      table.insert(selected, option) -- FIX: it's ok to insert option even if it's nil?
+      if option then
+        table.insert(selected, option)
+      end
       if not option then
         for j = #options, 1, -1 do
           if not vim.list_contains(selected, options[j]) then
@@ -304,7 +303,7 @@ function M.select(items, opts, on_choice)
     end
     option = option or '-'
     table.insert(choices, { option = option, item = item })
-    local charnr = vim.str_utfindex(option, 'utf-8') + vim.str_utfindex(item, "utf-8") + 5 -- 5 because of the spaces I will add later
+    local charnr = vim.fn.strdisplaywidth(option) + vim.fn.strdisplaywidth(item) + 5 -- 5 because of the spaces I will add later
     if charnr > max_length then
       max_length = charnr
     end
@@ -352,7 +351,7 @@ function M.select(items, opts, on_choice)
         break
       end
       local choice = choices[pos]
-      local item_whitespace = col_start - vim.str_utfindex(text[j] or '', "utf-8")
+      local item_whitespace = col_start - vim.str_utfindex(text[j] or '', 'utf-8')
       local col = #(text[j] or '') + item_whitespace + 1
       table.insert(hl[j], { col, col + 1 + #choice.option })
       text[j] = string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choice.option, choice.item)
