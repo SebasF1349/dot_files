@@ -627,6 +627,9 @@ vim.api.nvim_create_autocmd('FileType', {
         vim.wo[0][0].foldmethod = 'expr'
         vim.cmd.normal('zx')
       end)
+      if args.match == 'php' then
+        vim.bo[args.buf].syntax = 'ON'
+      end
     end
   end,
 })
