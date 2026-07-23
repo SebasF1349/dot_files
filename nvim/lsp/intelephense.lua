@@ -31,7 +31,7 @@ return {
         usages = { enable = true },
       },
       files = {
-        maxSize = 1000000,
+        maxSize = 5000000,
         exclude = {
           '**/.git/**',
           '**/.svn/**',
