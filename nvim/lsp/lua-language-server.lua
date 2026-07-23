@@ -17,6 +17,18 @@ return {
       completion = { callSnippet = 'Replace' },
       hint = { enable = true, arrayIndex = 'Disable' },
       telemetry = { enable = false },
+      diagnostics = {
+        enable = true,
+        neededFileStatus = {
+          ['type-check'] = 'Any',
+          ['strict-type-check'] = 'Any',
+        },
+        groupSeverity = {
+          strong = 'Warning',
+          strict = 'Warning',
+        },
+        unusedLocalExclude = { '_*' },
+      },
     },
   },
 }
