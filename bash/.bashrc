@@ -34,7 +34,7 @@ export ELECTRON_OZONE_PLATFORM_HINT=auto
 
 path_add ~/dot_files/install_scripts/
 path_add ~/scripts/
-path_add ~/.local/bin
+path_add ~/.local/bin/
 
 # 4. THIRD PARTY TOOLS
 export ANDROID_HOME=$HOME/android-sdk
