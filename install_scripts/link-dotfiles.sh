@@ -22,6 +22,8 @@ declare -A file_links=(
     ["$HOME/.ideavimrc"]="$DOT_FILES_DIR/ideavim/.ideavimrc"
     ["$CONFIG_DIR/starship.toml"]="$DOT_FILES_DIR/starship/starship.toml"
     ["$HOME/.xinitrc"]="$DOT_FILES_DIR/.xinitrc"
+    ["$HOME/.Xauthority"]="$DOT_FILES_DIR/.Xauthority"
+    ["$HOME/.Xresources"]="$DOT_FILES_DIR/.Xresources"
 )
 
 declare -A dir_links=(
@@ -36,6 +38,8 @@ declare -A dir_links=(
     ["$CONFIG_DIR/picom"]="$DOT_FILES_DIR/picom/"
     ["$CONFIG_DIR/dunst"]="$DOT_FILES_DIR/dunst/"
     ["$CONFIG_DIR/xdg-desktop-portal"]="$DOT_FILES_DIR/xdg-desktop-portal/"
+    ["$CONFIG_DIR/gtk-3.0"]="$DOT_FILES_DIR/gtk-3.0/"
+    ["$CONFIG_DIR/xfce4"]="$DOT_FILES_DIR/xfce4/"
 )
 
 declare -A hypr_dir_links=(

@@ -11,6 +11,12 @@ exec_always --no-startup-id feh --bg-fill ~/dot_files/wallpaper/wallpaper_clean.
 exec_always --no-startup-id xrandr --output ANY --mode 1920x1080
 exec_always --no-startup-id blueman-applet
 
+# Load Xresources on startup
+exec_always --no-startup-id xrdb -merge ~/.Xresources
+
+# Set default cursor image on root window background
+exec_always --no-startup-id xsetroot -cursor_name left_ptr
+
 gaps inner 3
 gaps outer 0
 default_border pixel 0
