@@ -97,7 +97,7 @@ alias du='du -hc'
 alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
 
 alias nocomment="grep -Ev '^[[:space:]]*(#|$)'"
-alias tree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
+alias tree="find . -not -path './.git*' -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
 
 function ll {
     command ls -lAhFv --color=always --time-style=long-iso "$@" | less -R -X -F
