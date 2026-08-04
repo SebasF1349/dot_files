@@ -213,6 +213,7 @@ function M.select(items, opts, on_choice)
   local max_length = -1
   local selected = {}
 
+  -- stylua: ignore
   local code_action_chars =
     { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' }
   local default_chars =
