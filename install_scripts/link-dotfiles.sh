@@ -24,6 +24,7 @@ declare -A file_links=(
     ["$HOME/.xinitrc"]="$DOT_FILES_DIR/.xinitrc"
     ["$HOME/.Xauthority"]="$DOT_FILES_DIR/.Xauthority"
     ["$HOME/.Xresources"]="$DOT_FILES_DIR/.Xresources"
+    ["$CONFIG_DIR/greenclip.toml"]="$DOT_FILES_DIR/greenclip.toml"
 )
 
 declare -A dir_links=(
