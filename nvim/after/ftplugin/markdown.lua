@@ -119,7 +119,8 @@ if vim.startswith(curr_buf, notes_path) then
   end, { desc = 'Add [L]ink', buf = 0 })
 
   vim.keymap.set({ 'x' }, '<C-l>', function()
-    local region = vim.fn.getregionpos(vim.fn.getpos('v'), vim.fn.getpos('.'))
+    local regtype = vim.fn.mode():match('[vV\22]') or 'v'
+    local region = vim.fn.getregionpos(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = regtype })
     local starting = region[1][1]
     local ending = region[#region][2]
     local text = vim.api.nvim_buf_get_text(0, starting[2] - 1, starting[3] - 1, ending[2] - 1, ending[3], {})
