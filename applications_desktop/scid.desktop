@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Scid vs PC
+Comment=Chess Database Manager
+Exec=scid
+Icon=/usr/share/pixmaps/scid.png
+Terminal=false
+Type=Application
+Categories=Game;BoardGame;
