@@ -217,6 +217,7 @@ local function add_virt_lines(list)
   local lastfname = ''
   for i, item in ipairs(list) do
     local fname = vim.fs.relpath('.', vim.fn.bufname(item.bufnr))
+    -- this is null if the file is outside cwd (for example, in git operations where cwd is not git root
     if fname and fname ~= lastfname then
       lastfname = fname
       local path = vim.fs.dirname(fname) .. oss.dir_separator
