@@ -27,6 +27,7 @@ declare -A file_links=(
     ["$CONFIG_DIR/greenclip.toml"]="$DOT_FILES_DIR/greenclip.toml"
     ["$HOME/.local/share/applications/nvim.desktop"]="$DOT_FILES_DIR/applications/nvim.desktop"
     ["$HOME/.local/share/applications/scid.desktop"]="$DOT_FILES_DIR/applications/scid.desktop"
+    ["$CONFIG_DIR/Thunar/uca.xml"]="$DOT_FILES_DIR/thunar/uca.xml"
 )
 
 declare -A dir_links=(

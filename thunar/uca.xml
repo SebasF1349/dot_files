@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>org.wezfurlong.wezterm</icon>
+	<name>Open with Wezterm</name>
+	<submenu></submenu>
+	<unique-id>1784893056693870-1</unique-id>
+	<command>wezterm start --cwd %f</command>
+	<description></description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+<action>
+	<icon>nvim</icon>
+	<name>Open With Neovim</name>
+	<submenu></submenu>
+	<unique-id>1784902786682005-1</unique-id>
+	<command>wezterm start -- nvim %f</command>
+	<description></description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+	<other-files/>
+	<text-files/>
+</action>
+</actions>
