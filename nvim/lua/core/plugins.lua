@@ -780,8 +780,8 @@ WHERE EVENT_OBJECT_TABLE = '%s'
   vim.g.db_ui_table_helpers = {
     mysql = {
       List = [[SELECT *
-    FROM {optional_schema}`{table}`
-    LIMIT 10;]],
+FROM {optional_schema}`{table}`
+LIMIT 10;]],
       Columns = '',
       ['Primary Keys'] = '',
       Indexes = '',
