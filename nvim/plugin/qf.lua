@@ -320,7 +320,7 @@ function _G.quickfixtextfunc(info)
   if list.context == '' and last_cmd and last_cmd ~= '' then
     setList(listType, {
       context = { last_cmd = last_cmd },
-    }, 'a')
+    }, 'a', info.winid)
   end
   qfbufnr = list.qfbufnr
   local diffs_arr
