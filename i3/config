@@ -96,8 +96,8 @@ bindsym $mod+Shift+8 move container to workspace number 8; workspace 8
 bindsym $mod+Shift+9 move container to workspace number 9; workspace 9
 bindsym $mod+Shift+0 move container to workspace number 10; workspace 10
 
-bindsym $mod+s splith
-bindsym $mod+v splitv
+bindsym $mod+s split h
+bindsym $mod+v split v
 bindsym $mod+f fullscreen
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+ctrl+space focus mode_toggle
@@ -106,15 +106,10 @@ bindsym $mod+a focus parent
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
-mode "resize" {
-    bindsym $left resize shrink width 10px
-    bindsym $down resize grow height 10px
-    bindsym $up resize shrink height 10px
-    bindsym $right resize grow width 10px
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
-bindsym $mod+r mode "resize"
+bindsym $mod+comma resize shrink height 10px
+bindsym $mod+period resize grow height 10px
+bindsym $mod+Shift+comma resize shrink width 10px
+bindsym $mod+Shift+period resize grow width 10px
 
 bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
