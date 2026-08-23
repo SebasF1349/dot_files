@@ -5,24 +5,16 @@
 )
 
 (defsrc
-    caps esc lmet spc
+    caps esc
 )
 
 (deflayer default
-    @escctrl @esc-behavior @leftmeta @space
+    @escctrl @esc-behavior
 )
 
 (defalias
     escctrl (tap-hold 0 190 esc lctrl)
     esc-behavior (tap-hold 190 190 esc caps)
-    leftmeta (chord launcher leftmeta)
-    space (chord launcher space)
-)
-
-(defchords launcher 500
-  (leftmeta      ) lmet
-  (         space) spc
-  (leftmeta space) A-spc
 )
 
 ;; vim: syntax=lisp
