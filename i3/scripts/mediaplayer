@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+DELAY=0.05
+SPOTIFY_STR="spotify"
+PLAYER_ARG=""
+
+if [ -n "$BLOCK_INSTANCE" ]; then
+    PLAYER_ARG="--player=$BLOCK_INSTANCE"
+fi
+
+if [ -n "$BLOCK_BUTTON" ]; then
+    case "$BLOCK_BUTTON" in
+        1)
+            playerctl $PLAYER_ARG previous
+            [ "$BLOCK_INSTANCE" = "$SPOTIFY_STR" ] && sleep $DELAY
+            ;;
+        2)
+            playerctl $PLAYER_ARG play-pause
+            ;;
+        3)
+            playerctl $PLAYER_ARG next
+            [ "$BLOCK_INSTANCE" = "$SPOTIFY_STR" ] && sleep $DELAY
+            ;;
+        4)
+            playerctl $PLAYER_ARG volume 0.01+
+            ;;
+        5)
+            playerctl $PLAYER_ARG volume 0.01-
+            ;;
+    esac
+fi
+
+ARTIST=$(playerctl $PLAYER_ARG metadata artist 2>/dev/null)
+[ $? -ne 0 ] || [ "$ARTIST" = "(null)" ] && exit 0
+
+TITLE=$(playerctl $PLAYER_ARG metadata title 2>/dev/null)
+[ $? -ne 0 ] || [ "$TITLE" = "(null)" ] && exit 0
+
+echo "$ARTIST - $TITLE"

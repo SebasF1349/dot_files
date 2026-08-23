@@ -1,7 +1,45 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
-case $BLOCK_BUTTON in
-1) notify-send "$(cal --color=never)" ;;
+SCREEN_WIDTH=1920
+WIDTH=200
+HEIGHT=200
+DATEFMT="+%a %d %b %H:%M"
+
+OPTIND=1
+while getopts ":f:W:H:" opt; do
+    case $opt in
+        f) DATEFMT="$OPTARG" ;;
+        W) WIDTH="$OPTARG" ;;
+        H) HEIGHT="$OPTARG" ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
+done
+
+case "$BLOCK_BUTTON" in
+  1|2|3) 
+
+	posY=30
+	posX=$((BLOCK_X - WIDTH / 2))
+
+    if [ "$posX" -lt 0 ]; then
+        posX=0
+    elif [ "$posX" -gt $((SCREEN_WIDTH - WIDTH - 5)) ]; then
+        posX=$((SCREEN_WIDTH - WIDTH - 5))
+    fi
+
+	i3-msg -q "exec yad --calendar \
+        --width=$WIDTH --height=$HEIGHT \
+	    --undecorated --fixed \
+	    --close-on-unfocus --no-buttons \
+	    --posx=$posX --posy=$posY \
+	    > /dev/null"
 esac
 
-date '+%a %d %b %H:%M'
+date "$DATEFMT"
