@@ -681,14 +681,14 @@ if db_status and db_secrets and db_secrets.databases then
       name = 'Columns',
       query = [[
 SELECT
-    COLUMN_NAME AS 'Field',
-    COLUMN_TYPE AS 'Type',
-    IS_NULLABLE AS 'Null',
-    COLUMN_DEFAULT AS 'Default',
-    COLUMN_KEY AS 'Key',
-    EXTRA AS 'Extra',
-    COLLATION_NAME AS 'Collation',
-    COLUMN_COMMENT AS 'Comment'
+    COLUMN_NAME,
+    COLUMN_TYPE,
+    IS_NULLABLE,
+    COLUMN_DEFAULT,
+    COLUMN_KEY,
+    EXTRA,
+    COLLATION_NAME,
+    COLUMN_COMMENT
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = '%s'
     AND TABLE_SCHEMA = '%s'
@@ -699,17 +699,17 @@ ORDER BY ORDINAL_POSITION;
       name = 'Indexes',
       query = [[
 SELECT
-    TABLE_NAME AS 'Table',
-    NON_UNIQUE AS 'Non Unique',
-    INDEX_NAME AS 'Index Name',
+    TABLE_NAME,
+    NON_UNIQUE,
+    INDEX_NAME,
     SEQ_IN_INDEX AS 'Sequence in Index',
-    COLUMN_NAME AS 'Column',
-    INDEX_TYPE AS 'Type',
-    COLLATION AS 'Order',
-    CARDINALITY AS 'Cardinality',
-    NULLABLE AS 'Nullable',
-    COMMENT AS 'Column Comment',
-    INDEX_COMMENT AS 'Index Comment'
+    COLUMN_NAME,
+    INDEX_TYPE,
+    COLLATION,
+    CARDINALITY,
+    NULLABLE,
+    COMMENT,
+    INDEX_COMMENT
 FROM INFORMATION_SCHEMA.STATISTICS
 WHERE TABLE_NAME = '%s'
     AND TABLE_SCHEMA = '%s';
@@ -719,11 +719,11 @@ WHERE TABLE_NAME = '%s'
       name = 'Keys',
       query = [[
 SELECT
-    CONSTRAINT_NAME AS 'Constraint Name',
-    COLUMN_NAME AS 'Column',
-    ORDINAL_POSITION AS 'Ordinal',
-    REFERENCED_TABLE_NAME AS 'Referenced Table',
-    REFERENCED_COLUMN_NAME AS 'Referenced Column'
+    CONSTRAINT_NAME,
+    COLUMN_NAME,
+    ORDINAL_POSITION,
+    REFERENCED_TABLE_NAME,
+    REFERENCED_COLUMN_NAME
 FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
 WHERE TABLE_NAME = '%s'
     AND TABLE_SCHEMA = '%s'
@@ -734,11 +734,11 @@ ORDER BY CONSTRAINT_NAME;
       name = 'References',
       query = [[
 SELECT
-    TABLE_SCHEMA AS 'Referencing Database',
-    TABLE_NAME AS 'Referencing Table',
-    COLUMN_NAME AS 'Referencing Column',
-    CONSTRAINT_NAME AS 'Foreign Key Name',
-    REFERENCED_COLUMN_NAME AS 'Referenced Column'
+    TABLE_SCHEMA,
+    TABLE_NAME,
+    COLUMN_NAME,
+    CONSTRAINT_NAME,
+    REFERENCED_COLUMN_NAME
 FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
 WHERE REFERENCED_TABLE_NAME = '%s'
     AND REFERENCED_TABLE_SCHEMA = '%s'
