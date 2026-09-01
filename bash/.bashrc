@@ -213,6 +213,8 @@ if [ -f /etc/os-release ]; then
     esac
 fi
 
+[[ -f "$HOME/.bashrc_local" ]] && source "$HOME/.bashrc_local"
+
 if [ "$TERM" != "linux" ]; then
     eval "$(starship init bash)"
 else
