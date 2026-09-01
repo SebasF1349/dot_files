@@ -77,6 +77,7 @@ vim.pack.add({
   { src = 'https://github.com/ThePrimeagen/refactoring.nvim' },
   { src = 'https://github.com/windwp/nvim-ts-autotag' },
   { src = 'https://github.com/artemave/workspace-diagnostics.nvim' },
+  { src = 'https://github.com/stevearc/quicker.nvim' },
 
   { src = 'https://github.com/mason-org/mason.nvim' },
 })
@@ -600,6 +601,35 @@ vim.api.nvim_create_autocmd('FileType', {
     })
   end,
   once = true,
+})
+
+vim.keymap.set('n', '<leader>q', function()
+  require('quicker').toggle()
+end, {
+  desc = 'Toggle quickfix',
+})
+vim.keymap.set('n', '<leader>l', function()
+  require('quicker').toggle({ loclist = true })
+end, {
+  desc = 'Toggle loclist',
+})
+require('quicker').setup({
+  keys = {
+    {
+      '>',
+      function()
+        require('quicker').expand({ before = 2, after = 2, add_to_existing = true })
+      end,
+      desc = 'Expand quickfix context',
+    },
+    {
+      '<',
+      function()
+        require('quicker').collapse()
+      end,
+      desc = 'Collapse quickfix context',
+    },
+  },
 })
 
 --------------------------------------------------

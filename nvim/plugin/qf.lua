@@ -1,13 +1,4 @@
-local ui = require('utils.ui')
-local oss = require('utils.os')
-local signs = ui.diagnostic_icons_char
-local highlights = ui.diagnostic_hl_char
-
-local qfbufnr
-local qfim_namespace = vim.api.nvim_create_namespace('qfim')
-local qfim_file_namespace = vim.api.nvim_create_namespace('qfim-file')
 local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
-local last_cmd = ''
 
 --------------------------------------------------
 -- Types
@@ -76,24 +67,17 @@ local function getList(listType, nr, winid)
   end
 end
 
-local function getActiveList()
-  local type = getListType() or (vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and 'l') or 'c'
-  return getList(type)
-end
-
 ---@param listType ListType
----@param severity? vim.diagnostic.SeverityFilter
 ---@return qflist | nil
-local function getDiagList(listType, severity)
-  severity = severity or vim.diagnostic.severity.HINT
+local function getDiagList(listType)
   local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
     local list = getList(listType, i)
     if
-      list.context ~= ''
+      type(list.context) == 'table'
       and list.context.qfim_diag
       and list.context.qfim_diag.type == listType
-      and list.context.qfim_diag.severity == severity
+      and list.context.qfim_diag.diagnostics
     then
       return list
     end
@@ -107,405 +91,8 @@ local function isDiffTool(list)
 end
 
 --------------------------------------------------
--- Treesitter highlighting
---------------------------------------------------
-
----@class uim.TSHighlight
----@field [1] integer start_col
----@field [2] integer end_col
----@field [3] string highlight group
-
-local _cached_queries = {}
----@param lang string
----@return vim.treesitter.Query?
-local function get_highlight_query(lang)
-  local query = _cached_queries[lang]
-  if query == nil then
-    query = vim.treesitter.query.get(lang, 'highlights') or false
-    _cached_queries[lang] = query
-  end
-  if query then
-    return query
-  end
-end
-
----@param bufnr integer
----@param lnum integer
----@return uim.TSHighlight[]
-local function buf_get_ts_highlights(bufnr, lnum)
-  local filetype = vim.bo[bufnr].filetype
-  if not filetype or filetype == '' then
-    filetype = vim.filetype.match({ buf = bufnr }) or ''
-  end
-  local lang = vim.treesitter.language.get_lang(filetype) or filetype
-  if lang == '' then
-    return {}
-  end
-  local parser = vim.treesitter.get_parser(bufnr, lang)
-  if not parser then
-    return {}
-  end
-
-  local row = lnum - 1
-  if not parser:is_valid() then
-    parser:parse(true)
-  end
-
-  local hls = {}
-  parser:for_each_tree(function(tstree, tree)
-    if not tstree then
-      return
-    end
-
-    local root_node = tstree:root()
-    local root_start_row, _, root_end_row, _ = root_node:range()
-
-    -- Only worry about trees within the line range
-    if root_start_row > row or root_end_row < row then
-      return
-    end
-
-    local query = get_highlight_query(tree:lang())
-
-    -- Some injected languages may not have highlight queries.
-    if not query then
-      return
-    end
-
-    for capture, node, metadata in query:iter_captures(root_node, bufnr, row, row + 1) do
-      if capture == nil then
-        break
-      end
-
-      local range = vim.treesitter.get_range(node, bufnr, metadata[capture])
-      local start_row, start_col, _, end_row, end_col, _ = unpack(range)
-      if start_row > row then
-        break
-      end
-      local capture_name = query.captures[capture]
-      local hl = string.format('@%s.%s', capture_name, tree:lang())
-      if end_row > start_row then
-        end_col = -1
-      end
-      table.insert(hls, { start_col, end_col, hl })
-    end
-  end)
-
-  return hls
-end
-
---------------------------------------------------
--- Better Quickfix Window Style
---------------------------------------------------
-
-local GIT_STATUS_MAP = {
-  ['A'] = 'ADDED',
-  ['B'] = 'BROKEN',
-  ['C'] = 'COPIED',
-  ['D'] = 'DELETED',
-  ['M'] = 'MODIFIED',
-  ['R'] = 'RENAMED',
-  ['T'] = 'CHANGED',
-  ['U'] = 'UNMERGED',
-  ['X'] = 'UNKNOWN',
-}
-
--- from https://www.reddit.com/r/neovim/comments/1klka38/tinkering_quickfix_ui/
---- @param list vim.quickfix.entry[]
-local function add_virt_lines(list)
-  vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_file_namespace, 0, -1)
-  local lastfname = ''
-  for i, item in ipairs(list) do
-    local fname = vim.fs.relpath('.', vim.fn.bufname(item.bufnr))
-    -- this is null if the file is outside cwd (for example, in git operations where cwd is not git root
-    if fname and fname ~= lastfname then
-      lastfname = fname
-      local path = vim.fs.dirname(fname) .. oss.dir_separator
-      if path == './' then
-        path = ''
-      end
-      local name = vim.fs.basename(fname)
-      vim.api.nvim_buf_set_extmark(qfbufnr, qfim_file_namespace, i - 1, 0, {
-        virt_lines = { { { name .. ' ', 'qfFileName' }, { path, 'Comment' } } },
-        virt_lines_above = true,
-        strict = false,
-      })
-    end
-  end
-  vim.schedule(function()
-    vim.api.nvim_win_set_cursor(0, { 1, 0 })
-  end)
-end
-
--- workaround for cannot scroll to see virtual line before first line - see https://github.com/neovim/neovim/issues/16166
-vim.api.nvim_create_autocmd('CursorMoved', {
-  group = qf_group,
-  callback = function()
-    if vim.bo.filetype ~= 'qf' then
-      return
-    end
-    local row = unpack(vim.api.nvim_win_get_cursor(0))
-    if row == 1 then
-      vim.api.nvim_feedkeys(vim.keycode('<C-u>'), 'm', true)
-    end
-  end,
-  desc = 'Show first virtual line',
-})
-
-local function hl_line(line, col, end_col, hl_group)
-  vim.api.nvim_buf_set_extmark(qfbufnr, qfim_namespace, line, col, {
-    hl_group = hl_group,
-    end_col = end_col,
-    priority = 100,
-    strict = false,
-  })
-end
-
----@param items vim.quickfix.entry[]
-local function hl_lines(items)
-  local columns = vim.o.columns
-  for i = 0, 500 do
-    local item = items[i + 1]
-    if not item then
-      return
-    end
-
-    local is_unloaded = not vim.api.nvim_buf_is_loaded(item.bufnr)
-    local default_hl = 'CursorLineNr'
-    local text_space = 2
-    local ts_highlighted = nil
-    if item.lnum > 0 then
-      text_space = #tostring(item.lnum) + 4
-      hl_line(i, 0, text_space, default_hl)
-    end
-    if item.type ~= '' then
-      default_hl = highlights[item.type]
-    else
-      if is_unloaded then
-        vim.cmd('noautocmd call bufload(' .. item.bufnr .. ')')
-      end
-
-      -- TS highlight
-      local src_line = vim.api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
-      if src_line and item.text == vim.trim(src_line) then
-        local src_space = src_line:match('^%s*'):len()
-        local offset = text_space - src_space
-        local hls = buf_get_ts_highlights(item.bufnr, item.lnum)
-        for _, hl in ipairs(hls) do
-          local start_col, end_col, hl_group = hl[1], hl[2], hl[3]
-          if end_col == -1 then
-            end_col = src_line:len()
-          end
-          hl_line(i, start_col + offset, end_col + offset, hl_group)
-        end
-        if #hls > 0 then
-          ts_highlighted = true
-        end
-      end
-
-      if is_unloaded then
-        vim.api.nvim_buf_delete(item.bufnr, { unload = true })
-      end
-    end
-
-    if not ts_highlighted then
-      hl_line(i, text_space, columns, default_hl)
-    end
-  end
-end
-
-function _G.quickfixtextfunc(info)
-  local listType = info.quickfix == 1 and 'c' or 'l'
-  local list = getList(listType, nil, info.winid)
-  if list.context == '' and last_cmd and last_cmd ~= '' then
-    setList(listType, {
-      context = { last_cmd = last_cmd },
-    }, 'a', info.winid)
-  end
-  qfbufnr = list.qfbufnr
-  local diffs_arr
-  local isDiff = isDiffTool(list)
-  if isDiff then
-    local diffs = vim.system({ 'git', 'diff', '--numstat' }, { text = true }):wait()
-    diffs_arr = vim.split(diffs.stdout, '\n')
-    diffs_arr = vim.iter(diffs_arr):rskip(1):fold({}, function(acc, diff)
-      diff = vim.split(diff, '\t')
-      acc[vim.fn.bufnr(diff[3])] = { added = diff[1], removed = diff[2] }
-      return acc
-    end)
-  end
-  local validFmt = '  %s%s%s'
-  list = list.items
-  local ret = {}
-  for i = info.start_idx, info.end_idx do
-    local l = list[i]
-    local d = diffs_arr and diffs_arr[l.bufnr]
-    if not isDiff then
-      list[i].text = vim.trim(l.text)
-    elseif d then
-      list[i].text = ('%s (+%s-%s)'):format(GIT_STATUS_MAP[l.text:sub(1, 1)] or '', d.added, d.removed)
-    else
-      list[i].text = GIT_STATUS_MAP[l.text:sub(1, 1)]
-    end
-    local icon = l.type == '' and '' or (signs[l.type] and signs[l.type] or signs.I)
-    local lnum = l.lnum > 0 and tostring(l.lnum) .. ': ' or ''
-    local str = validFmt:format(lnum, icon, l.text)
-    table.insert(ret, str)
-  end
-  vim.defer_fn(function()
-    vim.api.nvim_buf_clear_namespace(qfbufnr, qfim_namespace, 0, -1)
-    add_virt_lines(list)
-    hl_lines(list)
-  end, 10)
-  return ret
-end
-
-vim.o.quickfixtextfunc = '{info -> v:lua._G.quickfixtextfunc(info)}'
-
---------------------------------------------------
--- Quickfix Options
---------------------------------------------------
-
-local function getHeight()
-  if not qfbufnr then
-    return 10
-  end
-  local lines = vim.api.nvim_buf_line_count(qfbufnr)
-  local extmarks = vim.api.nvim_buf_get_extmarks(qfbufnr, qfim_file_namespace, 0, -1, { details = true })
-  return math.max(math.min(lines + #extmarks, 10), 5)
-end
-
-function _G.qffoldexprfunc()
-  local extmarks = vim.api.nvim_buf_get_extmarks(qfbufnr, qfim_file_namespace, 0, -1, {})
-  local line = vim.v.lnum
-  for _, ext in ipairs(extmarks) do
-    if line == ext[2] then
-      return '<1'
-    elseif line == ext[2] + 1 then
-      return '>1'
-    end
-  end
-  return '1'
-end
-
-function _G.qffoldtextfunc()
-  local extmarks = vim.api.nvim_buf_get_extmarks(qfbufnr, qfim_file_namespace, 0, -1, { details = true })
-  for _, ext in ipairs(extmarks) do
-    if vim.v.foldstart == ext[2] + 1 then
-      local virt_lines = ext[4].virt_lines[1]
-      local lines = vim.v.foldend - vim.v.foldstart + 1
-      table.insert(virt_lines, { ' [' .. lines .. (lines == 1 and ' line]' or ' lines]'), 'Label' })
-      return virt_lines
-    end
-  end
-end
-
-local function setOptions()
-  local buf = vim.api.nvim_get_current_buf()
-  local win = vim.api.nvim_get_current_win()
-  vim.cmd('wincmd J')
-  vim.api.nvim_win_resize(win, -1, getHeight())
-  vim.api.nvim_set_option_value('previewheight', 10, { scope = 'global' })
-  vim.api.nvim_set_option_value('hidden', true, { scope = 'global' })
-  vim.api.nvim_set_option_value('buflisted', false, { buf = buf, scope = 'local' })
-  vim.api.nvim_set_option_value('winfixheight', true, { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('winfixbuf', true, { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('foldmethod', 'expr', { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('foldminlines', 0, { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('foldexpr', 'v:lua._G.qffoldexprfunc()', { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('foldtext', 'v:lua._G.qffoldtextfunc()', { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('signcolumn', 'no', { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('statuscolumn', '', { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('number', true, { win = win, scope = 'local' })
-  vim.api.nvim_set_option_value('relativenumber', false, { win = win, scope = 'local' })
-end
-
---------------------------------------------------
 -- Keymaps inside Quickfix
 --------------------------------------------------
-
--- NOTE: take into account that this messes up with the error numbers
----@param file boolean remove all items in file
-local function delete(file)
-  local listType = getListType()
-  assert(listType)
-  local list = getList(listType)
-  local qfitems = list.items
-
-  local mode = vim.api.nvim_get_mode().mode
-  if mode == 'v' or mode == 'V' then
-    local visual_start = vim.fn.getpos('v')
-    local visual_end = vim.fn.getpos('.')
-    for i = visual_start[2], visual_end[2] do
-      qfitems[i] = vim.empty_dict()
-    end
-    qfitems = vim.tbl_filter(function(item)
-      return not vim.tbl_isempty(item)
-    end, qfitems)
-    setList(listType, { items = qfitems }, 'r', list.filewinid)
-    vim.api.nvim_input('<Esc>')
-  else
-    local cursor = vim.api.nvim_win_get_cursor(0)
-    local line = cursor[1]
-    if file then
-      local bufnr = qfitems[line].bufnr
-      qfitems = vim
-        .iter(qfitems)
-        :filter(function(item)
-          return item.bufnr ~= bufnr
-        end)
-        :totable()
-    else
-      table.remove(qfitems, line)
-    end
-    setList(listType, { items = qfitems }, 'r', list.filewinid)
-    local new_pos = line > #qfitems and #qfitems or line
-    vim.api.nvim_win_set_cursor(0, { new_pos, 0 })
-  end
-end
-
-local function getPreview()
-  local wins = vim.api.nvim_list_wins()
-  for _, win in ipairs(wins) do
-    if vim.api.nvim_get_option_value('previewwindow', { win = win }) then
-      return win
-    end
-  end
-  return nil
-end
-
-local function openPreview()
-  local qfLinenr = vim.api.nvim_win_get_cursor(0)[1]
-  local list = getActiveList().items
-  if qfLinenr > #list then
-    vim.notify('Error retriving list items', vim.log.levels.WARN)
-    return
-  end
-  local path = vim.api.nvim_buf_get_name(list[qfLinenr].bufnr)
-  local line = list[qfLinenr].lnum
-  vim.cmd('keepjumps aboveleft pedit +' .. line .. ' ' .. path)
-  local preview_win = getPreview()
-  if not preview_win then
-    vim.notify('Error opening the preview window', vim.log.levels.WARN)
-    return
-  end
-  local preview_buf = vim.api.nvim_win_get_buf(preview_win)
-  vim.api.nvim_set_option_value('buflisted', false, { buf = preview_buf })
-end
-
----@param direction 1 | -1
-local function moveWithPreview(direction)
-  local current_pos = vim.fn.getcurpos()
-  local move_line = current_pos[2] + direction
-  local list_size = getActiveList().size
-  if move_line < 1 then
-    move_line = list_size
-  elseif move_line > list_size then
-    move_line = 1
-  end
-  vim.api.nvim_win_set_cursor(0, { move_line, 0 })
-  openPreview()
-end
 
 local function openAsDiff()
   for _, win in ipairs(vim.api.nvim_list_wins()) do
@@ -521,7 +108,11 @@ end
 local function get_prev_win(winnr)
   local prev_win = vim.fn.win_getid(vim.fn.winnr('#'))
   if prev_win <= 0 or vim.fn.win_gettype(prev_win) ~= '' then
-    local tab = vim.fn.getwininfo(winnr)[1].tabnr
+    local info = vim.fn.getwininfo(winnr)
+    if #info == 0 then
+      return prev_win
+    end
+    local tab = info[1].tabnr
     for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
       if vim.fn.win_gettype(win) == '' then
         prev_win = win
@@ -548,10 +139,6 @@ local function selectItem(selectItemOpts)
     return
   end
   local qfitempos = vim.fn.getpos('.')
-  local preview = getPreview()
-  if preview then
-    vim.cmd('pclose')
-  end
   if not opts.split then
     vim.cmd('.' .. listType .. listType)
   else
@@ -582,10 +169,6 @@ local function closeList()
     pcall(vim.cmd.tabclose)
     return
   end
-  local preview = getPreview()
-  if preview then
-    vim.cmd('pclose')
-  end
   vim.cmd.close()
 end
 
@@ -614,90 +197,35 @@ local function yank(what)
   local list = getList(listType)
   local line = vim.api.nvim_win_get_cursor(0)
   local qfitem = list.items[line[1]]
-  local text = what == 'message' and vim.trim(qfitem.text)
-    or vim.fs.relpath('.', vim.api.nvim_buf_get_name(qfitem.bufnr))
+  local bufname = vim.api.nvim_buf_get_name(qfitem.bufnr)
+  local text = what == 'message' and vim.trim(qfitem.text) or (bufname ~= '' and vim.fs.relpath('.', bufname) or '')
   vim.fn.setreg('', text)
-end
-
-local function refresh()
-  local listType = getListType()
-  assert(listType)
-  local list = getList(listType)
-  if list.context == '' then
-    return
-  end
-  if list.context.qfim_diag and list.context.qfim_diag.type == listType then
-    local diag_where = listType == 'l' and 0 or nil
-    local severity = list.context.qfim_diag.severity
-    local scope = list.context.qfim_diag.scope
-    local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
-    if scope then
-      diag_list = vim
-        .iter(diag_list)
-        :filter(function(v)
-          return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
-        end)
-        :totable()
-    end
-    setList(listType, {
-      items = vim.diagnostic.toqflist(diag_list),
-    }, 'r')
-    if #diag_list == 0 then
-      vim.notify('List is now Empty', vim.log.levels.INFO)
-      vim.cmd(listType .. 'close')
-    end
-  elseif list.context.last_cmd then
-    vim.cmd(list.context.last_cmd)
-  end
-end
-
-local file_name
-local function searchFileName(search)
-  local curr_pos = vim.api.nvim_win_get_cursor(0)
-  local extmarks =
-    vim.api.nvim_buf_get_extmarks(0, qfim_file_namespace, curr_pos, -1, { details = true, type = 'virt_lines' })
-  for _, extmark in ipairs(extmarks) do
-    local text = extmark[4].virt_lines[1]
-    for _, e in ipairs(text) do
-      if e[1]:find(search) then
-        vim.api.nvim_win_set_cursor(0, { extmark[2] + 1, 0 })
-        file_name = search
-        return
-      end
-    end
-  end
-  file_name = nil
-end
-
-local function searchFile()
-  vim.ui.input({ prompt = 'File Search: ' }, function(input)
-    if not input then
-      return
-    end
-    searchFileName(input)
-  end)
-end
-
-local function repeatSearchFileName()
-  if not file_name then
-    vim.notify('No text to search', vim.log.levels.INFO)
-  end
-  searchFileName(file_name)
 end
 
 ---@param direction 'next'|'prev'
 local function moveAdyacentFile(direction)
-  local curr_pos = vim.api.nvim_win_get_cursor(0)
-  local start = direction == 'next' and curr_pos or 0
-  local end_ = direction == 'next' and -1 or { curr_pos[1] - 1, curr_pos[2] }
-  local extmarks = vim.api.nvim_buf_get_extmarks(0, qfim_file_namespace, start, end_, { type = 'virt_lines' })
-  local extmarkPos = direction == 'next' and 1 or (#extmarks > 0 and #extmarks - 1 or 0)
-  local target = extmarks[extmarkPos]
-  if not target then
-    vim.notify('End of list', vim.log.levels.INFO)
+  local qf = getList('c', 0)
+  local items = qf.items
+  local current_idx = qf.idx
+
+  if #items == 0 or current_idx == 0 then
+    vim.notify('Quickfix list is empty', vim.log.levels.INFO)
     return
   end
-  vim.api.nvim_win_set_cursor(0, { target[2] + 1, 0 })
+
+  local current_buf = items[current_idx].bufnr
+  local step = direction == 'next' and 1 or -1
+  local start_idx = current_idx + step
+  local end_idx = direction == 'next' and #items or 1
+
+  for i = start_idx, end_idx, step do
+    if items[i].bufnr ~= current_buf and items[i].bufnr ~= 0 then
+      vim.fn.setqflist({}, 'r', { idx = i })
+      return
+    end
+  end
+
+  vim.notify('No quickfix items in ' .. direction .. ' file', vim.log.levels.INFO)
 end
 
 local function setKeymaps()
@@ -709,18 +237,6 @@ local function setKeymaps()
   vim.keymap.set('n', '<C-v>', function()
     selectItem({ split = 'v' })
   end, { buf = 0, desc = 'Open QF Item in [V]ertical Split' })
-  vim.keymap.set('n', 'o', function()
-    selectItem({ close = true })
-  end, { buf = 0, desc = 'Open and Close QF' })
-  vim.keymap.set('n', 'O', function()
-    selectItem({ keep_cursor = true })
-  end, { buf = 0, desc = 'Open and Stay in QF' })
-  vim.keymap.set('n', '<C-n>', function()
-    moveWithPreview(1)
-  end, { buf = 0, desc = 'Move and Preview Next QF Item' })
-  vim.keymap.set('n', '<C-p>', function()
-    moveWithPreview(-1)
-  end, { buf = 0, desc = 'Move and Preview Previous QF Item' })
   vim.keymap.set('n', ']]', function()
     moveAdyacentFile('next')
   end, { buf = 0, desc = 'Move to QF Item in Next File' })
@@ -733,12 +249,6 @@ local function setKeymaps()
   vim.keymap.set('n', '<C-i>', function()
     listHistory('newer')
   end, { buf = 0, desc = 'Open Newer List' })
-  vim.keymap.set('n', 'p', openPreview, { buf = 0, desc = 'Open and Close QF' })
-  vim.keymap.set('n', 'dd', delete, { buf = 0, desc = 'Delete QF Item' })
-  vim.keymap.set('n', 'D', function()
-    delete(true)
-  end, { buf = 0, desc = 'Delete QF Items in Same Buffer' })
-  vim.keymap.set('x', 'd', delete, { buf = 0, desc = 'Delete QF Item' })
   vim.keymap.set('n', 'yf', function()
     yank('file')
   end, { buf = 0, desc = 'Yank Item File' })
@@ -746,9 +256,6 @@ local function setKeymaps()
     yank('message')
   end, { buf = 0, desc = 'Yank Item Message' })
   vim.keymap.set('n', 'gd', openAsDiff, { buf = 0, desc = '[G]it [D]iff' })
-  vim.keymap.set('n', 'r', refresh, { buf = 0, desc = '[R]eload List' })
-  vim.keymap.set('n', 'g/', searchFile, { buf = 0, desc = 'Search File Names' })
-  vim.keymap.set('n', 'gn', repeatSearchFileName, { buf = 0, desc = 'Search File Names Again' })
 end
 
 --------------------------------------------------
@@ -759,13 +266,11 @@ vim.o.grepprg = 'rg --vimgrep --smart-case --hidden'
 vim.o.grepformat = '%f:%l:%c:%m'
 
 vim.api.nvim_create_user_command('Rg', function(opts)
-  last_cmd = 'silent! grep! ' .. opts.args
-  vim.cmd(last_cmd)
+  vim.cmd('silent! grep! ' .. opts.args)
 end, { nargs = '+' })
 
 vim.api.nvim_create_user_command('LRg', function(opts)
-  last_cmd = 'silent lgrep! "' .. opts.args .. '" %'
-  vim.cmd(last_cmd)
+  vim.cmd('silent lgrep! "' .. opts.args .. '" %')
 end, { nargs = '+' })
 
 vim.keymap.set('n', '<leader>rg', ':Rg ', { desc = '[R]efactor [G]rep' })
@@ -818,171 +323,43 @@ vim.api.nvim_create_user_command('Cf', cf_execute, {
 })
 
 --------------------------------------------------
--- Keymaps to open qf
+-- Keymaps to open diagnostics in qf
 --------------------------------------------------
 
-local function document_symbols()
-  vim.lsp.buf.document_symbol({
-    on_list = function(options)
-      local items = options.items
-      if not items then
-        return
-      end
-
-      local seen = {}
-      local out = {}
-      for _, item in ipairs(items) do
-        local v = item.kind
-        if v ~= nil and not seen[v] then
-          seen[v] = true
-          table.insert(out, v:lower())
-        end
-      end
-
-      ---@diagnostic disable-next-line: unused-local
-      function _G.qf_symbols_completion(cmdarg)
-        return out
-      end
-
-      vim.ui.input(
-        { prompt = 'File Search: ', completion = 'customlist,v:lua._G.qf_symbols_completion' },
-        function(input)
-          if not input then
-            return
-          end
-          items = vim.tbl_filter(function(item)
-            return input == string.lower(item.kind)
-          end, items)
-          if vim.tbl_isempty(items) then
-            vim.notify('No ' .. input .. ' Symbols in the Document', vim.lsp.log_levels.WARN)
-            return
-          end
-          items = vim.tbl_map(function(item)
-            item.text = vim.trim(vim.fn.getline(item.lnum))
-            return item
-          end, items)
-          vim.fn.setloclist(0, {}, ' ', { title = 'Document Symbols: ' .. input:upper(), items = items })
-          vim.schedule(function()
-            vim.cmd('lopen')
-          end)
-        end
-      )
-    end,
-  })
-end
-
 ---@param listType ListType
----@param diagnostics? boolean
----@param severity? vim.diagnostic.SeverityFilter
----@param scope? string
-local function list_toggle(listType, diagnostics, severity, scope)
+local function dianostics_toggle(listType)
   local list = getList(listType)
   if list.winid ~= 0 then
     vim.cmd(listType .. 'close')
-  elseif diagnostics then
-    last_cmd = ''
-    severity = severity or vim.diagnostic.severity.HINT
-    local diag_where = listType == 'l' and 0 or nil
-    local diag_list = vim.diagnostic.get(diag_where, { severity = { min = severity } })
-    if scope then
-      diag_list = vim
-        .iter(diag_list)
-        :filter(function(v)
-          return vim.startswith(vim.api.nvim_buf_get_name(v.bufnr), scope)
-        end)
-        :totable()
-    end
-    if #diag_list == 0 then
-      vim.notify('List is Empty', vim.log.levels.INFO)
-      return
-    end
-    local qf_diag_list = getDiagList(listType, severity)
-    local action = ' '
-    if qf_diag_list then
-      -- NOTE: looks like a nvim bug that #chistory redraws the qf
-      vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
-      action = 'r'
-    end
-    local title = ('%s Diagnostics (%s)'):format(listType == 'c' and 'Workspace' or 'Local', severity)
-    setList(listType, {
-      title = title,
-      items = vim.diagnostic.toqflist(diag_list),
-      context = { qfim_diag = { type = listType, severity = severity, scope = scope } },
-    }, action)
-    vim.schedule(function()
-      vim.cmd(listType .. 'open')
-    end)
-  elseif list.size == 0 then
+    return
+  end
+  local diag_where = listType == 'l' and 0 or nil
+  local diag_list = vim.diagnostic.get(diag_where)
+  if #diag_list == 0 then
     vim.notify('List is Empty', vim.log.levels.INFO)
-  else
+    return
+  end
+  local qf_diag_list = getDiagList(listType)
+  local action = ' '
+  if qf_diag_list then
+    -- NOTE: looks like a nvim bug that #chistory redraws the qf
+    vim.cmd(('silent %s%shistory'):format(qf_diag_list.nr, listType))
+    action = 'r'
+  end
+  local title = ('%s Diagnostics'):format(listType == 'c' and 'Workspace' or 'Local')
+  setList(listType, {
+    title = title,
+    items = vim.diagnostic.toqflist(diag_list),
+    context = { qfim_diag = { type = listType, diagnostics = true } },
+  }, action)
+  vim.schedule(function()
     vim.cmd(listType .. 'open')
-    local win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_resize(win, -1, getHeight())
-  end
+  end)
 end
 
----@param listType ListType
-local function moveToList(listType)
-  local list = getList(listType)
-  local win = list.winid
-  if vim.api.nvim_win_is_valid(win) then
-    vim.api.nvim_set_current_win(win)
-  end
-end
-
----@param listType? ListType
-local function addToQuickfix(listType)
-  listType = listType or 'c'
-  local cursor_pos = vim.fn.getpos('.')
-  local new_qf_item = {
-    {
-      bufnr = vim.api.nvim_get_current_buf(),
-      lnum = cursor_pos[2],
-      col = cursor_pos[3],
-      text = vim.api.nvim_get_current_line(),
-    },
-  }
-  setList(listType, { items = new_qf_item }, 'a')
-  local list = getList(listType)
-  if list.winid ~= 0 then
-    vim.schedule(function()
-      vim.cmd(listType .. 'open') -- needed to rerender highlights
-      vim.cmd(list.size .. listType .. listType) -- don't know if if should enter or keep the same qfitem position
-    end)
-  end
-end
-
-vim.keymap.set('n', '<leader>qq', function()
-  list_toggle('c')
-end, { desc = 'Toggle [Q]uickfix' })
-vim.keymap.set('n', '<leader>qd', function()
-  list_toggle('c', true)
+vim.keymap.set('n', '<leader>Q', function()
+  dianostics_toggle('c')
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
-vim.keymap.set('n', '<leader>qe', function()
-  list_toggle('c', true, vim.diagnostic.severity.ERROR)
-end, { desc = '[Q]uickfix [E]rror Toggle' })
-vim.keymap.set('n', '<leader>qE', function()
-  list_toggle('c', true, vim.diagnostic.severity.ERROR, vim.fn.expand('%:p:h'))
-end, { desc = '[Q]uickfix [E]rror Toggle' })
-vim.keymap.set('n', '<leader>qb', function()
-  moveToList('c')
-end, { desc = 'Move to [Q]uickfix [B]uffer' })
-
-vim.keymap.set('n', '<leader>ll', function()
-  list_toggle('l')
-end, { desc = 'Toggle [L]ocation List' })
-vim.keymap.set('n', '<leader>ld', function()
-  list_toggle('l', true)
-end, { desc = '[L]ocation List [D]iagnostics Toggle' })
-vim.keymap.set('n', '<leader>ls', document_symbols, { desc = '[L]ocation List [S]ymbols' })
-vim.keymap.set('n', '<leader>lb', function()
-  moveToList('l')
-end, { desc = 'Move to [L]ocation List [B]uffer' })
-
-vim.keymap.set('n', '<leader>qa', addToQuickfix, { desc = '[A]dd cursor position to [Q]uickfix List' })
-vim.keymap.set('n', '<leader>la', function()
-  addToQuickfix('l')
-end, { desc = '[A]dd cursor position to [L]ocation List' })
 
 -- NOTE: implement something similar to compare branches: https://gist.github.com/jmacadie/6f934282870f0d481599c8339ef61f64
 -- and/or other commits: https://github.com/jecaro/fugitive-difftool.nvim
@@ -1001,14 +378,9 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   group = qf_group,
   pattern = 'quickfix',
   callback = function()
-    local foldexpr = vim.api.nvim_get_option_value('foldexpr', { scope = 'local' })
-    if foldexpr == 'v:lua._G.qffoldexprfunc()' then
-      return
-    end
-    setOptions()
     setKeymaps()
   end,
-  desc = 'Set qf options and keymaps',
+  desc = 'Set qf keymaps',
 })
 
 --------------------------------------------------
@@ -1044,56 +416,13 @@ vim.api.nvim_create_autocmd('WinEnter', {
 vim.api.nvim_create_autocmd('WinClosed', {
   group = qf_group,
   callback = function(opt)
-    local loclist = vim.fn.getloclist(tonumber(opt.file) or 0, { winid = 0 })
+    local loclist = vim.fn.getloclist(0, { winid = tonumber(opt.file) or 0 })
     if loclist and loclist.winid ~= 0 then
       vim.cmd('close ' .. loclist.winid)
     end
   end,
   desc = 'Close location list if parent window is closed',
 })
-
---------------------------------------------------
--- Features
---------------------------------------------------
-
--- grep commands: Rg, LRg & <leader>rg
--- qf style
--- toggle qf/ll and diagnostics and list symbols (functions)
--- qf/ll next/prev item/file-item with wrapping
--- add cursor position to qf/ll
--- update diagnostics in qf and ll (for buffer errors)
--- folding
--- qf/ll options
--- preview, preview on move, preview on hover
--- open item, with splits, staying, moving and/or closing
--- delete item from qf
--- update qf list position on cursor move
--- close neovim if qf is the last window (check what happens on bdel)
--- close ll if parent window is closed
--- maybe open the qf window automatically after :make, :grep, :lvimgrep
---          and friends if there are valid locations/errors
--- decide in which window to open an item
-
---------------------------------------------------
--- Ideas to Implement
---------------------------------------------------
-
--- shorten filepaths for better legibility (qf.vim) -- don't like it, but can use pathshorten
--- have qf win ALWAYS on bottom, when opened in split or when creating new splits
--- make possible to undo deleted qf items
--- highlight messages (it is even possible?)
--- make it possible to have only one set of keymaps that understand if you want to use qf or loclist
---          (considering which list is open or which is not open and have a fallback just in case)
--- not sure about making qf editable like replacer.nvim
--- show definition, references, implementations, type definition and declarations from word under the cursor (trouble)
--- use buf_request_all for definitions/symbols/etc for async requests
--- use qf to list buffers and/or open buffers
--- use more the api and less cmd/vim.fn
--- use more keepjumps in cmd (https://github.com/ronakg/quickr-preview.vim/blob/master/after/ftplugin/qf.vim#L190)
--- https://yutkat.github.io/my-neovim-pluginlist/quickfix_location.html
-
--- location list
--- make every qf feature available for location windows too (qf.vim)
 
 --------------------------------------------------
 -- Credits
