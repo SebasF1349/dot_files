@@ -684,18 +684,8 @@ local db_status, db_secrets = pcall(dofile, secrets_path)
 if db_status and db_secrets and db_secrets.databases then
   vim.pack.add({
     { src = 'https://github.com/tpope/vim-dadbod' },
-    { src = 'https://github.com/kristijanhusak/vim-dadbod-ui' },
     { src = 'https://github.com/kristijanhusak/vim-dadbod-completion' },
   })
-
-  local data_path = vim.fn.stdpath('data')
-  vim.g.db_ui_save_location = data_path .. '/dadbod_ui'
-  vim.g.db_ui_execute_on_save = false
-  vim.g.db_ui_auto_execute_table_helpers = 1
-  vim.g.db_ui_use_nvim_notify = true
-  vim.g.db_ui_show_database_icon = true
-  vim.g.db_ui_use_nerd_fonts = true
-  vim.g.db_ui_disable_mappings_sql = false
 
   local DBFactory = require('modules.db_types')
   local databases_connections = DBFactory.generate(db_secrets.databases)
@@ -705,6 +695,16 @@ if db_status and db_secrets and db_secrets.databases then
     local SSHFactory = require('modules.ssh_types')
     ssh_connections = SSHFactory.generate(db_secrets.ssh)
   end
+
+  local mini_dbui = require('modules.mini_dbui')
+  mini_dbui.setup(databases_connections, ssh_connections)
+
+  vim.api.nvim_create_user_command('DBDisconnect', function(opts)
+    mini_dbui.disconnect(opts.args)
+  end, { nargs = 1 })
+
+  vim.keymap.set('n', '<leader>dd', mini_dbui.toggle_ui, { desc = '[D]B: Toggle UI' })
+  vim.keymap.set('n', '<leader>ds', ':DBDisconnect ', { desc = '[D]B: [S]top Connection' })
 
   local sql_helpers = {
     {
@@ -819,138 +819,6 @@ LIMIT 10;]],
     },
   }
 
-  local db_tab
-
-  local function get_db_tab()
-    if db_tab and vim.api.nvim_tabpage_is_valid(db_tab) then
-      return db_tab
-    end
-  end
-
-  local function open_db_tab()
-    db_tab = get_db_tab()
-    local curr_tab = vim.api.nvim_get_current_tabpage()
-    if not db_tab then
-      db_tab = vim.api.nvim_open_tabpage(0, true, { after = -1 })
-      vim.cmd('DBUI')
-      vim.cmd('only')
-    elseif curr_tab ~= db_tab then
-      vim.api.nvim_set_current_tabpage(db_tab)
-    end
-    vim.schedule(function()
-      vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(DBUI_Redraw)', true, false, true), 'm')
-    end)
-  end
-
-  local function toggle_db_tab()
-    db_tab = get_db_tab()
-    local curr_tab = vim.api.nvim_get_current_tabpage()
-    if curr_tab == db_tab then
-      local tab_nr = vim.api.nvim_tabpage_get_number(db_tab)
-      vim.cmd('wa | ' .. tab_nr .. 'tabclose')
-      db_tab = nil
-      return
-    else
-      open_db_tab()
-    end
-  end
-
-  local active_tunnels = {}
-
-  local function connect_db(name)
-    local db = databases_connections[name]
-    if not db then
-      vim.notify('DB "' .. name .. '" not found', vim.log.levels.ERROR)
-      return
-    end
-
-    local dbs = vim.g.dbs or {}
-    if dbs[name] then
-      open_db_tab()
-      return
-    end
-
-    if not db.db_host then
-      local ssh = ssh_connections[name]
-      if not ssh then
-        vim.notify('Missing credentials to open tunnel to ' .. name, vim.log.levels.ERROR)
-        return
-      end
-      local pid = ssh:create_tunnel(active_tunnels, name, db.db_port)
-      active_tunnels[name] = pid
-    end
-
-    dbs[name] = db:get_connection_cmd()
-
-    vim.g.dbs = dbs
-
-    open_db_tab()
-  end
-
-  local function disconnect_db(name)
-    local dbs = vim.g.dbs or {}
-    if not dbs[name] then
-      vim.notify('DB "' .. name .. '" is not active', vim.log.levels.WARN)
-      return
-    end
-
-    dbs[name] = nil
-    vim.g.dbs = dbs
-    vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>(DBUI_Redraw)', true, false, true), 'm')
-
-    local pid = active_tunnels[name]
-    if not pid then
-      return
-    end
-
-    local success, err = vim.uv.kill(pid, 15)
-
-    if success then
-      vim.notify('Successfully stopped tunnel: ' .. name, vim.log.levels.INFO)
-      active_tunnels[name] = nil
-    else
-      vim.notify('Failed to kill tunnel ' .. name .. ': ' .. (err or 'unknown error'), vim.log.levels.ERROR)
-    end
-  end
-
-  local function db_completion(arg_lead, list)
-    local items = {}
-    for name, _ in pairs(list) do
-      if name:find('^' .. arg_lead) then
-        table.insert(items, name)
-      end
-    end
-    return items
-  end
-
-  local function all_db_complete(arg_lead)
-    return db_completion(arg_lead, databases_connections)
-  end
-
-  local function active_db_complete(arg_lead)
-    return db_completion(arg_lead, vim.g.dbs)
-  end
-
-  vim.api.nvim_create_user_command('ConnectDB', function(opts)
-    connect_db(opts.args)
-  end, { nargs = 1, complete = all_db_complete })
-
-  vim.api.nvim_create_user_command('DisconnectDB', function(opts)
-    disconnect_db(opts.args)
-  end, { nargs = 1, complete = active_db_complete })
-
-  vim.keymap.set('n', '<leader>dd', toggle_db_tab, { desc = '[D]B: Toggle' })
-  vim.keymap.set('n', '<leader>dn', ':ConnectDB ', { desc = '[D]B: [N]ew Connection' })
-  vim.keymap.set('n', '<leader>ds', ':DisconnectDB ', { desc = '[D]B: [S]top Connection' })
-
-  vim.api.nvim_create_autocmd('VimLeavePre', {
-    callback = function()
-      for _, pid in pairs(active_tunnels) do
-        vim.uv.kill(pid, 9)
-      end
-    end,
-  })
-
   local function get_statement()
     local curr_line = vim.api.nvim_win_get_cursor(0)
     local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
@@ -971,6 +839,8 @@ LIMIT 10;]],
       vim.bo[0].omnifunc = 'vim_dadbod_completion#omni'
       vim.bo[0].complete = 'o'
       vim.bo[0].autocomplete = true
+      vim.opt_local.ignorecase = true
+      vim.opt_local.smartcase = false
 
       vim.keymap.set('n', '<leader>h', function()
         vim.ui.select(sql_helpers, {
@@ -989,11 +859,11 @@ LIMIT 10;]],
         end)
       end, { desc = 'DB: [H]elpers', buf = 0 })
 
-      vim.keymap.set('x', '<CR>', '<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buf = 0 })
-      vim.keymap.set('n', '<CR>', 'vaq<Plug>(DBUI_ExecuteQuery)', { desc = 'DB: Execute', buf = 0, remap = true })
-      vim.keymap.set('n', 'W', '<Plug>(DBUI_SaveQuery)', { desc = 'DB: [W]rite', buf = 0 })
-      vim.keymap.set('n', 'E', '<Plug>(DBUI_EditBindParameters)', { desc = 'DB: [E]dit Parameters', buf = 0 })
-      vim.keymap.set('n', 'L', '<Plug>(DBUI_ToggleResultLayout)', { desc = 'DB: Change Result [L]ayout' })
+      vim.keymap.set('x', '<CR>', ':DB<CR>', { desc = 'DB: Execute', buf = 0 })
+      vim.keymap.set('n', '<CR>', 'vaq:DB<CR>', { desc = 'DB: Execute', buf = 0, remap = true })
+      vim.keymap.set('n', 'W', mini_dbui.save_query, { desc = 'DB: [W]rite', buf = 0 })
+      -- vim.keymap.set('n', 'E', '<Plug>(DBUI_EditBindParameters)', { desc = 'DB: [E]dit Parameters', buf = 0 })
+      -- vim.keymap.set('n', 'L', '<Plug>(DBUI_ToggleResultLayout)', { desc = 'DB: Change Result [L]ayout' })
 
       vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
         return vim.fn['db#op_exec']()
@@ -1017,36 +887,10 @@ LIMIT 10;]],
       if vim.b.dbui_db_key_name then
         local server = vim.b.dbui_db_key_name:match('([^_]+)')
         local db = databases_connections[server]
+        local hl = (db and db.type == 'prod') and 'Normal:DiffDelete' or ''
         local win = vim.api.nvim_get_current_win()
-        local hl = db.type == 'prod' and 'Normal:DiffDelete' or ''
         vim.wo[win][0].winhighlight = hl
       end
     end,
-  })
-
-  vim.api.nvim_create_autocmd('FileType', {
-    pattern = 'dbui',
-    callback = function()
-      vim.keymap.set('n', '<CR>', function()
-        local line = vim.api.nvim_get_current_line()
-
-        vim.cmd([[execute "normal! \<Plug>(DBUI_SelectLine)"]])
-
-        if vim.startswith(vim.trim(line), '▸  ') then
-          vim.cmd([[execute "normal! j\<Plug>(DBUI_SelectLine)"]])
-        end
-      end, { buf = 0 })
-    end,
-  })
-
-  vim.api.nvim_create_autocmd('WinEnter', {
-    callback = function()
-      db_tab = get_db_tab()
-      local curr_tab = vim.api.nvim_get_current_tabpage()
-      if curr_tab == db_tab and #vim.api.nvim_list_tabpages() == 1 then
-        vim.cmd('quitall!')
-      end
-    end,
-    desc = 'Close Neovim if the last tab is a DBUI tabpage',
   })
 end
