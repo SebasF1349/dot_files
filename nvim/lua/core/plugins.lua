@@ -827,6 +827,7 @@ WHERE EVENT_OBJECT_TABLE = '%s'
       vim.bo[0].omnifunc = 'v:lua.custom_sql_omni'
       vim.bo[0].complete = 'o'
       vim.bo[0].autocomplete = true
+      vim.bo[0].completeopt = 'menuone,popup,noselect,fuzzy'
 
       vim.keymap.set('n', '<leader>h', function()
         vim.ui.select(sql_helpers, {
