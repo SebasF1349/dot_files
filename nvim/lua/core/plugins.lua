@@ -688,7 +688,7 @@ if db_status and db_secrets and db_secrets.databases then
   })
 
   local DBFactory = require('modules.db_types')
-  local databases_connections = DBFactory.generate(db_secrets.databases)
+  local databases_connections, db_order = DBFactory.generate(db_secrets.databases)
 
   local ssh_connections = {}
   if db_secrets.ssh then
@@ -697,7 +697,7 @@ if db_status and db_secrets and db_secrets.databases then
   end
 
   local mini_dbui = require('modules.mini_dbui')
-  mini_dbui.setup(databases_connections, ssh_connections)
+  mini_dbui.setup(databases_connections, ssh_connections, db_order)
 
   vim.api.nvim_create_user_command('DBDisconnect', function(opts)
     mini_dbui.disconnect(opts.args)
@@ -807,18 +807,6 @@ WHERE EVENT_OBJECT_TABLE = '%s'
     },
   }
 
-  vim.g.db_ui_table_helpers = {
-    mysql = {
-      List = [[SELECT *
-FROM {optional_schema}`{table}`
-LIMIT 10;]],
-      Columns = '',
-      ['Primary Keys'] = '',
-      Indexes = '',
-      ['Foreign Keys'] = '',
-    },
-  }
-
   local function get_statement()
     local curr_line = vim.api.nvim_win_get_cursor(0)
     local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
@@ -836,11 +824,9 @@ LIMIT 10;]],
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'mysql', 'sql' },
     callback = function()
-      vim.bo[0].omnifunc = 'vim_dadbod_completion#omni'
+      vim.bo[0].omnifunc = 'v:lua.custom_sql_omni'
       vim.bo[0].complete = 'o'
       vim.bo[0].autocomplete = true
-      vim.opt_local.ignorecase = true
-      vim.opt_local.smartcase = false
 
       vim.keymap.set('n', '<leader>h', function()
         vim.ui.select(sql_helpers, {
@@ -859,11 +845,16 @@ LIMIT 10;]],
         end)
       end, { desc = 'DB: [H]elpers', buf = 0 })
 
-      vim.keymap.set('x', '<CR>', ':DB<CR>', { desc = 'DB: Execute', buf = 0 })
-      vim.keymap.set('n', '<CR>', 'vaq:DB<CR>', { desc = 'DB: Execute', buf = 0, remap = true })
+      vim.keymap.set('x', '<CR>', function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'x', false)
+        mini_dbui.exec_query("'<,'>DB", 'Query')
+      end, { desc = 'DB: Execute', buf = 0 })
+      vim.keymap.set('n', '<CR>', function()
+        vim.cmd('normal vaq')
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'x', false)
+        mini_dbui.exec_query("'<,'>DB", 'Query')
+      end, { desc = 'DB: Execute', buf = 0, remap = true })
       vim.keymap.set('n', 'W', mini_dbui.save_query, { desc = 'DB: [W]rite', buf = 0 })
-      -- vim.keymap.set('n', 'E', '<Plug>(DBUI_EditBindParameters)', { desc = 'DB: [E]dit Parameters', buf = 0 })
-      -- vim.keymap.set('n', 'L', '<Plug>(DBUI_ToggleResultLayout)', { desc = 'DB: Change Result [L]ayout' })
 
       vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
         return vim.fn['db#op_exec']()

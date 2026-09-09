@@ -2,7 +2,6 @@ local M = {}
 
 local function url_encode(str)
   if str then
-    -- Find any character that isn't alphanumeric, '-', '_', '.', or '~'
     str = str:gsub('([^%w%-%.%_%~])', function(c)
       return string.format('%%%02X', string.byte(c))
     end)
@@ -22,31 +21,30 @@ M.DB = {}
 M.DB.__index = M.DB
 
 function M.DB:generate_cmd(ip, port)
-  local db_user = url_encode(self.db_user)
-  local db_pass = url_encode(self.db_pass)
-  return string.format(mysql_cmd, db_user, db_pass, ip, port)
+  return string.format(mysql_cmd, url_encode(self.db_user), url_encode(self.db_pass), ip, port)
 end
 
 function M.DB:get_connection_cmd()
-  local host = self.db_host or '127.0.0.1'
-  local port = self.db_port or '3306'
-  return self.generate_cmd(self, host, port)
+  return self:generate_cmd(self.db_host or '127.0.0.1', self.db_port or 3306)
 end
 
 ---@param configs table[]
----@return table<string, db>
+---@return table<string, db>, table
 function M.generate(configs)
   local result = {}
+  local order = {}
   local port = 3306
-  for name, cfg in pairs(configs) do
+  for _, cfg in ipairs(configs) do
+    assert(cfg.name, 'Database config missing "name" field')
     setmetatable(cfg, M.DB)
     if not cfg.db_host then
       port = port + 1
       cfg.db_port = port
     end
-    result[name] = cfg
+    result[cfg.name] = cfg
+    table.insert(order, cfg.name)
   end
-  return result
+  return result, order
 end
 
 return M
