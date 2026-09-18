@@ -701,7 +701,14 @@ if db_status and db_secrets and db_secrets.databases then
 
   vim.api.nvim_create_user_command('DBDisconnect', function(opts)
     mini_dbui.disconnect(opts.args)
-  end, { nargs = 1 })
+  end, {
+    nargs = 1,
+    complete = function(arg_lead, _cmdline, _cursor_pos)
+      return vim.tbl_filter(function(key)
+        return vim.startswith(key, arg_lead)
+      end, mini_dbui.get_connected_dbs())
+    end,
+  })
 
   vim.keymap.set('n', '<leader>dd', mini_dbui.toggle_ui, { desc = '[D]B: Toggle UI' })
   vim.keymap.set('n', '<leader>ds', ':DBDisconnect ', { desc = '[D]B: [S]top Connection' })
@@ -821,13 +828,12 @@ WHERE EVENT_OBJECT_TABLE = '%s'
     end
   end
 
+  local sql = vim.api.nvim_create_augroup('sql.ft', { clear = true })
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'mysql', 'sql' },
+    group = sql,
     callback = function()
-      vim.bo[0].omnifunc = 'v:lua.custom_sql_omni'
-      vim.bo[0].complete = 'o'
-      vim.bo[0].autocomplete = true
-      vim.bo[0].completeopt = 'menuone,popup,noselect,fuzzy'
+      vim.keymap.set('n', '<leader>q', mini_dbui.open_saved_queries, { desc = 'DB: Open Saved [Q]ueries', buf = 0 })
 
       vim.keymap.set('n', '<leader>h', function()
         vim.ui.select(sql_helpers, {
@@ -839,7 +845,7 @@ WHERE EVENT_OBJECT_TABLE = '%s'
           if not choice then
             return
           end
-          local query = choice.query:format(vim.b.dbui_table_name, vim.b.dbui_schema_name)
+          local query = choice.query:format('', vim.b.db_schema_name)
           local output = vim.split(query, '\n')
           local cursor = vim.api.nvim_win_get_cursor(0)
           vim.api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1] - 1, false, output)
@@ -847,13 +853,13 @@ WHERE EVENT_OBJECT_TABLE = '%s'
       end, { desc = 'DB: [H]elpers', buf = 0 })
 
       vim.keymap.set('x', '<CR>', function()
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'x', false)
-        mini_dbui.exec_query("'<,'>DB", 'Query')
+        vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'x', false)
+        mini_dbui.exec_query("'<,'>DB")
       end, { desc = 'DB: Execute', buf = 0 })
       vim.keymap.set('n', '<CR>', function()
         vim.cmd('normal vaq')
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'x', false)
-        mini_dbui.exec_query("'<,'>DB", 'Query')
+        vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'x', false)
+        mini_dbui.exec_query("'<,'>DB")
       end, { desc = 'DB: Execute', buf = 0, remap = true })
       vim.keymap.set('n', 'W', mini_dbui.save_query, { desc = 'DB: [W]rite', buf = 0 })
 
@@ -876,13 +882,14 @@ WHERE EVENT_OBJECT_TABLE = '%s'
       end, { desc = 'DB: Select SQL Query', buf = 0 })
       vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buf = 0, remap = true })
 
-      if vim.b.dbui_db_key_name then
-        local server = vim.b.dbui_db_key_name:match('([^_]+)')
-        local db = databases_connections[server]
-        local hl = (db and db.type == 'prod') and 'Normal:DiffDelete' or ''
-        local win = vim.api.nvim_get_current_win()
-        vim.wo[win][0].winhighlight = hl
-      end
+      vim.schedule(function()
+        if vim.b.db_key_name then
+          local db = databases_connections[vim.b.db_key_name]
+          local hl = (db and db.type == 'prod') and 'Normal:DiffDelete' or ''
+          local win = vim.api.nvim_get_current_win()
+          vim.wo[win][0].winhighlight = hl
+        end
+      end)
     end,
   })
 end
