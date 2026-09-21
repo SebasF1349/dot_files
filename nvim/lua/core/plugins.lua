@@ -814,20 +814,6 @@ WHERE EVENT_OBJECT_TABLE = '%s'
     },
   }
 
-  local function get_statement()
-    local curr_line = vim.api.nvim_win_get_cursor(0)
-    local non_blank = vim.api.nvim_get_current_line():find('%S') or 0
-    local bufnr = vim.api.nvim_win_get_buf(0)
-    vim.treesitter.get_parser(bufnr):parse()
-    local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank } })
-    while curr_node do
-      if curr_node:type() == 'statement' then
-        return vim.treesitter.get_node_range(curr_node)
-      end
-      curr_node = curr_node:parent()
-    end
-  end
-
   local sql = vim.api.nvim_create_augroup('sql.ft', { clear = true })
   vim.api.nvim_create_autocmd('FileType', {
     pattern = { 'mysql', 'sql' },
@@ -866,30 +852,6 @@ WHERE EVENT_OBJECT_TABLE = '%s'
       vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
         return vim.fn['db#op_exec']()
       end, { desc = 'DB: Execute Operator', buf = 0, expr = true })
-
-      vim.keymap.set('x', 'aq', function()
-        local start_row, start_col, end_row, end_col = get_statement()
-        if not start_row then
-          return
-        end
-        vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-        if vim.api.nvim_get_mode().mode:find('v') then
-          vim.cmd.normal({ 'o', bang = true })
-        else
-          vim.cmd.normal({ 'v', bang = true })
-        end
-        vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
-      end, { desc = 'DB: Select SQL Query', buf = 0 })
-      vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buf = 0, remap = true })
-
-      vim.schedule(function()
-        if vim.b.db_key_name then
-          local db = databases_connections[vim.b.db_key_name]
-          local hl = (db and db.type == 'prod') and 'Normal:DiffDelete' or ''
-          local win = vim.api.nvim_get_current_win()
-          vim.wo[win][0].winhighlight = hl
-        end
-      end)
     end,
   })
 end

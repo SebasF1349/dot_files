@@ -5,7 +5,6 @@ local M = {}
 ---@field dbs table<string, db>
 ---@field ssh table<string, ssh>
 ---@field db_order string[]
----@field connected_dbs table<string, boolean>
 ---@field schemas table<string, string[]>
 
 ---@type MiniState
@@ -13,7 +12,6 @@ local state = {
   dbs = {},
   ssh = {},
   db_order = {},
-  connected_dbs = {},
   schemas = {},
 }
 
@@ -22,7 +20,7 @@ local save_path = vim.fs.joinpath(vim.fn.stdpath('data'), 'dadbod_queries')
 
 local function get_saved_queries(db_name)
   vim.fn.mkdir(vim.fs.joinpath(save_path, db_name), 'p')
-  return vim.fn.glob(vim.fs.joinpath(save_path, db_name, '*.sql'), true, true) or {}
+  return vim.fn.glob(vim.fs.joinpath(save_path, db_name, '*.sql'), true, true)
 end
 
 function M.exec_query(action)
@@ -94,6 +92,18 @@ local function run_db_query(url, query)
   return vim.split(res.stdout, '\r?\n', { trimempty = true })
 end
 
+local function get_statement_node()
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local col = (vim.api.nvim_get_current_line():find('%S') or 1) - 1
+  local node = vim.treesitter.get_node({ bufnr = 0, pos = { row - 1, col } })
+  while node do
+    if node:type() == 'statement' then
+      return vim.treesitter.get_node_range(node)
+    end
+    node = node:parent()
+  end
+end
+
 local function open_buffer(name, schema, query_file, keep_win)
   local base_url = vim.g.dbs[name]
   if not base_url then
@@ -128,6 +138,26 @@ local function open_buffer(name, schema, query_file, keep_win)
   vim.bo[buf].autocomplete = true
   vim.bo[buf].completeopt = 'menuone,popup,noselect,fuzzy'
 
+  local db = state.dbs[name]
+  local hl = (db and db.type == 'prod') and 'Normal:DiffDelete' or ''
+  local win = vim.api.nvim_get_current_win()
+  vim.wo[win][0].winhighlight = hl
+
+  vim.keymap.set('x', 'aq', function()
+    local start_row, start_col, end_row, end_col = get_statement_node()
+    if not start_row then
+      return
+    end
+    vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
+    if vim.api.nvim_get_mode().mode:find('v') then
+      vim.cmd.normal({ 'o', bang = true })
+    else
+      vim.cmd.normal({ 'v', bang = true })
+    end
+    vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
+  end, { desc = 'DB: Select SQL Query', buf = buf })
+  vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buf = buf, remap = true })
+
   vim.keymap.set('i', '.', function()
     vim.api.nvim_feedkeys('.', 'n', false)
     vim.defer_fn(function()
@@ -137,7 +167,6 @@ local function open_buffer(name, schema, query_file, keep_win)
 end
 
 local function fetch_schemas(name, url)
-  vim.g.dbs = vim.tbl_extend('force', vim.g.dbs or {}, { [name] = url })
   local res, err = run_db_query(url, 'SHOW DATABASES;')
 
   if err then
@@ -153,7 +182,7 @@ local function fetch_schemas(name, url)
     end
   end
 
-  state.connected_dbs[name] = true
+  vim.g.dbs = vim.tbl_extend('force', vim.g.dbs or {}, { [name] = url })
   return true
 end
 
@@ -175,7 +204,7 @@ local function handle_db_selection(name)
   local db = state.dbs[name]
   local url = db:get_connection_cmd()
 
-  if state.connected_dbs[name] then
+  if vim.g.dbs and vim.g.dbs[name] ~= nil then
     select_schema_and_open(name)
     return
   end
@@ -254,29 +283,27 @@ function M.save_query()
 end
 
 function M.disconnect(name)
-  state.connected_dbs[name] = nil
-
-  local g_dbs = vim.g.dbs or {}
-  g_dbs[name] = nil
-  vim.g.dbs = g_dbs
-
   local tunnel = ssh_module.active_tunnels[name]
   if tunnel then
     tunnel:kill('sigterm')
     ssh_module.active_tunnels[name] = nil
   end
+
+  local g_dbs = vim.g.dbs or {}
+  g_dbs[name] = nil
+  vim.g.dbs = g_dbs
+  state.schemas[name] = nil
+
   vim.notify('Disconnected from ' .. name, vim.log.levels.INFO)
 end
 
 function M.get_connected_dbs()
-  return vim.tbl_keys(state.connected_dbs)
+  return vim.tbl_keys(vim.g.dbs or {})
 end
 
 function M.setup(databases, ssh, db_order)
   state.dbs, state.ssh = databases or {}, ssh or {}
   state.db_order = db_order or vim.tbl_keys(state.dbs)
-
-  vim.api.nvim_create_autocmd('VimLeavePre', { group = augroup, callback = ssh_module.kill_all })
 end
 
 function M.custom_sql_omni(findstart, base)
@@ -319,5 +346,7 @@ vim.api.nvim_create_autocmd('User', {
     end
   end,
 })
+
+vim.api.nvim_create_autocmd('VimLeavePre', { group = augroup, callback = ssh_module.kill_all })
 
 return M
