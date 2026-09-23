@@ -18,8 +18,108 @@ local state = {
 local augroup = vim.api.nvim_create_augroup('MiniDbui', { clear = true })
 local save_path = vim.fs.joinpath(vim.fn.stdpath('data'), 'dadbod_queries')
 
+local sql_helpers = {
+  {
+    name = 'Columns',
+    query = [[
+SELECT
+    COLUMN_NAME,
+    COLUMN_TYPE,
+    IS_NULLABLE,
+    COLUMN_DEFAULT,
+    COLUMN_KEY,
+    EXTRA,
+    COLLATION_NAME,
+    COLUMN_COMMENT
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = '%s'
+    AND TABLE_SCHEMA = '%s'
+ORDER BY ORDINAL_POSITION;
+      ]],
+  },
+  {
+    name = 'Indexes',
+    query = [[
+SELECT
+    TABLE_NAME,
+    NON_UNIQUE,
+    INDEX_NAME,
+    SEQ_IN_INDEX AS 'Sequence in Index',
+    COLUMN_NAME,
+    INDEX_TYPE,
+    COLLATION,
+    CARDINALITY,
+    NULLABLE,
+    COMMENT,
+    INDEX_COMMENT
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_NAME = '%s'
+    AND TABLE_SCHEMA = '%s';
+      ]],
+  },
+  {
+    name = 'Keys',
+    query = [[
+SELECT
+    CONSTRAINT_NAME,
+    COLUMN_NAME,
+    ORDINAL_POSITION,
+    REFERENCED_TABLE_NAME,
+    REFERENCED_COLUMN_NAME
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE TABLE_NAME = '%s'
+    AND TABLE_SCHEMA = '%s'
+ORDER BY CONSTRAINT_NAME;
+      ]],
+  },
+  {
+    name = 'References',
+    query = [[
+SELECT
+    TABLE_SCHEMA,
+    TABLE_NAME,
+    COLUMN_NAME,
+    CONSTRAINT_NAME,
+    REFERENCED_COLUMN_NAME
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_NAME = '%s'
+    AND REFERENCED_TABLE_SCHEMA = '%s'
+ORDER BY TABLE_NAME;
+      ]],
+  },
+  {
+    name = 'Table Data',
+    query = [[
+SELECT 
+    ENGINE,
+    TABLE_ROWS,
+    AUTO_INCREMENT,
+    ROUND(DATA_LENGTH / 1024 / 1024, 2) AS 'Data_Size_MB',
+    ROUND(INDEX_LENGTH / 1024 / 1024, 2) AS 'Index_Size_MB',
+    ROUND(DATA_FREE / 1024 / 1024, 2) AS 'Free_Space_MB',
+    CREATE_TIME,
+    UPDATE_TIME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_NAME = '%s' 
+    AND TABLE_SCHEMA = '%s';
+      ]],
+  },
+  {
+    name = 'Triggers',
+    query = [[
+SELECT 
+    TRIGGER_NAME, 
+    ACTION_TIMING, 
+    EVENT_MANIPULATION AS 'EVENT', 
+    ACTION_STATEMENT AS 'LOGIC'
+FROM INFORMATION_SCHEMA.TRIGGERS
+WHERE EVENT_OBJECT_TABLE = '%s' 
+    AND TRIGGER_SCHEMA = '%s';
+      ]],
+  },
+}
+
 local function get_saved_queries(db_name)
-  vim.fn.mkdir(vim.fs.joinpath(save_path, db_name), 'p')
   return vim.fn.glob(vim.fs.joinpath(save_path, db_name, '*.sql'), true, true)
 end
 
@@ -93,17 +193,16 @@ local function run_db_query(url, query)
 end
 
 local function get_statement_node()
-  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
   local col = (vim.api.nvim_get_current_line():find('%S') or 1) - 1
   local node = vim.treesitter.get_node({ bufnr = 0, pos = { row - 1, col } })
-  while node do
-    if node:type() == 'statement' then
-      return vim.treesitter.get_node_range(node)
-    end
+  while node and node:type() ~= 'statement' do
     node = node:parent()
   end
+  if node then
+    return vim.treesitter.get_node_range(node)
+  end
 end
-
 local function open_buffer(name, schema, query_file, keep_win)
   local base_url = vim.g.dbs[name]
   if not base_url then
@@ -143,6 +242,25 @@ local function open_buffer(name, schema, query_file, keep_win)
   local win = vim.api.nvim_get_current_win()
   vim.wo[win][0].winhighlight = hl
 
+  vim.keymap.set('n', '<leader>q', M.open_saved_queries, { desc = 'DB: Open Saved [Q]ueries', buf = buf })
+
+  vim.keymap.set('n', '<leader>h', function()
+    vim.ui.select(sql_helpers, {
+      prompt = 'Query: ',
+      format_item = function(item)
+        return item.name
+      end,
+    }, function(choice)
+      if not choice then
+        return
+      end
+      local query = choice.query:format('', vim.b.db_schema_name)
+      local output = vim.split(query, '\n')
+      local cursor = vim.api.nvim_win_get_cursor(0)
+      vim.api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1] - 1, false, output)
+    end)
+  end, { desc = 'DB: [H]elpers', buf = buf })
+
   vim.keymap.set('x', 'aq', function()
     local start_row, start_col, end_row, end_col = get_statement_node()
     if not start_row then
@@ -157,6 +275,21 @@ local function open_buffer(name, schema, query_file, keep_win)
     vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
   end, { desc = 'DB: Select SQL Query', buf = buf })
   vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buf = buf, remap = true })
+
+  vim.keymap.set('x', '<CR>', function()
+    vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'x', false)
+    M.exec_query("'<,'>DB")
+  end, { desc = 'DB: Execute', buf = buf })
+  vim.keymap.set('n', '<CR>', function()
+    vim.cmd('normal vaq')
+    vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'x', false)
+    M.exec_query("'<,'>DB")
+  end, { desc = 'DB: Execute', buf = buf, remap = true })
+  vim.keymap.set('n', 'W', M.save_query, { desc = 'DB: [W]rite', buf = buf })
+
+  vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
+    return vim.fn['db#op_exec']()
+  end, { desc = 'DB: Execute Operator', buf = 0, expr = true })
 
   vim.keymap.set('i', '.', function()
     vim.api.nvim_feedkeys('.', 'n', false)
@@ -208,20 +341,18 @@ local function handle_db_selection(name)
     select_schema_and_open(name)
     return
   end
-
-  vim.notify('Connecting to ' .. name .. '...', vim.log.levels.INFO)
-  if not db.db_host and state.ssh[name] then
-    state.ssh[name]:create_tunnel(name, db.db_port, function()
-      if fetch_schemas(name, url) then
-        vim.notify('Connected to ' .. name, vim.log.levels.INFO)
-        select_schema_and_open(name)
-      end
-    end)
-  else
+  local function on_connect()
     if fetch_schemas(name, url) then
       vim.notify('Connected to ' .. name, vim.log.levels.INFO)
       select_schema_and_open(name)
     end
+  end
+
+  vim.notify('Connecting to ' .. name .. '...', vim.log.levels.INFO)
+  if not db.db_host and state.ssh[name] then
+    state.ssh[name]:create_tunnel(name, db.db_port, on_connect)
+  else
+    on_connect()
   end
 end
 
@@ -302,8 +433,21 @@ function M.get_connected_dbs()
 end
 
 function M.setup(databases, ssh, db_order)
-  state.dbs, state.ssh = databases or {}, ssh or {}
-  state.db_order = db_order or vim.tbl_keys(state.dbs)
+  state.dbs, state.ssh, state.db_order = databases or {}, ssh or {}, db_order or vim.tbl_keys(state.dbs)
+
+  vim.api.nvim_create_user_command('DBDisconnect', function(opts)
+    M.disconnect(opts.args)
+  end, {
+    nargs = 1,
+    complete = function(arg_lead, _cmdline, _cursor_pos)
+      return vim.tbl_filter(function(key)
+        return vim.startswith(key, arg_lead)
+      end, M.get_connected_dbs())
+    end,
+  })
+
+  vim.keymap.set('n', '<leader>dd', M.toggle_ui, { desc = '[D]B: Toggle UI' })
+  vim.keymap.set('n', '<leader>ds', ':DBDisconnect ', { desc = '[D]B: [S]top Connection' })
 end
 
 function M.custom_sql_omni(findstart, base)
@@ -325,7 +469,7 @@ function M.custom_sql_omni(findstart, base)
   local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
   for _, line in ipairs(vim.api.nvim_buf_get_lines(0, math.max(0, row - 100), row, false)) do
     for word in line:gmatch('[%w_]+') do
-      if word:sub(1, #base) == base and not seen[word] then
+      if vim.startswith(word, base) and not seen[word] then
         seen[word] = true
         table.insert(results, { word = word, menu = '[Buf]', icase = 1 })
       end
