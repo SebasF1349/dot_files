@@ -481,12 +481,23 @@ end
 vim.api.nvim_create_autocmd('User', {
   pattern = '*/DBExecutePost',
   group = augroup,
-  callback = function()
-    local query_info = vim.b[0].db
-    if query_info and query_info.runtime then
-      local runtime_str =
-        string.format('-- %s query execution time: %.3fs', vim.fs.basename(query_info.input), query_info.runtime)
-      vim.notify(runtime_str, vim.log.levels.INFO)
+  callback = function(args)
+    local buf = args.buf
+    local query_info = vim.b[buf].db
+    if not (query_info and query_info.runtime and query_info.db_url) then
+      return
+    end
+    local runtime_str =
+      string.format('-- %s query execution time: %.3fs', vim.fs.basename(query_info.input), query_info.runtime)
+    vim.notify(runtime_str, vim.log.levels.INFO)
+    local query_connection = query_info.db_url:match('^(%w+://[^/]+)')
+    for db, url in pairs(vim.g.dbs) do
+      local db_connection = url:match('^(%w+://[^/]+)')
+      if db_connection == query_connection then
+        local parsed = vim.fn['db#url#parse'](query_info.db_url)
+        vim.b[buf].display_name = string.format('[db:%s] %s', db, parsed.path:gsub('^/', ''))
+        break
+      end
     end
   end,
 })
