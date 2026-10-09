@@ -124,6 +124,8 @@ local function get_saved_queries(db_name)
 end
 
 function M.exec_query(action)
+  local display_name = vim.b[0].display_name
+
   if type(action) == 'string' then
     vim.cmd(action)
   else
@@ -131,6 +133,8 @@ function M.exec_query(action)
   end
 
   vim.cmd.wincmd('j')
+
+  vim.b[0].display_name = display_name
 
   vim.keymap.set('n', 'K', function()
     local row, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -225,15 +229,19 @@ local function open_buffer(name, schema, query_file, keep_win)
     vim.bo[buf].filetype = 'sql'
   end
 
+  if schema then
+    local parsed_url = vim.fn['db#url#parse'](base_url)
+    parsed_url.path = '/' .. schema
+    vim.b[buf].db = vim.fn['db#url#format'](parsed_url)
+  else
+    vim.b[buf].db = base_url
+  end
   vim.b[buf].display_name =
     string.format('[db:%s] %s', name, query_file and vim.fs.basename(query_file) or schema or 'default')
-  vim.b[buf].db = schema
-      and (base_url:match('/%?') and base_url:gsub('/%?', '/' .. schema .. '?') or (base_url .. '/' .. schema))
-    or base_url
   vim.b[buf].db_key_name = name
   vim.b[buf].db_schema_name = schema or ''
-  vim.bo[buf].omnifunc = M.custom_sql_omni
-  vim.bo[buf].complete = 'o'
+  vim.bo[buf].omnifunc = vim.fn['vim_dadbod_completion#omni']
+  vim.bo[buf].complete = 'o,.'
   vim.bo[buf].autocomplete = true
   vim.bo[buf].completeopt = 'menuone,popup,noselect,fuzzy'
 
@@ -450,55 +458,17 @@ function M.setup(databases, ssh, db_order)
   vim.keymap.set('n', '<leader>ds', ':DBDisconnect ', { desc = '[D]B: [S]top Connection' })
 end
 
-function M.custom_sql_omni(findstart, base)
-  if findstart == 1 then
-    return vim.fn['vim_dadbod_completion#omni'](1, base)
-  end
-
-  local results = vim.fn['vim_dadbod_completion#omni'](0, base)
-  results = type(results) == 'table' and results or {}
-  if base == '' then
-    return results
-  end
-
-  local seen = {}
-  for _, item in ipairs(results) do
-    seen[item.word] = true
-  end
-
-  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
-  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, math.max(0, row - 100), row, false)) do
-    for word in line:gmatch('[%w_]+') do
-      if vim.startswith(word, base) and not seen[word] then
-        seen[word] = true
-        table.insert(results, { word = word, menu = '[Buf]', icase = 1 })
-      end
-    end
-  end
-  return results
-end
-
 vim.api.nvim_create_autocmd('User', {
   pattern = '*/DBExecutePost',
   group = augroup,
   callback = function(args)
-    local buf = args.buf
-    local query_info = vim.b[buf].db
+    local query_info = vim.b[args.buf].db
     if not (query_info and query_info.runtime and query_info.db_url) then
       return
     end
     local runtime_str =
       string.format('-- %s query execution time: %.3fs', vim.fs.basename(query_info.input), query_info.runtime)
     vim.notify(runtime_str, vim.log.levels.INFO)
-    local query_connection = query_info.db_url:match('^(%w+://[^/]+)')
-    for db, url in pairs(vim.g.dbs) do
-      local db_connection = url:match('^(%w+://[^/]+)')
-      if db_connection == query_connection then
-        local parsed = vim.fn['db#url#parse'](query_info.db_url)
-        vim.b[buf].display_name = string.format('[db:%s] %s', db, parsed.path:gsub('^/', ''))
-        break
-      end
-    end
   end,
 })
 
