@@ -157,7 +157,7 @@ local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
   group = lint_augroup,
   callback = function()
-    if vim.o.buftype == '' then
+    if vim.o.buftype == '' or vim.o.filetype == 'sql' then
       lint.try_lint()
     end
   end,
