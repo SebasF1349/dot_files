@@ -123,54 +123,28 @@ local function get_saved_queries(db_name)
   return vim.fn.glob(vim.fs.joinpath(save_path, db_name, '*.sql'), true, true)
 end
 
-function M.exec_query(action)
+local function exec_query(action)
   local display_name = vim.b[0].display_name
-
-  if type(action) == 'string' then
-    vim.cmd(action)
-  else
-    action()
-  end
-
-  vim.cmd.wincmd('j')
-
+  vim.cmd(action)
+  vim.cmd.wincmd('P')
   vim.b[0].display_name = display_name
 
   vim.keymap.set('n', 'K', function()
     local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-    local lines = vim.api.nvim_buf_get_lines(0, 0, row, false)
-    local header_line = lines[2]
     local count = 0
-
-    for i = #lines, 1, -1 do
-      local line = lines[i]
-      local target_str = (i == row) and line:sub(1, col + 1) or line
-      local _, added = target_str:gsub('|', '')
-      count = count + added
-
-      if i <= row and vim.startswith(line, '|') then
+    for i = row, 1, -1 do
+      local line = vim.fn.getline(i)
+      if i == row then
+        line = line:sub(1, col + 1)
+      end
+      count = count + select(2, line:gsub('|', ''))
+      if vim.startswith(line, '|') then
         break
       end
     end
-
-    local target_pos
-    for _ = 1, count do
-      target_pos = header_line:find('|', (target_pos or 0) + 1)
-      if not target_pos then
-        break
-      end
-    end
-
-    if not target_pos then
-      return
-    end
-
-    local next_pipe = header_line:find('|', target_pos + 1)
-    local end_pos = next_pipe and (next_pipe - 1) or #header_line
-    local col_name = vim.trim(header_line:sub(target_pos + 1, end_pos))
-
-    if col_name ~= '' then
-      vim.lsp.util.open_floating_preview({ col_name }, 'md', {})
+    local name = vim.trim(vim.split(vim.fn.getline(2), '|', { plain = true })[count + 1] or '')
+    if name ~= '' then
+      vim.lsp.util.open_floating_preview({ name }, 'md', {})
     end
   end, { buf = 0, desc = 'Show column name for current cell' })
 end
@@ -182,13 +156,8 @@ local function run_db_query(url, query)
   end
 
   local _, env = pcall(vim.fn['db#adapter#env'], url)
-  local res = vim
-    .system(cmd, {
-      text = true,
-      stdin = query,
-      env = vim.tbl_extend('force', vim.fn.environ(), type(env) == 'table' and env or {}),
-    })
-    :wait()
+  local res =
+    vim.system(cmd, { text = true, stdin = query, env = type(env) == 'table' and env or nil, timeout = 60000 }):wait()
 
   if res.code ~= 0 then
     return nil, res.stderr ~= '' and res.stderr or res.stdout
@@ -197,7 +166,7 @@ local function run_db_query(url, query)
 end
 
 local function get_statement_node()
-  local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+  local row = vim.api.nvim_win_get_cursor(0)[1]
   local col = (vim.api.nvim_get_current_line():find('%S') or 1) - 1
   local node = vim.treesitter.get_node({ bufnr = 0, pos = { row - 1, col } })
   while node and node:type() ~= 'statement' do
@@ -208,11 +177,6 @@ local function get_statement_node()
   end
 end
 local function open_buffer(name, schema, query_file, keep_win)
-  local base_url = vim.g.dbs[name]
-  if not base_url then
-    return
-  end
-
   if not keep_win then
     vim.cmd('tabnew')
   end
@@ -229,13 +193,7 @@ local function open_buffer(name, schema, query_file, keep_win)
     vim.bo[buf].filetype = 'sql'
   end
 
-  if schema then
-    local parsed_url = vim.fn['db#url#parse'](base_url)
-    parsed_url.path = '/' .. schema
-    vim.b[buf].db = vim.fn['db#url#format'](parsed_url)
-  else
-    vim.b[buf].db = base_url
-  end
+  vim.b[buf].db = state.dbs[name]:url(schema)
   vim.b[buf].display_name =
     string.format('[db:%s] %s', name, query_file and vim.fs.basename(query_file) or schema or 'default')
   vim.b[buf].db_key_name = name
@@ -245,10 +203,8 @@ local function open_buffer(name, schema, query_file, keep_win)
   vim.bo[buf].autocomplete = true
   vim.bo[buf].completeopt = 'menuone,popup,noselect,fuzzy'
 
-  local db = state.dbs[name]
-  local hl = (db and db.type == 'prod') and 'Normal:DiffDelete' or ''
   local win = vim.api.nvim_get_current_win()
-  vim.wo[win][0].winhighlight = hl
+  vim.wo[win][0].winhighlight = state.dbs[name].type == 'prod' and 'Normal:DiffDelete' or ''
 
   vim.keymap.set('n', '<leader>q', M.open_saved_queries, { desc = 'DB: Open Saved [Q]ueries', buf = buf })
 
@@ -275,29 +231,23 @@ local function open_buffer(name, schema, query_file, keep_win)
       return
     end
     vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
-    if vim.api.nvim_get_mode().mode:find('v') then
-      vim.cmd.normal({ 'o', bang = true })
-    else
-      vim.cmd.normal({ 'v', bang = true })
-    end
+    vim.cmd.normal({ 'o', bang = true })
     vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
   end, { desc = 'DB: Select SQL Query', buf = buf })
   vim.keymap.set('o', 'aq', '<cmd>normal vaq<CR>', { desc = 'DB: SQL Query Text-Object', buf = buf, remap = true })
 
   vim.keymap.set('x', '<CR>', function()
     vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'x', false)
-    M.exec_query("'<,'>DB")
+    exec_query("'<,'>DB")
   end, { desc = 'DB: Execute', buf = buf })
   vim.keymap.set('n', '<CR>', function()
     vim.cmd('normal vaq')
     vim.api.nvim_feedkeys(vim.keycode('<Esc>'), 'x', false)
-    M.exec_query("'<,'>DB")
+    exec_query("'<,'>DB")
   end, { desc = 'DB: Execute', buf = buf, remap = true })
   vim.keymap.set('n', 'W', M.save_query, { desc = 'DB: [W]rite', buf = buf })
 
-  vim.keymap.set({ 'n', 'x' }, '<C-q>', function()
-    return vim.fn['db#op_exec']()
-  end, { desc = 'DB: Execute Operator', buf = 0, expr = true })
+  vim.keymap.set({ 'n', 'x' }, '<C-q>', 'db#op_exec()', { desc = 'DB: Execute Operator', buf = buf, expr = true })
 
   vim.keymap.set('i', '.', function()
     vim.api.nvim_feedkeys('.', 'n', false)
@@ -308,64 +258,69 @@ local function open_buffer(name, schema, query_file, keep_win)
 end
 
 local function fetch_schemas(name, url)
-  local res, err = run_db_query(url, 'SHOW DATABASES;')
+  local res, err = run_db_query(
+    url,
+    [[SHOW DATABASES WHERE `Database` NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys');]]
+  )
 
   if err then
     vim.notify('Fetch schemas err: ' .. err, vim.log.levels.ERROR)
     return false
   end
 
-  state.schemas[name] = {}
-  for _, line in ipairs(res or {}) do
-    local clean = vim.trim(line)
-    if clean ~= '' and not clean:match('^[-+|]+') and not clean:match('^[Dd]atabase') then
-      table.insert(state.schemas[name], clean)
-    end
-  end
-
-  vim.g.dbs = vim.tbl_extend('force', vim.g.dbs or {}, { [name] = url })
+  state.schemas[name] = vim.list_slice(res or {}, 2)
   return true
 end
 
 local function select_schema_and_open(name)
-  local schemas = state.schemas[name] or {}
-  if #schemas == 0 then
-    open_buffer(name, nil)
-    return
-  end
-
-  vim.ui.select(schemas, { prompt = 'Select Schema (' .. name .. '):' }, function(schema)
+  vim.ui.select(state.schemas[name] or {}, { prompt = 'Select Schema (' .. name .. '):' }, function(schema)
     if schema then
       open_buffer(name, schema)
     end
   end)
 end
 
+local function free_port()
+  local tcp = assert(vim.uv.new_tcp())
+  tcp:bind('127.0.0.1', 0)
+  local port = tcp:getsockname().port
+  tcp:close()
+  return port
+end
+
 local function handle_db_selection(name)
   local db = state.dbs[name]
-  local url = db:get_connection_cmd()
+  local tunnel = not db.db_host and state.ssh[name]
 
-  if vim.g.dbs and vim.g.dbs[name] ~= nil then
+  if state.schemas[name] and (not tunnel or ssh_module.active_tunnels[name]) then
     select_schema_and_open(name)
     return
   end
+
+  if tunnel then
+    db.db_port = free_port()
+  end
+  local url = db:url()
+
   local function on_connect()
     if fetch_schemas(name, url) then
       vim.notify('Connected to ' .. name, vim.log.levels.INFO)
       select_schema_and_open(name)
+    else
+      ssh_module.kill_tunnel(name)
     end
   end
 
   vim.notify('Connecting to ' .. name .. '...', vim.log.levels.INFO)
-  if not db.db_host and state.ssh[name] then
-    state.ssh[name]:create_tunnel(name, db.db_port, on_connect)
+  if tunnel then
+    tunnel:create_tunnel(name, db.db_port or '3306', on_connect)
   else
     on_connect()
   end
 end
 
 function M.toggle_ui()
-  if vim.b.db_key_name then
+  if vim.b.display_name and vim.startswith(vim.b.display_name, '[db:') then
     pcall(vim.cmd.tabclose)
     return
   end
@@ -388,7 +343,7 @@ function M.open_saved_queries()
   vim.ui.select(queries, {
     prompt = 'Open saved query: ',
     format_item = function(path)
-      return vim.fn.fnamemodify(path, ':t')
+      return vim.fs.basename(path)
     end,
   }, function(query_file)
     if not query_file then
@@ -403,9 +358,6 @@ end
 
 function M.save_query()
   local db = vim.b.db_key_name
-  if not db then
-    return vim.notify('Not in a DB buffer', vim.log.levels.ERROR)
-  end
   if vim.startswith(vim.fn.expand('%:p'), save_path) then
     vim.cmd('w')
     vim.notify('Query saved', vim.log.levels.INFO)
@@ -422,40 +374,22 @@ function M.save_query()
 end
 
 function M.disconnect(name)
-  local tunnel = ssh_module.active_tunnels[name]
-  if tunnel then
-    tunnel:kill('sigterm')
-    ssh_module.active_tunnels[name] = nil
-  end
-
-  local g_dbs = vim.g.dbs or {}
-  g_dbs[name] = nil
-  vim.g.dbs = g_dbs
+  ssh_module.kill_tunnel(name)
   state.schemas[name] = nil
-
   vim.notify('Disconnected from ' .. name, vim.log.levels.INFO)
 end
 
-function M.get_connected_dbs()
-  return vim.tbl_keys(vim.g.dbs or {})
-end
-
 function M.setup(databases, ssh, db_order)
-  state.dbs, state.ssh, state.db_order = databases or {}, ssh or {}, db_order or vim.tbl_keys(state.dbs)
-
-  vim.api.nvim_create_user_command('DBDisconnect', function(opts)
-    M.disconnect(opts.args)
-  end, {
-    nargs = 1,
-    complete = function(arg_lead, _cmdline, _cursor_pos)
-      return vim.tbl_filter(function(key)
-        return vim.startswith(key, arg_lead)
-      end, M.get_connected_dbs())
-    end,
-  })
+  state.dbs, state.ssh, state.db_order = databases, ssh or {}, db_order
 
   vim.keymap.set('n', '<leader>dd', M.toggle_ui, { desc = '[D]B: Toggle UI' })
-  vim.keymap.set('n', '<leader>ds', ':DBDisconnect ', { desc = '[D]B: [S]top Connection' })
+  vim.keymap.set('n', '<leader>ds', function()
+    vim.ui.select(vim.tbl_keys(state.schemas), { prompt = 'Disconnect:' }, function(name)
+      if name then
+        M.disconnect(name)
+      end
+    end)
+  end, { desc = '[D]B: [S]top Connection' })
 end
 
 vim.api.nvim_create_autocmd('User', {
@@ -463,11 +397,11 @@ vim.api.nvim_create_autocmd('User', {
   group = augroup,
   callback = function(args)
     local query_info = vim.b[args.buf].db
-    if not (query_info and query_info.runtime and query_info.db_url) then
+    if not (query_info and query_info.runtime) then
       return
     end
-    local runtime_str =
-      string.format('-- %s query execution time: %.3fs', vim.fs.basename(query_info.input), query_info.runtime)
+    local display_name = vim.b[args.buf].display_name
+    local runtime_str = string.format('-- %s query execution time: %.3fs', display_name or '', query_info.runtime)
     vim.notify(runtime_str, vim.log.levels.INFO)
   end,
 })
