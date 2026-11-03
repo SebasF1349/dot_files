@@ -15,6 +15,8 @@ local state = {
   schemas = {},
 }
 
+vim.filetype.add({ extension = { dbout = 'dbout' } })
+
 local augroup = vim.api.nvim_create_augroup('MiniDbui', { clear = true })
 local save_path = vim.fs.joinpath(vim.fn.stdpath('data'), 'dadbod_queries')
 
@@ -119,10 +121,6 @@ WHERE EVENT_OBJECT_TABLE = '%s'
   },
 }
 
-local function get_saved_queries(db_name)
-  return vim.fn.glob(vim.fs.joinpath(save_path, db_name, '*.sql'), true, true)
-end
-
 local function exec_query(action)
   local display_name = vim.b[0].display_name
   vim.cmd(action)
@@ -189,7 +187,7 @@ local function open_buffer(name, schema, query_file, keep_win)
     vim.cmd('enew')
     buf = vim.api.nvim_get_current_buf()
     vim.bo[buf].buftype = 'nofile'
-    vim.bo[buf].bufhidden = 'hide'
+    vim.bo[buf].bufhidden = 'wipe'
     vim.bo[buf].filetype = 'sql'
   end
 
@@ -198,7 +196,7 @@ local function open_buffer(name, schema, query_file, keep_win)
     string.format('[db:%s] %s', name, query_file and vim.fs.basename(query_file) or schema or 'default')
   vim.b[buf].db_key_name = name
   vim.b[buf].db_schema_name = schema or ''
-  vim.bo[buf].omnifunc = vim.fn['vim_dadbod_completion#omni']
+  vim.bo[buf].omnifunc = 'vim_dadbod_completion#omni'
   vim.bo[buf].complete = 'o,.'
   vim.bo[buf].autocomplete = true
   vim.bo[buf].completeopt = 'menuone,popup,noselect,fuzzy'
@@ -248,13 +246,6 @@ local function open_buffer(name, schema, query_file, keep_win)
   vim.keymap.set('n', 'W', M.save_query, { desc = 'DB: [W]rite', buf = buf })
 
   vim.keymap.set({ 'n', 'x' }, '<C-q>', 'db#op_exec()', { desc = 'DB: Execute Operator', buf = buf, expr = true })
-
-  vim.keymap.set('i', '.', function()
-    vim.api.nvim_feedkeys('.', 'n', false)
-    vim.defer_fn(function()
-      vim.api.nvim_feedkeys(vim.keycode('<C-x><C-o>'), 'm', false)
-    end, 50)
-  end, { buf = buf, desc = 'Delayed SQL omnicompletion' })
 end
 
 local function fetch_schemas(name, url)
@@ -300,10 +291,8 @@ local function handle_db_selection(name)
   if tunnel then
     db.db_port = free_port()
   end
-  local url = db:url()
-
   local function on_connect()
-    if fetch_schemas(name, url) then
+    if fetch_schemas(name, db:url()) then
       vim.notify('Connected to ' .. name, vim.log.levels.INFO)
       select_schema_and_open(name)
     else
@@ -313,14 +302,14 @@ local function handle_db_selection(name)
 
   vim.notify('Connecting to ' .. name .. '...', vim.log.levels.INFO)
   if tunnel then
-    tunnel:create_tunnel(name, db.db_port or '3306', on_connect)
+    tunnel:create_tunnel(name, db.db_port, on_connect)
   else
     on_connect()
   end
 end
 
 function M.toggle_ui()
-  if vim.b.display_name and vim.startswith(vim.b.display_name, '[db:') then
+  if vim.startswith(vim.b.display_name or '', '[db:') then
     pcall(vim.cmd.tabclose)
     return
   end
@@ -334,7 +323,8 @@ end
 
 function M.open_saved_queries()
   local db = vim.b.db_key_name
-  local queries = get_saved_queries(db)
+  local schema = vim.b.db_schema_name
+  local queries = vim.fn.glob(vim.fs.joinpath(save_path, db, '*.sql'), true, true)
   if #queries == 0 then
     vim.notify('No saved queries for ' .. db, vim.log.levels.INFO)
     return
@@ -349,8 +339,6 @@ function M.open_saved_queries()
     if not query_file then
       return
     end
-
-    local schema = vim.b.db_schema_name
 
     open_buffer(db, schema, query_file, true)
   end)
