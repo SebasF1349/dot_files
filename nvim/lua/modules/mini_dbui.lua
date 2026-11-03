@@ -22,102 +22,53 @@ local save_path = vim.fs.joinpath(vim.fn.stdpath('data'), 'dadbod_queries')
 
 local sql_helpers = {
   {
-    name = 'Columns',
-    query = [[
-SELECT
-    COLUMN_NAME,
-    COLUMN_TYPE,
-    IS_NULLABLE,
-    COLUMN_DEFAULT,
-    COLUMN_KEY,
-    EXTRA,
-    COLLATION_NAME,
-    COLUMN_COMMENT
+    'Columns',
+    [[
+SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA, COLUMN_COMMENT
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = '%s'
-    AND TABLE_SCHEMA = '%s'
-ORDER BY ORDINAL_POSITION;
-      ]],
+WHERE TABLE_SCHEMA = '$schema' AND TABLE_NAME = '$table'
+ORDER BY ORDINAL_POSITION;]],
   },
   {
-    name = 'Indexes',
-    query = [[
-SELECT
-    TABLE_NAME,
-    NON_UNIQUE,
-    INDEX_NAME,
-    SEQ_IN_INDEX AS 'Sequence in Index',
-    COLUMN_NAME,
-    INDEX_TYPE,
-    COLLATION,
-    CARDINALITY,
-    NULLABLE,
-    COMMENT,
-    INDEX_COMMENT
+    'Indexes',
+    [[
+SELECT INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME, CARDINALITY, INDEX_TYPE
 FROM INFORMATION_SCHEMA.STATISTICS
-WHERE TABLE_NAME = '%s'
-    AND TABLE_SCHEMA = '%s';
-      ]],
+WHERE TABLE_SCHEMA = '$schema' AND TABLE_NAME = '$table'
+ORDER BY INDEX_NAME, SEQ_IN_INDEX;]],
   },
   {
-    name = 'Keys',
-    query = [[
-SELECT
-    CONSTRAINT_NAME,
-    COLUMN_NAME,
-    ORDINAL_POSITION,
-    REFERENCED_TABLE_NAME,
-    REFERENCED_COLUMN_NAME
+    'Keys',
+    [[
+SELECT CONSTRAINT_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
 FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-WHERE TABLE_NAME = '%s'
-    AND TABLE_SCHEMA = '%s'
-ORDER BY CONSTRAINT_NAME;
-      ]],
+WHERE TABLE_SCHEMA = '$schema' AND TABLE_NAME = '$table'
+ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION;]],
   },
   {
-    name = 'References',
-    query = [[
-SELECT
-    TABLE_SCHEMA,
-    TABLE_NAME,
-    COLUMN_NAME,
-    CONSTRAINT_NAME,
-    REFERENCED_COLUMN_NAME
+    'References',
+    [[
+SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_COLUMN_NAME
 FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-WHERE REFERENCED_TABLE_NAME = '%s'
-    AND REFERENCED_TABLE_SCHEMA = '%s'
-ORDER BY TABLE_NAME;
-      ]],
+WHERE REFERENCED_TABLE_SCHEMA = '$schema' AND REFERENCED_TABLE_NAME = '$table'
+ORDER BY TABLE_NAME;]],
   },
   {
-    name = 'Table Data',
-    query = [[
-SELECT 
-    ENGINE,
-    TABLE_ROWS,
-    AUTO_INCREMENT,
-    ROUND(DATA_LENGTH / 1024 / 1024, 2) AS 'Data_Size_MB',
-    ROUND(INDEX_LENGTH / 1024 / 1024, 2) AS 'Index_Size_MB',
-    ROUND(DATA_FREE / 1024 / 1024, 2) AS 'Free_Space_MB',
-    CREATE_TIME,
+    'Table Data',
+    [[
+SELECT ENGINE, TABLE_ROWS, AUTO_INCREMENT,
+    ROUND(DATA_LENGTH / 1048576, 2) AS Data_MB,
+    ROUND(INDEX_LENGTH / 1048576, 2) AS Index_MB,
     UPDATE_TIME
 FROM INFORMATION_SCHEMA.TABLES
-WHERE TABLE_NAME = '%s' 
-    AND TABLE_SCHEMA = '%s';
-      ]],
+WHERE TABLE_SCHEMA = '$schema' AND TABLE_NAME = '$table';]],
   },
   {
-    name = 'Triggers',
-    query = [[
-SELECT 
-    TRIGGER_NAME, 
-    ACTION_TIMING, 
-    EVENT_MANIPULATION AS 'EVENT', 
-    ACTION_STATEMENT AS 'LOGIC'
+    'Triggers',
+    [[
+SELECT TRIGGER_NAME, ACTION_TIMING, EVENT_MANIPULATION AS EVENT, ACTION_STATEMENT AS LOGIC
 FROM INFORMATION_SCHEMA.TRIGGERS
-WHERE EVENT_OBJECT_TABLE = '%s' 
-    AND TRIGGER_SCHEMA = '%s';
-      ]],
+WHERE TRIGGER_SCHEMA = '$schema' AND EVENT_OBJECT_TABLE = '$table';]],
   },
 }
 
@@ -207,19 +158,19 @@ local function open_buffer(name, schema, query_file, keep_win)
   vim.keymap.set('n', '<leader>q', M.open_saved_queries, { desc = 'DB: Open Saved [Q]ueries', buf = buf })
 
   vim.keymap.set('n', '<leader>h', function()
+    local vars = { table = '', schema = vim.b.db_schema_name }
     vim.ui.select(sql_helpers, {
       prompt = 'Query: ',
       format_item = function(item)
-        return item.name
+        return item[1]
       end,
     }, function(choice)
       if not choice then
         return
       end
-      local query = choice.query:format('', vim.b.db_schema_name)
-      local output = vim.split(query, '\n')
-      local cursor = vim.api.nvim_win_get_cursor(0)
-      vim.api.nvim_buf_set_lines(0, cursor[1] - 1, cursor[1] - 1, false, output)
+      local lines = vim.split((choice[2]:gsub('%$(%w+)', vars)), '\n')
+      local row = vim.api.nvim_win_get_cursor(0)[1]
+      vim.api.nvim_buf_set_lines(0, row - 1, row - 1, false, lines)
     end)
   end, { desc = 'DB: [H]elpers', buf = buf })
 
