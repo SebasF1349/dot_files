@@ -198,11 +198,7 @@ local function open_notes(params)
   else
     local git_cmd = vim.system({ 'git', 'rev-parse', '--show-toplevel' }):wait()
     local raw_name = git_cmd.code == 0 and git_cmd.stdout or project_dir
-    project_file_name = raw_name
-      :gsub('%s+', '')
-      :gsub(vim.env.HOME, '')
-      :gsub('^%w:', '') -- Windows drive letter
-      :gsub('[/\\]', '__') .. '.' .. ext
+    project_file_name = vim.fs.slug(raw_name) .. '.' .. ext
   end
 
   local note_file_path = vim.fs.normalize(vim.fs.joinpath(projects_notes_directory, project_file_name))
