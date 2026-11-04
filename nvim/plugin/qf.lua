@@ -8,19 +8,6 @@ local qf_group = vim.api.nvim_create_augroup('qflist', { clear = true })
 ---| '"c"' # quickfix list
 ---| '"l"' # location list
 
----@class qflist
----@field changedtick number
----@field context table | string
----@field id number
----@field idx number
----@field items vim.quickfix.entry[]
----@field nr number
----@field qfbufnr number
----@field size number
----@field title string
----@field winid number
----@field filewinid? number
-
 --------------------------------------------------
 -- Utils
 --------------------------------------------------
@@ -52,7 +39,7 @@ end
 ---@param listType ListType
 ---@param nr? number | '$'
 ---@param winid? number
----@return qflist
+---@return vim.fn.getqflist.ret | vim.fn.getloclist.ret
 local function getList(listType, nr, winid)
   nr = nr or 0
   if listType == 'c' then
@@ -68,7 +55,7 @@ local function getList(listType, nr, winid)
 end
 
 ---@param listType ListType
----@return qflist | nil
+---@return vim.fn.getqflist.ret | vim.fn.getloclist.ret | nil
 local function getDiagList(listType)
   local size = listType == 'c' and vim.fn.getqflist({ nr = '$' }).nr or vim.fn.getloclist(0, { nr = '$' }).nr
   for i = size, 1, -1 do
@@ -84,7 +71,7 @@ local function getDiagList(listType)
   end
 end
 
----@param list qflist
+---@param list vim.fn.getqflist.ret
 ---@return boolean
 local function isDiffTool(list)
   return list.title:find('difftool') ~= nil
@@ -203,12 +190,12 @@ local function yank(what)
 end
 
 ---@param direction 'next'|'prev'
-local function moveAdyacentFile(direction)
+local function moveAdjacentFile(direction)
   local qf = getList('c', 0)
   local items = qf.items
-  local current_idx = qf.idx
+  local current_idx = vim.api.nvim_win_get_cursor(qf.winid)[1]
 
-  if #items == 0 or current_idx == 0 then
+  if not items or #items == 0 or current_idx == 0 then
     vim.notify('Quickfix list is empty', vim.log.levels.INFO)
     return
   end
@@ -238,10 +225,10 @@ local function setKeymaps()
     selectItem({ split = 'v' })
   end, { buf = 0, desc = 'Open QF Item in [V]ertical Split' })
   vim.keymap.set('n', ']]', function()
-    moveAdyacentFile('next')
+    moveAdjacentFile('next')
   end, { buf = 0, desc = 'Move to QF Item in Next File' })
   vim.keymap.set('n', '[[', function()
-    moveAdyacentFile('prev')
+    moveAdjacentFile('prev')
   end, { buf = 0, desc = 'Move to QF Item in Previous File' })
   vim.keymap.set('n', '<C-o>', function()
     listHistory('older')
@@ -285,7 +272,7 @@ local function cf_preview(opts, preview_ns, _)
     return
   end
   local qf_winid = vim.fn.getqflist({ winid = 0 }).winid
-  if qf_winid == 0 then
+  if not qf_winid or qf_winid == 0 then
     return
   end
   local qf_bufnr = vim.api.nvim_win_get_buf(qf_winid)
@@ -327,7 +314,7 @@ vim.api.nvim_create_user_command('Cf', cf_execute, {
 --------------------------------------------------
 
 ---@param listType ListType
-local function dianostics_toggle(listType)
+local function diagnostics_toggle(listType)
   local list = getList(listType)
   if list.winid ~= 0 then
     vim.cmd(listType .. 'close')
@@ -358,12 +345,12 @@ local function dianostics_toggle(listType)
 end
 
 vim.keymap.set('n', '<leader>Q', function()
-  dianostics_toggle('c')
+  diagnostics_toggle('c')
 end, { desc = '[Q]uickfix [D]iagnostics Toggle' })
 
 -- NOTE: implement something similar to compare branches: https://gist.github.com/jmacadie/6f934282870f0d481599c8339ef61f64
 -- and/or other commits: https://github.com/jecaro/fugitive-difftool.nvim
-vim.keymap.set('n', '<leader>qg', function()
+vim.keymap.set('n', '<leader>G', function()
   vim.cmd('tabedit | Git difftool --name-status | wincmd p')
   -- vim.cmd('tabedit | Git difftool --numstat --raw')
   -- would be cool to have status and numstat in the same command, but looks like it's not possible
