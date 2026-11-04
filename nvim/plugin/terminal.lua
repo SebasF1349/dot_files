@@ -11,6 +11,11 @@ local api, fn, map, cmd = vim.api, vim.fn, vim.keymap.set, vim.cmd
 ---@type term[]
 local terms = {}
 
+local RUNNERS = {
+  build = { jdtls = 'mvn spring-boot:run' },
+  test = { jdtls = 'mvn test' },
+}
+
 local terminal_autocmds = api.nvim_create_augroup('Terminal Autocmds', { clear = true })
 
 --------------------------------------------------
@@ -23,12 +28,16 @@ vim.o.shell = fn.has('win32') == 1 and 'pwsh' or '/bin/bash'
 -- Keymaps
 --------------------------------------------------
 
-map('t', '<ESC>', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
+map('t', '<ESC><ESC>', '<C-\\><C-n>', { desc = 'Escape Terminal Mode' })
 
 map({ 'n', 't' }, '<leader>tb', function()
-  local win = api.nvim_win_is_valid(terms[1].winid) and terms[1].winid or terms[2].winid
-  if api.nvim_win_is_valid(win) then
-    api.nvim_set_current_win(win)
+  local w1, w2 = terms[1].winid, terms[2].winid
+  local target_win = api.nvim_win_is_valid(w1) and w1 or (api.nvim_win_is_valid(w2) and w2 or nil)
+
+  if target_win then
+    api.nvim_set_current_win(target_win)
+  else
+    vim.notify('No active terminal windows', vim.log.levels.WARN)
   end
 end, { desc = 'Move to [T]erminal [B]uffer ' })
 
@@ -39,13 +48,13 @@ end, { desc = 'Move to [T]erminal [B]uffer ' })
 ---@param opts term
 local function set_term_opts(opts)
   cmd.startinsert()
-  vim.bo.filetype = 'terminal'
-  vim.bo.buflisted = false
-  vim.bo.scrollback = 1000000
-  vim.wo[0][0].statuscolumn = ''
-  vim.wo[0][0].winfixheight = true
-  vim.wo[0][0].winfixwidth = true
-  vim.wo[0][0].winfixbuf = true
+  vim.bo[opts.bufnr].filetype = 'terminal'
+  vim.bo[opts.bufnr].buflisted = false
+  vim.bo[opts.bufnr].scrollback = 1000000
+  vim.wo[opts.winid][0].statuscolumn = ''
+  vim.wo[opts.winid][0].winfixheight = true
+  vim.wo[opts.winid][0].winfixwidth = true
+  vim.wo[opts.winid][0].winfixbuf = true
   map('n', 'q', '<cmd>bd!<cr>', { buf = opts.bufnr })
   map('n', 'gf', '<cmd>aboveleft vertical wincmd F<cr>', { buf = opts.bufnr, desc = 'Open file under the cursor' })
   api.nvim_set_option_value('winhighlight', 'Normal:TerminalNormal', { win = opts.winid, scope = 'local' })
@@ -107,32 +116,28 @@ local function run_term_command(command)
     terms[1] = create_term(terms[1].bufnr)
   end
   scroll_to_end(terms[1].bufnr, terms[1].winid)
-  local terminal_job_id = (api.nvim_buf_get_var(terms[1].bufnr, 'terminal_job_id'))
-  api.nvim_chan_send(terminal_job_id, '\n')
+  local terminal_job_id = vim.b[terms[1].bufnr].terminal_job_id
+  api.nvim_chan_send(terminal_job_id, '\x03\n')
   api.nvim_chan_send(terminal_job_id, command .. '\n')
 end
 
 -- NOTE: improve keymaps checking this plugin code: https://github.com/samharju/yeet.nvim/blob/master/lua/yeet/buffer.lua
-map('n', '<leader>cb', function()
-  local build = { jdtls = 'mvn spring-boot:run' }
+local function execute_runner(type)
   for _, client in ipairs(vim.lsp.get_clients()) do
-    if build[client.name] then
-      run_term_command(build[client.name])
+    local cmd_str = RUNNERS[type][client.name]
+    if cmd_str then
+      run_term_command(cmd_str)
       return
     end
   end
-  vim.notify('No Build command for attached lsps', vim.log.levels.INFO)
-end, { desc = '[C]ode [B]uild' })
+  vim.notify('No ' .. type .. ' command for attached lsps', vim.log.levels.INFO)
+end
 
+map('n', '<leader>cb', function()
+  execute_runner('build')
+end, { desc = '[C]ode [B]uild' })
 map('n', '<leader>ct', function()
-  local test = { jdtls = 'mvn test' }
-  for _, client in ipairs(vim.lsp.get_clients()) do
-    if test[client.name] then
-      run_term_command(test[client.name])
-      return
-    end
-  end
-  vim.notify('No Test command for attached lsps', vim.log.levels.INFO)
+  execute_runner('test')
 end, { desc = '[C]ode [T]est' })
 
 --------------------------------------------------
