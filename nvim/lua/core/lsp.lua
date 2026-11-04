@@ -172,9 +172,26 @@ local function on_attach(client_id, buf)
           end
 
           local next_location = 1
+          local current_buf = vim.api.nvim_get_current_buf()
+          local current_file = vim.api.nvim_buf_get_name(current_buf)
           local lnum = vim.fn.line('.')
           local col = vim.fn.col('.')
-          for i, item in ipairs(options.items) do
+
+          local local_items = {}
+          for _, item in ipairs(options.items) do
+            local is_current_file = item.bufnr and vim.api.nvim_buf_is_valid(item.bufnr) and (item.bufnr == current_buf)
+              or (item.filename == current_file)
+            if is_current_file then
+              table.insert(local_items, item)
+            end
+          end
+
+          if #local_items == 0 then
+            vim.notify('No references found in the current file', vim.log.levels.WARN)
+            return
+          end
+
+          for i, item in ipairs(local_items) do
             if item.lnum == lnum and col >= item.col and col <= item.end_col then
               next_location = i + direction
               break
@@ -182,13 +199,13 @@ local function on_attach(client_id, buf)
           end
 
           if next_location == 0 then
-            next_location = #options.items
-          elseif next_location > #options.items then
+            next_location = #local_items
+          elseif next_location > #local_items then
             next_location = 1
           end
 
-          local item = options.items[next_location]
-          vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
+          local target = local_items[next_location]
+          vim.api.nvim_win_set_cursor(0, { target.lnum, target.col - 1 })
         end,
       })
     end
