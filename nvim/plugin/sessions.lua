@@ -51,13 +51,19 @@ api.nvim_create_autocmd('VimLeavePre', {
   group = auSession,
   callback = function()
     local session_path = get_session_path()
-    local has_opt = vim.iter(vim.v.argv):any(function(v)
-      return v:find('+')
-    end)
-    local has_code_bufs = vim.iter(api.nvim_list_wins()):any(function(win)
-      local bufnr = api.nvim_win_get_buf(win)
-      return vim.bo[bufnr].buftype == ''
-    end)
+    local has_opt = vim.iter(vim.v.argv):any(
+      ---@param v string
+      function(v)
+        return v:find('+') ~= nil
+      end
+    )
+    local has_code_bufs = vim.iter(api.nvim_list_wins()):any(
+      ---@param win integer
+      function(win)
+        local bufnr = api.nvim_win_get_buf(win)
+        return vim.bo[bufnr].buftype == ''
+      end
+    )
     if not vim.uv.fs_stat(session_path) or has_opt or not has_code_bufs then
       return
     end
@@ -69,9 +75,12 @@ api.nvim_create_autocmd('VimLeavePre', {
 -- using an autocmd on VimEnter to load session opens buffers with empty filetype
 if vim.v.vim_did_enter then
   local session_path = get_session_path()
-  local has_opt = vim.iter(vim.v.argv):any(function(v)
-    return v:find('+')
-  end)
+  local has_opt = vim.iter(vim.v.argv):any(
+    ---@param v string
+    function(v)
+      return v:find('+') ~= nil
+    end
+  )
   if has_opt then
   elseif vim.uv.fs_stat(session_path) and fn.argc() == 0 then
     sessionLoad()
