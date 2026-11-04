@@ -31,13 +31,17 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
   desc = "Don't auto comment after pressing enter in comment",
 })
 
-vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
   callback = function()
-    vim.schedule(function()
-      if vim.o.buftype == '' then
-        vim.fn.matchadd('ColorColumn', '\\%101v', 100)
-      end
-    end)
+    local is_normal = vim.bo.buftype == '' and vim.bo.filetype ~= 'dbout'
+    local id = vim.w.long_line_match
+
+    if is_normal and not id then
+      vim.w.long_line_match = vim.fn.matchadd('ColorColumn', '\\%101v', 100)
+    elseif not is_normal and id then
+      pcall(vim.fn.matchdelete, id)
+      vim.w.long_line_match = nil
+    end
   end,
   group = general,
   desc = 'Show when lines are longer than 100 chars',
