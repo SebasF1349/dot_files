@@ -121,7 +121,7 @@ local function file()
       fname = fs.joinpath(fn.fnamemodify(bufname, ':h:t'), fname)
     end
     local fpath = bufname:sub(1, -#fname - 1)
-    local bufnr = fn.bufnr(fname)
+    local bufnr = fn.bufnr(bufname)
     if bufnr ~= -1 and vim.bo[bufnr].modified or false then
       fname = fname .. '•'
     end
@@ -157,9 +157,8 @@ local function get_context()
   if not nodes then
     return ''
   end
-  local curr_line = api.nvim_win_get_cursor(0)
-  local non_blank = api.nvim_get_current_line():find('%S') or 0
-  local curr_node = vim.treesitter.get_node({ pos = { curr_line[1] - 1, non_blank } })
+  local cursor = api.nvim_win_get_cursor(0)
+  local curr_node = vim.treesitter.get_node({ pos = { cursor[1] - 1, cursor[2] } })
   while curr_node do
     local name = nodes[curr_node:type()]
     if name then
@@ -211,7 +210,7 @@ local function custom_diagnostics()
 end
 
 ---- STATUSLINE ----
-Statusline = {
+_G.Statusline = {
   active = function()
     if vim.o.columns > 80 then
       return table.concat({
@@ -240,6 +239,6 @@ Statusline = {
 }
 
 vim.g.qf_disable_statusline = true
-vim.o.statusline = '%!v:lua.Statusline.active()'
+vim.o.statusline = '%!v:lua._G.Statusline.active()'
 vim.o.laststatus = 3
 vim.o.ruler = false
