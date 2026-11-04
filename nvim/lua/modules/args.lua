@@ -8,14 +8,17 @@ local M = {}
 
 ---Get normalized filename
 ---@param buf string
----@return string?
+---@return string
 local function normalizeCompleteBufName(buf)
+  if buf == '' then
+    return ''
+  end
   return fn.fnamemodify(buf, ':p:~:.')
 end
 
 ---Get normalized filename
 ---@param bufnr? integer
----@return string?
+---@return string
 function M.getBufName(bufnr)
   bufnr = bufnr or 0
   local buf = api.nvim_buf_get_name(bufnr)
@@ -36,13 +39,12 @@ end
 
 ---@param argnr number?
 function M.move(argnr)
-  argnr = argnr or 0
   local argc = fn.argc()
   if argc == 0 then
     return
   end
-
-  cmd('silent! write')
+  argnr = argnr or (fn.argidx() + 1)
+  cmd('silent! update')
   argnr = (argnr - 1) % argc + 1
 
   cmd({ cmd = 'argument', count = argnr, bang = true, mods = { silent = true } })
@@ -61,9 +63,9 @@ function M.select()
     format_item = function(item)
       return item == args[current + 1] and ('[' .. item .. ']') or item
     end,
-  }, function(_, selected)
-    if selected then
-      M.move(selected)
+  }, function(_item, idx)
+    if idx then
+      M.move(idx)
     end
   end)
 end
@@ -84,12 +86,19 @@ end
 ---@param bufnr? integer
 function M.insert(bufnr)
   local buf = M.getBufName(bufnr)
-  cmd('silent! argedit ' .. buf .. ' | argdedupe')
+  if buf == '' then
+    return
+  end
+  cmd('silent! argedit ' .. fn.fnameescape(buf) .. ' | argdedupe')
 end
 
 ---@param argnr? integer
 function M.remove(argnr)
-  local arg = argnr and fn.argv(argnr) or '%'
+  local arg = '%'
+  if argnr then
+    local target = fn.argv(argnr - 1) --[[@as string]]
+    arg = fn.fnameescape(target)
+  end
   cmd('silent! argdelete ' .. arg)
   if fn.winnr('$') > 1 then
     api.nvim_win_close(0, false)
@@ -103,16 +112,19 @@ function M.remove_select()
     vim.notify('No args', vim.log.levels.WARN)
     return
   end
-  ui.select(M.getArgs(), { prompt = 'Select buffer to delete:' }, function(_, selected)
-    if selected then
-      M.remove(selected)
+  ui.select(M.getArgs(), { prompt = 'Select buffer to delete:' }, function(_item, idx)
+    if idx then
+      M.remove(idx)
     end
   end)
 end
 
 function M.only()
   local buf = M.getBufName(0)
-  cmd('silent! args ' .. buf)
+  if buf == '' then
+    return
+  end
+  cmd('silent! args ' .. fn.fnameescape(buf))
 end
 
 return M
