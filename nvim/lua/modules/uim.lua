@@ -21,8 +21,6 @@ local function create_win(bufnr, winOpts)
   return winnr
 end
 
-local autocmd_id = nil
-
 ---@class uim.OptsClosingKeys
 ---@field [1] string
 ---@field modes string[]
@@ -352,12 +350,11 @@ function M.select(items, opts, on_choice)
         break
       end
       local choice = choices[pos]
-      local item_whitespace = col_start - vim.str_utfindex(text[j] or '', 'utf-8')
+      local item_whitespace = col_start - vim.fn.strdisplaywidth(text[j] or '')
       local col = #(text[j] or '') + item_whitespace + 1
       table.insert(hl[j], { col, col + 1 + #choice.option })
       text[j] = string.format('%s%s %s: %s ', text[j] or '', (' '):rep(item_whitespace), choice.option, choice.item)
       if choice.option ~= '-' then
-        -- TODO: maybe use vim.fn.getcharstr() instead of keymaps?
         vim.keymap.set('n', choice.option, function()
           cleanup()
           on_choice(items[pos], pos)
