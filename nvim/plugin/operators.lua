@@ -32,6 +32,10 @@ local surround = {
 
 local function get_pair()
   local char = fn.getcharstr()
+  -- Cancel on <Esc> or <C-c>
+  if char == '\27' or char == '\3' then
+    return nil
+  end
   if char == '\r' then
     return { { '', '' }, { '', '' } }
   end
@@ -202,6 +206,7 @@ local function operateSurround(pairDelete, pairAdd)
     lines = add_pair(lines, pairAdd)
   end
   api.nvim_buf_set_text(0, opening[1] - 1, opening[2], ending[1] - 1, ending[2] + 1, lines)
+  api.nvim_win_set_cursor(0, curr)
 end
 
 map('n', 'ds', function()
