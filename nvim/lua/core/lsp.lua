@@ -1,5 +1,4 @@
-local oss = require('utils.os')
-vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (oss.is_win and ';' or ':') .. vim.env.PATH
+vim.env.PATH = vim.fn.stdpath('data') .. '/mason/bin' .. (vim.fn.has('win32') ~= 0 and ';' or ':') .. vim.env.PATH
 
 local M = {}
 

@@ -1,5 +1,4 @@
 local api, fn, fs, cmd = vim.api, vim.fn, vim.fs, vim.cmd
-local oss = require('utils.os')
 
 vim.o.sessionoptions = 'curdir,winsize'
 local sessions_path = vim.fs.joinpath(fn.stdpath('data'), 'sessions')
@@ -8,11 +7,8 @@ local function get_session_path()
   if fn.isdirectory(sessions_path) == 0 then
     vim.fs.mkdir(sessions_path, { parents = true })
   end
-  local session_name =
-    vim.uv.cwd():gsub('%s+', ''):gsub(vim.env.HOME, ''):gsub('.:\\', ''):gsub(oss.dir_separator, '__')
-  if #session_name == 0 then
-    session_name = 'home'
-  end
+  local cwd = vim.uv.cwd()
+  local session_name = cwd and vim.fs.slug(cwd) or 'home'
   -- local branch = vim.g.gitsigns_head
   local branch = vim.system({ 'git', 'rev-parse', '--abbrev-ref', 'HEAD' }, { text = true }):wait(500)
   if branch.code == 0 then
