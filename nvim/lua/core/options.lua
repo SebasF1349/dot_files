@@ -61,7 +61,7 @@ local function fold_virt_text(result, lnum, trim)
   local hl
   for i = 1, #str do
     local char = str:sub(i, i)
-    local hls = vim.treesitter.get_captures_at_pos(0, lnum, coloff + i - 1)
+    local hls = vim.treesitter.get_captures(0, { lnum, coloff + i - 1})
     local _hl = hls[#hls]
     if _hl then
       local new_hl = '@' .. _hl.capture
