@@ -43,6 +43,11 @@ opt.inccommand = 'split'
 opt.ignorecase = true
 opt.smartcase = true
 
+map('n', '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark' })
+map('x', '/', 'ms<Esc>/\\%V', { desc = 'Search on Selection with Forward Seach and add s Mark' })
+map('n', '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark' })
+map('x', '?', 'ms<Esc>?\\%V', { desc = 'Search on Selection with Backward Search and add s Mark' })
+
 api.nvim_create_autocmd({ 'CursorHold', 'InsertEnter' }, {
   pattern = '*',
   callback = vim.schedule_wrap(function()

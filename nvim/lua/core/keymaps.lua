@@ -5,8 +5,6 @@
 vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true })
 
-vim.keymap.set('n', 'U', '<Nop>', { desc = 'Redo' })
-
 -- Stay in indent mode
 vim.keymap.set('x', '<', '<gv', { desc = 'Stay in visual mode after indenting' })
 vim.keymap.set('x', '>', '>gv', { desc = 'Stay in visual mode after indenting' })
@@ -25,45 +23,19 @@ vim.keymap.set('x', 'A', function()
   return vim.api.nvim_get_mode().mode == 'V' and '$<C-v>A' or 'A'
 end, { desc = 'Append on multiple lines', expr = true })
 
-vim.keymap.set('n', 'dd', function()
-  return vim.api.nvim_get_current_line() == '' and '"_dd' or 'dd'
-end, { desc = 'Send blank lines to black hole', expr = true })
-
-vim.keymap.set('x', 'r', 'y`mp', { desc = 'Yank and Paste [R]emotely to the m mark' })
 vim.keymap.set({ 'n', 'x' }, 'gy', '"+y', { desc = 'Copy to system clipboard' })
 vim.keymap.set('n', 'yc', '"yy".v:count1."gcc\']p"', { desc = 'Make a Copy Commentted out', remap = true, expr = true })
 vim.keymap.set('x', 'yc', "ygvgc']p", { desc = 'Make a Copy Commentted out', remap = true })
 vim.keymap.set('n', '[p', '<cmd>exe "iput! " . v:register<CR>', { desc = 'Paste Linewise Above' })
 vim.keymap.set('n', ']p', '<cmd>exe "iput "  . v:register<CR>', { desc = 'Paste Linewise Below' })
 
-vim.keymap.set('i', '<C-l>', function()
-  local curr_node = vim.treesitter.get_node({ ignore_injections = false })
-  if not curr_node then
-    return
-  end
-  local rowe, cole = curr_node:end_()
-  if vim.api.nvim_buf_line_count(0) == rowe then
-    return
-  end
-  vim.api.nvim_win_set_cursor(0, { rowe + 1, cole })
-end, { desc = 'Escape TS Node in Insert Mode' })
-
---------------------------------------------------
--- Searching
---------------------------------------------------
-
-vim.keymap.set('n', '/', 'ms/\\V', { desc = 'Add Very Nomagic to Forward Seach and add s Mark' })
-vim.keymap.set('x', '/', 'ms<Esc>/\\%V', { desc = 'Search on Selection with Forward Seach and add s Mark' })
-vim.keymap.set('n', '?', 'ms?\\V', { desc = 'Add Very Nomagic to Backwards Search and add s Mark' })
-vim.keymap.set('x', '?', 'ms<Esc>?\\%V', { desc = 'Search on Selection with Backward Search and add s Mark' })
-
 vim.keymap.set('o', '*', '"<esc>*g``".v:operator."gn"', { desc = 'Repeteable word text-object edit', expr = true })
+
+vim.keymap.set('n', '-', '<Plug>(nvim-dir-up)', { desc = 'Open dir.lua' })
 
 --------------------------------------------------
 -- Window Management
 --------------------------------------------------
-
-vim.keymap.set('n', '<C-q>', '<cmd>close<CR>', { desc = 'Window [Q]uit' })
 
 local nav = {
   h = 'Left',
