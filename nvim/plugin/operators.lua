@@ -30,6 +30,10 @@ local surround = {
   ['_'] = { { '_' }, { '_' } },
 }
 
+local function lookup(char)
+  return (vim.b.surroundPair or {})[char] or surround[char]
+end
+
 local function get_pair()
   local char = fn.getcharstr()
   -- Cancel on <Esc> or <C-c>
@@ -48,18 +52,7 @@ local function get_pair()
     local tag_name = tag:match('^(%S+)')
     return { { '<' .. tag .. '>' }, { '</' .. tag_name .. '>' }, 'tag' }
   end
-  if vim.b.surroundPair then
-    local _, item = vim.iter(vim.b.surroundPair):find(function(t, _)
-      return char == t
-    end)
-    if item then
-      return item
-    end
-  end
-  local _, item = vim.iter(surround):find(function(t, _)
-    return char == t
-  end)
-  return item or { { char }, { char } }
+  return lookup(char) or { { char }, { char } }
 end
 
 -- https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
@@ -217,7 +210,14 @@ map('n', 'ds', function()
 end, { desc = '[D]elete [S]urround' })
 
 map('n', 'cs', function()
-  local pair, replace = get_pair(), get_pair()
+  local pair = get_pair()
+  if not pair then
+    return
+  end
+  local replace = get_pair()
+  if not replace then
+    return
+  end
   if pair and replace then
     operateSurround(pair, replace)
   end
@@ -230,11 +230,8 @@ end, { desc = '[C]hange [S]urround' })
 -- based on https://www.reddit.com/r/neovim/comments/xrwo05/comment/ja7oyqy/
 ---@param mode "char"|"line"|"block"
 function _G.Substitute(mode)
-  local reg = fn.getreg()
-  local text = vim.split(reg, '\n')
-  if text[#text] == '' then
-    table.remove(text)
-  end
+  local reg = vim.v.register
+  local text = fn.getreg(reg, 1, true)
   local starting = api.nvim_buf_get_mark(0, '[')
   local ending = api.nvim_buf_get_mark(0, ']')
   if mode == 'char' then
