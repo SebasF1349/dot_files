@@ -1,9 +1,9 @@
 vim.bo.commentstring = '# %s'
 
 vim.api.nvim_set_hl(0, '@curl.program', { link = '@function' })
-vim.api.nvim_set_hl(0, '@flag', { link = '@keyword' })
+vim.api.nvim_set_hl(0, '@curl.flag', { link = '@keyword' })
 vim.api.nvim_set_hl(0, '@http.method', { link = '@operator' })
-vim.api.nvim_set_hl(0, '@url', { link = '@text' })
+vim.api.nvim_set_hl(0, "@curl.url", { underline = true })
 vim.api.nvim_set_hl(0, '@string.value', { link = '@string' })
 
 vim.treesitter.language.register('bash', 'curl')

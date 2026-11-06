@@ -1,45 +1,59 @@
 ;; extends
 
-; 1. Capture the entire curl command
+; Capture the entire curl command
 (command
   name: (command_name
     (word) @curl.program
     (#eq? @curl.program "curl"))) @curl.command
 
-; 2. Capture URLs
-((command
-    name: (command_name
-      (word) @curl.program
-      (#eq? @curl.program "curl"))
-    argument: (word) @url)
-  (#match? @url "^https?://"))
+; Capture strings
+(command
+  name: (command_name (word) @_c)
+  argument: [(string) (raw_string)] @curl.string
+  (#eq? @_c "curl"))
 
-; 3. Capture HTTP method values (GET, POST, etc.)
-((command
-    name: (command_name
-      (word) @curl.program
-      (#eq? @curl.program "curl"))
-    argument: (word) @http.method)
-  (#match? @http.method "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)$"))
+; Capture flags
+; short: -s, -X, -XPOST (attached values included), but not a lone "-"
+(command
+  name: (command_name (word) @_c)
+  argument: (word) @curl.flag
+  (#eq? @_c "curl")
+  (#lua-match? @curl.flag "^%-[^-]")
+  (#set! priority 110))
 
-; 4. Capture all flags (any argument starting with -)
-((command
-    name: (command_name
-      (word) @curl.program
-      (#eq? @curl.program "curl"))
-    argument: (word) @flag)
-  (#match? @flag "^-"))
+; long: --header, --silent, ...  (a bare "--" is excluded)
+(command
+  name: (command_name (word) @_c)
+  argument: (word) @curl.flag
+  (#eq? @_c "curl")
+  (#lua-match? @curl.flag "^%-%-.")
+  (#set! priority 110))
 
-; 5. Capture string arguments (headers, data, etc.)
-((command
-    name: (command_name
-      (word) @curl.program
-      (#eq? @curl.program "curl"))
-    argument: (string) @string.value))
+; Capture HTTP method values (GET, POST, etc.)
+(command
+  name: (command_name (word) @_c)
+  argument: (word) @_flag
+  .
+  argument: (word) @http.method
+  (#eq? @_c "curl")
+  (#any-of? @_flag "-X" "--request")
+  (#any-of? @http.method "GET" "POST" "PUT" "DELETE" "PATCH" "HEAD" "OPTIONS")
+  (#set! priority 120))
 
-; 6. Capture raw string arguments
-((command
-    name: (command_name
-      (word) @curl.program
-      (#eq? @curl.program "curl"))
-    argument: (raw_string) @string.value))
+; Capture URLs
+; bare: https://example.com/x
+(command
+  name: (command_name (word) @_c)
+  argument: (word) @curl.url
+  (#eq? @_c "curl")
+  (#lua-match? @curl.url "^https?://")
+  (#set! priority 120))
+
+; quoted ('...' or "..."); capturing the whole node also covers strings
+; that contain expansions, e.g. "https://api.example.com/$ID"
+(command
+  name: (command_name (word) @_c)
+  argument: [(string) (raw_string)] @curl.url
+  (#eq? @_c "curl")
+  (#lua-match? @curl.url "^%p?https?://")
+  (#set! priority 120))
