@@ -32,7 +32,6 @@ export FUNCNEST=100
 export CHROME_EXECUTABLE=/usr/bin/chromium
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 
-path_add ~/dot_files/install_scripts/
 path_add ~/scripts/
 path_add ~/.local/bin/
 

@@ -2,8 +2,11 @@
 
 CONFIG_DIR="$HOME/.config"
 DOT_FILES_DIR="$HOME/dot_files"
+SCRIPTS_DIR="$HOME/scripts"
 BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 FORCE_OVERWRITE=false
+
+mkdir $SCRIPTS_DIR
 
 while getopts "f" opt; do
     case ${opt} in
@@ -28,6 +31,7 @@ declare -A file_links=(
     ["$HOME/.local/share/applications/nvim.desktop"]="$DOT_FILES_DIR/applications/nvim.desktop"
     ["$HOME/.local/share/applications/scid.desktop"]="$DOT_FILES_DIR/applications/scid.desktop"
     ["$CONFIG_DIR/Thunar/uca.xml"]="$DOT_FILES_DIR/thunar/uca.xml"
+    ["$SCRIPTS_DIR/install-neovim.sh"]="$DOT_FILES_DIR/install_scripts/install-neovim.sh"
 )
 
 declare -A dir_links=(
