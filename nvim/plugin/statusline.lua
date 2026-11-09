@@ -3,58 +3,47 @@ local mocha = require('catppuccin.palettes').get_palette('mocha')
 local signs = require('utils.ui').diagnostic_icons_num
 local args = require('modules.args')
 
+local statusline_group = api.nvim_create_augroup('statusline', { clear = true })
+
 ---- Highlights ----
-local custom_bg = mocha.surface0
-local curr_statusline_bg = api.nvim_get_hl(0, { name = 'StatusLine' })['bg'] or custom_bg
-local statusline_normal = api.nvim_get_hl(0, { name = 'Normal' })['fg']
-
-api.nvim_set_hl(0, 'SLNormal', { bg = curr_statusline_bg, fg = statusline_normal })
-
-api.nvim_set_hl(0, 'SLSeparator', { bg = curr_statusline_bg, fg = mocha.blue })
-
--- modes hl --
-local modes_hi = {
-  N = { bg = curr_statusline_bg, fg = mocha.blue },
-  I = { bg = curr_statusline_bg, fg = mocha.green },
-  T = { bg = curr_statusline_bg, fg = mocha.teal },
-  C = { bg = curr_statusline_bg, fg = mocha.peach },
-  V = { bg = curr_statusline_bg, fg = mocha.mauve },
-  R = { bg = curr_statusline_bg, fg = mocha.red },
-  O = { bg = curr_statusline_bg, fg = mocha.overlay2 },
-  S = { bg = curr_statusline_bg, fg = mocha.yellow },
-}
-
-for mode, hi in pairs(modes_hi) do
-  api.nvim_set_hl(0, 'SLMode' .. mode, hi)
+local function fg_of(name)
+  return api.nvim_get_hl(0, { name = name, link = false })['fg']
 end
 
--- file hl --
-local active_buf_fg = api.nvim_get_hl(0, { name = 'Normal' })['fg']
-api.nvim_set_hl(0, 'SLActiveBuffer', { bg = curr_statusline_bg, fg = active_buf_fg })
+local function set_highlights()
+  local bg = api.nvim_get_hl(0, { name = 'StatusLine', link = false })['bg'] or mocha.surface0
+  local groups = {
+    SLNormal = fg_of('Normal'),
+    SLSeparator = mocha.blue,
+    -- modes
+    SLModeN = mocha.blue,
+    SLModeI = mocha.green,
+    SLModeT = mocha.teal,
+    SLModeC = mocha.peach,
+    SLModeV = mocha.mauve,
+    SLModeR = mocha.red,
+    SLModeO = mocha.overlay2,
+    SLModeS = mocha.yellow,
+    -- file
+    SLActiveBuffer = fg_of('Normal'),
+    SLInactiveBuffer = fg_of('Comment'),
+    -- context
+    SLContext = fg_of('CursorLineNr'),
+    -- diagnostics
+    SLDiagError = fg_of('DiagnosticError'),
+    SLDiagWarn = fg_of('DiagnosticWarn'),
+    SLDiagInfo = fg_of('DiagnosticInfo'),
+    SLDiagHint = fg_of('DiagnosticHint'),
+    SLDiagExternal = fg_of('Comment'),
+    -- git
+    SLBranch = fg_of('Special'),
+  }
+  for name, fg in pairs(groups) do
+    api.nvim_set_hl(0, name, { bg = bg, fg = fg })
+  end
+end
 
-local inactive_buf_fg = api.nvim_get_hl(0, { name = 'Comment' })['fg']
-api.nvim_set_hl(0, 'SLInactiveBuffer', { bg = curr_statusline_bg, fg = inactive_buf_fg })
-
--- context hl --
--- local normal_fg = api.nvim_get_hl(0, { name = 'Normal' })['fg']
-local normal_fg = api.nvim_get_hl(0, { name = 'CursorLineNr' })['fg']
-api.nvim_set_hl(0, 'SLContext', { bg = curr_statusline_bg, fg = normal_fg })
-
--- diagnostics hl --
-local diag_error_fg = api.nvim_get_hl(0, { name = 'DiagnosticError' })['fg']
-local diag_warn_fg = api.nvim_get_hl(0, { name = 'DiagnosticWarn' })['fg']
-local diag_info_fg = api.nvim_get_hl(0, { name = 'DiagnosticInfo' })['fg']
-local diag_hint_fg = api.nvim_get_hl(0, { name = 'DiagnosticHint' })['fg']
-local diag_external_fg = api.nvim_get_hl(0, { name = 'Comment' })['fg']
-api.nvim_set_hl(0, 'SLDiagError', { bg = curr_statusline_bg, fg = diag_error_fg })
-api.nvim_set_hl(0, 'SLDiagWarn', { bg = curr_statusline_bg, fg = diag_warn_fg })
-api.nvim_set_hl(0, 'SLDiagInfo', { bg = curr_statusline_bg, fg = diag_info_fg })
-api.nvim_set_hl(0, 'SLDiagHint', { bg = curr_statusline_bg, fg = diag_hint_fg })
-api.nvim_set_hl(0, 'SLDiagExternal', { bg = curr_statusline_bg, fg = diag_external_fg })
-
--- git hl --
-local git_branch = api.nvim_get_hl(0, { name = 'Special' })['fg']
-api.nvim_set_hl(0, 'SLBranch', { bg = curr_statusline_bg, fg = git_branch })
+set_highlights()
 
 ---- MODE ----
 local function mode()
@@ -77,9 +66,6 @@ local function file()
     title, label = fn.expand('%:t:r:r'), 'Help'
   elseif ftype == 'checkhealth' then
     title, label = '', 'CheckHealth'
-  elseif ftype == 'netrw' then
-    label = 'Netrw'
-    title = vim.b.netrw_curdir:gsub(cwd(), '.')
   elseif ftype == 'fugitive' then
     title, label = fn.expand('%:h:h:t'), 'Fugitive'
   elseif ftype == 'gitcommit' then
@@ -108,6 +94,14 @@ local function file()
     end
   end
 
+  -- NOTE: don't use fn.bufnr(bufname) as it takes a pattern (breaks with names like `[id]/+page.svelte`)
+  local modified = {}
+  for _, bufnr in ipairs(api.nvim_list_bufs()) do
+    if vim.bo[bufnr].modified then
+      modified[args.getBufName(bufnr)] = true
+    end
+  end
+
   local buffer_displays = {}
 
   for i, bufname in ipairs(buffer_list) do
@@ -121,8 +115,7 @@ local function file()
       fname = fs.joinpath(fn.fnamemodify(bufname, ':h:t'), fname)
     end
     local fpath = bufname:sub(1, -#fname - 1)
-    local bufnr = fn.bufnr(bufname)
-    if bufnr ~= -1 and vim.bo[bufnr].modified or false then
+    if modified[bufname] then
       fname = fname .. '•'
     end
 
@@ -173,7 +166,7 @@ end
 
 ---- GIT ----
 local function get_branch()
-  return string.format('%%#SLBranch#%s', vim.g.gitsigns_head or '')
+  return string.format('%%#SLBranch#%s', (vim.fn['fugitive#Head']()))
 end
 
 ---- DIAGNOSTICS ----
@@ -188,7 +181,7 @@ local local_diagnostics = ''
 local workspace_diagnostics = ''
 local function custom_diagnostics()
   if api.nvim_get_mode().mode ~= 'n' then
-    return string.format('%s%s', local_diagnostics, workspace_diagnostics)
+    return local_diagnostics .. workspace_diagnostics
   end
 
   local_diagnostics = ''
@@ -212,29 +205,16 @@ end
 ---- STATUSLINE ----
 _G.Statusline = {
   active = function()
-    if vim.o.columns > 80 then
-      return table.concat({
-        '%#SLNormal# ',
-        mode(),
-        file(),
-        '%=',
-        get_context(),
-        ' ',
-        custom_diagnostics(),
-        get_branch(),
-        ' ',
-      })
-    else
-      return table.concat({
-        '%#SLNormal# ',
-        mode(),
-        file(),
-        '%=',
-        custom_diagnostics(),
-        get_branch(),
-        ' ',
-      })
-    end
+    return table.concat({
+      '%#SLNormal# ',
+      mode(),
+      file(),
+      '%=',
+      vim.o.columns > 80 and (get_context() .. ' ') or '',
+      custom_diagnostics(),
+      get_branch(),
+      ' ',
+    })
   end,
 }
 
