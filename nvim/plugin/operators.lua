@@ -245,4 +245,4 @@ function _G.Substitute(mode)
   end
 end
 
-map({ 'n', 'v' }, 'S', _G.opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })
+map({ 'n', 'x' }, 'S', _G.opfunc('_G.Substitute'), { desc = '[S]ubstitute', silent = true, expr = true })
