@@ -37,32 +37,28 @@ function _G.MakeList()
 end
 
 vim.keymap.set(
-  { 'n', 'v' },
+  { 'n', 'x' },
   'gl',
   _G.opfunc('_G.MakeList'),
   { desc = 'Make [L]ist', silent = true, expr = true, buf = 0 }
 )
 
-vim.keymap.set('n', '<leader>x', function()
+--- Toggle the first todo of the line between `- [ ]` and `- [{mark}]`
+---@param mark string
+local function toggle_todo(mark)
   local line = vim.api.nvim_get_current_line()
-  if line:find('- [ ]', 1, true) then
-    local new_line = line:gsub('- %b[]', '- [x]')
-    vim.api.nvim_set_current_line(new_line)
-  elseif line:find('- [x]', 1, true) then
-    local new_line = line:gsub('- %b[]', '- [ ]')
-    vim.api.nvim_set_current_line(new_line)
+  local state = line:match('%- %[(.)%]')
+  if state == ' ' or state == mark then
+    local new_state = state == ' ' and mark or ' '
+    vim.api.nvim_set_current_line((line:gsub('%- %[.%]', '- [' .. new_state .. ']', 1)))
   end
-end, { desc = 'Toggle TODO Completed', buf = 0 })
+end
 
+vim.keymap.set('n', '<leader>x', function()
+  toggle_todo('x')
+end, { desc = 'Toggle TODO Completed', buf = 0 })
 vim.keymap.set('n', '<leader>-', function()
-  local line = vim.api.nvim_get_current_line()
-  if line:find('- [ ]', 1, true) then
-    local new_line = line:gsub('- %b[]', '- [-]')
-    vim.api.nvim_set_current_line(new_line)
-  elseif line:find('- [-]', 1, true) then
-    local new_line = line:gsub('- %b[]', '- [ ]')
-    vim.api.nvim_set_current_line(new_line)
-  end
+  toggle_todo('-')
 end, { desc = 'Toggle TODO Incompleted', buf = 0 })
 
 vim.keymap.set('n', '<leader>r', function()
@@ -163,7 +159,7 @@ vim.b.undo_ftplugin = (vim.b.undo_ftplugin or '')
   .. ' | sil! nunmap <buffer> gO'
   .. ' | sil! nunmap <buffer> <leader>mt'
   .. ' | sil! nunmap <buffer> gl'
-  .. ' | sil! vunmap <buffer> gl'
+  .. ' | sil! xunmap <buffer> gl'
   .. ' | sil! nunmap <buffer> <leader>x'
   .. ' | sil! nunmap <buffer> <leader>-'
   .. ' | sil! nunmap <buffer> <leader>r'
