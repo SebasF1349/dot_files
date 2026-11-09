@@ -48,7 +48,7 @@ vim.keymap.set('n', '<CR>', function()
   local output = vim.fn.systemlist(cmd .. get_timing)
   local is_json = starts_with_bracket(output[1])
 
-  if is_json and vim.fn.executable('jq') then
+  if is_json and vim.fn.executable('jq') == 1 then
     local timing = table.remove(output)
     local json_formatted = vim.system({ 'jq', '.' }, { text = true, stdin = output }):wait(10000).stdout
     if json_formatted then
