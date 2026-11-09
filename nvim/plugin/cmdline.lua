@@ -38,7 +38,6 @@ api.nvim_create_autocmd({ 'CmdlineChanged' }, {
 -- Search
 --------------------------------------------------
 
-opt.incsearch = true
 opt.inccommand = 'split'
 opt.ignorecase = true
 opt.smartcase = true
@@ -192,12 +191,21 @@ end, { desc = 'Expand %% to File Directory', expr = true })
 -- Abbreviations
 --------------------------------------------------
 
+--- Only expand when the typo is the whole `:` cmdline (not inside patterns, args, searches...)
+---@param typo string
+---@param replacement string
+local function cmd_abbrev(typo, replacement)
+  map('ca', typo, function()
+    return (fn.getcmdtype() == ':' and fn.getcmdline() == typo) and replacement or typo
+  end, { expr = true, desc = 'Fix typo ' .. typo })
+end
+
 local cmds_typos = { 'W', 'Wa', 'WA', 'X', 'Xa', 'XA', 'H', 'Mes', 'Mess' }
 for _, cmd_typo in ipairs(cmds_typos) do
-  map('ca', cmd_typo, cmd_typo:lower())
+  cmd_abbrev(cmd_typo, cmd_typo:lower())
 end
 
 local custom_cmds_typos = { 'RG', 'LA', 'MAson' }
 for _, cmd_typo in ipairs(custom_cmds_typos) do
-  map('ca', cmd_typo, cmd_typo:sub(1, 1):upper() .. cmd_typo:sub(2):lower())
+  cmd_abbrev(cmd_typo, cmd_typo:sub(1, 1):upper() .. cmd_typo:sub(2):lower())
 end
