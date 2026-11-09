@@ -21,9 +21,7 @@ vim.o.fileencoding = 'utf-8'
 vim.o.iskeyword = vim.o.iskeyword .. ',-'
 
 vim.o.undofile = true
-vim.o.backup = false
 vim.o.writebackup = false
-vim.o.autoread = true
 
 vim.o.tabstop = 4
 vim.o.softtabstop = 4
@@ -33,7 +31,6 @@ vim.o.expandtab = true
 vim.o.formatoptions = 'qjl1'
 vim.o.wrap = false
 vim.o.linebreak = true
-vim.o.textwidth = 0
 vim.o.smoothscroll = true
 
 vim.o.smartindent = true
@@ -47,8 +44,6 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 
 vim.o.diffopt = 'internal,filler,closeoff,indent-heuristic,inline:char,linematch:60,algorithm:histogram'
-
-vim.o.pumheight = 10
 
 vim.o.jumpoptions = 'view,clean'
 
