@@ -7,10 +7,9 @@ vim.bo.shiftwidth = 2
 vim.b.contextStatus = { function_declaration = 'name' }
 
 local snippets = {
-  fn = [[local function ${1:FunctionName}(${2:})
-{
+  fn = [[local function ${1:functionName}(${2:})
   ${0}
-}]],
+end]],
   p = [[vim.print($0);]],
 }
 
