@@ -25,7 +25,7 @@ ui.open = (function(overridden)
       elseif vim.b.friendlyManual and vim.b.friendlyManual ~= '' then
         path = (vim.b.friendlyManual):format(path)
       elseif not is_dir then
-        path = ('https://google.com/search?q=%s'):format(path)
+        path = ('https://google.com/search?q=%s'):format(vim.uri_encode(path))
       end
     end
     overridden(path, opt)
