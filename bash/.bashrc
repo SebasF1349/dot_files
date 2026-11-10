@@ -195,7 +195,7 @@ if [ -f /etc/os-release ]; then
     debian)
         [ -r /etc/debian_chroot ] && debian_chroot=$(cat /etc/debian_chroot)
         PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]sebas\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-        alias uu="sudo apt update && sudo apt upgrade"
+        alias up="sudo apt update && sudo apt upgrade && flatpak update"
         alias clean="sudo apt autoclean && sudo apt autoremove"
         ;;
     arch)
