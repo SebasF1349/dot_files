@@ -103,10 +103,6 @@ require('catppuccin').setup({
   custom_highlights = function(colors)
     return {
       Pmenu = { bg = colors.base, fg = colors.overlay2 },
-
-      NormalFloat = { bg = colors.base, fg = colors.text },
-      FloatBorder = { bg = colors.base, fg = colors.text },
-
       TerminalNormal = { bg = colors.base, fg = colors.text },
     }
   end,
@@ -149,6 +145,8 @@ lint.linters.sqlfluff.args = {
   'lint',
   '--format=json',
   '--dialect=mariadb',
+  '--exclude-rules',
+  'layout.indent,CP02,CV06',
   '-',
 }
 
@@ -179,7 +177,13 @@ require('conform').setup({
       append_args = { '--print-width', '120', '--tab-width', '4' },
     },
     sqlfluff = {
-      args = { 'format', '--dialect=mariadb', '-' },
+      args = {
+        'format',
+        '--dialect=mariadb',
+        '--exclude-rules',
+        'layout.indent,CP02,CV06',
+        '-',
+      },
       require_cwd = false,
     },
   },
@@ -201,7 +205,7 @@ require('conform').setup({
     sql = { 'sqlfluff' },
     mysql = { 'sqlfluff' },
   },
-  notify_on_error = false,
+  notify_on_error = true,
 })
 
 vim.o.formatexpr = "v:lua.require'conform'.formatexpr()" -- makes gq use conform
@@ -588,8 +592,10 @@ vim.keymap.set({ 'x', 'n' }, '<leader>rc', function()
   return refactoring_debug.cleanup({ restore_view = true })
 end, { desc = '[R]efactoring: [C]lear Debug', expr = true })
 
+local autotag = vim.api.nvim_create_augroup('autotag', { clear = true })
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'svelte', 'html', 'markdown', 'php' },
+  group = autotag,
   callback = function()
     require('nvim-ts-autotag').setup({
       opts = {
