@@ -1,475 +1,118 @@
-" OPTIONS
-
 set nocompatible
 filetype plugin indent on
-
+syntax on
 set encoding=utf-8
-set fileencoding=utf-8
+set background=dark
 
+" --- Security / safety ---
+set nomodeline
+set modelines=0
+set viminfo=
+set noundofile
+set nobackup
+set writebackup
+
+" --- UI ---
 set number
-set numberwidth=3
-set signcolumn=yes
-set cursorline
-set cursorlineopt=number
 set ruler
-set laststatus=2
 set showcmd
-set cmdheight=1
+set laststatus=2
+set scrolloff=8
+set nowrap
+set list
+set listchars=tab:>-,trail:.
+set splitbelow splitright
+set wrap
 
+" --- Search ---
 set hlsearch
 set incsearch
 set ignorecase
 set smartcase
-set showmatch
 
-set mouse=a
-set virtualedit=block
-set clipboard=unnamed,unnamedplus
-set iskeyword+=-
+" --- Editing ---
 set backspace=indent,eol,start
+set autoindent
+set tabstop=4 shiftwidth=4 softtabstop=4
+set expandtab
+set smarttab
+set hidden
 set nojoinspaces
-set nostartofline
 
-set scrolloff=8
-set sidescroll=1
-set sidescrolloff=20
-set scroll=13
-
-set splitbelow
-set splitright
-
+" --- Completion / responsiveness ---
 set wildmenu
 set wildmode=longest:full,full
 let &wildoptions="pum,tagfile"
 set pumheight=10
 set complete=.,w,b,u,t
 set completeopt=menuone,noselect
-
-set autoindent
-set smartindent
-set breakindent
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-set smarttab
-
-set formatoptions=qjl1
-set nowrap
-set linebreak
-set textwidth=0
-if v:version >= 901
-  set smoothscroll
-endif
-
-set fillchars=eob:\ ,fold:\ ,foldopen:\ ,foldclose:\ ,foldsep:\ 
-set listchars=
-
-set undodir=~/.vim/undodir
-set undofile
-set undolevels=1000
-set undoreload=10000
-set nobackup
-set nowritebackup
-set history=10000
-
-set hidden
-set autoread
-set nofsync
-
-set diffopt=internal,filler,closeoff,indent-heuristic,algorithm:histogram
-
-set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
-
-set updatetime=2000
-set timeoutlen=300
 set ttimeout
-set ttimeoutlen=100
+set ttimeoutlen=50
 
-set background=dark
-set belloff=all
-set display=lastline
-set helpheight=0
-set maxcombine=6
+" --- Per-filetype indentation common on servers ---
+augroup server_ft
+  autocmd!
+  autocmd FileType yaml,json,sh,bash,nginx,terraform setlocal shiftwidth=2 softtabstop=2 tabstop=2
+  autocmd FileType make setlocal noexpandtab
+augroup END
 
-set sessionoptions-=options
-set viewoptions-=options
-set tabpagemax=50
-set switchbuf=uselast
-
-set tags=./tags;,tags
-set cdpath=,.,~/src,~/
-
-set notitle
-set titleold=
-
-set shortmess=filnxtToOF
-
-let &nrformats="bin,hex"
-set nrformats-=octal
-set nolangremap
-
-if has('win32')
-  set guioptions-=t
-endif
-
-set ttyfast
-
-let &viminfo='!,'.&viminfo
-let g:vimsyn_embed='l'
-
-syntax on
-let c_comment_strings=1
-
+" --- Mappings ---
 let mapleader = " "
-
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-nmap <expr> k v:count == 0 ? 'gk' : 'k'
-nmap <expr> j v:count == 0 ? 'gj' : 'j'
-nmap <expr> $ v:count == 0 ? 'g$' : '$'
-nmap 0 g0
-nmap ^ g^
 nnoremap Y y$
-nnoremap U <C-r>
-nnoremap ' `
-nnoremap ` '
-nnoremap <C-q> <cmd>close<CR>
-nnoremap <C-r> <C-w><C-w>
-nnoremap <C-L> <Cmd>nohlsearch<Bar>diffupdate<CR><C-L>
-
-inoremap <C-U> <C-G>u<C-U>
-inoremap <C-W> <C-G>u<C-W>
-
+nnoremap <silent> <C-l> :nohlsearch<CR><C-l>
 vnoremap < <gv
 vnoremap > >gv
-vnoremap S) <esc>`>a)<esc>`<i(<esc>
-vnoremap S( <esc>`>a)<esc>`<i(<esc>
-vnoremap S] <esc>`>a]<esc>`<i[<esc>
-vnoremap S[ <esc>`>a]<esc>`<i[<esc>
-vnoremap S} <esc>`>a}<esc>`<i{<esc>
-vnoremap S{ <esc>`>a}<esc>`<i{<esc>
-vnoremap S" <esc>`>a"<esc>`<i"<esc>
-vnoremap S' <esc>`>a'<esc>`<i'<esc>
-vnoremap S` <esc>`>a`<esc>`<i`<esc>
 
-" Implement Q
-let g:qreg='@'
-function! RecordOrStop()
-  if reg_recording() == ''
-    echo 'Enter register to record to: '
-    let g:qreg=getcharstr()
-    if g:qreg != "\e"
-      execute 'normal! q'.g:qreg
-    endif
+" --- WezTerm integration over SSH (OSC sequences) ---
+function! s:Emit(seq) abort
+  if empty($SSH_CONNECTION) || !exists('*echoraw')
+    return
+  endif
+  call echoraw(a:seq)
+endfunction
+
+function! s:SetIsSshVim(val) abort
+  let l:b64 = a:val ==# 'true' ? 'dHJ1ZQ==' : 'ZmFsc2U='   " base64 of true / false
+  call s:Emit("\<Esc>]1337;SetUserVar=IS_SSH_VIM=" . l:b64 . "\x07")
+endfunction
+
+augroup wezterm_uservar
+  autocmd!
+  autocmd VimEnter,VimResume  * call s:SetIsSshVim('true')
+  autocmd VimLeave,VimSuspend * call s:SetIsSshVim('false')
+augroup END
+
+" Copy text to the local clipboard (OSC 52, write-only)
+function! s:Osc52Send(text) abort
+  let l:b64 = substitute(system('base64', a:text), '\n', '', 'g')
+  if v:shell_error == 0 && !empty(l:b64)
+    call s:Emit("\<Esc>]52;c;" . l:b64 . "\x07")
+  endif
+endfunction
+
+" gy{motion} / visual gy: yank and send to the local clipboard
+function! s:GyOp(type) abort
+  let l:sel = &selection
+  set selection=inclusive
+  if a:type ==# 'line'
+    silent execute "normal! '[V']y"
+  elseif a:type ==# 'char'
+    silent execute "normal! `[v`]y"
+  elseif a:type ==# 'block'
+    silent execute "normal! `[\<C-v>`]y"
   else
-    normal! q
-    call setreg(g:qreg, substitute(getreg(g:qreg), "q$", "", ""))
+    " called from visual mode (v, V or CTRL-V)
+    silent execute "normal! gvy"
   endif
+  let &selection = l:sel
+  let l:text = getreg('"')
+  if getregtype('"') ==# 'V' && l:text[-1:] !=# "\n"
+    let l:text .= "\n"
+  endif
+  call s:Osc52Send(l:text)
 endfunction
 
-" :MapQ will activate the Q mapping
-command! MapQ noremap q <cmd>call RecordOrStop()<cr>
-noremap Q <cmd>execute 'normal! @'.g:qreg<cr>
+nnoremap <silent> gy :set operatorfunc=<SID>GyOp<CR>g@
+nnoremap <silent> gyy :set operatorfunc=<SID>GyOp<CR>g@_
+xnoremap <silent> gy :<C-u>call <SID>GyOp(visualmode())<CR>
 
-" TEXT-OBJECTS
-
-" Indent text object
-function! Obj_indent(inner)
-    if getline('.') =~ '^\s*$'
-        let ln_start = s:detect_nearest_line()
-        let ln_end = ln_start
-    else
-        let ln_start = line('.')
-        let ln_end = ln_start
-    endif
-    let indent = indent(ln_start)
-    if indent > 0
-        while indent(ln_start) >= indent && ln_start > 0
-            let ln_start = prevnonblank(ln_start-1)
-        endwhile
-        while indent(ln_end) >= indent && ln_end <= line('$')
-            let ln_end = s:nextnonblank(ln_end+1)
-        endwhile
-    else
-        while indent(ln_start) == 0 && ln_start > 0 && getline(ln_start) !~ '^\s*$'
-            let ln_start -= 1
-        endwhile
-        while indent(ln_start) > 0 && ln_start > 0
-            let ln_start = prevnonblank(ln_start-1)
-        endwhile
-        while indent(ln_start) == 0 && ln_start > 0 && getline(ln_start) !~ '^\s*$'
-            let ln_start -= 1
-        endwhile
-        while indent(ln_end) == 0 && ln_end <= line('$') && getline(ln_end) !~ '^\s*$'
-            let ln_end += 1
-        endwhile
-        while indent(ln_end) > 0 && ln_end <= line('$')
-            let ln_end = s:nextnonblank(ln_end+1)
-        endwhile
-    endif
-    if a:inner || indent == 0
-        let ln_start = s:nextnonblank(ln_start+1)
-    endif
-    if a:inner
-        let ln_end = prevnonblank(ln_end-1)
-    else
-        let ln_end = ln_end-1
-    endif
-    if ln_end < ln_start
-        let ln_end = ln_start
-    endif
-    exe ln_end
-    normal! V
-    exe ln_start
-endfunction
-
-function! s:nextnonblank(lnum) abort
-    let res = nextnonblank(a:lnum)
-    if res == 0
-        let res = line('$')+1
-    endif
-    return res
-endfunction
-
-function! s:detect_nearest_line() abort
-    let lnum = line('.')
-    let nline = s:nextnonblank(lnum)
-    let pline = prevnonblank(lnum)
-    if abs(nline - lnum) > abs(pline - lnum) || getline(nline) =~ '^\s*$'
-        return pline
-    else
-        return nline
-    endif
-endfunction
-
-onoremap <silent>ii :<C-u>call Obj_indent(v:true)<CR>
-onoremap <silent>ai :<C-u>call Obj_indent(v:false)<CR>
-xnoremap <silent>ii :<C-u>call Obj_indent(v:true)<CR>
-xnoremap <silent>ai :<C-u>call Obj_indent(v:false)<CR>
-
-" 26 simple text objects
-" ----------------------
-" i_ i. i: i, i; i| i/ i\ i* i+ i- i# i<tab>
-" a_ a. a: a, a; a| a/ a\ a* a+ a- a# a<tab>
-function! Obj(char, inner) abort
-    let lnum = line('.')
-    let char = escape(a:char, '.*')
-    if (search('^\|'.char, 'cnbW', lnum) && search(char, 'W', lnum))
-          \ || (search(char, 'nbW', lnum) && search(char.'\|$', 'cW', lnum))
-        if a:inner
-            call search('[^'.a:char.']', 'cbW', lnum)
-        endif
-        normal! v
-        call search('^\|'.char, 'bW', lnum)
-        if a:inner
-            call search('[^'.a:char.']', 'cW', lnum)
-        endif
-        return
-    endif
-endfunction
-
-for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '-', '#', '<tab>' ]
-    execute 'xnoremap <silent> i' .. char .. ' :<C-u>call Obj("' .. char .. '", 1)<CR>'
-    execute 'xnoremap <silent> a' .. char .. ' :<C-u>call Obj("' .. char .. '", 0)<CR>'
-    execute 'onoremap <silent> i' .. char .. ' :normal vi' .. char .. '<CR>'
-    execute 'onoremap <silent> a' .. char .. ' :normal va' .. char .. '<CR>'
-endfor
-
-
-" DEFAULT PLUGINS
-
-if has('syntax') && !exists('g:syntax_on')
-  syntax enable
-endif
-if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
-  runtime! macros/matchit.vim
-endif
-if exists(":Man") != 2
-  runtime! ftplugin/man.vim
-endif
-
-" GREP
-
-if executable('rg') == 1
-  let &grepprg='rg --vimgrep -uu '
-  let &grepformat='%f:%l:%c:%m'
-endif
-
-" COLORSCHEME
-
-" colorscheme elflord
-" hi LineNr       ctermfg=DarkMagenta
-" hi NonText      ctermfg=DarkBlue
-" hi SpecialKey   ctermfg=DarkBlue
-" hi ColorColumn  ctermbg=Black
-
-" https://github.com/catppuccin/vim/blob/main/colors/catppuccin_mocha.vim
-" Name: catppuccin_mocha.vim
-
-set termguicolors
-set background=dark
-hi clear
-
-if exists('syntax on')
-    syntax reset
-endif
-
-let g:colors_name='catppuccin_mocha'
-set t_Co=256
-
-let s:rosewater = "#F5E0DC"
-let s:flamingo = "#F2CDCD"
-let s:pink = "#F5C2E7"
-let s:mauve = "#CBA6F7"
-let s:red = "#F38BA8"
-let s:maroon = "#EBA0AC"
-let s:peach = "#FAB387"
-let s:yellow = "#F9E2AF"
-let s:green = "#A6E3A1"
-let s:teal = "#94E2D5"
-let s:sky = "#89DCEB"
-let s:sapphire = "#74C7EC"
-let s:blue = "#89B4FA"
-let s:lavender = "#B4BEFE"
-
-let s:text = "#CDD6F4"
-let s:subtext1 = "#BAC2DE"
-let s:subtext0 = "#A6ADC8"
-let s:overlay2 = "#9399B2"
-let s:overlay1 = "#7F849C"
-let s:overlay0 = "#6C7086"
-let s:surface2 = "#585B70"
-let s:surface1 = "#45475A"
-let s:surface0 = "#313244"
-
-let s:base = "#1E1E2E"
-let s:mantle = "#181825"
-let s:crust = "#11111B"
-
-function! s:hi(group, guisp, guifg, guibg, gui, cterm)
-  let cmd = ""
-  if a:guisp != ""
-    let cmd = cmd . " guisp=" . a:guisp
-  endif
-  if a:guifg != ""
-    let cmd = cmd . " guifg=" . a:guifg
-  endif
-  let guibg="NONE"
-  if a:guibg != ""
-    let cmd = cmd . " guibg=" . guibg
-  endif
-  if a:gui != ""
-    let cmd = cmd . " gui=" . a:gui
-  endif
-  if a:cterm != ""
-    let cmd = cmd . " cterm=" . a:cterm
-  endif
-  if cmd != ""
-    exec "hi " . a:group . cmd
-  endif
-endfunction
-
-
-
-call s:hi("Normal", "NONE", s:text, s:base, "NONE", "NONE")
-call s:hi("Visual", "NONE", "NONE", s:surface1,"bold", "bold")
-call s:hi("Conceal", "NONE", s:overlay1, "NONE", "NONE", "NONE")
-call s:hi("ColorColumn", "NONE", "NONE", s:surface0, "NONE", "NONE")
-call s:hi("Cursor", "NONE", s:base, s:text, "NONE", "NONE")
-call s:hi("lCursor", "NONE", s:base, s:text, "NONE", "NONE")
-call s:hi("CursorIM", "NONE", s:base, s:text, "NONE", "NONE")
-call s:hi("CursorColumn", "NONE", "NONE", s:mantle, "NONE", "NONE")
-call s:hi("CursorLine", "NONE", "NONE", s:surface0, "NONE", "NONE")
-call s:hi("Directory", "NONE", s:blue, "NONE", "NONE", "NONE")
-call s:hi("DiffAdd", "NONE", s:base, s:green, "NONE", "NONE")
-call s:hi("DiffChange", "NONE", s:base, s:yellow, "NONE", "NONE")
-call s:hi("DiffDelete", "NONE", s:base, s:red, "NONE", "NONE")
-call s:hi("DiffText", "NONE", s:base, s:blue, "NONE", "NONE")
-call s:hi("EndOfBuffer", "NONE", "NONE", "NONE", "NONE", "NONE")
-call s:hi("ErrorMsg", "NONE", s:red, "NONE", "bolditalic"    , "bold,italic")
-call s:hi("VertSplit", "NONE", s:crust, "NONE", "NONE", "NONE")
-call s:hi("Folded", "NONE", s:blue, s:surface1, "NONE", "NONE")
-call s:hi("FoldColumn", "NONE", s:overlay0, s:base, "NONE", "NONE")
-call s:hi("SignColumn", "NONE", s:surface1, s:base, "NONE", "NONE")
-call s:hi("IncSearch", "NONE", s:surface1, s:pink, "NONE", "NONE")
-call s:hi("CursorLineNR", "NONE", s:lavender, "NONE", "NONE", "NONE")
-call s:hi("LineNr", "NONE", s:surface1, "NONE", "NONE", "NONE")
-call s:hi("MatchParen", "NONE", s:peach, "NONE", "bold", "bold")
-call s:hi("ModeMsg", "NONE", s:text, "NONE", "bold", "bold")
-call s:hi("MoreMsg", "NONE", s:blue, "NONE", "NONE", "NONE")
-call s:hi("NonText", "NONE", s:overlay0, "NONE", "NONE", "NONE")
-call s:hi("Pmenu", "NONE", s:overlay2, s:surface0, "NONE", "NONE")
-call s:hi("PmenuSel", "NONE", s:text, s:surface1, "bold", "bold")
-call s:hi("PmenuSbar", "NONE", "NONE", s:surface1, "NONE", "NONE")
-call s:hi("PmenuThumb", "NONE", "NONE", s:overlay0, "NONE", "NONE")
-call s:hi("Question", "NONE", s:blue, "NONE", "NONE", "NONE")
-call s:hi("QuickFixLine", "NONE", "NONE", s:surface1, "bold", "bold")
-call s:hi("Search", "NONE", s:pink, s:surface1, "bold", "bold")
-call s:hi("SpecialKey", "NONE", s:subtext0, "NONE", "NONE", "NONE")
-call s:hi("SpellBad", "NONE", s:base, s:red, "NONE", "NONE")
-call s:hi("SpellCap", "NONE", s:base, s:yellow, "NONE", "NONE")
-call s:hi("SpellLocal", "NONE", s:base, s:blue, "NONE", "NONE")
-call s:hi("SpellRare", "NONE", s:base, s:green, "NONE", "NONE")
-call s:hi("StatusLine", "NONE", s:text, s:mantle, "NONE", "NONE")
-call s:hi("StatusLineNC", "NONE", s:surface1, s:mantle, "NONE", "NONE")
-call s:hi("StatusLineTerm", "NONE", s:text, s:mantle, "NONE", "NONE")
-call s:hi("StatusLineTermNC", "NONE", s:surface1, s:mantle, "NONE", "NONE")
-call s:hi("TabLine", "NONE", s:surface1, s:mantle, "NONE", "NONE")
-call s:hi("TabLineFill", "NONE", "NONE", s:mantle, "NONE", "NONE")
-call s:hi("TabLineSel", "NONE", s:green, s:surface1, "NONE", "NONE")
-call s:hi("Title", "NONE", s:blue, "NONE", "bold", "bold")
-call s:hi("VisualNOS", "NONE", "NONE", s:surface1, "bold", "bold")
-call s:hi("WarningMsg", "NONE", s:yellow, "NONE", "NONE", "NONE")
-call s:hi("WildMenu", "NONE", "NONE", s:overlay0, "NONE", "NONE")
-call s:hi("Comment", "NONE", s:overlay0, "NONE", "NONE", "NONE")
-call s:hi("Constant", "NONE", s:peach, "NONE", "NONE", "NONE")
-call s:hi("Identifier", "NONE", s:flamingo, "NONE", "NONE", "NONE")
-call s:hi("Statement", "NONE", s:mauve, "NONE", "NONE", "NONE")
-call s:hi("PreProc", "NONE", s:pink, "NONE", "NONE", "NONE")
-call s:hi("Type", "NONE", s:blue, "NONE", "NONE", "NONE")
-call s:hi("Special", "NONE", s:pink, "NONE", "NONE", "NONE")
-call s:hi("Underlined", "NONE", s:text, s:base, "underline", "underline")
-call s:hi("Error", "NONE", s:red, "NONE", "NONE", "NONE")
-call s:hi("Todo", "NONE", s:base, s:flamingo, "bold", "bold")
-
-call s:hi("String", "NONE", s:green, "NONE", "NONE", "NONE")
-call s:hi("Character", "NONE", s:teal, "NONE", "NONE", "NONE")
-call s:hi("Number", "NONE", s:peach, "NONE", "NONE", "NONE")
-call s:hi("Boolean", "NONE", s:peach, "NONE", "NONE", "NONE")
-call s:hi("Float", "NONE", s:peach, "NONE", "NONE", "NONE")
-call s:hi("Function", "NONE", s:blue, "NONE", "NONE", "NONE")
-call s:hi("Conditional", "NONE", s:red, "NONE", "NONE", "NONE")
-call s:hi("Repeat", "NONE", s:red, "NONE", "NONE", "NONE")
-call s:hi("Label", "NONE", s:peach, "NONE", "NONE", "NONE")
-call s:hi("Operator", "NONE", s:sky, "NONE", "NONE", "NONE")
-call s:hi("Keyword", "NONE", s:pink, "NONE", "NONE", "NONE")
-call s:hi("Include", "NONE", s:pink, "NONE", "NONE", "NONE")
-call s:hi("StorageClass", "NONE", s:yellow, "NONE", "NONE", "NONE")
-call s:hi("Structure", "NONE", s:yellow, "NONE", "NONE", "NONE")
-call s:hi("Typedef", "NONE", s:yellow, "NONE", "NONE", "NONE")
-call s:hi("debugPC", "NONE", "NONE", s:crust, "NONE", "NONE")
-call s:hi("debugBreakpoint", "NONE", s:overlay0, s:base, "NONE", "NONE")
-
-hi link Define PreProc
-hi link Macro PreProc
-hi link PreCondit PreProc
-hi link SpecialChar Special
-hi link Tag Special
-hi link Delimiter Special
-hi link SpecialComment Special
-hi link Debug Special
-hi link Exception Error
-hi link StatusLineTerm StatusLine
-hi link StatusLineTermNC StatusLineNC
-hi link Terminal Normal
-hi link Ignore Comment
-
-" Set terminal colors for playing well with plugins like fzf
-let g:terminal_ansi_colors = [
-  \ s:surface1, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext1,
-  \ s:surface2, s:red, s:green, s:yellow, s:blue, s:pink, s:teal, s:subtext0
-\ ]

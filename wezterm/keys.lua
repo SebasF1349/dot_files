@@ -221,7 +221,7 @@ end)
 function M.scroll(mods, key, dir)
 	local event = "Scroll_" .. dir
 	wezterm.on(event, function(win, pane)
-		if utils.is_nvim(pane) then
+		if utils.is_nvim(pane) or utils.is_ssh_vim(pane) then
 			-- pass the keys through to vim/nvim
 			win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
 		elseif dir == "Up" then
