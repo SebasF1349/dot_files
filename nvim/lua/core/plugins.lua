@@ -73,7 +73,6 @@ vim.pack.add({
 
   { src = 'https://github.com/nvim-mini/mini.splitjoin' },
   { src = 'https://github.com/nvim-mini/mini.ai' },
-  { src = 'https://github.com/lewis6991/async.nvim' },
   { src = 'https://github.com/ThePrimeagen/refactoring.nvim' },
   { src = 'https://github.com/windwp/nvim-ts-autotag' },
   { src = 'https://github.com/artemave/workspace-diagnostics.nvim' },
@@ -412,7 +411,6 @@ require('gitsigns').setup({
 
 vim.g.diffs = {
   highlights = {
-    context = { lines = 1000 },
     treesitter = { max_lines = 1000 },
     vim = { max_lines = 1000 },
   },
