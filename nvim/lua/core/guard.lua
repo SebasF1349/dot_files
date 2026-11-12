@@ -38,7 +38,7 @@ ft('sh'):fmt({
   stdin = true,
 }):lint({
   cmd = 'shellcheck',
-  args = { '--format', 'json1', '--external-sources' },
+  args = { '--format', 'json1', '--external-sources', '-x' },
   parse = lint.from_json({
     get_diagnostics = function(...)
       return vim.json.decode(...).comments
@@ -88,26 +88,53 @@ ft('typescript,javascript,svelte'):lint({
 })
 ft('typescript,javascript,svelte,html,css,json'):fmt({
   cmd = 'npx',
-  args = { 'prettier', '--stdin-filepath', '--print-width', '120', '--tab-width', '4' },
+  args = {
+    'prettier',
+    '--stdin-filepath',
+    '--print-width',
+    '120',
+    '--tab-width',
+    '4',
+  },
   fname = true,
   stdin = true,
 })
 ft('markdown'):fmt({
   cmd = 'npx',
-  args = { 'prettier', '--stdin-filepath', '--print-width', '120', '--tab-width', '4' },
+  args = {
+    'prettier',
+    '--stdin-filepath',
+    '--print-width',
+    '120',
+    '--tab-width',
+    '4',
+  },
   fname = true,
   stdin = true,
 }):append({
   cmd = 'markdown-toc',
+  args = { 'markdown-toc', '--bullets', '-' },
   stdin = true,
 })
 ft('sql'):fmt({
   cmd = 'sqlfluff',
-  args = { 'fix', '-' },
+  args = {
+    'fix',
+    '--dialect=mariadb',
+    '--exclude-rules',
+    'layout.indent,CP02,CV06',
+    '-',
+  },
   stdin = true,
 }):lint({
   cmd = 'sqlfluff',
-  args = { 'lint', '-f', 'github-annotation' },
+  args = {
+    'lint',
+    '--format=json',
+    '--dialect=mariadb',
+    '--exclude-rules',
+    'layout.indent,CP02,CV06',
+  },
   stdin = true,
   parse = lint.from_json({
     attributes = {
