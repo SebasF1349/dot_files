@@ -56,6 +56,7 @@ local snippets = {
   this = [[\$this->$0;]],
   p = [[var_dump($0);]],
   pe = [[echo '<pre>'; var_export($0); echo '</pre>';exit;]],
+  me = [[echo Html::errorSummary($0);]],
   ['-'] = [[<?php ${0} ?>]],
   ['_'] = [[<?php
   ${0}
@@ -354,7 +355,7 @@ vim.keymap.set('n', 'gf', function()
     end)
   elseif fileObj:getType() == 'view' then
     local line = vim.api.nvim_get_current_line()
-    local m_var, attr = line:match('->field%(%s*%$([%w_]+)%s*,%s*[\'"]([%w_]+)[\'"]')
+    local m_var, _ = line:match('->field%(%s*%$([%w_]+)%s*,%s*[\'"]([%w_]+)[\'"]')
 
     if m_var then
       local content = table.concat(vim.api.nvim_buf_get_lines(0, 0, 50, false), '\n')
