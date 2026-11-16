@@ -1,15 +1,7 @@
 local ui = vim.ui
+local uim = require('modules.uim')
 
-local function select()
-  return require('modules.uim').select
-end
-
-local function input()
-  return require('modules.uim').input
-end
-
-ui.select = select()
-ui.input = input()
+ui.select, ui.input = uim.select, uim.input
 ui.open = (function(overridden)
   return function(path, opt)
     vim.validate('path', path, 'string')
@@ -25,7 +17,7 @@ ui.open = (function(overridden)
       elseif vim.b.friendlyManual and vim.b.friendlyManual ~= '' then
         path = (vim.b.friendlyManual):format(path)
       elseif not is_dir then
-        path = ('https://google.com/search?q=%s'):format(vim.uri_encode(path))
+        path = ('https://google.com/search?q=%s'):format(vim.uri.encode(path))
       end
     end
     overridden(path, opt)
