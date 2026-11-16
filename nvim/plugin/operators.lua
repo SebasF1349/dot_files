@@ -11,24 +11,12 @@ end
 -- Surround
 --------------------------------------------------
 
--- TODO: try to reduce boilerplate
-
-local surround = {
-  ['('] = { { '(' }, { ')' } },
-  ['b'] = { { '(' }, { ')' } },
-  [')'] = { { '(' }, { ')' } },
-  ['['] = { { '[' }, { ']' } },
-  [']'] = { { '[' }, { ']' } },
-  ['{'] = { { '{' }, { '}' } },
-  ['}'] = { { '{' }, { '}' } },
-  ["'"] = { { "'" }, { "'" } },
-  ['"'] = { { '"' }, { '"' } },
-  ['`'] = { { '`' }, { '`' } },
-  ['<'] = { { '<' }, { '>' } },
-  ['>'] = { { '<' }, { '>' } },
-  ['*'] = { { '*' }, { '*' } },
-  ['_'] = { { '_' }, { '_' } },
-}
+local surround = { b = { { '(' }, { ')' } } }
+for _, p in ipairs({ '()', '[]', '{}', '<>' }) do
+  local open, close = p:sub(1, 1), p:sub(2, 2)
+  surround[open] = { { open }, { close } }
+  surround[close] = surround[open]
+end
 
 local function lookup(char)
   return (vim.b.surroundPair or {})[char] or surround[char]
@@ -55,57 +43,17 @@ local function get_pair()
   return lookup(char) or { { char }, { char } }
 end
 
--- https://github.com/Wansmer/nvim-config/blob/fe7a8243656807f13b13e9f129aec107735c2613/lua/utils.lua#L110
-
---- Get whitespace around line (maybe too much for surrounding)
----@param line string
----@param side 'left' | 'right' | 'both'
----@return string, string, string
-local function get_whitespace(line, side)
-  side = side or 'both'
-  local is_left = side == 'both' or side == 'left'
-  local is_right = side == 'both' or side == 'right'
-  local pad_left, pad_right = '', ''
-
-  if is_left then
-    local start, end_ = line:find('^%s+')
-    if start and end_ then
-      pad_left = line:sub(start, end_)
-      line = line:sub(end_ + 1)
-    end
-  end
-
-  if is_right then
-    local start, end_ = line:find('%s+$')
-    if start then
-      pad_right = line:sub(start, end_)
-      line = line:sub(1, -(#pad_right + 1))
-    end
-  end
-
-  return pad_left, line, pad_right
-end
-
---- Add pair around text
+--- Add pair around text (after the indentation of the first line)
 ---@param text string[]
 ---@param pair string[][]
 ---@return string[]
 local function add_pair(text, pair)
-  assert(#pair == 2 or #pair == 3, "There can't be less than 2 pairs")
-  local left_pad, first_line = get_whitespace(text[1], 'left')
-  local newText = {}
-  for i = 1, #pair[1] do
-    table.insert(newText, pair[1][i])
-  end
-  newText[#newText] = left_pad .. newText[#newText] .. first_line
-  for i = 2, #text do
-    table.insert(newText, text[i])
-  end
-  newText[#newText] = newText[#newText] .. pair[2][1]
-  for i = 2, #pair[2] do
-    table.insert(newText, pair[2][i])
-  end
-  return newText
+  local left_pad, first_line = text[1]:match('^(%s*)(.*)$')
+  local new_text = vim.list_extend({}, pair[1]) -- copy, `pair` is shared
+  new_text[#new_text] = left_pad .. new_text[#new_text] .. first_line
+  vim.list_extend(new_text, text, 2)
+  new_text[#new_text] = new_text[#new_text] .. pair[2][1]
+  return vim.list_extend(new_text, pair[2], 2)
 end
 
 --- Add surround to a block of lines
@@ -154,10 +102,6 @@ end, { desc = 'Easy Word [S]urround', expr = true, remap = true })
 ---@param pairDelete string[][]
 ---@param pairAdd? string[][]
 local function operateSurround(pairDelete, pairAdd)
-  assert(#pairDelete == 2 or #pairDelete == 3, 'There must be 2 pairs to delete')
-  if pairAdd then
-    assert(#pairAdd == 2 or #pairAdd == 3, 'There must be 2 pairs to add')
-  end
   local curr = api.nvim_win_get_cursor(0)
 
   local open_pattern = pairDelete[1][1]
@@ -211,13 +155,7 @@ end, { desc = '[D]elete [S]urround' })
 
 map('n', 'cs', function()
   local pair = get_pair()
-  if not pair then
-    return
-  end
-  local replace = get_pair()
-  if not replace then
-    return
-  end
+  local replace = pair and get_pair()
   if pair and replace then
     operateSurround(pair, replace)
   end
