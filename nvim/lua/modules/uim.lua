@@ -30,17 +30,12 @@ end
 ---@param on_close function
 local function close_mappings(bufnr, closing_keys, on_close)
   for _, key in ipairs(closing_keys) do
-    if type(key) == 'string' then
-      vim.keymap.set({ 'n', 'i', 'x' }, key, function()
-        vim.cmd.stopinsert()
-        on_close()
-      end, { buf = bufnr })
-    elseif type(key) == 'table' then
-      vim.keymap.set(key.modes, key[1], function()
-        vim.cmd.stopinsert()
-        on_close()
-      end, { buf = bufnr })
-    end
+    ---@type uim.OptsClosingKeys
+    local k = type(key) == 'table' and key or { key, modes = { 'n', 'i', 'x' } }
+    vim.keymap.set(k.modes, k[1], function()
+      vim.cmd.stopinsert()
+      on_close()
+    end, { buf = bufnr })
   end
 
   local augroup = vim.api.nvim_create_augroup('ui_' .. bufnr, { clear = true })
@@ -216,28 +211,19 @@ function M.select(items, opts, on_choice)
     { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' }
   local default_chars =
     { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[' }
-  local possible_chars = opts.kind == 'codeaction' and code_action_chars or default_chars
   local keys_method = opts.kind == 'codeaction' and 'intelligent' or 'list'
 
   local closing_keys = { 'q', '<C-c>', '<ESC>' }
-  local ignore_chars = {}
-  for _, key in ipairs(closing_keys) do
-    if type(key) == 'string' then
-      table.insert(ignore_chars, key)
-    elseif type(key) == 'table' then
-      table.insert(ignore_chars, key[1])
-    end
-  end
 
-  local posible_chars = vim
-    .iter(possible_chars)
+  local possible_chars = vim
+    .iter(opts.kind == 'codeaction' and code_action_chars or default_chars)
     :filter(function(item)
-      return not vim.list_contains(ignore_chars, item)
+      return not vim.list_contains(closing_keys, item)
     end)
     :totable()
 
   local number_chars = 1
-  while #items > math.pow(#posible_chars, number_chars) do
+  while #items > (#possible_chars) ^ number_chars do
     number_chars = number_chars + 1
   end
 
@@ -246,7 +232,7 @@ function M.select(items, opts, on_choice)
   local function get_options(o)
     local perm = {}
     for _, p in ipairs(o) do
-      for _, c in ipairs(posible_chars) do
+      for _, c in ipairs(possible_chars) do
         table.insert(perm, p .. c)
       end
     end
