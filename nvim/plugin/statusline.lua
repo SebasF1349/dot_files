@@ -3,8 +3,6 @@ local mocha = require('catppuccin.palettes').get_palette('mocha')
 local signs = require('utils.ui').diagnostic_icons_num
 local args = require('modules.args')
 
-local statusline_group = api.nvim_create_augroup('statusline', { clear = true })
-
 ---- Highlights ----
 local function fg_of(name)
   return api.nvim_get_hl(0, { name = name, link = false })['fg']
