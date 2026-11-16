@@ -16,7 +16,7 @@ vim.api.nvim_create_autocmd('LspProgress', {
       id = msgId,
       kind = 'progress',
       source = 'lsp',
-      status = 'success',
+      status = value.kind == 'end' and 'success' or 'running',
       title = title,
       percent = value.percentage,
     })
@@ -33,7 +33,10 @@ vim.diagnostic.config({
       return '- ' .. d.message
     end,
     suffix = function(d)
-      return string.format('[%s: %s]', d.source, d.code), ''
+      if d.code then
+        return string.format('[%s: %s]', d.source, d.code), ''
+      end
+      return string.format('[%s]', d.source), ''
     end,
   },
   jump = {
@@ -64,15 +67,8 @@ vim.diagnostic.config({
 -- copied from https://github.com/neovim/nvim-lspconfig/blob/2163c54bb6cfec53e3e555665ada945b8c8331b9/lua/lspconfig/util.lua#L393-L398
 -- until https://github.com/neovim/neovim/issues/33225 gets resolved
 local function bufname_valid(bufname)
-  if
-    bufname:match('^/')
-    or bufname:match('^[a-zA-Z]:')
-    or bufname:match('^zipfile://')
+  return bufname:match('^/') or bufname:match('^[a-zA-Z]:') or bufname:match('^zipfile://')
     or bufname:match('^tarfile:')
-  then
-    return true
-  end
-  return false
 end
 
 vim.lsp.codelens.enable(true)
@@ -156,10 +152,10 @@ local function on_attach(client_id, buf)
   end, { desc = 'Trigger And Select Next Completion' })
 
   vim.keymap.set('n', ']e', function()
-    vim.diagnostic.jump({ count = vim.v.count, severity = vim.diagnostic.severity.ERROR })
+    vim.diagnostic.jump({ count = vim.v.count1, severity = vim.diagnostic.severity.ERROR })
   end, { desc = 'LSP: Go to next [E]rror message', buf = buf })
   vim.keymap.set('n', '[e', function()
-    vim.diagnostic.jump({ count = -vim.v.count, severity = vim.diagnostic.severity.ERROR })
+    vim.diagnostic.jump({ count = -vim.v.count1, severity = vim.diagnostic.severity.ERROR })
   end, { desc = 'LSP: Go to prev [E]rror message', buf = buf })
 
   local function jump_to_reference(direction)
@@ -321,15 +317,11 @@ local function float_config()
     max_width = math.floor(vim.o.columns * 0.4),
   }
 end
-local hover = vim.lsp.buf.hover
----@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.hover = function()
-  hover(float_config())
-end
-local signature_help = vim.lsp.buf.signature_help
----@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.signature_help = function()
-  signature_help(float_config())
+for _, name in ipairs({ 'hover', 'signature_help' }) do
+  local original = vim.lsp.buf[name]
+  vim.lsp.buf[name] = function()
+    original(float_config())
+  end
 end
 
 M.servers = {}

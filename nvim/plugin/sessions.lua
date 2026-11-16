@@ -2,11 +2,9 @@ local api, fn, fs, cmd = vim.api, vim.fn, vim.fs, vim.cmd
 
 vim.o.sessionoptions = 'curdir,winsize'
 local sessions_path = vim.fs.joinpath(fn.stdpath('data'), 'sessions')
+fs.mkdir(sessions_path, { parents = true })
 
 local function get_session_path()
-  if fn.isdirectory(sessions_path) == 0 then
-    vim.fs.mkdir(sessions_path, { parents = true })
-  end
   local cwd = vim.uv.cwd()
   local session_name = cwd and vim.fs.slug(cwd) or 'home'
   -- local branch = vim.g.gitsigns_head
@@ -18,10 +16,19 @@ local function get_session_path()
   return vim.fs.joinpath(sessions_path, session_name)
 end
 
+--- Whether nvim was started with a `+cmd` argument
+---@return boolean
+local function has_cmd_arg()
+  return vim.iter(vim.v.argv):any(
+    ---@param v string
+    function(v)
+      return vim.startswith(v, '+')
+    end
+  )
+end
+
 local function sessionSave()
-  local session_path = get_session_path()
-  cmd('mksession! ' .. session_path)
-  cmd.qa()
+  cmd('mksession! ' .. fn.fnameescape(get_session_path()))
 end
 
 local function sessionLoad()
@@ -31,17 +38,18 @@ local function sessionLoad()
     session_path = session_path:gsub('@@.*$', '')
   end
   if vim.uv.fs_stat(session_path) then
-    cmd('source ' .. session_path)
+    cmd('source ' .. fn.fnameescape(session_path))
   end
 end
 
 local function sessionRemove()
-  local session_path = get_session_path()
-  fs.rm(session_path, { force = true })
-  fs.rm(session_path .. '.json', { force = true })
+  fs.rm(get_session_path(), { force = true })
 end
 
-api.nvim_create_user_command('SSave', sessionSave, { desc = 'Save Session And Quit' })
+api.nvim_create_user_command('SSave', function()
+  sessionSave()
+  cmd.qa()
+end, { desc = 'Save Session And Quit' })
 api.nvim_create_user_command('SLoad', sessionLoad, { desc = 'Load Session' })
 api.nvim_create_user_command('SRemove', sessionRemove, { desc = 'Remove Session' })
 
@@ -50,13 +58,6 @@ local auSession = api.nvim_create_augroup('Sessions', {})
 api.nvim_create_autocmd('VimLeavePre', {
   group = auSession,
   callback = function()
-    local session_path = get_session_path()
-    local has_opt = vim.iter(vim.v.argv):any(
-      ---@param v string
-      function(v)
-        return v:find('+') ~= nil
-      end
-    )
     local has_code_bufs = vim.iter(api.nvim_list_wins()):any(
       ---@param win integer
       function(win)
@@ -64,7 +65,7 @@ api.nvim_create_autocmd('VimLeavePre', {
         return vim.bo[bufnr].buftype == ''
       end
     )
-    if not vim.uv.fs_stat(session_path) or has_opt or not has_code_bufs then
+    if not vim.uv.fs_stat(get_session_path()) or has_cmd_arg() or not has_code_bufs then
       return
     end
     sessionSave()
@@ -73,16 +74,8 @@ api.nvim_create_autocmd('VimLeavePre', {
 })
 
 -- using an autocmd on VimEnter to load session opens buffers with empty filetype
-if vim.v.vim_did_enter then
-  local session_path = get_session_path()
-  local has_opt = vim.iter(vim.v.argv):any(
-    ---@param v string
-    function(v)
-      return v:find('+') ~= nil
-    end
-  )
-  if has_opt then
-  elseif vim.uv.fs_stat(session_path) and fn.argc() == 0 then
+if not has_cmd_arg() then
+  if vim.uv.fs_stat(get_session_path()) and fn.argc() == 0 then
     sessionLoad()
   elseif fn.argc() == 0 or (fn.argc() == 1 and fn.isdirectory(fn.expand('%')) == 1) then
     local dir = fn.argc() == 1 and fn.expand('%:p') or vim.uv.cwd()

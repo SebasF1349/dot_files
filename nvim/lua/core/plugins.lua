@@ -90,8 +90,7 @@ require('catppuccin').setup({
   auto_integrations = false,
   transparent_background = true,
   integrations = {
-    cmp = true,
-    dadbod_ui = true,
+    cmp = true, -- not using cmp, but defines the CmpItemKind* hl groups used by the LSP completion menu
     dap = true,
     gitsigns = true,
     markdown = true,
@@ -360,23 +359,17 @@ vim.keymap.set('n', '<leader>gL', log_cmd('%'), { desc = '[G]it: [L]og File' })
 vim.keymap.set('n', '<leader>gr', log_cmd('--numstat'), { desc = '[G]it: [R]eview Log' })
 vim.keymap.set('n', '<leader>gc', '<cmd>tab Git log -50 --oneline --patch<cr>', { desc = '[G]it: [C]hanges Log' })
 
+local gitsigns_signs = {
+  add = { text = '│' },
+  change = { text = '│' },
+  delete = { text = '_' },
+  topdelete = { text = '‾' },
+  changedelete = { text = '└' },
+  untracked = { text = '┆' },
+}
 require('gitsigns').setup({
-  signs = {
-    add = { text = '│' },
-    change = { text = '│' },
-    delete = { text = '_' },
-    topdelete = { text = '‾' },
-    changedelete = { text = '└' },
-    untracked = { text = '┆' },
-  },
-  signs_staged = {
-    add = { text = '│' },
-    change = { text = '│' },
-    delete = { text = '_' },
-    topdelete = { text = '‾' },
-    changedelete = { text = '└' },
-    untracked = { text = '┆' },
-  },
+  signs = gitsigns_signs,
+  signs_staged = gitsigns_signs,
   on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
 
@@ -537,8 +530,7 @@ ai.setup({
         }
       end
       if ai_type == 'i' then
-        ---@diagnostic disable-next-line: undefined-global
-        local reg = MiniAi.find_textobject('a', id, opts)
+        local reg = ai.find_textobject('a', id, opts)
         if reg then
           local line = vim.fn.getline(reg.from.line)
           local _, s = line:find('^[' .. SEP .. ']*.', reg.from.col)
@@ -575,7 +567,7 @@ refactoring.setup({
 local refactoring_debug = require('refactoring.debug')
 vim.keymap.set({ 'n', 'x' }, '<leader>rr', function()
   refactoring.select_refactor({ prefer_ex_cmd = true })
-end)
+end, { desc = '[R]efactoring: Select [R]efactor' })
 vim.keymap.set('n', '<leader>rp', function()
   return refactoring_debug.print_loc({ output_location = 'below' })
 end, { desc = '[R]efactoring: Debug [P]rint', expr = true })
