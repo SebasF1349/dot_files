@@ -37,6 +37,8 @@ vim.keymap.set('n', '-', '<Plug>(nvim-dir-up)', { desc = 'Open dir.lua' })
 -- Window Management
 --------------------------------------------------
 
+local wezterm = require('utils.wezterm')
+
 local nav = {
   h = 'Left',
   j = 'Down',
@@ -51,17 +53,7 @@ local function navigate(dir)
     local win = vim.api.nvim_get_current_win()
     vim.cmd.wincmd(dir)
     if win == vim.api.nvim_get_current_win() then
-      local cmd = vim.uv.os_uname().release:find('WSL') and 'wezterm.exe' or 'wezterm'
-      local pane_dir = nav[dir]
-      vim.system({ cmd, 'cli', 'activate-pane-direction', pane_dir }, { text = true }, function(p)
-        if p.code ~= 0 then
-          vim.notify(
-            'Failed to move to pane ' .. pane_dir .. '\n' .. p.stderr,
-            vim.log.levels.ERROR,
-            { title = 'Wezterm' }
-          )
-        end
-      end)
+      wezterm.cli({ 'activate-pane-direction', nav[dir] }, 'Failed to move to pane ' .. nav[dir])
     end
   end
 end
@@ -77,15 +69,10 @@ local resize_dir = {
   j = { key = '.', dir = 'Down', nv_key = '+', inverted = 'k', desc = 'Resize Window [<]Bigger Vertically' },
 }
 
--- copied from https://github.com/pogyomo/winresize.nvim/blob/main/lua/winresize.lua#L24
 ---@param dir 'h' | 'j' | 'k' | 'l'
 ---@return boolean # True if the window have neighbor to 'dir'.
 local function have_neighbor_to(dir)
-  local neighbor = vim.api.nvim_win_call(0, function()
-    vim.cmd.wincmd(dir)
-    return vim.api.nvim_get_current_win()
-  end)
-  return vim.api.nvim_get_current_win() ~= neighbor
+  return vim.fn.winnr(dir) ~= vim.fn.winnr()
 end
 
 ---@param dir 'h' | 'j' | 'k' | 'l'
@@ -119,16 +106,7 @@ local function resize(dir)
     resize_window(dir)
     local new_height, new_width = vim.api.nvim_win_get_height(win), vim.api.nvim_win_get_width(win)
     if height == new_height and width == new_width then
-      local cmd = vim.uv.os_uname().release:find('WSL') and 'wezterm.exe' or 'wezterm'
-      vim.system({ cmd, 'cli', 'adjust-pane-size', resize_dir[dir].dir }, { text = true }, function(p)
-        if p.code ~= 0 then
-          vim.notify(
-            'Failed resize move to pane ' .. resize_dir[dir].dir .. '\n' .. p.stderr,
-            vim.log.levels.ERROR,
-            { title = 'Wezterm' }
-          )
-        end
-      end)
+      wezterm.cli({ 'adjust-pane-size', resize_dir[dir].dir }, 'Failed to resize pane ' .. resize_dir[dir].dir)
     end
   end
 end
