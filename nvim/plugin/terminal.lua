@@ -99,23 +99,13 @@ end, { desc = '[T]oggle [T]erminal 1' })
 -- Runners
 --------------------------------------------------
 
---- Move to end of file
----@param bufnr integer
----@param winid integer
-local function scroll_to_end(bufnr, winid)
-  api.nvim_buf_call(bufnr, function()
-    local target_line = api.nvim_buf_line_count(bufnr)
-    api.nvim_win_set_cursor(winid, { target_line, 0 })
-  end)
-end
-
 ---@param command string
 local function run_term_command(command)
   cmd('wa')
   if not api.nvim_win_is_valid(terms[1].winid) then
     terms[1] = create_term(terms[1].bufnr)
   end
-  scroll_to_end(terms[1].bufnr, terms[1].winid)
+  api.nvim_win_set_cursor(terms[1].winid, { api.nvim_buf_line_count(terms[1].bufnr), 0 })
   local terminal_job_id = vim.b[terms[1].bufnr].terminal_job_id
   api.nvim_chan_send(terminal_job_id, '\x03\n')
   api.nvim_chan_send(terminal_job_id, command .. '\n')
