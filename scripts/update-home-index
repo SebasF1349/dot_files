@@ -1,0 +1,4 @@
+#!/bin/sh
+nice -n 19 ionice -c3 updatedb -l no -U "$HOME" -o "$HOME/.cache/home.db" \
+  -e "$HOME/.cache $HOME/.local $HOME/.config $HOME/.mozilla" \
+  -n ".git node_modules __pycache__ .venv venv .npm .cargo .gradle .m2 .Trash"

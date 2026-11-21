@@ -32,6 +32,7 @@ declare -A file_links=(
     ["$HOME/.local/share/applications/scid.desktop"]="$DOT_FILES_DIR/applications/scid.desktop"
     ["$CONFIG_DIR/Thunar/uca.xml"]="$DOT_FILES_DIR/thunar/uca.xml"
     ["$SCRIPTS_DIR/install-neovim.sh"]="$DOT_FILES_DIR/install_scripts/install-neovim.sh"
+    ["$SCRIPTS_DIR/update-home-index"]="$DOT_FILES_DIR/scripts/update-home-index"
 )
 
 declare -A dir_links=(

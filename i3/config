@@ -55,7 +55,8 @@ bindsym $mod+shift+s exec --no-startup-id flameshot gui
 exec --no-startup-id greenclip daemon > /dev/null
 bindsym $mod+y exec --no-startup-id rofi -modi 'clipboard:greenclip print' -show clipboard -run-command '{cmd}'
 
-bindsym $mod+space exec rofi -show drun -modi "drun#calc#file:~/.config/rofi/pickers/find-files.sh" -matching fuzzy -display-drun "app" -kb-mode-next "Tab" -kb-element-next ""
+bindsym $mod+space exec rofi -show drun -modi "drun#calc" -matching fuzzy -display-drun "app" -kb-mode-next "Tab" -kb-element-next ""
+bindsym $mod+f exec --no-startup-id ~/.config/rofi/scripts/files.sh
 
 bindsym $mod+$left focus left
 bindsym $mod+$down focus down
@@ -95,7 +96,7 @@ bindsym $mod+Shift+0 move container to workspace number 10; workspace 10
 
 bindsym $mod+s split h
 bindsym $mod+v split v
-bindsym $mod+f fullscreen
+bindsym $mod+plus fullscreen
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+ctrl+space focus mode_toggle
 bindsym $mod+a focus parent
