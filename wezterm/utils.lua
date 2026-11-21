@@ -8,23 +8,8 @@ function M.is_nvim(pane)
 	return pane:get_user_vars().IS_NVIM == "true"
 end
 
-function M.is_ssh_vim(pane)
-	return pane:get_user_vars().IS_SSH_VIM == "true"
-end
-
 function M.is_windows()
-	return wezterm.target_triple == "x86_64-pc-windows-msvc"
-end
-
----@param inputstr string
----@param sep string
----@return string[]
-function M.split(inputstr, sep)
-	local t = {}
-	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-		table.insert(t, str)
-	end
-	return t
+	return wezterm.target_triple:find("windows") ~= nil
 end
 
 ---@param name string

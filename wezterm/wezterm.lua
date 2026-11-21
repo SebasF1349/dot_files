@@ -7,6 +7,8 @@ require("keys").setup(config)
 
 config.color_scheme = "Catppuccin Mocha Custom"
 local color_scheme_file = "catppuccin-mocha-custom"
+local ssh_color_scheme = "Catppuccin Frappe Custom"
+local ssh_color_scheme_file = "catppuccin-frappe-custom"
 config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.check_for_updates = false
 
@@ -24,12 +26,18 @@ config.window_close_confirmation = "NeverPrompt"
 config.cursor_blink_ease_in = "Constant"
 config.cursor_blink_ease_out = "Constant"
 
+local scheme_cache = {}
+local function load_scheme(file)
+	if not scheme_cache[file] then
+		scheme_cache[file] = wezterm.color.load_scheme(wezterm.config_dir .. "/colors/" .. file .. ".toml")
+	end
+	return scheme_cache[file]
+end
+
 if utils.is_windows() then
 	config.default_prog = { "pwsh", "-NoLogo", "-ExecutionPolicy", "RemoteSigned", "-NoProfileLoadTime" }
 	config.window_decorations = "RESIZE"
 	local background_image = wezterm.executable_dir .. "\\wallpaper_clean_mini.jpeg"
-	local theme_path = wezterm.config_dir .. "/colors/" .. color_scheme_file .. ".toml"
-	local color_scheme = wezterm.color.load_scheme(theme_path)
 	config.background = {
 		{
 			source = { File = background_image },
@@ -37,7 +45,7 @@ if utils.is_windows() then
 			vertical_align = "Middle",
 		},
 		{
-			source = { Color = color_scheme.background },
+			source = { Color = load_scheme(color_scheme_file).background },
 			height = "100%",
 			width = "100%",
 			opacity = 0.7,
@@ -49,60 +57,51 @@ elseif wezterm.target_triple:find("linux") then
 end
 
 wezterm.on("update-status", function(window, pane)
-	local ok, domain = pcall(function()
-		return pane:get_domain_name()
-	end)
-	if not ok then
+	local ok, domain = pcall(pane.get_domain_name, pane)
+	if not ok or not domain then
 		return
 	end
 
-	local process_name = pane:get_foreground_process_name() or ""
-	local is_ssh = domain:find("SSH") or process_name:lower():find("ssh")
-	if is_ssh then
-		local host = domain:match("to%s+(.+)$")
-		wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), host)
-		window:set_config_overrides({
-			color_scheme = "Catppuccin Frappe Custom",
-			background = {},
-		})
-		color_scheme_file = "catppuccin-frappe-custom"
+	local process = (pane:get_foreground_process_name() or ""):match("([^/\\]+)$") or ""
+	local is_ssh = domain:find("SSH") ~= nil or process:lower():gsub("%.exe$", "") == "ssh"
+	local host = is_ssh and domain:match("to%s+(.+)$")
+	if host and window:active_workspace() ~= host then
+		wezterm.mux.rename_workspace(window:active_workspace(), host)
 	end
 
-	local theme_path = wezterm.config_dir .. "/colors/" .. color_scheme_file .. ".toml"
-	local color_scheme = wezterm.color.load_scheme(theme_path)
-
-	local elements = {}
-	table.insert(elements, { Background = { Color = color_scheme.background } })
-
-	local mode = window:active_key_table()
-	local modes = {
-		copy_mode = { icon = " 󰆏 ", color = color_scheme.ansi[7] },
-		search_mode = { icon = " 󰍉 ", color = color_scheme.ansi[4] },
-	}
-	local current = modes[mode] or { icon = " 󰌌 ", color = color_scheme.split }
-
-	table.insert(elements, { Foreground = { Color = current.color } })
-	table.insert(elements, { Text = current.icon })
-
-	if is_ssh then
-		table.insert(elements, { Foreground = { Color = color_scheme.ansi[2] } })
-	else
-		table.insert(elements, { Foreground = { Color = color_scheme.split } })
+	-- only touch the overrides when they change, this runs every status tick
+	local overrides = window:get_config_overrides() or {}
+	local wanted_scheme = is_ssh and ssh_color_scheme or nil
+	if overrides.color_scheme ~= wanted_scheme then
+		overrides.color_scheme = wanted_scheme
+		overrides.background = is_ssh and {} or nil
+		window:set_config_overrides(overrides)
 	end
-	table.insert(elements, { Text = " 󰒋 " })
 
-	local bg = wezterm.color.parse(color_scheme.background):lighten(0.2)
-	local workspace = window:active_workspace()
+	local scheme = load_scheme(is_ssh and ssh_color_scheme_file or color_scheme_file)
+	local mode = ({
+		copy_mode = { icon = " 󰆏 ", color = scheme.ansi[7] },
+		search_mode = { icon = " 󰍉 ", color = scheme.ansi[4] },
+	})[window:active_key_table()] or { icon = " 󰌌 ", color = scheme.split }
 
-	table.insert(elements, { Background = { Color = bg } })
-	table.insert(elements, { Foreground = { Color = color_scheme.foreground } })
-	table.insert(elements, { Text = " " .. workspace .. " " })
-
-	window:set_right_status(wezterm.format(elements))
+	window:set_right_status(wezterm.format({
+		{ Background = { Color = scheme.background } },
+		{ Foreground = { Color = mode.color } },
+		{ Text = mode.icon },
+		{ Foreground = { Color = is_ssh and scheme.ansi[2] or scheme.split } },
+		{ Text = " 󰒋 " },
+		{ Background = { Color = wezterm.color.parse(scheme.background):lighten(0.2) } },
+		{ Foreground = { Color = scheme.foreground } },
+		{ Text = " " .. window:active_workspace() .. " " },
+	}))
 end)
 
 wezterm.on("format-window-title", function(tab)
-	return wezterm.mux.get_tab(tab.tab_id):window():get_workspace()
+	local ok, win = pcall(wezterm.mux.get_window, tab.window_id)
+	if ok and win then
+		return win:get_workspace()
+	end
+	return tab.active_pane.title
 end)
 
 wezterm.on("gui-startup", function(cmd)
