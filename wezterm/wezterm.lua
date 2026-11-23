@@ -1,5 +1,6 @@
 local wezterm = require("wezterm")
 local utils = require("utils")
+local ssh = require("ssh")
 
 local config = wezterm.config_builder and wezterm.config_builder() or {}
 
@@ -64,9 +65,13 @@ wezterm.on("update-status", function(window, pane)
 
 	local process = (pane:get_foreground_process_name() or ""):match("([^/\\]+)$") or ""
 	local is_ssh = domain:find("SSH") ~= nil or process:lower():gsub("%.exe$", "") == "ssh"
-	local host = is_ssh and domain:match("to%s+(.+)$")
-	if host and window:active_workspace() ~= host then
-		wezterm.mux.rename_workspace(window:active_workspace(), host)
+
+	-- a new ssh tab (no title yet): name it after its host and focus its window
+	local host = domain:match("^SSH:(.+)$")
+	local tab = pane:tab()
+	if host and tab and tab:get_title() == "" then
+		tab:set_title(host)
+		window:focus()
 	end
 
 	-- only touch the overrides when they change, this runs every status tick
@@ -97,6 +102,9 @@ wezterm.on("update-status", function(window, pane)
 end)
 
 wezterm.on("format-window-title", function(tab)
+	if ssh.is_ssh_process then
+		return "SSH"
+	end
 	local ok, win = pcall(wezterm.mux.get_window, tab.window_id)
 	if ok and win then
 		return win:get_workspace()
@@ -105,6 +113,9 @@ wezterm.on("format-window-title", function(tab)
 end)
 
 wezterm.on("gui-startup", function(cmd)
+	if ssh.is_ssh_process then
+		return -- spawn nothing: wezterm's default startup honours `--domain SSH:<host>`
+	end
 	local _, pane, window = wezterm.mux.spawn_window(cmd or {})
 	if not pane:get_domain_name():find("SSH") and not cmd then
 		local sessions = require("sessions")
