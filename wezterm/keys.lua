@@ -1,31 +1,58 @@
--- based on https://github.com/folke/dot/blob/master/config/wezterm/keys.lua
 local wezterm = require("wezterm")
 local act = wezterm.action
+local cb = wezterm.action_callback
 local sessions = require("sessions")
 local ssh = require("ssh")
 local utils = require("utils")
 
 local M = {}
 
-M.modWorkspace = "CTRL|ALT"
-M.mod = "ALT"
+local mod, mod_ws = "ALT", "CTRL|ALT"
 
----@param description string
----@param fn fun(window: table, line: string)
-local function prompt(description, fn)
-	return act.PromptInputLine({
-		description = description,
-		action = wezterm.action_callback(function(window, _, line)
-			if line and #line > 0 then
-				fn(window, line)
-			end
-		end),
-	})
+---@param window table
+---@param pane table
+local function copy_last_output(window, pane)
+	local zones = pane:get_semantic_zones("Output")
+	for i = #zones, 1, -1 do
+		local text = pane:get_text_from_semantic_zone(zones[i]):gsub("%s+$", "")
+		if #text > 0 then
+			window:copy_to_clipboard(text, "Clipboard")
+			local lines = select(2, text:gsub("\n", "")) + 1
+			return window:toast_notification("WezTerm", "Copied " .. lines .. " line(s) of output", nil, 2500)
+		end
+	end
+	window:toast_notification("WezTerm", "No command output found (is shell integration on?)", nil, 2500)
+end
+
+---@param window table
+---@param pane table
+local function open_in_nvim(window, pane)
+	local file, line, col = window:get_selection_text_for_pane(pane):match("^(.-):(%d+):?(%d*)$")
+	if not file then
+		return
+	end
+	local cursor = ("cursor(%s, %s)"):format(line, col ~= "" and col or 1)
+	local cwd = utils.pane_cwd(pane)
+	if file:sub(1, 1) == "~" then
+		file = wezterm.home_dir .. file:sub(2)
+	elseif cwd and not (file:match("^/") or file:match("^%a:[/\\]")) then
+		file = cwd .. "/" .. file
+	end
+	for _, p in ipairs(pane:tab():panes()) do
+		if utils.is_nvim(p) then
+			p:activate()
+			-- <C-\><C-n> leaves insert/terminal mode
+			return p:send_text(("\x1c\x0e:e %s | call %s\r"):format(file:gsub("([ %%#|])", "\\%1"), cursor))
+		end
+	end
+	local dim = pane:get_dimensions()
+	local direction = dim.pixel_height > dim.pixel_width and "Bottom" or "Right"
+	pane:split({ direction = direction, args = { "nvim", "+call " .. cursor, file }, cwd = cwd })
 end
 
 ---@param n integer
 local function switch_workspace_relative(n)
-	return wezterm.action_callback(function(win, pane)
+	return cb(function(win, pane)
 		if #wezterm.mux.get_workspace_names() > 1 then
 			wezterm.GLOBAL.previous_workspace = win:active_workspace()
 		end
@@ -33,173 +60,129 @@ local function switch_workspace_relative(n)
 	end)
 end
 
-function M.setup(config)
-	config.disable_default_key_bindings = true
-	config.keys = {
-		-- Dumb workaround to make C-space work in nvim
-		{ mods = "CTRL", key = " ", action = act.SendKey({ key = " ", mods = "CTRL" }) },
-		-- Workspaces
-		{ mods = M.modWorkspace, key = "s", action = wezterm.action_callback(sessions.save_state) },
-		{
-			mods = M.modWorkspace,
-			key = "w",
-			action = wezterm.action_callback(function(win, pane)
-				sessions.select_workspace(win, pane)
-			end),
-		},
-		{
-			mods = M.modWorkspace,
-			key = "q",
-			action = wezterm.action_callback(function(win, _)
-				local current = win:active_workspace()
-				local workspace = wezterm.GLOBAL.previous_workspace
-				wezterm.GLOBAL.previous_workspace = nil
-				sessions.close_tabs(win:mux_window())
-				if workspace and workspace ~= current and sessions.workspace_exists(workspace) then
-					wezterm.mux.set_active_workspace(workspace)
-				end
-			end),
-		},
-		{ mods = M.modWorkspace, key = "k", action = switch_workspace_relative(1) },
-		{ mods = M.modWorkspace, key = "j", action = switch_workspace_relative(-1) },
-		{
-			-- previous workspace, like vim's CTRL-6
-			mods = M.mod,
-			key = "6",
-			action = wezterm.action_callback(function(win, _)
-				local current = win:active_workspace()
-				local workspace = wezterm.GLOBAL.previous_workspace
-				if workspace and workspace ~= current and sessions.workspace_exists(workspace) then
-					wezterm.GLOBAL.previous_workspace = current
-					wezterm.mux.set_active_workspace(workspace)
-				end
-			end),
-		},
-		-- Tabs
-		{
-			mods = M.mod,
-			key = "t",
-			action = prompt("Enter name of new tab", function(window, line)
-				local tab_name, domain = utils.get_domain(line)
-				window:mux_window():spawn_tab({ domain = domain }):set_title(tab_name)
-			end),
-		},
-		{ mods = M.mod, key = "T", action = act.SpawnTab("CurrentPaneDomain") },
-		{
-			mods = M.mod,
-			key = "r",
-			action = prompt("Enter new name for tab", function(window, line)
-				window:active_tab():set_title(line)
-			end),
-		},
-		{ mods = M.mod, key = "Q", action = act.CloseCurrentTab({ confirm = false }) },
-		{ mods = M.mod, key = "S", action = wezterm.action_callback(ssh.select_ssh) },
-		{ mods = M.mod, key = "=", action = act.MoveTabRelative(1) },
-		{ mods = M.mod, key = "-", action = act.MoveTabRelative(-1) },
-		{ mods = M.mod, key = "n", action = act.ActivateTabRelative(1) },
-		{ mods = M.mod, key = "p", action = act.ActivateTabRelative(-1) },
-		-- Clipboard
-		{ mods = M.mod, key = "Y", action = act.CopyTo("Clipboard") },
-		{ mods = M.mod, key = "P", action = act.PasteFrom("Clipboard") },
-		{ mods = M.mod, key = "V", action = act.ActivateCopyMode },
-		-- Search
-		{ mods = M.mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
-		{ mods = M.mod, key = "F", action = act.QuickSelect },
-		{
-			mods = M.mod,
-			key = "u",
-			action = act.QuickSelectArgs({
-				label = "open url",
-				-- stop at quotes/brackets and drop trailing punctuation
-				patterns = { "https?://[^\\s\"'<>()\\[\\]]*[^\\s\"'<>()\\[\\].,;:!?]" },
-				action = wezterm.action_callback(function(window, pane)
-					wezterm.open_with(window:get_selection_text_for_pane(pane))
-				end),
-			}),
-		},
-		-- Splits
-		{ mods = M.mod, key = "Enter", action = M.smart_split },
-		{ mods = M.mod, key = "v", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.mod, key = "s", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-		{ mods = M.mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
-		{ mods = M.mod, key = "R", action = act.RotatePanes("Clockwise") },
-		{ mods = M.mod, key = "z", action = act.TogglePaneZoomState },
-		M.split_nav("resize", "ALT|SHIFT", "<", "Left"),
-		M.split_nav("resize", "ALT|SHIFT", ">", "Right"),
-		M.split_nav("resize", "ALT", ",", "Up"),
-		M.split_nav("resize", "ALT", ".", "Down"),
-		M.split_nav("move", "ALT", "h", "Left"),
-		M.split_nav("move", "ALT", "j", "Down"),
-		M.split_nav("move", "ALT", "k", "Up"),
-		M.split_nav("move", "ALT", "l", "Right"),
-		-- Scrollback (CTRL-u / CTRL-d half-page scrolling comes from the default copy_mode table)
-		{ mods = M.mod, key = "[", action = act.ScrollToPrompt(-1) },
-		{ mods = M.mod, key = "]", action = act.ScrollToPrompt(1) },
-	}
-	for i = 1, 4 do
-		table.insert(config.keys, { mods = M.mod, key = tostring(i), action = act.ActivateTab(i - 1) })
-	end
-
-	local default_tables = wezterm.gui and wezterm.gui.default_key_tables() or {}
-	local copy_mode = default_tables.copy_mode or {}
-	local search_mode = default_tables.search_mode or {}
-	local shared_mappings = {
-		{
-			key = "y",
-			mods = M.mod,
-			action = act.Multiple({
-				act.CopyTo("PrimarySelection"),
-				act.ClearSelection,
-				act.CopyMode("ClearSelectionMode"),
-				act.CopyMode("ClearPattern"),
-			}),
-		},
-		{
-			key = "Escape",
-			mods = "NONE",
-			action = act.Multiple({
-				act.CopyMode("ClearSelectionMode"),
-				act.CopyMode("ClearPattern"),
-				act.CopyMode("Close"),
-			}),
-		},
-	}
-	for _, mapping in ipairs(shared_mappings) do
-		table.insert(copy_mode, mapping)
-		table.insert(search_mode, mapping)
-	end
-	config.key_tables = { copy_mode = copy_mode, search_mode = search_mode }
-end
-
-M.smart_split = wezterm.action_callback(function(window, pane)
+local smart_split = cb(function(window, pane)
 	local dim = pane:get_dimensions()
 	local split = dim.pixel_height > dim.pixel_width and act.SplitVertical or act.SplitHorizontal
 	window:perform_action(split({ domain = "CurrentPaneDomain" }), pane)
 end)
 
-function M.split_nav(resize_or_move, mods, key, dir)
+---@param resize_or_move "resize"|"move"
+---@param mods string
+---@param key string
+---@param dir "Left"|"Right"|"Up"|"Down"
+local function split_nav(resize_or_move, mods, key, dir)
 	local event = "SplitNav_" .. resize_or_move .. "_" .. dir
 	wezterm.on(event, function(win, pane)
 		if utils.is_nvim(pane) then
-			-- pass the keys through to vim/nvim
-			return win:perform_action({ SendKey = { key = key, mods = mods } }, pane)
+			return win:perform_action(act.SendKey({ key = key, mods = mods }), pane)
 		end
 		if resize_or_move == "resize" then
-			return win:perform_action({ AdjustPaneSize = { dir, 3 } }, pane)
+			return win:perform_action(act.AdjustPaneSize({ dir, 3 }), pane)
 		end
 		local is_zoomed = false
 		for _, p in ipairs(pane:tab():panes_with_info()) do
 			is_zoomed = is_zoomed or p.is_zoomed
 		end
-		-- don't reassign `dir`: it's an upvalue shared by every press of this key
-		local target = dir
-		if is_zoomed then
-			target = (dir == "Up" or dir == "Right") and "Next" or "Prev"
-		end
-		win:perform_action({ ActivatePaneDirection = target }, pane)
-		win:perform_action({ SetPaneZoomState = is_zoomed }, pane)
+		local target = is_zoomed and ((dir == "Up" or dir == "Right") and "Next" or "Prev") or dir
+		win:perform_action(act.ActivatePaneDirection(target), pane)
+		win:perform_action(act.SetPaneZoomState(is_zoomed), pane)
 	end)
 	return { key = key, mods = mods, action = act.EmitEvent(event) }
+end
+
+function M.setup(config)
+	config.disable_default_key_bindings = true
+	config.keys = {
+		-- workaround to make C-space work in nvim
+		{ mods = "CTRL", key = " ", action = act.SendKey({ key = " ", mods = "CTRL" }) },
+		{ mods = mod_ws, key = "s", action = cb(sessions.save_state) },
+		{ mods = mod_ws, key = "w", action = cb(sessions.select_workspace) },
+		{ mods = mod_ws, key = "q", action = cb(sessions.close_workspace) },
+		{ mods = mod_ws, key = "k", action = switch_workspace_relative(1) },
+		{ mods = mod_ws, key = "j", action = switch_workspace_relative(-1) },
+		{ mods = mod, key = "6", action = cb(sessions.switch_to_previous) },
+		{
+			mods = mod,
+			key = "t",
+			action = utils.prompt("Enter name of new tab", function(window, line)
+				local tab_name, domain = utils.get_domain(line)
+				window:mux_window():spawn_tab({ domain = domain }):set_title(tab_name)
+			end),
+		},
+		{ mods = mod, key = "T", action = act.SpawnTab("CurrentPaneDomain") },
+		{
+			mods = mod,
+			key = "r",
+			action = utils.prompt("Enter new name for tab", function(window, line)
+				window:active_tab():set_title(line)
+			end),
+		},
+		{ mods = mod, key = "Q", action = act.CloseCurrentTab({ confirm = false }) },
+		{ mods = mod, key = "S", action = cb(ssh.select_ssh) },
+		{ mods = mod, key = "=", action = act.MoveTabRelative(1) },
+		{ mods = mod, key = "-", action = act.MoveTabRelative(-1) },
+		{ mods = mod, key = "n", action = act.ActivateTabRelative(1) },
+		{ mods = mod, key = "p", action = act.ActivateTabRelative(-1) },
+		{ mods = mod, key = "Y", action = act.CopyTo("Clipboard") },
+		{ mods = mod, key = "P", action = act.PasteFrom("Clipboard") },
+		{ mods = mod, key = "V", action = act.ActivateCopyMode },
+		{ mods = mod, key = "O", action = cb(copy_last_output) },
+		{ mods = mod, key = "f", action = act.Search("CurrentSelectionOrEmptyString") },
+		{ mods = mod, key = "F", action = act.QuickSelect },
+		{
+			mods = mod,
+			key = "u",
+			action = act.QuickSelectArgs({
+				label = "open url",
+				-- stops at quotes/brackets and drops trailing punctuation
+				patterns = { "https?://[^\\s\"'<>()\\[\\]]*[^\\s\"'<>()\\[\\].,;:!?]" },
+				action = cb(function(window, pane)
+					wezterm.open_with(window:get_selection_text_for_pane(pane))
+				end),
+			}),
+		},
+		{
+			mods = mod,
+			key = "e",
+			action = act.QuickSelectArgs({
+				label = "open in nvim",
+				-- requires an extension so times like 12:30 don't match
+				patterns = { "[\\w./~-]*\\.\\w+:\\d+(?::\\d+)?" },
+				action = cb(open_in_nvim),
+			}),
+		},
+		{ mods = mod, key = "Enter", action = smart_split },
+		{ mods = mod, key = "v", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+		{ mods = mod, key = "s", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+		{ mods = mod, key = "q", action = act.CloseCurrentPane({ confirm = false }) },
+		{ mods = mod, key = "R", action = act.RotatePanes("Clockwise") },
+		{ mods = mod, key = "z", action = act.TogglePaneZoomState },
+		split_nav("resize", "ALT|SHIFT", "<", "Left"),
+		split_nav("resize", "ALT|SHIFT", ">", "Right"),
+		split_nav("resize", "ALT", ",", "Up"),
+		split_nav("resize", "ALT", ".", "Down"),
+		split_nav("move", "ALT", "h", "Left"),
+		split_nav("move", "ALT", "j", "Down"),
+		split_nav("move", "ALT", "k", "Up"),
+		split_nav("move", "ALT", "l", "Right"),
+		{ mods = mod, key = "[", action = act.ScrollToPrompt(-1) },
+		{ mods = mod, key = "]", action = act.ScrollToPrompt(1) },
+	}
+	for i = 1, 4 do
+		table.insert(config.keys, { mods = mod, key = tostring(i), action = act.ActivateTab(i - 1) })
+	end
+
+	local defaults = wezterm.gui and wezterm.gui.default_key_tables() or {}
+	config.key_tables = { copy_mode = defaults.copy_mode or {}, search_mode = defaults.search_mode or {} }
+	local clear = { act.CopyMode("ClearSelectionMode"), act.CopyMode("ClearPattern") }
+	for _, tbl in pairs(config.key_tables) do
+		table.insert(tbl, {
+			mods = mod,
+			key = "y",
+			action = act.Multiple({ act.CopyTo("PrimarySelection"), act.ClearSelection, clear[1], clear[2] }),
+		})
+		table.insert(tbl, { mods = "NONE", key = "Escape", action = act.Multiple({ clear[1], clear[2], act.CopyMode("Close") }) })
+	end
 end
 
 return M
