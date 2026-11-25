@@ -145,58 +145,54 @@ vim.keymap.set('n', '+', zoom_toggle, { desc = 'Toggle Window Zoom' })
 ---@field index? boolean
 ---@field extension? 'md'|'curl'
 
-local notes_cache = {}
 ---@param params? notes -- use index or project local
 local function open_notes(params)
   params = params or {}
-  local project_dir = params.index and 'index' or vim.uv.cwd() or ''
   local ext = params.extension or 'md'
 
-  if not notes_cache[project_dir] then
-    notes_cache[project_dir] = {}
-  end
+  local dir = vim.fs.joinpath(vim.env.HOME, 'notes', 'dev')
+  vim.fs.mkdir(dir, { parents = true })
 
-  local curr_project = notes_cache[project_dir][ext]
-
-  if curr_project and curr_project.win and vim.api.nvim_win_is_valid(curr_project.win) then
-    vim.cmd('silent! update')
-    vim.api.nvim_win_hide(curr_project.win)
-    curr_project.win = nil
-    return
-  end
-
-  local projects_notes_directory = vim.fs.joinpath(vim.env.HOME, 'notes', 'dev')
-  if not vim.uv.fs_stat(projects_notes_directory) then
-    vim.fs.mkdir(projects_notes_directory, { parents = true })
-  end
-
-  local project_file_name
+  local file_name
   if params.index then
-    project_file_name = 'index.md'
+    file_name = 'index.md'
   else
-    local git_cmd = vim.system({ 'git', 'rev-parse', '--show-toplevel' }):wait()
-    local raw_name = git_cmd.code == 0 and git_cmd.stdout or project_dir
-    project_file_name = vim.fs.slug(raw_name) .. '.' .. ext
+    local res = vim.system({ 'git', 'rev-parse', '--show-toplevel' }, { text = true }):wait()
+    local root = res.code == 0 and vim.trim(res.stdout) or vim.uv.cwd()
+    assert(root, 'Cannot determine cwd')
+    file_name = vim.fs.slug(root) .. '.' .. ext
   end
 
-  local note_file_path = vim.fs.normalize(vim.fs.joinpath(projects_notes_directory, project_file_name))
+  local buf = vim.fn.bufadd(vim.fs.joinpath(dir, file_name))
+  vim.bo[buf].swapfile = false -- must be set BEFORE the buffer is loaded
+  vim.fn.bufload(buf)
+  vim.bo[buf].buflisted = true
 
-  local note_buf = (curr_project and vim.api.nvim_buf_is_valid(curr_project.buf)) and curr_project.buf
-    or vim.fn.bufadd(note_file_path)
+  local tab = vim.api.nvim_get_current_tabpage()
+  for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+    if vim.api.nvim_win_get_tabpage(win) == tab then
+      vim.api.nvim_buf_call(buf, function()
+        vim.cmd('silent! update')
+      end)
+      vim.api.nvim_win_hide(win)
+      return
+    end
+  end
 
-  local note_win = vim.api.nvim_open_win(note_buf, true, {
+  vim.api.nvim_open_win(buf, true, {
     split = 'right',
     width = math.floor(vim.o.columns / 2),
   })
-
-  if vim.api.nvim_buf_get_name(note_buf) == '' then
-    vim.fn.bufload(note_buf)
-    vim.bo[note_buf].buflisted = true
-    vim.api.nvim_win_set_buf(note_win, note_buf)
-  end
-
-  notes_cache[project_dir][ext] = { buf = note_buf, win = note_win, file_path = note_file_path }
 end
+
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter' }, {
+  callback = function()
+    if vim.fn.mode() ~= 'c' then
+      vim.cmd('silent! checktime')
+    end
+  end,
+  desc = 'Reload files changed outside this instance',
+})
 
 vim.keymap.set('n', '<leader>on', open_notes, { desc = '[O]pen [N]otes' })
 vim.keymap.set('n', '<leader>oi', function()
