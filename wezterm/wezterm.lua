@@ -12,6 +12,9 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.check_for_updates = false
 config.enable_kitty_keyboard = true
 config.scrollback_lines = 20000
+if ssh.is_ssh_process then
+	config.default_workspace = "SSH"
+end
 
 config.window_padding = { left = "0.5cell", right = "0.5cell", top = "0cell", bottom = "0cell" }
 config.use_resize_increments = true
