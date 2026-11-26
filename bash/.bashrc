@@ -1,115 +1,123 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# shellcheck disable=SC1091
-
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# 1. EARLY EXIT & SHELL OPTIONS
+# shellcheck disable=SC1090,SC1091
 [[ $- != *i* ]] && return
 
-if [ -z "$DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-    if command -v startx >/dev/null; then
-        exec startx
-    fi
-fi
+[[ -z $DISPLAY && $(tty) == /dev/tty1 ]] && command -v startx >/dev/null && exec startx
 
 shopt -s histappend checkwinsize autocd extglob cmdhist cdspell nocaseglob histverify
-HISTCONTROL=erasedups:ignoredups:ignorespace
-HISTSIZE=10000
-HISTFILESIZE=10000
+set -o ignoreeof # ctrl-d on an empty line doesn't exit the shell, use `exit`
+# ignorespace is stripped by bash-preexec (OSC133.sh), so use HISTIGNORE for that instead
+HISTCONTROL=erasedups
+HISTIGNORE=' *'
+HISTSIZE=100000
+HISTFILESIZE=200000
+HISTTIMEFORMAT='%F %T '
+# on every prompt, save new commands to the history file and load the ones other terminals saved
+PROMPT_COMMAND="history -a${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+FUNCNEST=100
 
-# 2. HELPERS
-path_add() {
-    if [[ ":$PATH:" != *":$1:"* ]] && [ -d "$1" ]; then
-        export PATH="$1:$PATH"
-    fi
-}
-
-# 3. ENVIRONMENT & TOOLS
 export EDITOR=nvim
 export MANPAGER='nvim +Man!'
-export FUNCNEST=100
+export GIT_BASE=main
 export CHROME_EXECUTABLE=/usr/bin/chromium
 export ELECTRON_OZONE_PLATFORM_HINT=auto
-
-path_add ~/scripts/
-path_add ~/.local/bin/
-
-# 4. THIRD PARTY TOOLS
-export ANDROID_HOME=$HOME/android-sdk
-path_add "$ANDROID_HOME/platform-tools"
-
+export ANDROID_HOME=$HOME/Android/Sdk
 export PNPM_HOME="$HOME/.local/share/pnpm"
-path_add "$PNPM_HOME"
-
-path_add "$HOME/.config/composer/vendor/bin"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
 export FLYCTL_INSTALL="$HOME/.fly"
-path_add "$FLYCTL_INSTALL/bin"
-
-path_add "$HOME/.cargo/bin"
-
-path_add /usr/local/go/bin
-
+export NVM_DIR="$HOME/.nvm"
 export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
-export FZF_DEFAULT_OPTS='--height 50% --layout=reverse --border'
+export FZF_DEFAULT_OPTS='--height 50% --layout=reverse --border --bind ctrl-j:preview-half-page-down,ctrl-k:preview-half-page-up'
 export FZF_COMPLETION_OPTS='--border --info=inline'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS="--preview 'head -n 500 {}'"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# prepends each existing dir to PATH, in order (the last one ends up first)
+path_add() {
+    local d
+    for d; do [[ ":$PATH:" != *":$d:"* && -d $d ]] && PATH="$d:$PATH"; done
+}
+
+# nvm is slow to source: put the default node on PATH now (the newest one if the
+# default alias isn't a version number) and only load nvm on the first `nvm` call
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    { read -r _v <"$NVM_DIR/alias/default"; } 2>/dev/null
+    [[ $_v =~ ^v?([0-9].*) ]] && _v=${BASH_REMATCH[1]} || _v=
+    _node=$(printf '%s\n' "$NVM_DIR"/versions/node/v"$_v"*/bin | sort -V | tail -n1)
+    nvm() {
+        unset -f nvm
+        . "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+        nvm "$@"
+    }
+fi
+path_add ~/scripts ~/.local/bin "$ANDROID_HOME/platform-tools" /opt/gradle-8.9/bin \
+    "$ANDROID_HOME/cmdline-tools/latest/bin" "$PNPM_HOME" ~/.config/composer/vendor/bin \
+    "$_node" "$FLYCTL_INSTALL/bin" ~/.cargo/bin /usr/local/go/bin
+unset _v _node
+
+if ! shopt -oq posix; then
+    for f in /usr/share/bash-completion/bash_completion /usr/share/bash-completion/completions/git; do
+        [ -f "$f" ] && . "$f"
+    done
+    unset f
+fi
+
+command -v fzf >/dev/null && eval "$(fzf --bash)"
 _fzf_compgen_path() { fd --hidden --follow --exclude ".git" . "$1"; }
 _fzf_compgen_dir() { fd --type d --hidden --follow --exclude ".git" . "$1"; }
 
-# 5. SOURCING
-[ -f /etc/os-release ] && . /etc/os-release
-[ -f ~/.bash_aliases ] && . "$HOME/.bash_aliases"
-[ -f "$HOME/dot_files/bash/OSC133.sh" ] && . "$HOME/dot_files/bash/OSC133.sh"
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+[[ $TERM != linux && -f ~/dot_files/bash/OSC133.sh ]] && . ~/dot_files/bash/OSC133.sh
 
-if ! shopt -oq posix; then
-    if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-    elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
-    fi
-    [ -f /usr/share/bash-completion/completions/git ] && . /usr/share/bash-completion/completions/git
-fi
+# arrows search history for commands starting with the typed text
+# (\e[A is normal cursor mode, \eOA is application cursor mode)
+bind '"\e[A": history-search-backward' '"\eOA": history-search-backward'
+bind '"\e[B": history-search-forward' '"\eOB": history-search-forward'
 
-# 6. INTERACTIVE & ALIASES
-# use arrows to move in history with the same first letters
-bind '"\e[A": history-search-backward'
-bind '"\e[B": history-search-forward'
-# trick: use `cat > /dev/null` to see the input of your keys
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[ -f ~/.bash_aliases ] && . ~/.bash_aliases
 
 alias tup="cd ~/tup"
 alias dot="cd ~/dot_files"
 alias repos="cd ~/repos"
-
 alias ..="cd .."
 alias ...="cd ../.."
 alias cp="cp -iv"
 alias df='df -h'
 alias free='free -m'
 alias du='du -hc'
-alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-
+alias psgrep="pgrep -af"
+alias grep='grep --color=auto'
 alias nocomment="grep -Ev '^[[:space:]]*(#|$)'"
-alias tree="find . -not -path './.git*' -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
+command -v tree >/dev/null || alias tree="find . -not -path './.git*' -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'"
+ll() { command ls -lAhFv --color=always --time-style=long-iso "$@" | less -R -X -F; }
+mkcd() { mkdir -p -- "$1" && cd -P -- "$1" || return; }
 
-function ll {
-    command ls -lAhFv --color=always --time-style=long-iso "$@" | less -R -X -F
+extract() {
+    [[ -f "$1" ]] || {
+        echo "'$1' is not a valid file" >&2
+        return 1
+    }
+    case "$1" in
+    # tar detects the compression itself
+    *.tar | *.tar.* | *.tgz | *.tbz2 | *.txz | *.tzst) tar xf "$1" ;;
+    *.bz2) bunzip2 "$1" ;;
+    *.gz) gunzip "$1" ;;
+    *.xz) unxz "$1" ;;
+    *.zst) unzstd "$1" ;;
+    *.rar) rar x "$1" ;;
+    *.zip) unzip "$1" ;;
+    *.7z) 7z x "$1" ;;
+    *)
+        echo "'$1' cannot be extracted via extract()" >&2
+        return 1
+        ;;
+    esac
 }
 
-if [ -x /usr/bin/dircolors ]; then
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# 7. GIT INTEGRATION
-export GIT_BASE=main
+alias nv='${EDITOR}'
+alias nvbash='${EDITOR} ~/.bashrc && source ~/.bashrc'
+alias sourcebash='source ~/.bashrc'
+alias snv='sudo ${EDITOR}'
 
 # gd ideas from https://blog.jez.io/cli-code-review/
 current_branch() { git symbolic-ref --short -q HEAD; }
@@ -117,9 +125,11 @@ git_diff_branch() { git diff --stat "$(git merge-base HEAD "${1:-$GIT_BASE}")"; 
 
 git_checkout_fzf() {
     local branch
-    branch=$(git branch --sort=-committerdate --all |
+    # origin/HEAD shows up as plain "origin", so drop it
+    branch=$(git branch --all --sort=-committerdate --format='%(refname:short)' |
+        grep -vx 'origin' |
         fzf --height "90%" --header "CHECKOUT BRANCH" --preview "git diff --color=always {1}" --pointer=">" |
-        sed "s/remotes\/origin\///" | xargs)
+        sed "s#^origin/##")
     [[ -n "$branch" ]] && git checkout "$branch"
 }
 
@@ -131,10 +141,10 @@ alias gdn='git diff --name-only $(git merge-base HEAD "$GIT_BASE")'
 alias gdv='nvim -p $(gdn) +"tabdo Gdiffsplit $(current_branch)"'
 alias gdvf='nvim -p +"tabdo Gdiffsplit $(current_branch)"'
 alias gdb='git_diff_branch'
-alias gdlc="git diff --cached HEAD^" #show diff of last commit
+alias gdlc="git diff --cached HEAD^" #show diff of last commit + staged changes
 alias gc="git commit -m"
 alias gac="git commit -am"
-alias gca="commit -a --amend --no-edit"
+alias gca="git commit -a --amend --no-edit"
 alias gcl="git clone"
 alias ga="git add"
 alias gaa="git add --all"
@@ -150,73 +160,38 @@ alias gp="git pull"
 alias gst="git stash"
 alias gu="git reset HEAD~1 --mixed"
 alias gl="git log --graph --pretty=format:\"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]\" --decorate"
-alias gll="git log --graph --pretty=format:\"%C(yellow)%h %Cred%d %Creset%s%Cblue [%cn - %ar]\" --decorate --numstat" #with files changed
+alias gll="gl --numstat"
 
-# 8. WORKFLOW FUNCTIONS
-alias nv='${EDITOR}'
-alias nvbash='${EDITOR} ~/.bashrc && source ~/.bashrc'
-alias sourcebash='source ~/.bashrc'
-alias snv='sudo ${EDITOR}'
-
-nvf() {
-    local files
-    IFS=$'\n' files=("$(fzf --query="$1" --multi --select-1 --exit-0 --preview "bat --color=always --style=numbers --line-range=:500 {}")")
-    [[ -n "${files[*]}" ]] && ${EDITOR:-vim} "${files[@]}"
-}
-
-cdf() {
-    local dir
-    dir=$(fd . "${1:-$HOME}" --type d | fzf +m)
-    [[ -n "$dir" ]] && cd "$dir" || exit
-}
-
-mkcd() { mkdir -p -- "$1" && cd -P -- "$1" || exit; }
-
-extract() {
-    if [[ -f "$1" ]]; then
-        case "$1" in
-        *.tar.bz2 | *.tbz2) tar xjf "$1" ;;
-        *.tar.gz | *.tgz) tar xzf "$1" ;;
-        *.bz2) bunzip2 "$1" ;;
-        *.rar) rar x "$1" ;;
-        *.gz) gunzip "$1" ;;
-        *.tar) tar xf "$1" ;;
-        *.zip) unzip "$1" ;;
-        *.7z) 7z x "$1" ;;
-        *) echo "'$1' cannot be extracted via extract()" ;;
-        esac
-    else
-        echo "'$1' is not a valid file" >&2
-    fi
-}
-
-if [ -f /etc/os-release ]; then
-    case ${ID_LIKE:-$ID} in
-    debian)
-        [ -r /etc/debian_chroot ] && debian_chroot=$(cat /etc/debian_chroot)
-        PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]sebas\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-        alias up="sudo apt update && sudo apt upgrade && flatpak update"
-        alias clean="sudo apt autoclean && sudo apt autoremove"
-        ;;
-    arch)
-        # pacman + fzf
-        # install
-        alias fuzi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
-        # remove
-        alias fuzr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"
-        # install with yay
-        alias yayi="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
-        # remove with yay
-        alias yayr="yay -Qq | fzf --multi --preview 'yay -Qi {1}' | xargs -ro yay -Rns"
-        ;;
-    esac
+# tab completion for the git aliases (alias:git-subcommand)
+if declare -F __git_complete >/dev/null; then
+    __git_complete g __git_main
+    for a in gd:diff ga:add gb:branch gbd:branch gch:checkout gcb:checkout gP:push gp:pull gst:stash gl:log gll:log; do
+        __git_complete "${a%%:*}" "_git_${a#*:}"
+    done
+    unset a
 fi
 
-[[ -f "$HOME/.bashrc_local" ]] && source "$HOME/.bashrc_local"
+case $(
+    . /etc/os-release 2>/dev/null
+    echo "${ID_LIKE:-$ID}"
+) in
+*debian*)
+    alias up="sudo apt update && sudo apt upgrade && flatpak update"
+    alias clean="sudo apt autoclean && sudo apt autoremove"
+    ;;
+*arch*)
+    # fuzzy install (i) / remove (r) packages with pacman (fuz*) or yay (yay*)
+    alias fuzi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
+    alias fuzr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"
+    alias yayi="yay -Slq | fzf --multi --preview 'yay -Si {1}' | xargs -ro yay -S"
+    alias yayr="yay -Qq | fzf --multi --preview 'yay -Qi {1}' | xargs -ro yay -Rns"
+    ;;
+esac
 
-if [ "$TERM" != "linux" ]; then
+[ -f ~/.bashrc_local ] && . ~/.bashrc_local
+
+if [[ $TERM != linux ]] && command -v starship >/dev/null; then
     eval "$(starship init bash)"
 else
-    unset PROMPT_COMMAND
     PS1='\u@\h:\w\$ '
 fi
